@@ -589,42 +589,42 @@ __WebGLRenderingContext.createTexture = function() {
 
 __WebGLRenderingContext.disable = function(cap) {
 	//@validation
-	return this._context.disable(cap);
+	this._context.disable(cap);
 }
 
 __WebGLRenderingContext.drawArrays = function(mode, first, count) {
 	//@validation	
-	return this._context.drawArrays(mode, first, count);	
+	this._context.drawArrays(mode, first, count);	
 }
 
 __WebGLRenderingContext.drawElements = function(mode, count, type, offset) {
 	//@validation
-	return this._context.drawElements(mode, count, type, offset);
+	this._context.drawElements(mode, count, type, offset);
 }
 
 __WebGLRenderingContext.enable = function(cap) {
 	//@validation
-	return this._context.enable(cap);
+	this._context.enable(cap);
 }
 
 __WebGLRenderingContext.enableVertexAttribArray = function(index) {
 	//@validation
-	return this._context.enableVertexAttribArray(index);
+	this._context.enableVertexAttribArray(index);
 }
 
 __WebGLRenderingContext.framebufferRenderbuffer = function(target, attachment, renderbuffertarget, renderbuffer) {
 	//@validation
-	return this._context.framebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer.object());
+	this._context.framebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer.object());
 }
 
 __WebGLRenderingContext.framebufferTexture2D = function(target, attachment, textarget, texture, level) {
 	//@validation
-	return this._context.framebufferTexture2D(target, attachment, textarget, texture.object(), level);
+	this._context.framebufferTexture2D(target, attachment, textarget, texture.object(), level);
 }
 
 __WebGLRenderingContext.generateMipmap = function(target) {
 	//@validation
-	return this._context.generateMipmap(target);
+	this._context.generateMipmap(target);
 }
 
 __WebGLRenderingContext.getAttribLocation = function(program, name) {
@@ -642,6 +642,11 @@ __WebGLRenderingContext.getShaderParameter = function(shader, pname) {
 	return this._context.getShaderParameter(shader.object(), pname);
 }
 
+__WebGLRenderingContext.getShaderInfoLog = function(shader) {
+	//@validation
+	return this._context.getShaderInfoLog(shader.object());
+}
+
 __WebGLRenderingContext.getUniformLocation = function(program, name) {
 	//@validation
 	var o = new cWebGLUniformLocation(this);
@@ -655,17 +660,17 @@ __WebGLRenderingContext.graphicsContext3D = function() {
 
 __WebGLRenderingContext.linkProgram = function(program) {
 	//@validation
-	return this._context.linkProgram(program.object());
+	this._context.linkProgram(program.object());
 }
 
 __WebGLRenderingContext.pixelStorei = function(pname, param) {
 	//@validation
-	return this._context.pixelStorei(pname, param);
+	this._context.pixelStorei(pname, param);
 }
 
 __WebGLRenderingContext.renderbufferStorage = function(target, internalformat, width, height) {
 	//@validation
-	return this._context.renderbufferStorage(target, internalformat, width, height);
+	this._context.renderbufferStorage(target, internalformat, width, height);
 }
 
 __WebGLRenderingContext.shaderSource = function(shader, string) {
@@ -675,56 +680,56 @@ __WebGLRenderingContext.shaderSource = function(shader, string) {
 }
 
 __WebGLRenderingContext.texImage2D = function() {
-	return this._context.texImage2D.apply(this._context, arguments);
+	this._context.texImage2D.apply(this._context, arguments);
 }
 
 __WebGLRenderingContext.texParameteri = function(target, pname, param) {
-	return this._context.texParameteri(target, pname, param);
+	this._context.texParameteri(target, pname, param);
 }
 
 __WebGLRenderingContext.uniform1i = function(location, x) {
 	//@validation
-	return this._context.uniform1i(location.object(), x);
+	this._context.uniform1i(location.object(), x);
 }
 
 __WebGLRenderingContext.uniform1f = function(location, x) {
 	//@validation
-	return this._context.uniform1f(location.object(), x);
+	this._context.uniform1f(location.object(), x);
 }
 
 __WebGLRenderingContext.uniform3f = function(location, x, y, z) {
 	//@validation
-	return this._context.uniform3f(location.object(), x, y, z);
+	this._context.uniform3f(location.object(), x, y, z);
 }
 
 __WebGLRenderingContext.uniform3fv = function(location, v) {
 	//@validation
-	return this._context.uniform3fv(location.object(), v);
+	this._context.uniform3fv(location.object(), v);
 }
 
 __WebGLRenderingContext.uniformMatrix3fv = function(location, transpose, value) {
 	//@validation
-	return this._context.uniformMatrix3fv(location.object(), transpose, value);
+	this._context.uniformMatrix3fv(location.object(), transpose, value);
 }
 
 __WebGLRenderingContext.uniformMatrix4fv = function(location, transpose, value) {
 	//@validation
-	return this._context.uniformMatrix4fv(location.object(), transpose, value);
+	this._context.uniformMatrix4fv(location.object(), transpose, value);
 }
 
 __WebGLRenderingContext.useProgram = function(program) {
 	//@validation
-	return this._context.useProgram(program.object());
+	this._context.useProgram(program.object());
 }
 
 __WebGLRenderingContext.vertexAttribPointer = function(idx, size, type, normalized, stride, offset) {
 	//@validation
-	return this._context.vertexAttribPointer(idx, size, type, normalized, stride, offset);
+	this._context.vertexAttribPointer(idx, size, type, normalized, stride, offset);
 }
 
 __WebGLRenderingContext.viewport = function(x, y, width, height) {
 	//@validation
-	return this._context.viewport(x, y, width, height);
+	this._context.viewport(x, y, width, height);
 }
 
 
