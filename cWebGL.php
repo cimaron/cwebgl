@@ -39,29 +39,34 @@ function cWebGLInclude($file) {
 
 function cWebGLIncludeDebug($file) {
 	global $base;
-	echo "include('$base/$file');\n";
+	echo "include('$file');\n";
 }
 
 $include = 'cWebGLInclude';
 
+header('Content-Type: text/javascript');
+
 if ($debug) {
 	?>
 function include(file) {
-	document.write('<scr'+'ipt type="text/javascript" src="'+file+'"></script>');
+	document.write('<scr'+'ipt type="text/javascript" src="<? echo $base; ?>/'+file+'"></script>');
 }
 <?
 	$include .= 'Debug';
 }
 
-
-
 $include('library/pClass/pClass.js');
+$include('cWebGL.js');
 
-//CanvasGL Library
-//$include('library/cnvgl/cnvgl.js');
-//$include('driver/opengl/GraphicsContext3D.js');
-
-$include('drivers/WebGL/GraphicsContext3D.js');
+$cnvGL = true;
+if ($cnvGL) {
+	//CanvasGL Library
+	$include('cnvGL/cnvGL.js');
+	$include('drivers/OpenGL/GraphicsContext3D.js');
+} else {
+	//Passthru Driver
+	$include('drivers/WebGL/GraphicsContext3D.js');
+}
 
 //WebGLInclude('WebGLMath.js');
 //WebGLInclude('typedarray.js');
