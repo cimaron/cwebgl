@@ -1,13 +1,19 @@
 
-function ShaderLinker() {
-	this.construct();
+function ShaderLinker(program_obj) {
+
+	this.program_obj = null;
+
+	this.construct(program_obj);
 }
 
 function __ShaderLinker() {
-	this.ShaderLinker = function() {
+	
+	this.ShaderLinker = function(program_obj) {
+		this.program_obj = program_obj;
+		this.initialize(program_obj);
 	}
 
-	this.initializeProgram = function(program_obj) {
+	this.initialize = function(program_obj) {
 		program_obj.link_status = false;
 
 		program_obj.attribute_locations = program_obj.default_attribute_locations;
@@ -22,15 +28,33 @@ function __ShaderLinker() {
 		program_obj.object_code = null;
 	}
 
-	this.addSymbols = function(locations, symbols) {
+	this.addSymbols = function(symbols) {
 		for (var i = 0; i < symbols.length; i++) {
 			var symbol = symbols[i];
-			if (typeof locations[symbol] == 'undefined') {
+			
+			if (symbol.type == 'attribute') {
+				var locations = this.program_obj.attribute_locations;
+				var list = this.program_obj.attributes;
+				var data = new cnvgl_vertex_attribute(symbol.name, symbol);
+			}
+			if (symbol.type == 'uniform') {
+				var locations = this.program_obj.uniform_locations;
+				var list = this.program_obj.uniforms;
+				var data = new cnvgl_uniform_variable(symbol.name, symbol);
+			}
+			if (symbol.type == 'varying') {
+				var locations = this.program_obj.varying_locations;			
+				var list = this.program_obj.varying;
+				var data = new cnvgl_varying_variable(symbol.name, symbol);
+			}
+
+			if (typeof locations[symbol.name] == 'undefined') {
 				var pos = this.findNewSymbolLocation(locations);
 				if (pos === false) {
-					return false;	
+					return false;
 				}
-				locations[symbol] = pos;
+				locations[symbol.name] = pos;
+				list[pos] = data;
 			}
 		}
 		return true;
@@ -50,37 +74,31 @@ function __ShaderLinker() {
 		return false;
 	}
 
-	this.link = function(program_obj, shader_objs) {
+	this.link = function(shader_objs) {
 
-		var shader;
-
-		if (!program_obj.vertex_object_code) {
-			program_obj.vertex_object_code = '';
+		if (!this.program_obj.vertex_object_code) {
+			this.program_obj.vertex_object_code = '';
 		}
-		if (!program_obj.fragment_object_code) {
-			program_obj.fragment_object_code = '';
+		if (!this.program_obj.fragment_object_code) {
+			this.program_obj.fragment_object_code = '';
 		}
 
 		for (var i in shader_objs) {
-			shader = shader_objs[i];
-			if (!this.addSymbols(program_obj.attribute_locations, shader.attributes)) {
-				return false;	
-			}
-			if (!this.addSymbols(program_obj.uniform_locations, shader.uniforms)) {
-				return false;	
-			}
-			if (!this.addSymbols(program_obj.varying_locations, shader.varying)) {
-				return false;	
+
+			var shader = shader_objs[i];
+			
+			if (!this.addSymbols(shader.symbol_table)) {
+				return false;
 			}
 
 			if (shader.type == GL_VERTEX_SHADER) {
-				program_obj.vertex_object_code += shader.object_code;				
+				this.program_obj.vertex_object_code += shader.object_code;				
 			} else {
-				program_obj.fragment_object_code += shader.object_code;
+				this.program_obj.fragment_object_code += shader.object_code;
 			}
 		}
 
-		program_obj.link_status = true;
+		this.program_obj.link_status = true;
 		return true;
 	}
 }

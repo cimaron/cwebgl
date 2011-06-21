@@ -9,14 +9,11 @@ function cnvgl_shader() {
 	//attached programs
 	this.programs = {};
 
-	//program communication
-	this.uniforms = [];
-	this.attributes = [];
-	this.varying = [];
-
-	this.object_code = null;
-
+	//program communication	
 	this.source = null;
+
+	this.symbol_table = [];
+	this.object_code = null;
 
 	this.construct();
 }

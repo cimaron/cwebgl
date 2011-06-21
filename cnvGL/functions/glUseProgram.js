@@ -34,11 +34,14 @@ function glUseProgram(/*GLuint*/ program) {
 	}
 
 	if (program_obj.vertex_object_code) {
-		cnvgl_state.vertex_executable = eval("function(m) { "+program_obj.vertex_object_code+" ;main();}");
+		program_obj.vertex_executable = eval("function(m) { "+program_obj.vertex_object_code+" ;main();}");
 	}
 
 	if (program_obj.vertex_object_code) {
-		cnvgl_state.vertex_executable = eval("function(m) { "+program_obj.fragment_object_code+" ;main();}");
+		program_obj.vertex_executable = eval("function(m) { "+program_obj.fragment_object_code+" ;main();}");
 	}
+	
+	cnvgl_state.current_program = program_obj;
+	
 }
 

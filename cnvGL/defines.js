@@ -8,6 +8,7 @@ GL_ES_VERSION_2_0                 = 1;
 
 /* ClearBufferMask */
 GL_DEPTH_BUFFER_BIT               = 0x00000100;
+GL_ACCUM_BUFFER_BIT               = 0x00000200;
 GL_STENCIL_BUFFER_BIT             = 0x00000400;
 GL_COLOR_BUFFER_BIT               = 0x00004000;
 
@@ -83,6 +84,8 @@ GL_ARRAY_BUFFER_BINDING           = 0x8894;
 GL_ELEMENT_ARRAY_BUFFER_BINDING   = 0x8895;
 
 GL_STREAM_DRAW                    = 0x88E0;
+GL_STREAM_READ                    = 0x88E1;
+GL_STREAM_COPY                    = 0x88E2;
 GL_STATIC_DRAW                    = 0x88E4;
 GL_DYNAMIC_DRAW                   = 0x88E8;
 
@@ -204,6 +207,7 @@ GL_UNSIGNED_SHORT                 = 0x1403;
 GL_INT                            = 0x1404;
 GL_UNSIGNED_INT                   = 0x1405;
 GL_FLOAT                          = 0x1406;
+GL_DOUBLE                         = 0x140A;
 GL_FIXED                          = 0x140C;
 
 /* PixelFormat */

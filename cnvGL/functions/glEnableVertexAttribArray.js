@@ -8,7 +8,7 @@ function glEnableVertexAttribArray(index) {
 		return;
 	}
 
-	cnvgl_state.enabled_vertex_attrib_arrays[index] = true;
+	cnvgl_state.vertex_attributes[index] = new cnvgl_vertex_attribute();
 }
 
 function glDisableVertexAttribArray(index) {
@@ -19,5 +19,5 @@ function glDisableVertexAttribArray(index) {
 		return;
 	}
 
-	cnvgl_state.enabled_vertex_attrib_arrays[index] = false;
+	cnvgl_state.vertex_attributes[index] = null;
 }

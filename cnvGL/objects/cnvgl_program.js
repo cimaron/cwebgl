@@ -47,6 +47,9 @@ function cnvgl_program() {
 
 	this.vertex_object_code = null;
 	this.fragment_object_code = null;
+	
+	this.vertex_executable = null;
+	this.fragment_executable = null;
 
 	this.construct();
 }

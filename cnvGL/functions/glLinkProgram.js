@@ -24,9 +24,8 @@ function glLinkProgram(/*GLuint*/ program) {
 	//link error conditions:
 	//The number of active attribute variables supported by the implementation has been exceeded.
 
-	var linker = new ShaderLinker();
-	linker.initializeProgram(program_obj);
-	linker.link(program_obj, program_obj.vertex_shaders);
-	linker.link(program_obj, program_obj.fragment_shaders);
+	var linker = new ShaderLinker(program_obj);
+	linker.link(program_obj.vertex_shaders);
+	linker.link(program_obj.fragment_shaders);
 }
 

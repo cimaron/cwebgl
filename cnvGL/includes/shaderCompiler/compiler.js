@@ -1,4 +1,5 @@
 
+
 function ShaderCompiler(type) {
 	this.type = null;
 	this.construct(type);
@@ -60,12 +61,10 @@ void main(void) {
 */
 function defaultFragment(shader_obj) {
 
-	shader_obj.varying = ['vColor'];
-
 	//actual program
 	var program = 
 	"function() {"+
-	"	gl_FragColor = vColor;"+
+	"	gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);"+
 	"}";
 	shader_obj.object_code = program;
 	shader_obj.compile_status = true;
@@ -75,29 +74,29 @@ function defaultFragment(shader_obj) {
 
 /*
 attribute vec3 aVertexPosition;
-attribute vec4 aVertexColor;
 
 uniform mat4 uMVMatrix;
 uniform mat4 uPMatrix;
 
-varying vec4 vColor;
-
 void main(void) {
 	gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-	vColor = aVertexColor;
 }
 */
 function defaultVertex(shader_obj) {
 
-	shader_obj.attributes = ['aVertexPosition', 'aVertexColor'];
-	shader_obj.uniforms = ['uMVMatrix', 'uPMatrix'];
-	shader_obj.varying = ['vColor'];
+	var aVertexPosition = new cnvgl_shader_symbol('attribute', 'vec3', 'aVertexPosition', false);
+	shader_obj.symbol_table.push(aVertexPosition);
+
+	var uMVMatrix = new cnvgl_shader_symbol('uniform', 'mat4', 'uMVMatrix', false);
+	shader_obj.symbol_table.push(aVertexPosition);
+	
+	var uPMatrix = new cnvgl_shader_symbol('uniform', 'mat4', 'uPMatrix', false);
+	shader_obj.symbol_table.push(uPMatrix);
 
 	//program
 	var program = 
 	"function() {"+
 	"	gl_Position = mult4x4(mult4x4(uPMatrix, uMVMatrix), vec4(aVertexPosition, 1.0));"+
-	"	vColor = aVertexColor;"+
 	"}";
 
 	shader_obj.object_code = program;
