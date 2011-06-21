@@ -23,6 +23,7 @@ include('cnvGL/functions/glClearDepth.js');
 include('cnvGL/functions/glCompileShader.js');
 include('cnvGL/functions/glCreateProgram.js');
 include('cnvGL/functions/glCreateShader.js');
+include('cnvGL/functions/glDrawArrays.js');
 include('cnvGL/functions/glEnable.js');
 include('cnvGL/functions/glEnableVertexAttribArray.js');
 include('cnvGL/functions/glGenBuffers.js');

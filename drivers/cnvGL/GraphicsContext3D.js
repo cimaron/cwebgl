@@ -44,18 +44,22 @@ GraphicsContext3D.prototype = __GraphicsContext3D;
 //----------------------------------------------------------------------------------------
 
 __GraphicsContext3D.GraphicsContext3D = function(canvas) {
+	this.context = canvas.getContext('2d');
+
 	//create our cnvGL context here;
-	var width = canvas.width;
-	var height = canvas.height;
+	this.width = canvas.width;
+	this.height = canvas.height;
 
 	cnvgl_state = cnvGLState();
 
 	//initialize frame buffers
-	cnvgl_state.color_buffer = new Uint8Array(width * height * 4);
-	cnvgl_state.depth_buffer = new Float32Array(width * height);
+	//cnvgl_state.color_buffer = new Uint8Array(this.width * this.height * 4);
+	this.buffer = this.context.createImageData(this.width, this.height);
+	cnvgl_state.color_buffer = this.buffer.data;
+	cnvgl_state.depth_buffer = new Float32Array(this.width * this.height);
 
 	//initialize state
-	glClearColor(0, 0, 0, 0);
+	glClearColor(0, 0, 0, 255);
 	glClearDepth(1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
@@ -78,6 +82,7 @@ __GraphicsContext3D.bufferData = function(target, data, usage) {
 }
 
 __GraphicsContext3D.clear = function(mask) {
+	this.setRedraw();
 	glClear(mask);
 }
 
@@ -101,6 +106,10 @@ __GraphicsContext3D.createProgram = function() {
 
 __GraphicsContext3D.createShader = function(type) {
 	return glCreateShader(type);
+}
+
+__GraphicsContext3D.drawArrays = function(mode, first, count) {
+	glDrawArrays(mode, first, count);
 }
 
 __GraphicsContext3D.enable = function(cap) {
@@ -162,3 +171,16 @@ __GraphicsContext3D.viewport = function(x, y, width, height) {
 	glViewport(x, y, width, height);
 }
 
+//private:
+__GraphicsContext3D.setRedraw = function() {
+	this.redrawing = true;
+	var This = this;
+	setTimeout(function() { This.redraw(); }, 0);
+}
+
+__GraphicsContext3D.redraw = function() {
+	if (this.redrawing) {
+		this.context.putImageData(this.buffer, 0, 0);
+		this.redrawing = false;
+	}
+}
