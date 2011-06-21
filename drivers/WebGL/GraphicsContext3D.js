@@ -57,8 +57,8 @@ __GraphicsContext3D.attachShader = function(program, shader) {
 	this._context.attachShader(program, shader);
 }
 
-__GraphicsContext3D.bindBuffer = function(type, buffer) {
-	this._context.bindBuffer(type, buffer);
+__GraphicsContext3D.bindBuffer = function(target, buffer) {
+	this._context.bindBuffer(target, buffer);
 }
 
 __GraphicsContext3D.bindFramebuffer = function(type, framebuffer) {
@@ -226,7 +226,7 @@ __GraphicsContext3D.vertexAttribPointer = function(idx, size, type, normalized, 
 }
 
 __GraphicsContext3D.viewport = function(x, y, width, height) {
-	return this._context.viewport(x, y, width, height);
+	this._context.viewport(x, y, width, height);
 }
 
 

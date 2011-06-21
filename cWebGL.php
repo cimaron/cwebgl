@@ -62,7 +62,7 @@ $cnvGL = true;
 if ($cnvGL) {
 	//CanvasGL Library
 	$include('cnvGL/cnvGL.js');
-	$include('drivers/OpenGL/GraphicsContext3D.js');
+	$include('drivers/cnvGL/GraphicsContext3D.js');
 } else {
 	//Passthru Driver
 	$include('drivers/WebGL/GraphicsContext3D.js');
