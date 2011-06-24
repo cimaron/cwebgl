@@ -105,9 +105,10 @@ function defaultFragment(shader_obj) {
 
 	//actual program
 	var program = 
-	"function(__data) {"+
+	"var main = function(__initialize) { "+
+	"	__data = __initialize;"+
 	"	__data.gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);"+
-	"}";
+	"};";
 	shader_obj.object_code = program;
 	shader_obj.compile_status = true;
 }
@@ -137,9 +138,10 @@ function defaultVertex(shader_obj) {
 
 	//program
 	var program = 
-	"function(__data) {"+
-	"	__data.gl_Position = mult4x4(mult4x4(__data.uPMatrix, __data.uMVMatrix), vec4(__data.aVertexPosition, 1.0));"+
-	"}";
+	"var main = function(__initialize) { \n"+
+	"	__data = __initialize;\n"+
+	"	__data.gl_Position = mult4x4(mult4x4(__data.uPMatrix, __data.uMVMatrix), vec4(__data.aVertexPosition, 1.0));\n"+
+	"};\n";
 
 	shader_obj.object_code = program;
 	shader_obj.compile_status = true;

@@ -76,26 +76,31 @@ __ShaderLinker.link = function(shader_objs, type) {
 		ex = 'fragment_executable';
 	}
 
-	this.program_obj[oc] = '';
-
-	for (var i in shader_objs) {
-
-		var shader = shader_objs[i];
-
-		if (!this.addSymbols(shader.symbol_table)) {
-			return false;
-		}
-
-		this.program_obj[oc] += shader.object_code;				
-	}
-
-	this.program_obj[oc] += shader.object_code;
-	this.program_obj[ex] = eval(this.program_obj[oc]);
+	this.program_obj[oc] = this.buildObjectCode(shader_objs);
+	this.program_obj[ex] = this.buildExecutable(this.program_obj[oc]);
 
 	this.program_obj.link_status = true;
 	return true;
 }
 
+__ShaderLinker.buildObjectCode = function(shader_objs) {
+	var out = '';
+	for (var i in shader_objs) {
+		var shader = shader_objs[i];
+		if (!this.addSymbols(shader.symbol_table)) {
+			return false;
+		}
+		out += shader.object_code;
+	}
+	out += this._includeObjectCode();
+	return out;
+}
+
+__ShaderLinker.buildExecutable = function(__object_code) {
+	var __data;
+	eval(__object_code);
+	return main;
+}
 
 __ShaderLinker.addSymbols = function(symbols) {
 	for (var i = 0; i < symbols.length; i++) {
@@ -144,4 +149,13 @@ __ShaderLinker.findNewSymbolLocation = function(list) {
 	return false;
 }
 
+//private:
+
+__ShaderLinker._includeObjectCode = function() {
+	var include = 
+	"var mult4x4 = function(a, b) {\n"+
+	"	return mat4.multiply(a, b, [])\n"+
+	"};\n";
+	return include;
+}
 
