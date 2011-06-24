@@ -27,20 +27,8 @@ function glAttachShader(/*GLuint*/ program, /*GLuint*/ shader) {
 		return;
 	}
 
-	var attach;
-	if (shader_obj.type == GL_FRAGMENT_SHADER) {
-		attach = program_obj.fragment_shaders;
-	} else {
-		attach = program_obj.vertex_shaders;
-	}
+	program_obj.attached_shaders.push(shader);	
+	program_obj.attached_shaders_count++;
 	
-	if (attach[shader]) {
-		cnvgl_throw_error(GL_INVALID_OPERATION);
-		return;			
-	}
-	
-	//be careful with garbage collection (circular reference, need to clean up on destruct)
-	attach[shader] = shader_obj;
-	shader_obj.programs[program] = program_obj;
 }
 

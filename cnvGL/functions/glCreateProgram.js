@@ -13,7 +13,8 @@ function glCreateProgram() {
 	var program = new cnvgl_program();
 
 	cnvgl_objects.push(program);
-	var ref = cnvgl_objects.length - 1;
-	return ref;
+	program.name = cnvgl_objects.length - 1;
+	
+	return program.name;
 }
 

@@ -33,15 +33,9 @@ function glUseProgram(/*GLuint*/ program) {
 		return;
 	}
 
-	if (program_obj.vertex_object_code) {
-		program_obj.vertex_executable = eval("function(m) { "+program_obj.vertex_object_code+" ;main();}");
-	}
-
-	if (program_obj.vertex_object_code) {
-		program_obj.vertex_executable = eval("function(m) { "+program_obj.fragment_object_code+" ;main();}");
-	}
-	
 	cnvgl_state.current_program = program_obj;
 	
+	cnvgl_state.vertex_processor.setProgram(program_obj.executable);
+
 }
 

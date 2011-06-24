@@ -22,16 +22,16 @@ function glGetShaderiv(/*GLuint*/ shader, /*GLenum*/ pname, /*GLint* */ params) 
 			params[0] = shader_obj.type;
 			break;
 		case GL_DELETE_STATUS:
-			params[0] = shader_obj.deleting ? GL_TRUE : GL_FALSE;
+			params[0] = shader_obj.delete_status ? GL_TRUE : GL_FALSE;
 			break;
 		case GL_COMPILE_STATUS:
 			params[0] = shader_obj.compile_status ? GL_TRUE : GL_FALSE;
 			break;
 		case GL_INFO_LOG_LENGTH:
-			params[0] = shader_obj.info_log.length;
+			params[0] = shader_obj.information_log_length;
 			break;
 		case GL_SHADER_SOURCE_LENGTH:
-			params[0] = shader_obj.source.length;
+			params[0] = shader_obj.shader_string_length;
 			break;
 		default:
 			cnvgl_throw_error(GL_INVALID_ENUM);

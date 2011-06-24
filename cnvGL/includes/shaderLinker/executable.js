@@ -19,27 +19,19 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+//----------------------------------------------------------------------------------------
+//	class ShaderLinkerExecutable
+//----------------------------------------------------------------------------------------
 
-/*void*/
-function glEnableVertexAttribArray(/*GLuint*/ index) {
+function ShaderLinkerExecutable() {
 
-	//out of bounds
-	if (index > cnvgl_device.GL_MAX_VERTEX_ATTRIBS - 1 || index < 0) {
-		cnvgl_throw_error(GL_INVALID_VALUE);
-		return;
-	}
-
-	//cnvgl_state.current_program.vertex_attributes[index] = new cnvgl_vertex_attribute();
+	//used in compilation/communication with GL
+	this.symbol_table = {};
+	this.object_code = '';
+	
+	//actual program
+	this.data = null;
+	this.vertex_entry = null;
+	this.fragment_entry = null;
 }
 
-/*void*/
-function glDisableVertexAttribArray(/*GLuint*/ index) {
-
-	//out of bounds
-	if (index > cnvgl_device.GL_MAX_VERTEX_ATTRIBS - 1 || index < 0) {
-		cnvgl_throw_error(GL_INVALID_VALUE);
-		return;
-	}
-
-	//cnvgl_state.vertex_attributes[index] = null;
-}

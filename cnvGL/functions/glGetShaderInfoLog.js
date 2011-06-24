@@ -27,7 +27,7 @@ function glGetShaderInfoLog(/*GLuint*/ shader, /*GLsizei*/ maxLength, /*GLsizei*
 		return 0;
 	} */
 
-	var log = shader_obj.info_log;
+	var log = shader_obj.information_log;
 	
 	if (maxLength && maxLength < log.length) {
 		log = log.substring(0, maxLength);

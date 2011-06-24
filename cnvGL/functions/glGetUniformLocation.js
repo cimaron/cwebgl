@@ -27,10 +27,13 @@ function glGetUniformLocation(/*GLuint*/ program, name) {
 		return;
 	}
 
-	if (typeof program_obj.uniform_locations[name] == 'undefined' || name.indexOf('gl_') === 0) {
-		return -1;
+	var t = program_obj.active_uniforms;
+	for (var i = 0; i < program_obj.active_uniforms_count; i++) {
+		if (t[i].name == name) {
+			return t[i].location;
+		}
 	}
-	
-	return program_obj.uniform_locations[name];
+
+	return -1;
 }
 

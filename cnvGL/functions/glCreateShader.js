@@ -16,7 +16,8 @@ function glCreateShader(/*GLenum*/ shaderType) {
 	shader.type = shaderType;
 
 	cnvgl_objects.push(shader);
-	var ref = cnvgl_objects.length - 1;
-	return ref;
+	shader.name = cnvgl_objects.length - 1;
+	
+	return shader.name;
 }
 

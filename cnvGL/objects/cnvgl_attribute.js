@@ -20,26 +20,22 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-/*void*/
-function glEnableVertexAttribArray(/*GLuint*/ index) {
+function cnvgl_attribute(definition) {
 
-	//out of bounds
-	if (index > cnvgl_device.GL_MAX_VERTEX_ATTRIBS - 1 || index < 0) {
-		cnvgl_throw_error(GL_INVALID_VALUE);
-		return;
-	}
+	//state
+	this.location = 0;
+	this.size = 4;
+	this.type = GL_FLOAT;
+	this.name = definition.name;
 
-	//cnvgl_state.current_program.vertex_attributes[index] = new cnvgl_vertex_attribute();
+	//custom state
+	this.definition = definition;
+	
+	//should we keep these??
+	this.enabled = false;
+	this.index = null;
+	this.normalized = GL_FALSE;
+	this.stride = 0;
+	this.offset = 0;
 }
 
-/*void*/
-function glDisableVertexAttribArray(/*GLuint*/ index) {
-
-	//out of bounds
-	if (index > cnvgl_device.GL_MAX_VERTEX_ATTRIBS - 1 || index < 0) {
-		cnvgl_throw_error(GL_INVALID_VALUE);
-		return;
-	}
-
-	//cnvgl_state.vertex_attributes[index] = null;
-}

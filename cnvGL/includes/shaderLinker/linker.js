@@ -23,13 +23,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //	class ShaderLinker
 //----------------------------------------------------------------------------------------
 
-function ShaderLinker(program_obj) {
+function ShaderLinker() {
 
 	//member variables:
-	this.program_obj = null;
 
 	//Call constructor
-	this.construct(program_obj);
+	this.construct();
 }
 
 //----------------------------------------------------------------------------------------
@@ -43,119 +42,51 @@ ShaderLinker.prototype = __ShaderLinker;
 //	Methods
 //----------------------------------------------------------------------------------------
 
-__ShaderLinker.ShaderLinker = function(program_obj) {
-	this.program_obj = program_obj;
-	this.initialize(program_obj);
+__ShaderLinker.ShaderLinker = function() {
+	this.executable = new ShaderLinkerExecutable();
+	this.object_code = [];
+	
+	var include = new ShaderCompilerObject();
+	include.object_code = 
+	"var mult4x4 = function(a, b) {\n"+
+	"	return mat4.multiply(a, b, [])\n"+
+	"};\n";
+	
+	this.addObjectCode(include);
 }
 
 //public:
 
-__ShaderLinker.initialize = function(program_obj) {
-	program_obj.link_status = false;
-
-	program_obj.attribute_locations = program_obj.default_attribute_locations;
-	program_obj.attributes = new Array(program_obj.max_attributes);
-
-	program_obj.uniform_locations = {};
-	program_obj.uniforms = new Array(program_obj.max_uniforms);
-
-	program_obj.varying_locations = {};
-	program_obj.varying = new Array(program_obj.max_varying);
+__ShaderLinker.addObjectCode = function(shader_obj) {
+	this.object_code.push(shader_obj);
 }
 
-
-__ShaderLinker.link = function(shader_objs, type) {
-
-	var oc, ex;
-
-	if (type == GL_VERTEX_SHADER) {
-		oc = 'vertex_object_code';
-		ex = 'vertex_executable';
-	} else {
-		oc = 'fragment_object_code';
-		ex = 'fragment_executable';
+__ShaderLinker.link = function() {
+	
+	for (var i = 0; i < this.object_code.length; i++) {
+		this.executable.object_code += this.object_code[i].object_code;
+		this.addSymbols(this.object_code[i].symbol_table);
 	}
 
-	this.program_obj[oc] = this.buildObjectCode(shader_objs);
-	this.program_obj[ex] = this.buildExecutable(this.program_obj[oc]);
+	var code = this.buildExecutable(this.executable.object_code);
+	this.executable.vertex_entry = code.vertex_entry;
+	this.executable.fragment_entry = code.fragment_entry;
 
-	this.program_obj.link_status = true;
-	return true;
-}
-
-__ShaderLinker.buildObjectCode = function(shader_objs) {
-	var out = '';
-	for (var i in shader_objs) {
-		var shader = shader_objs[i];
-		if (!this.addSymbols(shader.symbol_table)) {
-			return false;
-		}
-		out += shader.object_code;
-	}
-	out += this._includeObjectCode();
-	return out;
+	return this.executable;
 }
 
 __ShaderLinker.buildExecutable = function(__object_code) {
 	var __data;
 	eval(__object_code);
-	return main;
+	return {vertex_entry : __vertexEntry, fragment_entry : __fragmentEntry};
 }
 
 __ShaderLinker.addSymbols = function(symbols) {
-	for (var i = 0; i < symbols.length; i++) {
-		var symbol = symbols[i];
-		
-		if (symbol.type == 'attribute') {
-			var locations = this.program_obj.attribute_locations;
-			var list = this.program_obj.attributes;
-			var data = new cnvgl_vertex_attribute(symbol.name, symbol);
-		}
-		if (symbol.type == 'uniform') {
-			var locations = this.program_obj.uniform_locations;
-			var list = this.program_obj.uniforms;
-			var data = new cnvgl_uniform_variable(symbol.name, symbol);
-		}
-		if (symbol.type == 'varying') {
-			var locations = this.program_obj.varying_locations;			
-			var list = this.program_obj.varying;
-			var data = new cnvgl_varying_variable(symbol.name, symbol);
-		}
-
-		if (typeof locations[symbol.name] == 'undefined') {
-			var pos = this.findNewSymbolLocation(locations);
-			if (pos === false) {
-				return false;
-			}
-			locations[symbol.name] = pos;
-			list[pos] = data;
-		}
+	//@todo: generate errors for surpassing the maximum allowable amount of each type of variable
+	for (var i in symbols) {
+		this.executable.symbol_table[i] = symbols[i];	
 	}
-	return true;
-}
-
-
-__ShaderLinker.findNewSymbolLocation = function(list) {
-	var found = [];
-	for (var i in list) {
-		found[list[i]] = i;
-	}
-	//don't hardcode here
-	for (var i = 0; i < 32; i++) {
-		if (!found[i]) {
-			return i;	
-		}
-	}
-	return false;
 }
 
 //private:
-
-__ShaderLinker._includeObjectCode = function() {
-	var include = 
-	"var mult4x4 = function(a, b) {\n"+
-	"	return mat4.multiply(a, b, [])\n"+
-	"};\n";
-	return include;
-}
 

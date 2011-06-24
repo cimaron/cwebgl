@@ -27,7 +27,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 function ShaderCompiler(type) {
 
 	//member variables:
-	this.type = null;
+	this.object = null;
 
 	//call constructor
 	this.construct(type);
@@ -44,24 +44,14 @@ ShaderCompiler.prototype = __ShaderCompiler;
 //	Methods
 //----------------------------------------------------------------------------------------
 
-__ShaderCompiler.ShaderCompiler = function(type) {
-	this.type = type;
+__ShaderCompiler.ShaderCompiler = function() {
+	this.object = new ShaderCompilerObject();
 }
 
 //public:
 
-__ShaderCompiler.compile = function(shader_source, shader_obj) {
-	if (this.type == GL_VERTEX_SHADER) {
-		this.result = defaultVertex(shader_obj);
-	} else {
-		this.result = defaultFragment(shader_obj);
-	}
-	return true;
-}
-
 /*
-
-__ShaderCompiler._compile = function() {
+__ShaderCompiler.compile = function() {
 	//preprocess
 	var pp = new ShaderCompilerPreprocessor();
 	processed_source = pp.preprocess(shader_source);
@@ -90,6 +80,24 @@ __ShaderCompiler._compile = function() {
 //	They will be removed and replaced when the actual compiler is built
 //----------------------------------------------------------------------------------------
 
+__ShaderCompiler.compile = function(shader_source) {
+	this.defaultSymbols();
+	if (shader_source.indexOf('gl_Position') != -1) {
+		this.defaultVertex();		
+	} else {
+		this.defaultFragment();
+	}
+	return this.object;
+}
+
+
+__ShaderCompiler.defaultSymbols = function() {
+	var symbol_table = this.object.symbol_table;
+	symbol_table['gl_Position'] = new ShaderCompilerSymbol('attribute', 'vec4', 'gl_Position', false);
+	symbol_table['gl_FragColor'] = new ShaderCompilerSymbol('attribute', 'vec4', 'gl_FragColor', false);
+}
+
+
 /*
 #ifdef GL_ES
 	precision highp float;
@@ -101,18 +109,17 @@ void main(void) {
 	gl_FragColor = vColor;
 }	
 */
-function defaultFragment(shader_obj) {
+__ShaderCompiler.defaultFragment = function() {
+	var symbol_table = this.object.symbol_table;
 
 	//actual program
 	var program = 
-	"var main = function(__initialize) { "+
+	"var __fragmentEntry = function(__initialize) { "+
 	"	__data = __initialize;"+
 	"	__data.gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);"+
 	"};";
-	shader_obj.object_code = program;
-	shader_obj.compile_status = true;
+	this.object.object_code = program;
 }
-
 
 
 /*
@@ -125,24 +132,19 @@ void main(void) {
 	gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
 }
 */
-function defaultVertex(shader_obj) {
+__ShaderCompiler.defaultVertex = function() {
+	var symbol_table = this.object.symbol_table;
 
-	var aVertexPosition = new cnvgl_shader_symbol('attribute', 'vec3', 'aVertexPosition', false);
-	shader_obj.symbol_table.push(aVertexPosition);
-
-	var uMVMatrix = new cnvgl_shader_symbol('uniform', 'mat4', 'uMVMatrix', false);
-	shader_obj.symbol_table.push(aVertexPosition);
-	
-	var uPMatrix = new cnvgl_shader_symbol('uniform', 'mat4', 'uPMatrix', false);
-	shader_obj.symbol_table.push(uPMatrix);
+	symbol_table['aVertexPosition'] = new ShaderCompilerSymbol('attribute', 'vec3', 'aVertexPosition', false);
+	symbol_table['uMVMatrix'] = new ShaderCompilerSymbol('uniform', 'mat4', 'uMVMatrix', false);
+	symbol_table['uPMatrix'] = new ShaderCompilerSymbol('uniform', 'mat4', 'uPMatrix', false);
 
 	//program
 	var program = 
-	"var main = function(__initialize) { \n"+
+	"var __vertexEntry = function(__initialize) { \n"+
 	"	__data = __initialize;\n"+
 	"	__data.gl_Position = mult4x4(mult4x4(__data.uPMatrix, __data.uMVMatrix), vec4(__data.aVertexPosition, 1.0));\n"+
 	"};\n";
 
-	shader_obj.object_code = program;
-	shader_obj.compile_status = true;
+	this.object.object_code = program;
 }

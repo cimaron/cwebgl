@@ -21,7 +21,7 @@ function glGetProgramiv(/*GLuint*/ program, /*GLenum*/ pname, /*GLint* */ params
 	switch (pname) {
 
 		case GL_DELETE_STATUS:
-			params[0] = program_obj.deleting ? GL_TRUE : GL_FALSE;
+			params[0] = program_obj.delete_status ? GL_TRUE : GL_FALSE;
 			break;
 		
 		case GL_LINK_STATUS:
@@ -33,47 +33,38 @@ function glGetProgramiv(/*GLuint*/ program, /*GLenum*/ pname, /*GLint* */ params
 			break;
 		
 		case GL_INFO_LOG_LENGTH:
-			params[0] = program_obj.info_log.length;
+			params[0] = program_obj.information_log_length;
 			break;
 
 		case GL_ATTACHED_SHADERS:
-			params[0] = 0;
-			for (var i in program_obj.vertex_shaders) {
-				params[0]++;
-			}
-			for (var i in program_obj.fragment_shaders) {
-				params[0]++;
-			}
+			params[0] = program_obj.attached_shaders_count;
 			break;
 		
 		case GL_ACTIVE_ATTRIBUTES:
 			params[0] = 0;
-			for (var i in program_obj.attribute_locations) {
-				params[0]++;
-			}
+			params[0] = program_obj.active_attributes_count;
 			break;
 
 		case GL_ACTIVE_ATTRIBUTE_MAX_LENGTH:
 			params[0] = 0;
-			for (var i in program_obj.attribute_locations) {
-				if (params[0] < i.length) {
-					params[0] = i.length;
+			var t = program_obj.active_attributes;
+			for (var i = 0; i < program_obj.active_attributes_count; i++) {
+				if (params[0] < t[i].name.length) {
+					params[0] = t[i].name.length;	
 				}
 			}
 			break;
 		
 		case GL_ACTIVE_UNIFORMS:
-			params[0] = 0;
-			for (var i in program_obj.uniform_locations) {
-				params[0]++;
-			}		
+			params[0] = program_obj.active_uniforms_count;
 			break;
 
 		case GL_ACTIVE_UNIFORM_MAX_LENGTH:
 			params[0] = 0;
-			for (var i in program_obj.uniform_locations) {
-				if (params[0] < i.length) {
-					params[0] = i.length;
+			var t = program_obj.active_uniforms;
+			for (var i = 0; i < program_obj.active_uniforms_count; i++) {
+				if (params[0] < t[i].name.length) {
+					params[0] = t[i].name.length;	
 				}
 			}
 			break;

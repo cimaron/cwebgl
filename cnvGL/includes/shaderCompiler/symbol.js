@@ -20,26 +20,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-/*void*/
-function glEnableVertexAttribArray(/*GLuint*/ index) {
+//----------------------------------------------------------------------------------------
+//	class ShaderCompilerSymbol
+//----------------------------------------------------------------------------------------
 
-	//out of bounds
-	if (index > cnvgl_device.GL_MAX_VERTEX_ATTRIBS - 1 || index < 0) {
-		cnvgl_throw_error(GL_INVALID_VALUE);
-		return;
-	}
-
-	//cnvgl_state.current_program.vertex_attributes[index] = new cnvgl_vertex_attribute();
+function ShaderCompilerSymbol(type, data_type, name, pointer) {
+	this.type = type;
+	this.data_type = data_type;
+	this.name = name;
+	this.pointer = pointer ? true : false;
 }
 
-/*void*/
-function glDisableVertexAttribArray(/*GLuint*/ index) {
-
-	//out of bounds
-	if (index > cnvgl_device.GL_MAX_VERTEX_ATTRIBS - 1 || index < 0) {
-		cnvgl_throw_error(GL_INVALID_VALUE);
-		return;
-	}
-
-	//cnvgl_state.vertex_attributes[index] = null;
-}

@@ -30,6 +30,7 @@ function glShaderSource(/*GLuint*/ shader, count, string, length) {
 	//if between glbegin and glend
 	//cnvgl_throw_error(GL_INVALID_OPERATION);
 
-	shader_obj.source = string.join();
+	shader_obj.shader_string = string.join();
+	shader_obj.shader_string_length = shader_obj.shader_string.length;
 }
 

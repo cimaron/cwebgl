@@ -1,55 +1,48 @@
+/*
+Copyright (c) 2011 Cimaron Shanahan
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
 
 function cnvgl_program() {
 
-	//status markers
-	this.deleting = null;
+	//state
+	this.name = 0;
+	this.delete_status = GL_FALSE;
 	this.link_status = null;
 	this.validate_status = null;
-	this.info_log = '';
+	this.information_log = '';
+	this.information_log_length = 0;
 
-	//attached shaders
-	this.vertex_shaders = {};
-	this.fragment_shaders = {};
+	//shaders
+	this.attached_shaders_count = 0;
+	this.attached_shaders = [];
 
-	//arbitrary value (doesn't really matter in software mode)
-	this.max_attributes = cnvgl_device.GL_MAX_VERTEX_ATTRIBS;
-	this.max_uniforms = 32;
-	this.max_varying = 32;
-
-	//corresponds to nVidia implementation
-	this.default_attribute_locations = {
-		gl_Vertex			: 0,
-		gl_Normal			: 2,
-		gl_Color			: 3,
-		gl_SecondaryColor	: 4,
-		gl_FogCoord			: 5,
-		gl_MultiTexCoord0	: 8,
-		gl_MultiTexCoord1	: 9,
-		gl_MultiTexCoord2	: 10,
-		gl_MultiTexCoord3	: 11,
-		gl_MultiTexCoord4	: 12,
-		gl_MultiTexCoord5	: 13,
-		gl_MultiTexCoord6	: 14,
-		gl_MultiTexCoord7	: 15
-	};
-
-	//shader communication
-	this.uniform_locations = {
-	};
-	this.uniforms = new Array(this.max_uniforms);
-
-	this.attribute_locations = this.default_attribute_locations;
-	this.attributes = new Array(this.max_attributes);
-
-	this.varying_locations = {
-	};
-	this.varying = new Array(this.max_varying);
-
-	this.vertex_object_code = null;
-	this.fragment_object_code = null;
 	
-	this.vertex_executable = null;
-	this.fragment_executable = null;
+	//uniforms
+	this.active_uniforms_count = 0;
+	this.active_uniforms = [];
+	this.active_uniforms_values = [];
+
+	//attributes
+	this.active_attributes_count = 0;
+	this.active_attributes = [];
 
 	this.construct();
 }

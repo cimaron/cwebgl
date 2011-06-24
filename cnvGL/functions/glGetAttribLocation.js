@@ -27,10 +27,13 @@ function glGetAttribLocation(/*GLuint*/ program, name) {
 		return;		
 	}
 
-	if (typeof program_obj.attribute_locations[name] == 'undefined' || name.indexOf('gl_') === 0) {
-		return -1;
+	var t = program_obj.active_attributes;
+	for (var i = 0; i < program_obj.active_attributes_count; i++) {
+		if (t[i].name == name) {
+			return t[i].location;
+		}
 	}
-	
-	return program_obj.attribute_locations[name];
+
+	return -1;
 }
 

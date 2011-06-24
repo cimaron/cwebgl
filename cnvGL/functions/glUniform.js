@@ -12,7 +12,7 @@ function __glUniform(location, count, transpose, value, _size, _integer, _vector
 		return;
 	}
 
-	if (location != -1 && location < 0 && location >= current_program.uniforms.length) {
+	if (location != -1 && location < 0 && location >= current_program.active_uniforms_count) {
 		cnvgl_throw_error(GL_INVALID_OPERATION);
 		return;
 	}
@@ -22,7 +22,7 @@ function __glUniform(location, count, transpose, value, _size, _integer, _vector
 		return;
 	}
 
-	var uniform_variable = current_program.uniforms[location];
+	var uniform_obj = current_program.active_uniforms[location];
 
 	var itypes = ['int', 'ivec2', 'ivec3', 'ivec4'];
 	var ftypes = ['float', 'vec2', 'vec3', 'vec4', 'mat4'];
@@ -32,8 +32,8 @@ function __glUniform(location, count, transpose, value, _size, _integer, _vector
 	}
 	
 	//@todo: check for "or an array of these"
-	if ((_integer && itypes.indexOf(uniform_variable.definition.data_type) == -1) ||
-		(!_integer && ftypes.indexOf(uniform_variable.definition.data_type) == -1)) {
+	if ((_integer && itypes.indexOf(uniform_obj.definition.data_type) == -1) ||
+		(!_integer && ftypes.indexOf(uniform_obj.definition.data_type) == -1)) {
 		cnvgl_throw_error(GL_INVALID_OPERATION);
 		return;
 	}
@@ -51,7 +51,8 @@ function __glUniform(location, count, transpose, value, _size, _integer, _vector
 	} */
 
 	//@todo: fix this cheat!
-	uniform_variable.data = value;
+	
+	current_program.active_uniforms_values[location] = value;
 
 }
 

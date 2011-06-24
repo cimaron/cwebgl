@@ -21,10 +21,19 @@ function glCompileShader(/*GLuint*/ shader) {
 		return;
 	}
 
+	shader_obj.compile_status = GL_FALSE;
+	shader_obj.information_log = '';
+	shader_obj.information_log_length = 0;
+
 	//get source
-	var shader_source = shader_obj.source;
+	var shader_string = shader_obj.shader_string;
 	
-	var compiler = new ShaderCompiler(shader_obj.type);
-	compiler.compile(shader_source, shader_obj);
+	var compiler = new ShaderCompiler();
+	var object_code = compiler.compile(shader_string);
+	if (object_code) {
+		shader_obj.compile_status = GL_TRUE;
+		shader_obj.object_code = object_code;
+	}
+
 }
 
