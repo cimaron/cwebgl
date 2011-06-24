@@ -50,13 +50,14 @@ __GraphicsContext3D.GraphicsContext3D = function(canvas) {
 	this.width = canvas.width;
 	this.height = canvas.height;
 
-	cnvgl_state = cnvGLState();
+	var cnvgl_ctx = cnvgl_context.getCurrentContext();
 
 	//initialize frame buffers
 	//cnvgl_state.color_buffer = new Uint8Array(this.width * this.height * 4);
 	this.buffer = this.context.createImageData(this.width, this.height);
-	cnvgl_state.color_buffer = this.buffer.data;
-	cnvgl_state.depth_buffer = new Float32Array(this.width * this.height);
+
+	cnvgl_ctx.color_buffer = this.buffer.data;
+	cnvgl_ctx.depth_buffer = new Float32Array(this.width * this.height);
 
 	//initialize state
 	glClearColor(0, 0, 0, 255);
@@ -96,8 +97,8 @@ __GraphicsContext3D.compileShader = function(shader) {
 
 __GraphicsContext3D.createBuffer = function() {
 	var buffers = [];
-	glGenBuffers(1, buffers);
-	return buffers[0];
+	glGenBuffers(1, buffers);	
+	return buffers[0][0];
 }
 
 __GraphicsContext3D.createProgram = function() {
