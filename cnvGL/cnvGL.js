@@ -1,5 +1,6 @@
 
 include('cnvGL/defines.js');
+include('cnvGL/constants.js');
 
 include('cnvGL/objects/cnvgl_attribute.js');
 include('cnvGL/objects/cnvgl_buffer.js');
@@ -53,11 +54,6 @@ function cnvgl_throw_error(error_code) {
 	if (!cnvgl_state.current_error_code) {
 		cnvgl_state.current_error_code = error_code;
 	}
-}
-
-cnvgl_device = {
-	GL_MAX_VERTEX_ATTRIBS : 16,
-	GL_MAX_FRAGMENT_UNIFORM_COMPONENTS : 64
 }
 
 cnvgl_objects = [0];

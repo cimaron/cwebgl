@@ -1,0 +1,6 @@
+
+cnvgl_const = {
+	GL_MAX_VERTEX_ATTRIBS : 16,
+	GL_MAX_FRAGMENT_UNIFORM_COMPONENTS : 64
+}
+

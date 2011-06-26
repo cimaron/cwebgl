@@ -43,17 +43,25 @@ function cnvgl_context() {
 
 	this.current_program = null;
 
+	this.vertex_attrib_arrays = [];
+
 	//Shaders	
 }
 
 cnvgl_context.getCurrentContext = function() {
 	if (!window.cnvgl_state) {
 		cnvgl_state = new cnvgl_context();	
-		cnvgl_state.enabled[GL_DEPTH_TEST] = GL_TRUE;
-		cnvgl_state.bound_buffers[GL_ARRAY_BUFFER] = 0;
-		cnvgl_state.bound_buffers[GL_ELEMENT_ARRAY_BUFFER] = 0;		
-		cnvgl_state.vertex_processor = new cnvgl_vertex_processor();
+		cnvgl_contxt.initialize(cnvgl_state);
 	}
 	return cnvgl_state;
 }
+
+cnvgl_context.initialize(ctx) {
+	ctx.enabled[GL_DEPTH_TEST] = GL_TRUE;
+	ctx.bound_buffers[GL_ARRAY_BUFFER] = 0;
+	ctx.bound_buffers[GL_ELEMENT_ARRAY_BUFFER] = 0;		
+	ctx.vertex_processor = new cnvgl_vertex_processor();		
+}
+
+
 

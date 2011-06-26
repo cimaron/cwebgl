@@ -32,13 +32,13 @@ function glGetIntegerv(pname, params) {
 function __glGet(pname, params) {
 	switch (pname) {
 		case GL_MAX_VERTEX_ATTRIBS:
-			params[0] = cnvgl_device.GL_MAX_VERTEX_ATTRIBS;
+			params[0] = cnvgl_const.GL_MAX_VERTEX_ATTRIBS;
 			return;
 		case GL_MAX_FRAGMENT_UNIFORM_COMPONENTS:
-			params[0] = cnvgl_device.GL_MAX_FRAGMENT_UNIFORM_COMPONENTS;
+			params[0] = cnvgl_const.GL_MAX_FRAGMENT_UNIFORM_COMPONENTS;
 			return;
 		case GL_MAX_VIEWPORT_DIMS:
-			//use width and height of canvas context (possibly initialized in cnvgl_device)
+			//use width and height of canvas context (possibly initialized in cnvgl_const)
 
 		default:
 			console.log('todo: __glGet', pname);

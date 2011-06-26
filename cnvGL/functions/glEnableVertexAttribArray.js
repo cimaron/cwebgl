@@ -23,23 +23,27 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 /*void*/
 function glEnableVertexAttribArray(/*GLuint*/ index) {
 
+	var ctx = cnvgl_context.getCurrentContext();
+
 	//out of bounds
-	if (index > cnvgl_device.GL_MAX_VERTEX_ATTRIBS - 1 || index < 0) {
+	if (index >= cnvgl_const.GL_MAX_VERTEX_ATTRIBS || index < 0) {
 		cnvgl_throw_error(GL_INVALID_VALUE);
 		return;
 	}
-
-	//cnvgl_state.current_program.vertex_attributes[index] = new cnvgl_vertex_attribute();
+	
+	ctx.vertex_attrib_arrays[index].enabled = GL_TRUE;	
 }
 
 /*void*/
 function glDisableVertexAttribArray(/*GLuint*/ index) {
 
+	var ctx = cnvgl_context.getCurrentContext();
+
 	//out of bounds
-	if (index > cnvgl_device.GL_MAX_VERTEX_ATTRIBS - 1 || index < 0) {
+	if (index >= cnvgl_const.GL_MAX_VERTEX_ATTRIBS || index < 0) {
 		cnvgl_throw_error(GL_INVALID_VALUE);
 		return;
 	}
 
-	//cnvgl_state.vertex_attributes[index] = null;
+	ctx.vertex_attrib_arrays[index].enabled = GL_FALSE;
 }

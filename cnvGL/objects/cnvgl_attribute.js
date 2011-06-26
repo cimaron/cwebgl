@@ -30,12 +30,5 @@ function cnvgl_attribute(definition) {
 
 	//custom state
 	this.definition = definition;
-	
-	//should we keep these??
-	this.enabled = false;
-	this.index = null;
-	this.normalized = GL_FALSE;
-	this.stride = 0;
-	this.offset = 0;
 }
 
