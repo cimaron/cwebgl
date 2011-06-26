@@ -51,12 +51,12 @@ function cnvgl_context() {
 cnvgl_context.getCurrentContext = function() {
 	if (!window.cnvgl_state) {
 		cnvgl_state = new cnvgl_context();	
-		cnvgl_contxt.initialize(cnvgl_state);
+		cnvgl_context.initialize(cnvgl_state);
 	}
 	return cnvgl_state;
 }
 
-cnvgl_context.initialize(ctx) {
+cnvgl_context.initialize = function(ctx) {
 	ctx.enabled[GL_DEPTH_TEST] = GL_TRUE;
 	ctx.bound_buffers[GL_ARRAY_BUFFER] = 0;
 	ctx.bound_buffers[GL_ELEMENT_ARRAY_BUFFER] = 0;		
