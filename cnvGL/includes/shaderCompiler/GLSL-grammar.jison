@@ -130,16 +130,20 @@ identifier			[a-zA-Z_][a-zA-Z0-9_]*
 'struct'					return 'STRUCT'
 'void'						return 'VOID'
 'while'						return 'WHILE'
-{identifier}				return 'IDENTIFIER'
 'type_name'					return 'TYPE_NAME'
+'field_selection'			return 'FIELD_SELECTION'
+'invariant'					return 'INVARIANT'
+'highp'						return 'HIGH_PRECISION'
+'mediump'					return 'MEDIUM_PRECISION'
+'lowp'						return 'LOW_PRECISION'
+'precision'					return 'PRECISION'
 
-
-{floating-constant}				return 'FLOATCONSTANT'
-
+{identifier}				return 'IDENTIFIER'
+{floating-constant}			return 'FLOATCONSTANT'
 {integer-constant}			return 'INTCONSTANT'
 'uintconstant'				return 'UINTCONSTANT'
 'boolconstant'				return 'BOOLCONSTANT'
-'field_selection'			return 'FIELD_SELECTION'
+
 '<<'						return 'LEFT_OP'
 '>>'						return 'RIGHT_OP'
 '++'						return 'INC_OP'
@@ -165,13 +169,10 @@ identifier			[a-zA-Z_][a-zA-Z0-9_]*
 ')'							return 'RIGHT_PAREN'
 '['							return 'LEFT_BRACKET'
 ']'							return 'RIGHT_BRACKET'
-'{'							return 'LEFT_BRACE'
-'}'							return 'RIGHT_BRACE'
 '.'							return 'DOT'
 ','							return 'COMMA'
 ':'							return 'COLON'
 '='							return 'EQUAL'
-';'							return 'SEMICOLON'
 '!'							return 'BANG'
 '-'							return 'DASH'
 '~'							return 'TILDE'
@@ -185,23 +186,12 @@ identifier			[a-zA-Z_][a-zA-Z0-9_]*
 '^'							return 'CARET'
 '&'							return 'AMPERSAND'
 '?'							return 'QUESTION'
-'invariant'					return 'INVARIANT'
-'highp'						return 'HIGH_PRECISION'
-'mediump'					return 'MEDIUM_PRECISION'
-'lowp'						return 'LOW_PRECISION'
-'precision'					return 'PRECISION'
 
-
-
-
-
-
-
-
-
-
-<<EOF>>               return 'EOF'
-.                     return 'INVALID'
+';'							return 'SEMICOLON'
+'{'							return 'LEFT_BRACE'
+'}'							return 'RIGHT_BRACE'
+<<EOF>>						return 'EOF'
+.							return 'INVALID'
 
 /lex
 

@@ -44,7 +44,7 @@ __ShaderCompilerPreprocessor.ShaderCompilerPreprocessor = function() {
 
 __ShaderCompilerPreprocessor.preprocess = function(source) {
 	//pretty basic, just want to make it work for right now
-	source = source.replace(/\#[^\n]+/, '');
+	source = source.replace(/[ \t]*\#[^\n]+/g, '');
 	return source;
 }
 

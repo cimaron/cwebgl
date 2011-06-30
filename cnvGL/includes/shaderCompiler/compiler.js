@@ -67,18 +67,20 @@ __ShaderCompiler.compile = function(source) {
 		return;
 	}
 
-	var parsed = parser.parse(processed_source);
-	
-	debugger;
-
-	if (!parsed) {
-		//get some error from parser
+	try {
+		var parsed = parser.parse(processed_source);
+	} catch (err) {
+		this.errors.push(err.message);
 		return false;
 	}
 
 	var symbol_table = parsed.symbol_table;
 	var parse_tree = parsed.parse_tree;
 	return true;
+}
+
+__ShaderCompiler.getErrors = function() {
+	return this.errors.join("\n");	
 }
 
 //----------------------------------------------------------------------------------------
