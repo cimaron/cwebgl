@@ -2,6 +2,7 @@
 include('cnvGL/defines.js');
 include('cnvGL/constants.js');
 
+include('cnvGL/objects/cnvgl_attrib_array.js');
 include('cnvGL/objects/cnvgl_attribute.js');
 include('cnvGL/objects/cnvgl_buffer.js');
 include('cnvGL/objects/cnvgl_context.js');
@@ -11,11 +12,18 @@ include('cnvGL/objects/cnvgl_texture.js');
 include('cnvGL/objects/cnvgl_uniform.js');
 include('cnvGL/objects/cnvgl_vertex.js');
 
-include('cnvGL/includes/shaderCompiler/object.js');
+//Compiler
 include('cnvGL/includes/shaderCompiler/compiler.js');
+include('cnvGL/includes/shaderCompiler/object.js');
+include('cnvGL/includes/shaderCompiler/parser.js');
+include('cnvGL/includes/shaderCompiler/preprocessor.js');
 include('cnvGL/includes/shaderCompiler/symbol.js');
+
+//Linker
 include('cnvGL/includes/shaderLinker/linker.js');
 include('cnvGL/includes/shaderLinker/executable.js');
+
+include('cnvGL/includes/include.php');
 
 include('cnvGL/includes/vertex_processor.js');
 

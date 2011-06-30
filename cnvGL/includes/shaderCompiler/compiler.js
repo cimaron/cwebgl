@@ -28,6 +28,7 @@ function ShaderCompiler(type) {
 
 	//member variables:
 	this.object = null;
+	this.errors = [];
 
 	//call constructor
 	this.construct(type);
@@ -50,36 +51,42 @@ __ShaderCompiler.ShaderCompiler = function() {
 
 //public:
 
-/*
-__ShaderCompiler.compile = function() {
-	//preprocess
-	var pp = new ShaderCompilerPreprocessor();
-	processed_source = pp.preprocess(shader_source);
+__ShaderCompiler.compile = function(source) {
+
+	var preprocessor = new ShaderCompilerPreprocessor();
+	
+	//set up parser and communication
+	var parser = GLSLGrammar;
+	parser.yy.compiler = this;
+
+	//var generator = new ShaderCompilerGenerator();
+
+	var processed_source = preprocessor.preprocess(source);
 	if (!processed_source) {
-		//get some error from preprocessor	
+		//get some error from preprocessor
+		return;
 	}
 
-	var lexer = new __glCompileShaderLexer();
-	var parser = new __glCompileShaderParser();
-	var parsed = parser.parse(lexer, processed_source);
+	var parsed = parser.parse(processed_source);
+	
+	debugger;
 
 	if (!parsed) {
-		//get some error from 
+		//get some error from parser
+		return false;
 	}
 
 	var symbol_table = parsed.symbol_table;
 	var parse_tree = parsed.parse_tree;
-
-	var generator = new __glCompileShaderGenerator(symbol_table, parse_tree);
+	return true;
 }
-
-*/
 
 //----------------------------------------------------------------------------------------
 //	The following are preconstructed sample programs based on the specific test program
 //	They will be removed and replaced when the actual compiler is built
 //----------------------------------------------------------------------------------------
 
+/*
 __ShaderCompiler.compile = function(shader_source) {
 	this.defaultSymbols();
 	if (shader_source.indexOf('gl_Position') != -1) {
@@ -89,7 +96,7 @@ __ShaderCompiler.compile = function(shader_source) {
 	}
 	return this.object;
 }
-
+*/
 
 __ShaderCompiler.defaultSymbols = function() {
 	var symbol_table = this.object.symbol_table;
@@ -100,7 +107,7 @@ __ShaderCompiler.defaultSymbols = function() {
 
 /*
 #ifdef GL_ES
-	precision highp float;
+	precision high float;
 #endif
  
 varying vec4 vColor;
@@ -114,10 +121,9 @@ __ShaderCompiler.defaultFragment = function() {
 
 	//actual program
 	var program = 
-	"var __fragmentEntry = function(__initialize) { "+
-	"	__data = __initialize;"+
-	"	__data.gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);"+
-	"};";
+	"var __fragmentEntry = function() { \n"+
+	"	gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);\n"+
+	"};\n";
 	this.object.object_code = program;
 }
 
@@ -141,9 +147,11 @@ __ShaderCompiler.defaultVertex = function() {
 
 	//program
 	var program = 
-	"var __vertexEntry = function(__initialize) { \n"+
-	"	__data = __initialize;\n"+
-	"	__data.gl_Position = mult4x4(mult4x4(__data.uPMatrix, __data.uMVMatrix), vec4(__data.aVertexPosition, 1.0));\n"+
+	"__attributes['aVertexPosition'] = [0,0,0];\n"+
+	"__uniforms['uMVMatrix'] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];\n"+
+	"__uniforms['uPMatrix'] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];\n"+
+	"var __vertexEntry = function() { \n"+
+	"	gl_Position = mult4x4(mult4x4(__uniforms.uPMatrix, __uniforms.uMVMatrix), [__attributes.aVertexPosition[0], __attributes.aVertexPosition[1], __attributes.aVertexPosition[2], 1.0]);\n"+
 	"};\n";
 
 	this.object.object_code = program;
