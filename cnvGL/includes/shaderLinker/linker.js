@@ -45,12 +45,9 @@ ShaderLinker.prototype = __ShaderLinker;
 __ShaderLinker.ShaderLinker = function() {
 	this.executable = new ShaderLinkerExecutable();
 	this.object_code = [];
-	
+
 	var include = new ShaderCompilerObject();
-	include.object_code = 
-	"var mult4x4 = function(a, b) {\n"+
-	"	return mat4.multiply(a, b, [])\n"+
-	"};\n";
+	include.object_code = this.include_code;
 	
 	this.addObjectCode(include);
 }
@@ -71,15 +68,12 @@ __ShaderLinker.link = function() {
 	var code = this.buildExecutable(this.executable.object_code);
 	this.executable.vertex_entry = code.vertex_entry;
 	this.executable.fragment_entry = code.fragment_entry;
+	this.executable.access = code.access;
 
 	return this.executable;
 }
 
-__ShaderLinker.buildExecutable = function(__object_code) {
-	var __data;
-	eval(__object_code);
-	return {vertex_entry : __vertexEntry, fragment_entry : __fragmentEntry};
-}
+//private:
 
 __ShaderLinker.addSymbols = function(symbols) {
 	//@todo: generate errors for surpassing the maximum allowable amount of each type of variable
@@ -88,5 +82,23 @@ __ShaderLinker.addSymbols = function(symbols) {
 	}
 }
 
-//private:
+__ShaderLinker.buildExecutable = function(__object_code) {
+
+	//special variables and functions form the basic storage and input/output mechanism of
+	//the program "executable" (closure)
+
+	eval(__object_code);
+	
+	return {
+		access : {
+			getUniform : __getUniform,
+			setUniform : __setUniform,
+			getAttribute : __getAttribute,
+			setAttribute : __setAttribute,
+			getOut : __getOut
+		},
+		vertex_entry : __vertexEntry,
+		fragment_entry : __fragmentEntry
+	};
+}
 
