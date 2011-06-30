@@ -205,7 +205,7 @@ identifier			[a-zA-Z_][a-zA-Z0-9_]*
 %% /* language grammar */
 
 glsl-start :
-			translation_unit EOF				{ return $1; }
+			translation_unit EOF
 		;
 
 variable_identifier:
@@ -389,7 +389,7 @@ constant_expression:
 declaration:
 			function_prototype 'SEMICOLON'
 		|	init_declarator_list 'SEMICOLON'
-		|	'PRECISION' precision_qualifier type_specifier_no_prec 'SEMICOLON'
+		|	'PRECISION' precision_qualifier type_specifier_no_prec 'SEMICOLON'	{	$$ = { type : $1, left : $2, right : $3} }
 		|	type_qualifier 'IDENTIFIER' 'LEFT_BRACE' struct_declaration_list 'RIGHT_BRACE' 'SEMICOLON'
 		|	type_qualifier 'IDENTIFIER' 'LEFT_BRACE' struct_declaration_list 'RIGHT_BRACE'
 		|	'IDENTIFIER' 'SEMICOLON'

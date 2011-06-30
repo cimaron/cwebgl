@@ -73,7 +73,8 @@ __ShaderCompiler.compile = function(source) {
 		this.errors.push(err.message);
 		return false;
 	}
-
+	console.log(parsed);
+	
 	var symbol_table = parsed.symbol_table;
 	var parse_tree = parsed.parse_tree;
 	return true;
