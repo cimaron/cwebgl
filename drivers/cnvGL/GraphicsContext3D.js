@@ -165,7 +165,7 @@ __GraphicsContext3D.useProgram = function(program) {
 
 __GraphicsContext3D.vertexAttribPointer = function(idx, size, type, normalized, stride, offset) {
 	var pointer = [];
-	glVertexAttribPointer(idx, size, type, normalized, stride, pointer);
+	glVertexAttribPointer(idx, size, type, normalized, stride, offset);
 }
 
 __GraphicsContext3D.viewport = function(x, y, width, height) {
