@@ -76,9 +76,10 @@ $include('WebGL/WebGLObject.js');
 
 ?>
 if (typeof Float32Array == 'undefined') {
-	<? $include('WebGL/ArrayBufferView.js'); ?>
-	<? $include('WebGL/TypedArrayBase.js'); ?>
-	<? $include('WebGL/Float32Array.js'); ?>
+	<? //$include('WebGL/ArrayBufferView.js'); ?>
+	<? //$include('WebGL/TypedArrayBase.js'); ?>
+	<? //$include('WebGL/Float32Array.js'); ?>
+	<? $include('library/TypedArray/TypedArray.js'); ?>
 }
 <?
 
