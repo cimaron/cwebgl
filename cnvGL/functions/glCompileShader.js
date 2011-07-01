@@ -30,9 +30,13 @@ function glCompileShader(/*GLuint*/ shader) {
 	
 	var compiler = new ShaderCompiler();
 	var object_code = compiler.compile(shader_string);
+
 	if (object_code) {
 		shader_obj.compile_status = GL_TRUE;
 		shader_obj.object_code = object_code;
+	} else {
+		shader_obj.information_log = compiler.getErrors();
+		shader_obj.information_log_length = shader_obj.information_log.length;
 	}
 
 }

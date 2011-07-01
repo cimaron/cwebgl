@@ -13,6 +13,7 @@ include('cnvGL/objects/cnvgl_uniform.js');
 include('cnvGL/objects/cnvgl_vertex.js');
 
 //Compiler
+include('cnvGL/includes/shaderCompiler/ast.js');
 include('cnvGL/includes/shaderCompiler/compiler.js');
 include('cnvGL/includes/shaderCompiler/object.js');
 include('cnvGL/includes/shaderCompiler/parser.js');

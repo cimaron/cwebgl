@@ -57,10 +57,18 @@ cnvgl_context.getCurrentContext = function() {
 }
 
 cnvgl_context.initialize = function(ctx) {
+
 	ctx.enabled[GL_DEPTH_TEST] = GL_TRUE;
+
 	ctx.bound_buffers[GL_ARRAY_BUFFER] = 0;
 	ctx.bound_buffers[GL_ELEMENT_ARRAY_BUFFER] = 0;		
-	ctx.vertex_processor = new cnvgl_vertex_processor();		
+
+	//Vertex attribute arrays
+	for (var i = 0; i < cnvgl_const.GL_MAX_VERTEX_ATTRIBS; i++) {
+		ctx.vertex_attrib_arrays[i] = new cnvgl_attrib_array_object();
+	}	
+
+	ctx.vertex_processor = new cnvgl_vertex_processor();	
 }
 
 

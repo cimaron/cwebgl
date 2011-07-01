@@ -57,7 +57,9 @@ __ShaderCompiler.compile = function(source) {
 	
 	//set up parser and communication
 	var parser = GLSLGrammar;
-	parser.yy.compiler = this;
+	var ast = new ShaderCompilerAst();
+	parser.yy.c = this;
+	parser.yy.ast = ast;
 
 	//var generator = new ShaderCompilerGenerator();
 
@@ -73,6 +75,7 @@ __ShaderCompiler.compile = function(source) {
 		this.errors.push(err.message);
 		return false;
 	}
+	
 	console.log(parsed);
 	
 	var symbol_table = parsed.symbol_table;
@@ -84,12 +87,15 @@ __ShaderCompiler.getErrors = function() {
 	return this.errors.join("\n");	
 }
 
+
+
+
+
 //----------------------------------------------------------------------------------------
 //	The following are preconstructed sample programs based on the specific test program
 //	They will be removed and replaced when the actual compiler is built
 //----------------------------------------------------------------------------------------
 
-/*
 __ShaderCompiler.compile = function(shader_source) {
 	this.defaultSymbols();
 	if (shader_source.indexOf('gl_Position') != -1) {
@@ -99,7 +105,6 @@ __ShaderCompiler.compile = function(shader_source) {
 	}
 	return this.object;
 }
-*/
 
 __ShaderCompiler.defaultSymbols = function() {
 	var symbol_table = this.object.symbol_table;
@@ -125,7 +130,7 @@ __ShaderCompiler.defaultFragment = function() {
 	//actual program
 	var program = 
 	"var __fragmentEntry = function() { \n"+
-	"	gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);\n"+
+	"	gl_FragColor = [1.0, 1.0, 1.0, 1.0];\n"+
 	"};\n";
 	this.object.object_code = program;
 }
@@ -154,7 +159,7 @@ __ShaderCompiler.defaultVertex = function() {
 	"__uniforms['uMVMatrix'] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];\n"+
 	"__uniforms['uPMatrix'] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];\n"+
 	"var __vertexEntry = function() { \n"+
-	"	gl_Position = mult4x4(mult4x4(__uniforms.uPMatrix, __uniforms.uMVMatrix), [__attributes.aVertexPosition[0], __attributes.aVertexPosition[1], __attributes.aVertexPosition[2], 1.0]);\n"+
+	"	__out.gl_PerVertex.gl_Position = mat4_multiplyVec4(mat4_multiply(__uniforms.uPMatrix, __uniforms.uMVMatrix), [__attributes.aVertexPosition[0], __attributes.aVertexPosition[1], __attributes.aVertexPosition[2], 1.0]);\n"+
 	"};\n";
 
 	this.object.object_code = program;
