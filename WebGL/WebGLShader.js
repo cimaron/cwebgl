@@ -38,7 +38,7 @@ function cWebGLShader(context, /*GLenum*/ type) {
 //	Class Magic
 //----------------------------------------------------------------------------------------
 
-__WebGLShader = new cWebGLObject;
+__WebGLShader =  new cWebGLObject().extend('cWebGLShader');
 cWebGLShader.prototype = __WebGLShader;
 
 //----------------------------------------------------------------------------------------

@@ -33,7 +33,7 @@ function cWebGLFramebuffer(context) {
 //	Class Magic
 //----------------------------------------------------------------------------------------
 
-__WebGLFramebuffer = new cWebGLObject;
+__WebGLFramebuffer = new cWebGLObject().extend('cWebGLFramebuffer');
 cWebGLFramebuffer.prototype = __WebGLFramebuffer;
 
 //----------------------------------------------------------------------------------------

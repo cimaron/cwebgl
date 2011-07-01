@@ -36,7 +36,7 @@ function cWebGLProgram(context) {
 //	Class Magic
 //----------------------------------------------------------------------------------------
 
-__WebGLProgram = new cWebGLObject;
+__WebGLProgram = new cWebGLObject().extend('cWebGLProgram');
 cWebGLProgram.prototype = __WebGLProgram;
 
 //----------------------------------------------------------------------------------------

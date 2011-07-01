@@ -38,7 +38,7 @@ function ShaderCompiler(type) {
 //	Class Magic
 //----------------------------------------------------------------------------------------
 
-__ShaderCompiler = new pClass;
+__ShaderCompiler = new pClass('ShaderCompiler');
 ShaderCompiler.prototype = __ShaderCompiler;
 
 //----------------------------------------------------------------------------------------
@@ -159,7 +159,9 @@ __ShaderCompiler.defaultVertex = function() {
 	"__uniforms['uMVMatrix'] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];\n"+
 	"__uniforms['uPMatrix'] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];\n"+
 	"var __vertexEntry = function() { \n"+
-	"	__out.gl_PerVertex.gl_Position = mat4_multiplyVec4(mat4_multiply(__uniforms.uPMatrix, __uniforms.uMVMatrix), [__attributes.aVertexPosition[0], __attributes.aVertexPosition[1], __attributes.aVertexPosition[2], 1.0]);\n"+
+	"var a = mat4_multiply(__uniforms.uPMatrix, __uniforms.uMVMatrix);"+
+	"var b = [__attributes.aVertexPosition[0], __attributes.aVertexPosition[1], __attributes.aVertexPosition[2], 1.0];"+
+	"	__out.gl_PerVertex.gl_Position = mat4_multiplyVec4(a, b);\n"+
 	"};\n";
 
 	this.object.object_code = program;

@@ -37,7 +37,7 @@ function cnvgl_vertex_processor() {
 //	Class Magic
 //----------------------------------------------------------------------------------------
 
-__cnvgl_vertex_processor = new pClass;
+__cnvgl_vertex_processor = new pClass('cnvgl_vertex_processor');
 cnvgl_vertex_processor.prototype = __cnvgl_vertex_processor;
 
 //----------------------------------------------------------------------------------------

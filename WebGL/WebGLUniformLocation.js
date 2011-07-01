@@ -36,7 +36,7 @@ function cWebGLUniformLocation(context) {
 //	Class Magic
 //----------------------------------------------------------------------------------------
 
-__WebGLUniformLocation = new cWebGLObject;
+__WebGLUniformLocation = new cWebGLObject().extend('cWebGLUniformLocation');;
 cWebGLUniformLocation.prototype = __WebGLUniformLocation;
 
 //----------------------------------------------------------------------------------------

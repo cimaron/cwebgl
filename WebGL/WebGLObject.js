@@ -38,7 +38,7 @@ function cWebGLObject(context) {
 //	Class Magic
 //----------------------------------------------------------------------------------------
 
-__WebGLObject = new pClass;
+__WebGLObject = new pClass('cWebGLObject');
 cWebGLObject.prototype = __WebGLObject;
 
 //----------------------------------------------------------------------------------------

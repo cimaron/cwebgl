@@ -33,7 +33,7 @@ function cWebGLBuffer(context) {
 //	Class Magic
 //----------------------------------------------------------------------------------------
 
-__WebGLBuffer = new cWebGLObject;
+__WebGLBuffer = new cWebGLObject().extend('cWebGLBuffer');
 cWebGLBuffer.prototype = __WebGLBuffer;
 
 //----------------------------------------------------------------------------------------

@@ -38,4 +38,4 @@ function cnvgl_shader() {
 	this.construct();
 }
 
-cnvgl_shader.prototype = new pClass;
+cnvgl_shader.prototype = new pClass('cnvgl_shader');

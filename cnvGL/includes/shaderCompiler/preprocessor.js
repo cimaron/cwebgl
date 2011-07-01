@@ -32,7 +32,7 @@ function ShaderCompilerPreprocessor() {
 //	Class Magic
 //----------------------------------------------------------------------------------------
 
-__ShaderCompilerPreprocessor = new pClass;
+__ShaderCompilerPreprocessor = new pClass('ShaderCompilerPreprocessor');
 ShaderCompilerPreprocessor.prototype = __ShaderCompilerPreprocessor;
 
 //----------------------------------------------------------------------------------------

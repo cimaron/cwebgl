@@ -36,7 +36,7 @@ function cWebGLRenderingContext(canvas, attrs) {
 //	Class Magic
 //----------------------------------------------------------------------------------------
 
-__WebGLRenderingContext = new pClass;
+__WebGLRenderingContext = new pClass('cWebGLRenderingContext');
 cWebGLRenderingContext.prototype = __WebGLRenderingContext;
 
 __WebGLRenderingContext.enums = {

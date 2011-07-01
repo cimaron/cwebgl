@@ -35,7 +35,7 @@ function ShaderLinker() {
 //	Class Magic
 //----------------------------------------------------------------------------------------
 
-__ShaderLinker = new pClass;
+__ShaderLinker = new pClass('ShaderLinker');
 ShaderLinker.prototype = __ShaderLinker;
 
 //----------------------------------------------------------------------------------------

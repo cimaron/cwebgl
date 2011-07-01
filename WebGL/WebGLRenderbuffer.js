@@ -33,7 +33,7 @@ function cWebGLRenderbuffer(context) {
 //	Class Magic
 //----------------------------------------------------------------------------------------
 
-__WebGLRenderbuffer = new cWebGLObject;
+__WebGLRenderbuffer = new cWebGLObject().extend('cWebGLRenderbuffer');
 cWebGLRenderbuffer.prototype = __WebGLRenderbuffer;
 
 //----------------------------------------------------------------------------------------

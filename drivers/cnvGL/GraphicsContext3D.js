@@ -36,7 +36,7 @@ function GraphicsContext3D(canvas) {
 //	Class Magic
 //----------------------------------------------------------------------------------------
 
-__GraphicsContext3D = new pClass;
+__GraphicsContext3D = new pClass('GraphicsContext3D');
 GraphicsContext3D.prototype = __GraphicsContext3D;
 
 //----------------------------------------------------------------------------------------
@@ -57,7 +57,12 @@ __GraphicsContext3D.GraphicsContext3D = function(canvas) {
 	this.buffer = this.context.createImageData(this.width, this.height);
 
 	cnvgl_ctx.color_buffer = this.buffer.data;
-	cnvgl_ctx.depth_buffer = new Float32Array(this.width * this.height);
+
+	if (Float32Array.native) {
+		cnvgl_ctx.depth_buffer = new Float32Array(this.width * this.height);
+	} else {
+		cnvgl_ctx.depth_buffer = new Array(this.width * this.height);
+	}
 
 	//initialize state
 	glClearColor(0, 0, 0, 255);

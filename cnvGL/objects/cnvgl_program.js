@@ -47,4 +47,4 @@ function cnvgl_program() {
 	this.construct();
 }
 
-cnvgl_program.prototype = new pClass;
+cnvgl_program.prototype = new pClass('cnvgl_program');

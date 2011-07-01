@@ -21,23 +21,26 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 if (typeof pClass == 'undefined') {
-	function pClass() {
-		var _className = '';
+	function pClass(_className) {
+
+		this._className = _className;
 
 		this.construct = function() {
-			_className = arguments.callee.caller.name.replace(/^__/, '');
-			if (!arguments.callee.caller.name.match(/^__/)) {
-				if (this[_className] && typeof this[_className] == 'function') {
-					this[_className].apply(this, arguments);
-				}
+			if (this[this._className] && typeof this[this._className] == 'function') {
+				this[this._className].apply(this, arguments);
 			}
+		}
+
+		this.extend = function(className) {
+			this._className = className;
+			return this;
 		}
 
 		this.instanceOf = function(type) {
 			if (type) {
-				return (_className == type);
+				return (this._className == type);
 			}
-			return _className;
+			return this._className;
 		}
 
 		this.enumerate = function(enm, obj) {
@@ -46,8 +49,7 @@ if (typeof pClass == 'undefined') {
 				return;
 			}
 			if (!obj) {
-				var className = arguments.callee.caller.name.replace(/^_+/, '');
-				var obj = window[className];
+				var obj = window[this._className];
 			}
 			if (obj) {
 				for (var i in enm) {

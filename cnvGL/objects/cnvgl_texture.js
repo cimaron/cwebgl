@@ -4,4 +4,4 @@ function cnvgl_texture() {
 	this.construct();
 }
 
-cnvgl_texture.prototype = new pClass;
+cnvgl_texture.prototype = new pClass('cnvgl_texture');

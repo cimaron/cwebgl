@@ -36,7 +36,7 @@ function cWebGLTexture(context) {
 //	Class Magic
 //----------------------------------------------------------------------------------------
 
-__WebGLTexture = new cWebGLObject;
+__WebGLTexture = new new cWebGLObject().extend('cWebGLTexture');
 cWebGLTexture.prototype = __WebGLTexture;
 
 //----------------------------------------------------------------------------------------
