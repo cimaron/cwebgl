@@ -22,7 +22,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //----------------------------------------------------------------------------------------
 //	class cnvgl_vertex_processor
 //----------------------------------------------------------------------------------------
-function cnvgl_vertex_processor() {
+function cnvgl_fragment_processor() {
 	
 	//member variables
 	this.mode = null;
@@ -37,73 +37,92 @@ function cnvgl_vertex_processor() {
 //	Class Magic
 //----------------------------------------------------------------------------------------
 
-__cnvgl_vertex_processor = new pClass('cnvgl_vertex_processor');
-cnvgl_vertex_processor.prototype = __cnvgl_vertex_processor;
+__cnvgl_fragment_processor = new pClass('cnvgl_fragment_processor');
+cnvgl_fragment_processor.prototype = __cnvgl_fragment_processor;
 
 //----------------------------------------------------------------------------------------
 //	Methods
 //----------------------------------------------------------------------------------------
 
-__cnvgl_vertex_processor.cnvgl_vertex_processor = function() {
-	this.buffer = [];
-	//build data heap for vertex executable
+__cnvgl_fragment_processor.cnvgl_fragment_processor = function() {
 }
 
-//public:
+__cnvgl_fragment_processor.processPrimitive = function(v1, v2, v3) {
 
-__cnvgl_vertex_processor.setProgram = function(program) {
-	this.program = program;
-	this.access = this.program.access;
-}
+	//@todo: sort vertices
+	
+	var line1 = this.line(v1, v2);
+	var line2 = this.line(v1, v3);
+	var line3 = this.line(v2, v3);
 
-__cnvgl_vertex_processor.sendVertex = function(attributes) {
+	//console.log(line1);
+	//console.log(line2);
+	//console.log(line3);
 
-	for (var i in attributes) {
-		this.access.setAttribute(i, attributes[i]);	
-		//console.log(i, attributes[i]);
-	}
+	//for each horizontal scanline
+	
+	//debugger;
 
-	//console.log('vertex in', attributes);
-
-	this.program.vertex_entry();
-
-	var gl_PerVertex = this.access.getOut('gl_PerVertex');
-	var gl_Position = gl_PerVertex.gl_Position;
-
-	//console.log('vertex out', gl_PerVertex.gl_Position);
-
-	var vertex = new cnvgl_vertex(gl_Position[0], gl_Position[1], gl_Position[2], gl_Position[3]);
-
-	//@todo: clip line and split if necessary
-	this.processVertex(vertex);
-
-	this.buffer.push(vertex);
-
-	if (this.buffer.length == 3) {
-		this.processPrimitive();
-	}
-}
-
-
-__cnvgl_vertex_processor.processVertex = function(v) {
-
-	v.x = v.x / v.w;
-	v.y = v.y / v.w;
-	v.z = v.z / v.w;
+	var yi_start = Math.ceil(line1.y1);
+	var yi_end = Math.ceil(line1.y2);
+	var varying = {};
 
 	var buffer = cnvgl_state.color_buffer;
+	var viewport_w = cnvgl_state.viewport_w;
+	var viewport_h = cnvgl_state.viewport_h;
+	var c = [0, 0, 0];
 
-	var w = cnvgl_state.viewport_w;
-	var h = cnvgl_state.viewport_h;
+	for (var yi = yi_start; yi < yi_end; yi++) {
 
-	v.sx = (v.x + 1) * (w / 2);
-	v.sy = (1 - v.y) * (h / 2);
+		//get left/right
+		var xi_start = Math.floor((yi - line1.y1) / line1.dy + line1.x1);
+		var xi_end = Math.floor((yi - line2.y1) / line2.dy + line2.x1);
+
+		for (var xi = xi_start; xi < xi_end; xi++) {
+			
+			this.fragment(xi, yi, varying, c);
+
+			//draw it!
+			var i = (viewport_w * yi + xi) * 4;
+
+			buffer[i] = c[0];
+			buffer[i + 1] = c[1];
+			buffer[i + 2] = c[2];	
+		}
+
+		//console.log(yi, xi_start, yi, xi_end);
+	}
+
+	
 }
 
-__cnvgl_vertex_processor.processPrimitive = function() {
-	var fp = cnvgl_state.fragment_processor;
-	fp.processPrimitive(this.buffer[0], this.buffer[1], this.buffer[2]);
-	this.buffer = [];
+__cnvgl_fragment_processor.line = function(v1, v2) {
+	var line;
+	if (v1.sy > v2.sy) {
+		line = {
+			x1 : v2.sx,
+			y1 : v2.sy,
+			x2 : v1.sx,
+			y2 : v1.sy
+		};
+	} else {
+		line = {
+			x1 : v1.sx,
+			y1 : v1.sy,
+			x2 : v2.sx,
+			y2 : v2.sy
+		};
+	}
+	line.dy = (v2.sy - v1.sy) / (v2.sx - v1.sx);
+	line.dx = 1 / line.dy;
+	return line;
+}
+
+
+__cnvgl_fragment_processor.fragment = function(xi, yi, varying, c) {
+	c[0] = 255;
+	c[1] = 255;
+	c[2] = 255;
 }
 
 

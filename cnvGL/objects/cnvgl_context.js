@@ -69,6 +69,7 @@ cnvgl_context.initialize = function(ctx) {
 	}	
 
 	ctx.vertex_processor = new cnvgl_vertex_processor();	
+	ctx.fragment_processor = new cnvgl_fragment_processor();	
 }
 
 

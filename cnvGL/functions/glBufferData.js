@@ -48,7 +48,6 @@ function glBufferData(/*GLenum*/ target, /*GLsizeiptr*/ size, /*const GLVoid* */
 
 	buffer_obj.target = target;
 	buffer_obj.usage = usage;
-	debugger;
 	
 	if (Float32Array.native) {
 		var temp = new Float32Array(data);

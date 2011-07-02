@@ -27,6 +27,7 @@ include('cnvGL/includes/shaderLinker/executable.js');
 include('cnvGL/includes/include.php');
 
 include('cnvGL/includes/vertex_processor.js');
+include('cnvGL/includes/fragment_processor.js');
 
 include('cnvGL/functions/glAttachShader.js');
 include('cnvGL/functions/glBindBuffer.js');
