@@ -28,6 +28,8 @@ __out.gl_PerVertex = {
 	gl_ClipDistance : []
 };
 
+__out.gl_FragColor = [0, 0, 0, 0];
+
 var mat4_multiplyVec4 = function(a, b) {
 	return mat4.multiplyVec4(a, b, []);
 };

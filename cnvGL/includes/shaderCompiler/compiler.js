@@ -130,7 +130,7 @@ __ShaderCompiler.defaultFragment = function() {
 	//actual program
 	var program = 
 	"var __fragmentEntry = function() { \n"+
-	"	gl_FragColor = [1.0, 1.0, 1.0, 1.0];\n"+
+	"	__out.gl_FragColor = [1.0, 1.0, 1.0, 1.0];\n"+
 	"};\n";
 	this.object.object_code = program;
 }

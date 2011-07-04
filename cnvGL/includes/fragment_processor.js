@@ -25,8 +25,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 function cnvgl_fragment_processor() {
 	
 	//member variables
-	this.mode = null;
-	this.buffer = null;
 	this.program = null;
 
 	//Call constructor
@@ -46,6 +44,11 @@ cnvgl_fragment_processor.prototype = __cnvgl_fragment_processor;
 
 __cnvgl_fragment_processor.cnvgl_fragment_processor = function() {
 }
+
+__cnvgl_fragment_processor.setProgram = function(program) {
+	this.program = 	program;
+}
+
 
 __cnvgl_fragment_processor.processTriangle = function(v1, v2, v3) {
 
@@ -146,9 +149,11 @@ __cnvgl_fragment_processor.line = function(v1, v2) {
 
 
 __cnvgl_fragment_processor.fragment = function(xi, yi, varying, c) {
-	c[0] = 255;
-	c[1] = 255;
-	c[2] = 255;
+	this.program.fragment_entry();
+	var gl_PerVertex = this.program.access.getOut('gl_FragColor');
+	c[0] = Math.round(gl_PerVertex[0] * 255);
+	c[1] = Math.round(gl_PerVertex[1] * 255);
+	c[2] = Math.round(gl_PerVertex[2] * 255);
 }
 
 

@@ -36,6 +36,7 @@ function glUseProgram(/*GLuint*/ program) {
 	cnvgl_state.current_program = program_obj;
 	
 	cnvgl_state.vertex_processor.setProgram(program_obj.executable);
+	cnvgl_state.fragment_processor.setProgram(program_obj.executable);
 
 }
 
