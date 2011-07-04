@@ -56,11 +56,14 @@ __cnvgl_vertex_processor.setProgram = function(program) {
 	this.access = this.program.access;
 }
 
+__cnvgl_vertex_processor.setMode = function(mode) {
+	this.mode = mode;
+}
+
 __cnvgl_vertex_processor.sendVertex = function(attributes) {
 
 	for (var i in attributes) {
 		this.access.setAttribute(i, attributes[i]);	
-		//console.log(i, attributes[i]);
 	}
 
 	//console.log('vertex in', attributes);
@@ -79,9 +82,18 @@ __cnvgl_vertex_processor.sendVertex = function(attributes) {
 
 	this.buffer.push(vertex);
 
-	if (this.buffer.length == 3) {
-		this.processPrimitive();
+	if (this.mode == GL_TRIANGLES && this.buffer.length >= 3) {
+		this.processTriangle();
+		this.buffer = [];
 	}
+	
+	if (this.mode == GL_TRIANGLE_STRIP && this.buffer.length >= 3) {
+		this.processTriangle();
+		this.buffer = [this.buffer[1], this.buffer[2]];
+	}
+
+	//@todo: finish the rest of the modes
+
 }
 
 
@@ -100,10 +112,20 @@ __cnvgl_vertex_processor.processVertex = function(v) {
 	v.sy = (1 - v.y) * (h / 2);
 }
 
-__cnvgl_vertex_processor.processPrimitive = function() {
-	var fp = cnvgl_state.fragment_processor;
-	fp.processPrimitive(this.buffer[0], this.buffer[1], this.buffer[2]);
-	this.buffer = [];
+__cnvgl_vertex_processor.processTriangle = function() {
+	var v1 = this.buffer[0];
+	var v2 = this.buffer[1];
+	var v3 = this.buffer[2];
+
+	//@todo: check directionality for backface culling here
+
+	cnvgl_state.fragment_processor.processTriangle(v1, v2, v3);
 }
+
+__cnvgl_vertex_processor.processLine = function() {
+	cnvgl_state.fragment_processor.processLine(this.buffer[0], this.buffer[1]);		
+}
+
+
 
 

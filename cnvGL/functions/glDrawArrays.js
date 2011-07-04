@@ -23,6 +23,8 @@ function glDrawArrays(/*GLenum*/ mode, /*GLint*/ first, /*GLsizei*/ count) {
 		}
 	}
 
+	processor.setMode(mode);
+
 	//each vertex
 	for (var i = first; i < count; i++) {
 

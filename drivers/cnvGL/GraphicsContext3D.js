@@ -88,8 +88,8 @@ __GraphicsContext3D.bufferData = function(target, data, usage) {
 }
 
 __GraphicsContext3D.clear = function(mask) {
-	this.setRedraw();
 	glClear(mask);
+	this.setRedraw();
 }
 
 __GraphicsContext3D.clearColor = function(red, green, blue, alpha) {
@@ -116,6 +116,7 @@ __GraphicsContext3D.createShader = function(type) {
 
 __GraphicsContext3D.drawArrays = function(mode, first, count) {
 	glDrawArrays(mode, first, count);
+	this.setRedraw();
 }
 
 __GraphicsContext3D.enable = function(cap) {

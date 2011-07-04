@@ -47,36 +47,60 @@ cnvgl_fragment_processor.prototype = __cnvgl_fragment_processor;
 __cnvgl_fragment_processor.cnvgl_fragment_processor = function() {
 }
 
-__cnvgl_fragment_processor.processPrimitive = function(v1, v2, v3) {
+__cnvgl_fragment_processor.processTriangle = function(v1, v2, v3) {
+
+	var min = Math.min;
+	var max = Math.max;
+	var ceil = Math.ceil;
+	var floor = Math.floor;
 
 	//@todo: sort vertices
-	
+
 	var line1 = this.line(v1, v2);
 	var line2 = this.line(v1, v3);
 	var line3 = this.line(v2, v3);
 
-	//console.log(line1);
-	//console.log(line2);
-	//console.log(line3);
+	//get max vertical bounds
+	var yi_start = min(line1.y1, min(line2.y1, line3.y1));
+	var yi_start = ceil(yi_start - .5) + 1;
 
-	//for each horizontal scanline
-	
-	//debugger;
+	var yi_end = max(line1.y2, max(line2.y2, line3.y2));
+	var yi_end = ceil(yi_end + .5) - 1;
 
-	var yi_start = Math.ceil(line1.y1);
-	var yi_end = Math.ceil(line1.y2);
 	var varying = {};
 
 	var buffer = cnvgl_state.color_buffer;
 	var viewport_w = cnvgl_state.viewport_w;
 	var viewport_h = cnvgl_state.viewport_h;
-	var c = [0, 0, 0];
-
+	var c = [0, 0, 0, 0];
+	
+	//for each horizontal scanline	
 	for (var yi = yi_start; yi < yi_end; yi++) {
 
-		//get left/right
-		var xi_start = Math.floor((yi - line1.y1) / line1.dy + line1.x1);
-		var xi_end = Math.floor((yi - line2.y1) / line2.dy + line2.x1);
+		//get left and right edges
+		var xi1 = -1;
+		var xi2 = -1;
+		if (yi >= line1.y1 && yi <= line1.y2) {
+			xi1 = Math.floor((yi - line1.y1) / line1.dy + line1.x1);
+		}
+		if (yi >= line2.y1 && yi <= line2.y2) {
+			xi2 = Math.floor((yi - line2.y1) / line2.dy + line2.x1);
+			if (xi1 == -1) {
+				xi1 = xi2; xi2 = -1;	
+			}
+		}
+		if (xi2 == -1) {
+			var xi2 = Math.floor((yi - line3.y1) / line3.dy + line3.x1);
+		}
+
+		//check order
+		if (xi1 > xi2) {
+			var xi_start = xi2;
+			var xi_end = xi1;
+		} else {
+			var xi_end = xi2;
+			var xi_start = xi1;
+		}
 
 		for (var xi = xi_start; xi < xi_end; xi++) {
 			
@@ -97,6 +121,7 @@ __cnvgl_fragment_processor.processPrimitive = function(v1, v2, v3) {
 }
 
 __cnvgl_fragment_processor.line = function(v1, v2) {
+
 	var line;
 	if (v1.sy > v2.sy) {
 		line = {
@@ -115,6 +140,7 @@ __cnvgl_fragment_processor.line = function(v1, v2) {
 	}
 	line.dy = (v2.sy - v1.sy) / (v2.sx - v1.sx);
 	line.dx = 1 / line.dy;
+
 	return line;
 }
 
