@@ -63,11 +63,14 @@ var sprintf = function(str) {
 	return str;
 };
 
+var printf = function() {
+	var args = [].splice.call(arguments, 0);
+	args.unshift(stdout);
+	fprintf.apply(null, args);
+}
+
 var fprintf = function(file, str) {
-	var args = [];
-	for (var i = 1; i < arguments.length; i++) {
-		args[i - 1] = arguments[i];
-	}
+	var args = [].splice.call(arguments, 1);	
 	str = sprintf.apply(null, args);
 	files[file ? file : 1](str);
 };

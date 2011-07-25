@@ -68,7 +68,7 @@ var ast = (function() {
 		//External Constructor
 		function Constructor() {
 			ast_node.apply(this);
-			ast_node.ast_node();
+			this.ast_node();
 		}
 
 		//Class Inheritance
@@ -148,17 +148,16 @@ var ast = (function() {
 			this.is_array = 0;
 			this.array_size = null;
 			this.initializer = null;
-			this.ast_declaration(identifier, is_array, array_size, initializer);
 		}
 
 		//External Constructor
 		function Constructor(identifier, is_array, array_size, initializer) {
 			ast_declaration.apply(this);
-			ast_declaration.ast_declaration(identifier, is_array, array_size, initializer);
+			this.ast_declaration(identifier, is_array, array_size, initializer);
 		}
 
 		//Class Inheritance
-		Constructor.prototype = ast_node;
+		Constructor.prototype = ast_declaration;
 		ast_node.extend(ast_declaration);
 		
 		return Constructor;
@@ -235,10 +234,11 @@ var ast = (function() {
 		//Internal Constructor
 		function ast_type_specifier() {
 			this.parent();
-			this.name = null;
+			this.type_specifier = null;
+			this.type_name = null;
 			this.structure = null;
-			this.is_array = null;
-			this.array_size = null;
+			this.is_array = 0;
+			this.array_size = null;			
 			this.precision = 2;
 			this.is_precision_statement = null;
 		}
@@ -246,7 +246,7 @@ var ast = (function() {
 		//public:
 		ast_type_specifier.ast_type_specifier = function(specifier) {
 			if (this.ast_type_specifier[typeof specifier]) {
-				this.ast_type_specifier[typeof specifier]();
+				this.ast_type_specifier[typeof specifier].call(this, specifier);
 			}
 		}
 
@@ -324,7 +324,7 @@ var ast = (function() {
 		}
 		
 		ast_type_specifier.ast_type_specifier.object = function(specifier) {
-			this.type_specifier = ast_struct;
+			this.type_specifier = ast_types.struct;
 			this.type_name = s.name;
 			this.structure = s;
 			this.is_array = false;
@@ -333,7 +333,7 @@ var ast = (function() {
 		}
 
 		ast_type_specifier.print = function() {
-			if (this.type_specifier == ast_struct) {
+			if (this.type_specifier == ast_types.struct) {
 				this.structure.print();
 			} else {
 				printf("%s ", this.type_name);	
@@ -346,11 +346,11 @@ var ast = (function() {
 				printf(" ]");
 			}
 		}
-		
+
 		//External Constructor
 		function Constructor(specifier) {
 			ast_type_specifier.apply(this);
-			ast_type_specifier.ast_type_specifier(specifier);
+			this.ast_type_specifier(specifier);
 		}
 
 		//Class Inheritance
@@ -364,12 +364,72 @@ var ast = (function() {
 
 
 
+	var ast_function = (function() {
+
+		//Internal Constructor
+		function ast_function() {
+			this.parent();
+			this.return_type = null;
+			this.identifier = null;
+			this.parameters = null;
+			this.is_definition = null;
+			this.signature = null;
+		}
+
+		//public:
+		ast_function.ast_function = function() {
+			this.is_definition = false;
+		}
+		
+		ast_function.print = function() {
+			
+			this.return_type.print();
+			printf(" %s (", this.identifier);
+			for (var i = 0; i < this.parameters.length; i++) {
+				//var ast = exec_node_data(ast_node, n, link);
+				//ast.print();
+			}
+			printf(")");
+		}
+
+		//External Constructor
+		function Constructor() {
+			ast_function.apply(this);
+			this.ast_function();
+		}
+
+		//Class Inheritance
+		Constructor.prototype = ast_function;
+		ast_node.extend(ast_function);
+		
+		return Constructor;
+
+	})();
+
+
+
+
 	var ast_type_qualifier = function() {
 		//large union
-		this.flags = null;
+		this.flags = {};
 		this.location = null;
 	};
-
+	ast_type_qualifier.flags = {
+		invariant : 1,
+		constant : 2,
+		attribute : 4,
+		varying : 8,
+		in : 16,
+		out : 32,
+		centroid : 64,
+		uniform : 128,
+		smooth : 256,
+		flat : 512,
+		noperspective : 1024,
+		origin_upper_left : 2048,
+		pixel_center_integer : 4096,
+		explicit_location : 8192
+	};
 
 	var ast_fully_specified_type = (function() {
 
@@ -384,6 +444,11 @@ var ast = (function() {
 
 		ast_fully_specified_type.has_qualifers = function() {
 			return this.qualifer.flags.i != 0;
+		}
+
+		ast_fully_specified_type.print = function() {
+			//ast_Type_qualifier_print(qualifier);
+			this.specifier.print();	
 		}
 
 		//External Constructor
@@ -492,6 +557,46 @@ var ast = (function() {
 
 
 
+	var ast_parameter_declarator = (function() {
+
+		//Internal Constructor
+		function ast_parameter_declarator() {
+			this.parent();
+			this.type = null;
+			this.identifier = null;
+			this.is_array = 0;
+			this.array_size = null;
+			this.formal_parameter = null;
+			this.is_void = null;
+		}
+
+		//public:
+
+		ast_parameter_declarator.ast_parameter_declarator = function() {
+			this.identifier = null;
+			this.is_array = false;
+			this.array_size = 0;
+		}
+
+		ast_parameter_declarator.print = function() {
+			
+		}
+
+		//External Constructor
+		function Constructor() {
+			ast_parameter_declarator.apply(this);
+		}
+
+		//Class Inheritance
+		Constructor.prototype = ast_parameter_declarator;
+		ast_node.extend(ast_parameter_declarator);
+
+		return Constructor;
+	
+	})();
+
+
+
 	var ast = {	
 		float : 2,
 		precision : ast_precision,
@@ -499,7 +604,9 @@ var ast = (function() {
 		type_specifier : ast_type_specifier,
 		fully_specified_type : ast_fully_specified_type,
 		declaration : ast_declaration,
-		declarator_list : ast_declarator_list
+		declarator_list : ast_declarator_list,
+		function : ast_function,
+		parameter_declarator : ast_parameter_declarator
 	}
 
 	return ast;

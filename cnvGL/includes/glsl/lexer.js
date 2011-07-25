@@ -471,7 +471,7 @@ var lexer = (function () {
 			return 218;
 			break;
 		case 94:
-			return 'VOID_TOK';
+			return yy.token.VOID_TOK;
 			break;
 		case 95:
 			/*copy manually*/

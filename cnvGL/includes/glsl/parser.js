@@ -2039,26 +2039,69 @@ var parser = (function() {
 							state.translation_unit.push(yyvsa[yyvsp].node.link);
 						}
 						break;
+					
+					case 18:
+						/* FINISHME: The NULL test is required because pragmas are set to
+						* FINISHME: NULL. (See production rule for external_declaration.)
+						*/
+						if (yyvsa[yyvsp] != null) {
+							state.translation_unit.push(yyvsa[yyvsp].node.link);	
+						}
+						break;
 						
 					case 111:
+						yyval = {};
 						yyval.node = yyvsa[yyvsp - 1].declarator_list;
 						break;
 
 					case 112:
 						yyvsa[yyvsp - 1].type_specifier.precision = yyvsa[yyvsp - 1].n;
 						yyvsa[yyvsp - 1].type_specifier.is_precision_statement = true;
+						yyval = {};
 						yyval.node = yyvsa[yyvsp - 1].type_specifier;
+						break;
+						
+					case 118:
+						yyval = {};
+						yyval.function = new ast.function();
+						yyval.function.set_location(yylloc);
+						yyval.function.return_type = yyvsa[yyvsp - 2].fully_specified_type;
+						yyval.function.identifier = yyvsa[yyvsp - 1].identifier;
+						//state.symbols.functions.push(new ir_function(yyvsa[yyvsp - 1].identifier));
+						//state.symbols.push_scope();
+						break;
+						
+					case 124:
+						yyval = {};
+						yyval.parameter_declarator = new ast.parameter_declarator();
+						yyval.parameter_declarator.set_location(yylloc);
+						yyval.parameter_declarator.type = new ast.fully_specified_type();
+						yyval.parameter_declarator.type.qualifier = yyvsa[yyvsp - 1].type_qualifier;
+						yyval.parameter_declarator.type.specifier = yyvsa[yyvsp].type_specifier;
+						break;
+
+					case 125:
+						yyval = {};
+						yyval.type_qualifier = new ast.type_qualifier();
 						break;
 
 					case 138:
 						var decl = new ast.declaration(yyvsa[yyvsp].identifier, false, null, null);
+						yyval = {};
 						yyval.declarator_list = new ast.declarator_list(yyvsa[yyvsp - 1].fully_specified_type);
 						yyval.declarator_list.set_location(yylloc);
 						yyval.declarator_list.declarations.push(decl.link);
 						break;
 
+					case 145:
+						yyval = {};
+						yyval.fully_specified_type = new ast.fully_specified_type();
+						yyval.fully_specified_type.set_location(yylloc);
+						yyval.fully_specified_type.specifier = yyvsa[yyvsp].type_specifier;
+						break;
+
 					case 146:
-						var ctx = state;
+						yyval = {};
 						yyval.fully_specified_type = new ast.fully_specified_type();
 						yyval.fully_specified_type.set_location(yylloc);
 						yyval.fully_specified_type.qualifier = yyvsa[yyvsp - 1].type_qualifier;
@@ -2066,24 +2109,34 @@ var parser = (function() {
 					    break;
 
 					case 166:
-						yyval = { type_qualifier : { flags : { q : { varying : 1 }}}};
+						yyval = {};
+						yyval.type_qualifier = new ast.type_qualifier();
+						yyval.type_qualifier.flags.q = ast.type_qualifier.flags.varying;
 						break;
-					
+
 					case 173:
+						yyval = {};
 						yyval.type_specifier = yyvsa[yyvsp].type_specifier;
 						break;
 
 					case 178:
-						var ctx = state;
+						yyval = {};
 						yyval.type_specifier = new ast.type_specifier(yyvsa[yyvsp].n);
 						yyval.type_specifier.set_location(yylloc);
 					    break;
+					
+					case 181:
+						yyval = {};
+						yyval.n = ast.void;
+						break;
 
 					case 182:
+						yyval = {};
 						yyval.n = ast.float;
 					    break;
 
 					case 188:
+						yyval = {};
 						yyval.n = ast.vec4;
 						break;
 
@@ -2091,10 +2144,12 @@ var parser = (function() {
 						if (!state.es_shader && state.language_version < 130) {
 							yyerror(yylsa[yylsp], state, "precision qualifier forbidden in %s (1.30 or later required)\n", state.version_string);
 						}
+						yyval = {};
 						yyval.n = ast.precision.high;
 						break;
 
 					case 289:
+						yyval = {};
 						yyval.node = yyvsa[yyvsp].node;
 						break;
 
@@ -2104,7 +2159,6 @@ var parser = (function() {
 					case 5:
 					case 10:
 					case 16:
-					case 18:
 					case 21:
 					case 22:
 					case 23:
@@ -2169,14 +2223,11 @@ var parser = (function() {
 					case 110:
 					case 116:
 					case 117:
-					case 118:
 					case 119:
 					case 120:
 					case 121:
 					case 122:
 					case 123:
-					case 124:
-					case 125:
 					case 126:
 					case 127:
 					case 128:
@@ -2193,7 +2244,6 @@ var parser = (function() {
 					case 142:
 					case 143:
 					case 144:
-					case 145:
 					case 147:
 					case 149:
 					case 150:
@@ -2220,7 +2270,6 @@ var parser = (function() {
 					case 177:
 					case 179:
 					case 180:
-					case 181:
 					case 183:
 					case 184:
 					case 185:

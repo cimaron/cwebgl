@@ -63,12 +63,26 @@ var compiler = (function() {
 	};
 
 	var YYPRINT = function(yyoutput, yytoknum, yyvaluep) {
+		//object or child has print method
 		if (yyvaluep.print) {
 			yyvaluep.print();
-		} else if (JSON.stringify) {
-			fprintf(stdout, JSON.stringify(yyvaluep));
+			return;
+		}
+
+		if (typeof yyvaluep == 'object') {
+			for (var i in yyvaluep) {
+				if (yyvaluep[i] && yyvaluep[i].print) {
+					YYPRINT(yyoutput, yytoknum, yyvaluep[i]);
+					return;
+				}
+			}
+		}
+
+		if (JSON.stringify) {
+			fprintf(stdout, JSON.stringify(yyvaluep, null, 4));
 		} else {
 			fprintf(stdout, yyvaluep + "");
+			//console.log(yyvaluep);
 		}
 	}
 

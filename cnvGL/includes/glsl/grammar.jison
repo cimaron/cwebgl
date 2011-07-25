@@ -172,7 +172,7 @@ HASH		^{SPC}#{SPC}
 
 
 "struct"		return 'STRUCT';
-"void"		return 'VOID_TOK';
+"void"		return yy.token.VOID_TOK;
 
 "layout"		{/*copy manually*/}
 
