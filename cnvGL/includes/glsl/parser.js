@@ -1886,7 +1886,7 @@ var parser = (function() {
 		}
 		
 		yylsa[0] = yylloc;
-		
+
 		var _goto = '';
 
 		while (true) {
@@ -2021,6 +2021,10 @@ var parser = (function() {
 				}
 
 				switch (yyn) {
+					
+					case 2:
+						initialize_types(state);
+						break;
 
 					case 3:
 						state.symbols = {
@@ -2028,6 +2032,7 @@ var parser = (function() {
 							functions : {},
 							types : {}
 						};
+						initialize_types(state);
 					    break;
 
 					case 17:
@@ -2048,7 +2053,30 @@ var parser = (function() {
 							state.translation_unit.push(yyvsa[yyvsp].node.link);	
 						}
 						break;
+
+					case 21:
+						yyval = {};
+						yyval.expression = new ast.expression(ast.identifier, null, null, null);
+						yyval.expression.set_location(yylloc);
+						yyval.expression.primary_expression.identifier = yyvsa[yyvsp].identifier;
+						break;
+					
+					case 95:
+						yyval = {};
+						yyval.expression = new ast.expression(yyvsa[yyvsp - 1].n, yyvsa[yyvsp - 2].expression, yyvsa[yyvsp].expression, null);
+						yyval.expression.set_location(yylloc);
+						break;
+
+					case 96:
+						yyval = {};
+						yyval.n = ast.operators.assign;
+						break;
 						
+					case 107:
+						yyval = {};
+						yyval.expression = yyvsa[yyvsp].expression;
+						break;
+
 					case 111:
 						yyval = {};
 						yyval.node = yyvsa[yyvsp - 1].declarator_list;
@@ -2061,16 +2089,22 @@ var parser = (function() {
 						yyval.node = yyvsa[yyvsp - 1].type_specifier;
 						break;
 						
+					case 116:
+						yyval = {};
+						yyval['function'] = yyvsa[yyvsp - 1]['function'];
+						yyval['function'].parameters.push(yyvsa[yyvsp].parameter_declarator.link);
+						break;
+
 					case 118:
 						yyval = {};
-						yyval.function = new ast.function();
-						yyval.function.set_location(yylloc);
-						yyval.function.return_type = yyvsa[yyvsp - 2].fully_specified_type;
-						yyval.function.identifier = yyvsa[yyvsp - 1].identifier;
+						yyval['function'] = new ast['function']();
+						yyval['function'].set_location(yylloc);
+						yyval['function'].return_type = yyvsa[yyvsp - 2].fully_specified_type;
+						yyval['function'].identifier = yyvsa[yyvsp - 1].identifier;
 						//state.symbols.functions.push(new ir_function(yyvsa[yyvsp - 1].identifier));
 						//state.symbols.push_scope();
 						break;
-						
+
 					case 124:
 						yyval = {};
 						yyval.parameter_declarator = new ast.parameter_declarator();
@@ -2127,7 +2161,7 @@ var parser = (function() {
 					
 					case 181:
 						yyval = {};
-						yyval.n = ast.void;
+						yyval.n = ast['void'];
 						break;
 
 					case 182:
@@ -2147,18 +2181,57 @@ var parser = (function() {
 						yyval = {};
 						yyval.n = ast.precision.high;
 						break;
+					
+					case 261:
+						yyval = {};
+						yyval.compound_statement = new ast.compound_statement(false, yyvsa[yyvsp - 1].node);
+						yyval.compound_statement.set_location(yylloc);
+						break;
+
+					case 262:
+						if (yyvsa[yyvsp].node == null) {
+							_mesa_glsl_error(yylsa[yylsp], state, "<nil> statement\n");
+						}
+						yyval = {};
+						yyval.node = yyvsa[yyvsp].node;
+						break;
+
+					case 265:
+						yyval = {};
+						yyval.node = new ast.expression_statement(yyvsa[yyvsp - 1].expression);
+						yyval.node.set_location(yylloc);
+						break;
+
+					case 288:
+						yyval = {};
+						yyval.node = yyvsa[yyvsp].function_definition;
+						break;
 
 					case 289:
 						yyval = {};
 						yyval.node = yyvsa[yyvsp].node;
 						break;
 
+					case 291:
+						yyval = {};
+						yyval.function_definition = new ast.function_definition();
+						yyval.function_definition.set_location(yylloc);
+						yyval.function_definition.prototype = yyvsa[yyvsp - 1]['function'];
+						yyval.function_definition.body = yyvsa[yyvsp].compound_statement;
+						//state.symbols.pop_scope();
+						break;
+
+
 					//incomplete states
 
-
+					
+					case 2:
+					case 3:
 					case 5:
 					case 10:
 					case 16:
+					case 17:
+					case 18:
 					case 21:
 					case 22:
 					case 23:
@@ -2221,13 +2294,18 @@ var parser = (function() {
 					case 107:
 					case 108:
 					case 110:
+					case 111:
+					case 112:
 					case 116:
 					case 117:
+					case 118:
 					case 119:
 					case 120:
 					case 121:
 					case 122:
 					case 123:
+					case 124:
+					case 125:
 					case 126:
 					case 127:
 					case 128:
@@ -2238,12 +2316,15 @@ var parser = (function() {
 					case 135:
 					case 136:
 					case 137:
+					case 138:
 					case 139:
 					case 140:
 					case 141:
 					case 142:
 					case 143:
 					case 144:
+					case 145:
+					case 146:
 					case 147:
 					case 149:
 					case 150:
@@ -2259,22 +2340,28 @@ var parser = (function() {
 					case 163:
 					case 164:
 					case 165:
+					case 166:
 					case 167:
 					case 168:
 					case 169:
 					case 170:
 					case 171:
 					case 172:
+					case 173:
 					case 174:
 					case 176:
 					case 177:
+					case 178:
 					case 179:
 					case 180:
+					case 181:
+					case 182:
 					case 183:
 					case 184:
 					case 185:
 					case 186:
 					case 187:
+					case 188:
 					case 189:
 					case 190:
 					case 191:
@@ -2318,6 +2405,7 @@ var parser = (function() {
 					case 229:
 					case 230:
 					case 231:
+					case 232:
 					case 233:
 					case 234:
 					case 235:
@@ -2359,9 +2447,10 @@ var parser = (function() {
 					case 286:
 					case 287:
 					case 288:
+					case 289:
 					case 290:
 					case 291:
-						throw new Error('Missing state: ' + yyn);
+  						throw new Error('Missing state: ' + yyn);
 					default:
 						break;
 				}
@@ -2472,14 +2561,43 @@ var parser = (function() {
 					yystate = yyn;
 					_goto = 'yynewstate'; break;
 
+				/*-------------------------------------.
+				| yyacceptlab -- YYACCEPT comes here.  |
+				`-------------------------------------*/
+				case 'yyacceptlab':
+					yyresult = 0;
+					_goto = 'yyreturn'; break;
 
+				/*-----------------------------------.
+				| yyabortlab -- YYABORT comes here.  |
+				`-----------------------------------*/
+				case 'yyabortlab':
+					yyresult = 1;
+					_goto = 'yyreturn'; break;
+					
+				/*-------------------------------------------------.
+				| yyexhaustedlab -- memory exhaustion comes here.  |
+				`-------------------------------------------------*/
+				case 'yyexhaustedlab':
+				if (YYERROR_VERBOSE) {
+					yyerror(yylloc, state, YY_("memory exhausted"));
+					yyresult = 2;
+					/* Fall through.  */
+				}
 
-
-				default:
-					throw new Error('Should not get here: goto ' + _goto);		
+				case 'yyreturn':
+					if (yychar != YYEMPTY) {
+						 yydestruct("Cleanup: discarding lookahead", yytoken, yylval, yylloc, state);
+					}
+					/* Do not reclaim the symbols of the rule which action triggered
+					 this YYABORT or YYACCEPT.  */
+					YYPOPSTACK(yylen);
+					YY_STACK_PRINT(yyss, yyssp);
+					return yyresult;
+										
 			}
 		} //end while(true)
-		
+
 	}
 
 
@@ -2489,17 +2607,18 @@ var parser = (function() {
 	var YYPRINT;
 	var yylex;
 	var yyerror;
+	var initialize_types;
 
 	
 	var parser = {
-		
+
 		extern : function(varname, value) {
-			eval(varname + " = value;");	
+			eval(varname + " = value;");
 		},
 
 		//external visibility
 		yytokentype : yytokentype,
-		yyparse : yyparse,
+		yyparse : yyparse
 	};
 
 	return parser;

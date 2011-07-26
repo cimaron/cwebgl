@@ -34,7 +34,7 @@ var ast = (function() {
 				line : 0,
 				column : 0
 			};
-			this.link = null;
+			this.link = [];
 		}
 
 		//public:
@@ -78,11 +78,13 @@ var ast = (function() {
 		return Constructor;
 	})();
 	
+	
+
 
 	/**
 	 * Operators for AST expression nodes.
 	 */
-	var ast_operators = {	
+	var ast_operators = {
 		assign : 0,
 		plus : 1,        /**< Unary + operator. */
 		neg : 2,
@@ -173,7 +175,7 @@ var ast = (function() {
 	};
 
 	ast_types = {
-		void : 0,
+		'void' : 0,
 		float : 1,
 		int : 2,
 		uint : 3,
@@ -371,7 +373,7 @@ var ast = (function() {
 			this.parent();
 			this.return_type = null;
 			this.identifier = null;
-			this.parameters = null;
+			this.parameters = [];
 			this.is_definition = null;
 			this.signature = null;
 		}
@@ -407,6 +409,58 @@ var ast = (function() {
 	})();
 
 
+	/**
+	 * Representation of any sort of expression.
+	 */
+	var ast_expression = (function() {
+
+		//Internal Constructor
+		function ast_expression() {
+			this.parent();
+			this.oper = null;
+			this.subexpressions = new Array(3);
+			this.primary_expression = {};
+			this.expressions = [];
+		}
+
+		//public:
+		ast_expression.ast_expression = function() {
+			if (arguments.length == 1) {
+				this.ast_expression.one.apply(this, arguments);	
+			} else {
+				this.ast_expression.four.apply(this, arguments);
+			}
+		}
+		
+		ast_expression.ast_expression.one = function(identifier) {
+			//this.oper = ast_identifier
+			this.primary_expression.identifier = identifier;
+		}
+		
+		ast_expression.ast_expression.four = function(oper, ex0, ex1, ex2) {
+			this.oper = oper;
+			this.subexpressions[0] = ex0;
+			this.subexpressions[1] = ex1;
+			this.subexpressions[2] = ex2;
+		}
+		
+		ast_expression.print = function() {			
+		}
+
+		//External Constructor
+		function Constructor() {
+			ast_expression.apply(this);
+			this.ast_expression.apply(this, arguments);
+		}
+
+		//Class Inheritance
+		Constructor.prototype = ast_expression;
+		ast_node.extend(ast_expression);
+		
+		return Constructor;
+
+	})();
+
 
 
 	var ast_type_qualifier = function() {
@@ -419,7 +473,7 @@ var ast = (function() {
 		constant : 2,
 		attribute : 4,
 		varying : 8,
-		in : 16,
+		'in' : 16,
 		out : 32,
 		centroid : 64,
 		uniform : 128,
@@ -597,6 +651,110 @@ var ast = (function() {
 
 
 
+
+	var ast_expression_statement = (function() {
+
+		//Internal Constructor
+		function ast_expression_statement() {
+			this.parent();
+			this.expression = null;
+		}
+
+		//public:
+		ast_expression_statement.ast_expression_statement = function(ex) {
+			this.expression = ex;
+		}
+
+		ast_expression_statement.print = function() {			
+		}
+
+		//External Constructor
+		function Constructor(ex) {
+			ast_expression_statement.apply(this);
+			this.ast_expression_statement(ex);
+		}
+
+		//Class Inheritance
+		Constructor.prototype = ast_expression_statement;
+		ast_node.extend(ast_expression_statement);
+
+		return Constructor;
+	
+	})();
+
+
+
+	var ast_compound_statement = (function() {
+
+		//Internal Constructor
+		function ast_compound_statement() {
+			this.parent();
+			this.new_scope = null;
+			this.statements = [];
+		}
+
+		//public:
+		ast_compound_statement.ast_compound_statement = function(new_scope, statements) {
+			this.new_scope = new_scope;
+			if (statements) {
+				for (var i = statements.link.length - 1; i >= 0; i--) {
+					this.statements.unshift(statements.link[i]);	
+				}
+			}
+		}
+
+		ast_compound_statement.print = function() {			
+		}
+
+		//External Constructor
+		function Constructor(new_scope, statements) {
+			ast_compound_statement.apply(this);
+			this.ast_compound_statement(new_scope, statements);
+		}
+
+		//Class Inheritance
+		Constructor.prototype = ast_compound_statement;
+		ast_node.extend(ast_compound_statement);
+
+		return Constructor;
+	
+	})();
+
+
+
+
+	var ast_function_definition = (function() {
+
+		//Internal Constructor
+		function ast_function_definition() {
+			this.parent();
+			this.prototype = null;
+			this.body = null;
+		}
+
+		//public:
+		ast_function_definition.ast_function_definition = function() {
+		}
+
+		ast_function_definition.print = function() {			
+		}
+
+		//External Constructor
+		function Constructor() {
+			ast_function_definition.apply(this);
+			this.ast_function_definition();
+		}
+
+		//Class Inheritance
+		Constructor.prototype = ast_function_definition;
+		ast_node.extend(ast_function_definition);
+
+		return Constructor;
+	
+	})();
+
+
+
 	var ast = {	
 		float : 2,
 		precision : ast_precision,
@@ -605,8 +763,13 @@ var ast = (function() {
 		fully_specified_type : ast_fully_specified_type,
 		declaration : ast_declaration,
 		declarator_list : ast_declarator_list,
-		function : ast_function,
-		parameter_declarator : ast_parameter_declarator
+		'function' : ast_function,
+		parameter_declarator : ast_parameter_declarator,
+		expression : ast_expression,
+		operators : ast_operators,
+		expression_statement : ast_expression_statement,
+		compound_statement : ast_compound_statement,
+		function_definition : ast_function_definition
 	}
 
 	return ast;

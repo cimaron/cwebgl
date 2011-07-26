@@ -329,12 +329,13 @@ HASH		^{SPC}#{SPC}
 [_a-zA-Z][_a-zA-Z0-9]*	{
 				var state = yy.yyextra;
 				var ctx = state;
-				yy.yylval.identifier = ralloc_strdup(ctx, yytext);
+				yy.yylval.identifier = yytext;
 			    return yy.classify_identifier(state, yytext);
 			}
 
 .			{ return yytext[0].charCodeAt(0); }
 
+<<EOF>>		return 0; /*YYEOF*/
 
 
 /lex

@@ -36,8 +36,7 @@ var compiler = (function() {
 		
 		es_shader : true,		
 		language_version : 110,
-		version_string : '',
-		
+		version_string : ''
 	};
 	var ES = yyextra.es_shader;
 
@@ -54,6 +53,9 @@ var compiler = (function() {
 	var yylex = function(_yylval, yylloc, scanner) {
 		parser.yylval = copy(yylval, _yylval);
 		var result = lexer.lex();
+		if (result == 1) {
+			result = 0; //YYEOF	
+		}
 		copy(yylloc, lexer.yylloc);
 		return result;
 	};
@@ -105,7 +107,7 @@ var compiler = (function() {
 			yylval.identifier = this.lexer.yytext;
 			return this.classify_identifier(this.yyextra, this.lexer.yytext);
 		}
-	};
+	}
 
 	var classify_identifier = function(state, name) {
 		if (state.symbols.variables[name] || state.symbols.functions[name]) {
@@ -115,9 +117,12 @@ var compiler = (function() {
 		} else {
 			return parser.yytokentype.NEW_IDENTIFIER;
 		}
-	};
+	}
 
 
+	var initialize_types = function(state) {
+		
+	}
 
 
 	var compiler = {
@@ -148,6 +153,7 @@ var compiler = (function() {
 			this.parser.extern('yylex', yylex);
 			this.parser.extern('yyerror', yyerror);
 			this.parser.extern('YYPRINT', YYPRINT);
+			this.parser.extern('initialize_types', initialize_types);
 			this.token = p.yytokentype;
 		},
  
@@ -155,9 +161,9 @@ var compiler = (function() {
 			src = preprocessor.process(src);
 			lexer.setInput(src);
 			var result = parser.yyparse(yyextra);
+			debugger;
 			return result;
 		}
-		
 	}
 	
 	return compiler;
