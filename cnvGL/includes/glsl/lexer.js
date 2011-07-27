@@ -268,7 +268,7 @@ var lexer = (function () {
 			return 'INT_TOK';
 			break;
 		case 26:
-			return yy.KEYWORD(130, 130, UINT_TOK);
+			return this.KEYWORD(130, 130, UINT_TOK);
 			break;
 		case 27:
 			return 250;
@@ -316,13 +316,13 @@ var lexer = (function () {
 			return 145;
 			break;
 		case 42:
-			return yy.KEYWORD(130, 130, UVEC2);
+			return this.KEYWORD(130, 130, UVEC2);
 			break;
 		case 43:
-			return yy.KEYWORD(130, 130, UVEC3);
+			return this.KEYWORD(130, 130, UVEC3);
 			break;
 		case 44:
-			return yy.KEYWORD(130, 130, UVEC4);
+			return this.KEYWORD(130, 130, UVEC4);
 			break;
 		case 45:
 			return 134;
@@ -343,31 +343,31 @@ var lexer = (function () {
 			return 160;
 			break;
 		case 51:
-			return yy.KEYWORD(120, 120, MAT2X2);
+			return this.KEYWORD(120, 120, MAT2X2);
 			break;
 		case 52:
-			return yy.KEYWORD(120, 120, MAT2X3);
+			return this.KEYWORD(120, 120, MAT2X3);
 			break;
 		case 53:
-			return yy.KEYWORD(120, 120, MAT2X4);
+			return this.KEYWORD(120, 120, MAT2X4);
 			break;
 		case 54:
-			return yy.KEYWORD(120, 120, MAT3X2);
+			return this.KEYWORD(120, 120, MAT3X2);
 			break;
 		case 55:
-			return yy.KEYWORD(120, 120, MAT3X3);
+			return this.KEYWORD(120, 120, MAT3X3);
 			break;
 		case 56:
-			return yy.KEYWORD(120, 120, MAT3X4);
+			return this.KEYWORD(120, 120, MAT3X4);
 			break;
 		case 57:
-			return yy.KEYWORD(120, 120, MAT4X2);
+			return this.KEYWORD(120, 120, MAT4X2);
 			break;
 		case 58:
-			return yy.KEYWORD(120, 120, MAT4X3);
+			return this.KEYWORD(120, 120, MAT4X3);
 			break;
 		case 59:
-			return yy.KEYWORD(120, 120, MAT4X4);
+			return this.KEYWORD(120, 120, MAT4X4);
 			break;
 		case 60:
 			return 'IN_TOK';
@@ -385,19 +385,19 @@ var lexer = (function () {
 			return yy.token.VARYING;
 			break;
 		case 65:
-			return yy.KEYWORD(120, 120, CENTROID);
+			return this.KEYWORD(120, 120, CENTROID);
 			break;
 		case 66:
-			return yy.KEYWORD([120, 1], [120, 1], INVARIANT, true, true);
+			return this.KEYWORD([120, 1], [120, 1], INVARIANT, true, true);
 			break;
 		case 67:
-			return yy.KEYWORD([130, 1], 130, FLAT);
+			return this.KEYWORD([130, 1], 130, FLAT);
 			break;
 		case 68:
-			return yy.KEYWORD(130, 130, SMOOTH);
+			return this.KEYWORD(130, 130, SMOOTH);
 			break;
 		case 69:
-			return yy.KEYWORD(130, 130, NOPERSPECTIVE);
+			return this.KEYWORD(130, 130, NOPERSPECTIVE);
 			break;
 		case 70:
 			return 173;
@@ -412,10 +412,10 @@ var lexer = (function () {
 			return 176;
 			break;
 		case 74:
-			return yy.KEYWORD(130, 130, SAMPLER1DARRAY);
+			return this.KEYWORD(130, 130, SAMPLER1DARRAY);
 			break;
 		case 75:
-			return yy.KEYWORD(130, 130, SAMPLER2DARRAY);
+			return this.KEYWORD(130, 130, SAMPLER2DARRAY);
 			break;
 		case 76:
 			return 177;
@@ -424,49 +424,49 @@ var lexer = (function () {
 			return 178;
 			break;
 		case 78:
-			return yy.KEYWORD(130, 130, SAMPLERCUBESHADOW);
+			return this.KEYWORD(130, 130, SAMPLERCUBESHADOW);
 			break;
 		case 79:
-			return yy.KEYWORD(130, 130, SAMPLER1DARRAYSHADOW);
+			return this.KEYWORD(130, 130, SAMPLER1DARRAYSHADOW);
 			break;
 		case 80:
-			return yy.KEYWORD(130, 130, SAMPLER2DARRAYSHADOW);
+			return this.KEYWORD(130, 130, SAMPLER2DARRAYSHADOW);
 			break;
 		case 81:
-			return yy.KEYWORD(130, 130, ISAMPLER1D);
+			return this.KEYWORD(130, 130, ISAMPLER1D);
 			break;
 		case 82:
-			return yy.KEYWORD(130, 130, ISAMPLER2D);
+			return this.KEYWORD(130, 130, ISAMPLER2D);
 			break;
 		case 83:
-			return yy.KEYWORD(130, 130, ISAMPLER3D);
+			return this.KEYWORD(130, 130, ISAMPLER3D);
 			break;
 		case 84:
-			return yy.KEYWORD(130, 130, ISAMPLERCUBE);
+			return this.KEYWORD(130, 130, ISAMPLERCUBE);
 			break;
 		case 85:
-			return yy.KEYWORD(130, 130, ISAMPLER1DARRAY);
+			return this.KEYWORD(130, 130, ISAMPLER1DARRAY);
 			break;
 		case 86:
-			return yy.KEYWORD(130, 130, ISAMPLER2DARRAY);
+			return this.KEYWORD(130, 130, ISAMPLER2DARRAY);
 			break;
 		case 87:
-			return yy.KEYWORD(130, 130, USAMPLER1D);
+			return this.KEYWORD(130, 130, USAMPLER1D);
 			break;
 		case 88:
-			return yy.KEYWORD(130, 130, USAMPLER2D);
+			return this.KEYWORD(130, 130, USAMPLER2D);
 			break;
 		case 89:
-			return yy.KEYWORD(130, 130, USAMPLER3D);
+			return this.KEYWORD(130, 130, USAMPLER3D);
 			break;
 		case 90:
-			return yy.KEYWORD(130, 130, USAMPLERCUBE);
+			return this.KEYWORD(130, 130, USAMPLERCUBE);
 			break;
 		case 91:
-			return yy.KEYWORD(130, 130, USAMPLER1DARRAY);
+			return this.KEYWORD(130, 130, USAMPLER1DARRAY);
 			break;
 		case 92:
-			return yy.KEYWORD(130, 130, USAMPLER2DARRAY);
+			return this.KEYWORD(130, 130, USAMPLER2DARRAY);
 			break;
 		case 93:
 			return 218;
@@ -591,250 +591,250 @@ var lexer = (function () {
 
 			break;
 		case 127:
-			return yy.KEYWORD([110, 1], 999, ASM);
+			return this.KEYWORD([110, 1], 999, ASM);
 			break;
 		case 128:
-			return yy.KEYWORD([110, 1], 999, CLASS);
+			return this.KEYWORD([110, 1], 999, CLASS);
 			break;
 		case 129:
-			return yy.KEYWORD([110, 1], 999, UNION);
+			return this.KEYWORD([110, 1], 999, UNION);
 			break;
 		case 130:
-			return yy.KEYWORD([110, 1], 999, ENUM);
+			return this.KEYWORD([110, 1], 999, ENUM);
 			break;
 		case 131:
-			return yy.KEYWORD([110, 1], 999, TYPEDEF);
+			return this.KEYWORD([110, 1], 999, TYPEDEF);
 			break;
 		case 132:
-			return yy.KEYWORD([110, 1], 999, TEMPLATE);
+			return this.KEYWORD([110, 1], 999, TEMPLATE);
 			break;
 		case 133:
-			return yy.KEYWORD([110, 1], 999, THIS);
+			return this.KEYWORD([110, 1], 999, THIS);
 			break;
 		case 134:
-			return yy.KEYWORD([110, 1], 999, PACKED_TOK);
+			return this.KEYWORD([110, 1], 999, PACKED_TOK);
 			break;
 		case 135:
-			return yy.KEYWORD([110, 1], 999, GOTO);
+			return this.KEYWORD([110, 1], 999, GOTO);
 			break;
 		case 136:
-			return yy.KEYWORD([110, 1], 130, SWITCH);
+			return this.KEYWORD([110, 1], 130, SWITCH);
 			break;
 		case 137:
-			return yy.KEYWORD([110, 1], 130, DEFAULT);
+			return this.KEYWORD([110, 1], 130, DEFAULT);
 			break;
 		case 138:
-			return yy.KEYWORD([110, 1], 999, INLINE_TOK);
+			return this.KEYWORD([110, 1], 999, INLINE_TOK);
 			break;
 		case 139:
-			return yy.KEYWORD([110, 1], 999, NOINLINE);
+			return this.KEYWORD([110, 1], 999, NOINLINE);
 			break;
 		case 140:
-			return yy.KEYWORD([110, 1], 999, VOLATILE);
+			return this.KEYWORD([110, 1], 999, VOLATILE);
 			break;
 		case 141:
-			return yy.KEYWORD([110, 1], 999, PUBLIC_TOK);
+			return this.KEYWORD([110, 1], 999, PUBLIC_TOK);
 			break;
 		case 142:
-			return yy.KEYWORD([110, 1], 999, STATIC);
+			return this.KEYWORD([110, 1], 999, STATIC);
 			break;
 		case 143:
-			return yy.KEYWORD([110, 1], 999, EXTERN);
+			return this.KEYWORD([110, 1], 999, EXTERN);
 			break;
 		case 144:
-			return yy.KEYWORD([110, 1], 999, EXTERNAL);
+			return this.KEYWORD([110, 1], 999, EXTERNAL);
 			break;
 		case 145:
-			return yy.KEYWORD([110, 1], 999, INTERFACE);
+			return this.KEYWORD([110, 1], 999, INTERFACE);
 			break;
 		case 146:
-			return yy.KEYWORD([110, 1], 999, LONG_TOK);
+			return this.KEYWORD([110, 1], 999, LONG_TOK);
 			break;
 		case 147:
-			return yy.KEYWORD([110, 1], 999, SHORT_TOK);
+			return this.KEYWORD([110, 1], 999, SHORT_TOK);
 			break;
 		case 148:
-			return yy.KEYWORD([110, 1], 400, DOUBLE_TOK);
+			return this.KEYWORD([110, 1], 400, DOUBLE_TOK);
 			break;
 		case 149:
-			return yy.KEYWORD([110, 1], 999, HALF);
+			return this.KEYWORD([110, 1], 999, HALF);
 			break;
 		case 150:
-			return yy.KEYWORD([110, 1], 999, FIXED_TOK);
+			return this.KEYWORD([110, 1], 999, FIXED_TOK);
 			break;
 		case 151:
-			return yy.KEYWORD([110, 1], 999, UNSIGNED);
+			return this.KEYWORD([110, 1], 999, UNSIGNED);
 			break;
 		case 152:
-			return yy.KEYWORD([110, 1], 999, INPUT_TOK);
+			return this.KEYWORD([110, 1], 999, INPUT_TOK);
 			break;
 		case 153:
-			return yy.KEYWORD([110, 1], 999, OUTPUT);
+			return this.KEYWORD([110, 1], 999, OUTPUT);
 			break;
 		case 154:
-			return yy.KEYWORD([110, 1], 999, HVEC2);
+			return this.KEYWORD([110, 1], 999, HVEC2);
 			break;
 		case 155:
-			return yy.KEYWORD([110, 1], 999, HVEC3);
+			return this.KEYWORD([110, 1], 999, HVEC3);
 			break;
 		case 156:
-			return yy.KEYWORD([110, 1], 999, HVEC4);
+			return this.KEYWORD([110, 1], 999, HVEC4);
 			break;
 		case 157:
-			return yy.KEYWORD([110, 1], 400, DVEC2);
+			return this.KEYWORD([110, 1], 400, DVEC2);
 			break;
 		case 158:
-			return yy.KEYWORD([110, 1], 400, DVEC3);
+			return this.KEYWORD([110, 1], 400, DVEC3);
 			break;
 		case 159:
-			return yy.KEYWORD([110, 1], 400, DVEC4);
+			return this.KEYWORD([110, 1], 400, DVEC4);
 			break;
 		case 160:
-			return yy.KEYWORD([110, 1], 999, FVEC2);
+			return this.KEYWORD([110, 1], 999, FVEC2);
 			break;
 		case 161:
-			return yy.KEYWORD([110, 1], 999, FVEC3);
+			return this.KEYWORD([110, 1], 999, FVEC3);
 			break;
 		case 162:
-			return yy.KEYWORD([110, 1], 999, FVEC4);
+			return this.KEYWORD([110, 1], 999, FVEC4);
 			break;
 		case 163:
 			return 200;
 			break;
 		case 164:
-			return yy.KEYWORD([110, 1], 999, SAMPLER3DRECT);
+			return this.KEYWORD([110, 1], 999, SAMPLER3DRECT);
 			break;
 		case 165:
 			return 201;
 			break;
 		case 166:
-			return yy.KEYWORD([110, 1], 999, SIZEOF);
+			return this.KEYWORD([110, 1], 999, SIZEOF);
 			break;
 		case 167:
-			return yy.KEYWORD([110, 1], 999, CAST);
+			return this.KEYWORD([110, 1], 999, CAST);
 			break;
 		case 168:
-			return yy.KEYWORD([110, 1], 999, NAMESPACE);
+			return this.KEYWORD([110, 1], 999, NAMESPACE);
 			break;
 		case 169:
-			return yy.KEYWORD([110, 1], 999, USING);
+			return this.KEYWORD([110, 1], 999, USING);
 			break;
 		case 170:
-			return yy.KEYWORD(120, [130, 1], LOWP);
+			return this.KEYWORD(120, [130, 1], LOWP);
 			break;
 		case 171:
-			return yy.KEYWORD(120, [130, 1], MEDIUMP);
+			return this.KEYWORD(120, [130, 1], MEDIUMP);
 			break;
 		case 172:
-			return yy.KEYWORD(120, [130, 1], yy.token.HIGHP);
+			return this.KEYWORD(120, [130, 1], yy.token.HIGHP);
 			break;
 		case 173:
-			return yy.KEYWORD(120, [130, 1], yy.token.PRECISION);
+			return this.KEYWORD(120, [130, 1], yy.token.PRECISION);
 			break;
 		case 174:
-			return yy.KEYWORD(130, 130, CASE);
+			return this.KEYWORD(130, 130, CASE);
 			break;
 		case 175:
-			return yy.KEYWORD(130, 999, COMMON);
+			return this.KEYWORD(130, 999, COMMON);
 			break;
 		case 176:
-			return yy.KEYWORD(130, 999, PARTITION);
+			return this.KEYWORD(130, 999, PARTITION);
 			break;
 		case 177:
-			return yy.KEYWORD(130, 999, ACTIVE);
+			return this.KEYWORD(130, 999, ACTIVE);
 			break;
 		case 178:
-			return yy.KEYWORD([130, 1], 999, SUPERP);
+			return this.KEYWORD([130, 1], 999, SUPERP);
 			break;
 		case 179:
-			return yy.KEYWORD(130, 140, SAMPLERBUFFER);
+			return this.KEYWORD(130, 140, SAMPLERBUFFER);
 			break;
 		case 180:
-			return yy.KEYWORD(130, 999, FILTER);
+			return this.KEYWORD(130, 999, FILTER);
 			break;
 		case 181:
-			return yy.KEYWORD(130, 999, IMAGE1D);
+			return this.KEYWORD(130, 999, IMAGE1D);
 			break;
 		case 182:
-			return yy.KEYWORD(130, 999, IMAGE2D);
+			return this.KEYWORD(130, 999, IMAGE2D);
 			break;
 		case 183:
-			return yy.KEYWORD(130, 999, IMAGE3D);
+			return this.KEYWORD(130, 999, IMAGE3D);
 			break;
 		case 184:
-			return yy.KEYWORD(130, 999, IMAGECUBE);
+			return this.KEYWORD(130, 999, IMAGECUBE);
 			break;
 		case 185:
-			return yy.KEYWORD(130, 999, IIMAGE1D);
+			return this.KEYWORD(130, 999, IIMAGE1D);
 			break;
 		case 186:
-			return yy.KEYWORD(130, 999, IIMAGE2D);
+			return this.KEYWORD(130, 999, IIMAGE2D);
 			break;
 		case 187:
-			return yy.KEYWORD(130, 999, IIMAGE3D);
+			return this.KEYWORD(130, 999, IIMAGE3D);
 			break;
 		case 188:
-			return yy.KEYWORD(130, 999, IIMAGECUBE);
+			return this.KEYWORD(130, 999, IIMAGECUBE);
 			break;
 		case 189:
-			return yy.KEYWORD(130, 999, UIMAGE1D);
+			return this.KEYWORD(130, 999, UIMAGE1D);
 			break;
 		case 190:
-			return yy.KEYWORD(130, 999, UIMAGE2D);
+			return this.KEYWORD(130, 999, UIMAGE2D);
 			break;
 		case 191:
-			return yy.KEYWORD(130, 999, UIMAGE3D);
+			return this.KEYWORD(130, 999, UIMAGE3D);
 			break;
 		case 192:
-			return yy.KEYWORD(130, 999, UIMAGECUBE);
+			return this.KEYWORD(130, 999, UIMAGECUBE);
 			break;
 		case 193:
-			return yy.KEYWORD(130, 999, IMAGE1DARRAY);
+			return this.KEYWORD(130, 999, IMAGE1DARRAY);
 			break;
 		case 194:
-			return yy.KEYWORD(130, 999, IMAGE2DARRAY);
+			return this.KEYWORD(130, 999, IMAGE2DARRAY);
 			break;
 		case 195:
-			return yy.KEYWORD(130, 999, IIMAGE1DARRAY);
+			return this.KEYWORD(130, 999, IIMAGE1DARRAY);
 			break;
 		case 196:
-			return yy.KEYWORD(130, 999, IIMAGE2DARRAY);
+			return this.KEYWORD(130, 999, IIMAGE2DARRAY);
 			break;
 		case 197:
-			return yy.KEYWORD(130, 999, UIMAGE1DARRAY);
+			return this.KEYWORD(130, 999, UIMAGE1DARRAY);
 			break;
 		case 198:
-			return yy.KEYWORD(130, 999, UIMAGE2DARRAY);
+			return this.KEYWORD(130, 999, UIMAGE2DARRAY);
 			break;
 		case 199:
-			return yy.KEYWORD(130, 999, IMAGE1DSHADOW);
+			return this.KEYWORD(130, 999, IMAGE1DSHADOW);
 			break;
 		case 200:
-			return yy.KEYWORD(130, 999, IMAGE2DSHADOW);
+			return this.KEYWORD(130, 999, IMAGE2DSHADOW);
 			break;
 		case 201:
-			return yy.KEYWORD(130, 999, IMAGE1DARRAYSHADOW);
+			return this.KEYWORD(130, 999, IMAGE1DARRAYSHADOW);
 			break;
 		case 202:
-			return yy.KEYWORD(130, 999, IMAGE2DARRAYSHADOW);
+			return this.KEYWORD(130, 999, IMAGE2DARRAYSHADOW);
 			break;
 		case 203:
-			return yy.KEYWORD(130, 999, IMAGEBUFFER);
+			return this.KEYWORD(130, 999, IMAGEBUFFER);
 			break;
 		case 204:
-			return yy.KEYWORD(130, 999, IIMAGEBUFFER);
+			return this.KEYWORD(130, 999, IIMAGEBUFFER);
 			break;
 		case 205:
-			return yy.KEYWORD(130, 999, UIMAGEBUFFER);
+			return this.KEYWORD(130, 999, UIMAGEBUFFER);
 			break;
 		case 206:
-			return yy.KEYWORD(130, 999, ROW_MAJOR);
+			return this.KEYWORD(130, 999, ROW_MAJOR);
 			break;
 		case 207:
 			var state = yy.yyextra;
 			var ctx = state;
 			yy.yylval.identifier = yy_.yytext;
-			return yy.classify_identifier(state, yy_.yytext);
+			return this.classify_identifier(state, yy_.yytext);
 			break;
 		case 208:
 			return yy_.yytext[0].charCodeAt(0);

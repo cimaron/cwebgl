@@ -34,7 +34,7 @@ var ast = (function() {
 				line : 0,
 				column : 0
 			};
-			this.link = [];
+			this.link = null;
 		}
 
 		//public:
@@ -254,7 +254,7 @@ var ast = (function() {
 
 		//overloaded constructors
 		ast_type_specifier.ast_type_specifier.number = function(specifier) {
-			this.type_specifier = ast_types[specifier];
+			this.type_specifier = specifier;
 			this.precision = ast_precision.none;
 			this.is_precision_statement = false;
 			var names = [
@@ -318,7 +318,7 @@ var ast = (function() {
 		}
 
 		ast_type_specifier.ast_type_specifier.string = function(name) {
-			this.type_specifier = ast_type.name;
+			this.type_specifier = ast_types.type_name;
 			this.type_name = name;
 			this.is_array = false;
 			this.precision = ast_precision.none;
@@ -587,7 +587,7 @@ var ast = (function() {
 			
 			for (var i = 0; i < this.declarations.length; i++) {
 				if (i != 0) {
-					printf(", ");	
+					printf(", ");
 				}
 				var ast = exec_node_data(this.ast_node, i, this.link);
 				ast.print();
@@ -697,9 +697,7 @@ var ast = (function() {
 		ast_compound_statement.ast_compound_statement = function(new_scope, statements) {
 			this.new_scope = new_scope;
 			if (statements) {
-				for (var i = statements.link.length - 1; i >= 0; i--) {
-					this.statements.unshift(statements.link[i]);	
-				}
+				this.statements.unshift(statements);	
 			}
 		}
 
@@ -755,8 +753,8 @@ var ast = (function() {
 
 
 
-	var ast = {	
-		float : 2,
+	var ast = {
+		types : ast_types,
 		precision : ast_precision,
 		type_qualifier : ast_type_qualifier,
 		type_specifier : ast_type_specifier,
