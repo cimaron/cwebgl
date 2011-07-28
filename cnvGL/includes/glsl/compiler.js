@@ -25,6 +25,63 @@ var compiler = (function() {
 	var lexer;
 	var parser;
 
+	//stdin, stdout, stderr, buffer
+	var output = [null, '', ''];
+	var log = [null, '', ''];
+
+	var sprintf = function(str) {
+		var i = 1, m, rest = str; str = '';
+		while (m = rest.match('%([l]?)([dus%])')) {
+			var d = m[0];
+			switch (m[2]) {
+				case 'u':
+				case 'd':
+					d = parseInt(arguments[i]);
+					break;
+				case 's':
+					d = arguments[i];
+					break;
+				case '%':
+					d = '%';
+					break;
+				default:
+			}
+			i++;
+			str += rest.slice(0, m.index) + d;
+			rest = rest.slice(m.index + m[0].length);
+		}
+		str += rest;
+		return str;
+	};
+
+	var printf = function() {
+		var args = [].splice.call(arguments, 0);
+		args.unshift(1);
+		fprintf.apply(null, args);
+	}
+	
+	var fprintf = function(file, str) {
+		var args = [].splice.call(arguments, 1);	
+		str = sprintf.apply(null, args);
+		output[file ? file : 1] = str;
+		ob_stream(file, str);
+	};
+
+	var ob_stream = function(file, str) {
+		var i;
+		str = log[file] + str;
+		while ((i = str.indexOf("\n")) != -1) {
+			if (file == 2) {
+				console.log(str.slice(0, i));
+			} else {
+				console.info(str.slice(0, i));	
+			}
+			str = str.slice(i + 1);
+		}
+		log[file] = str;
+	}
+
+
 	var yyextra = {
 		scanner : null,
 		translation_unit : [],
@@ -48,8 +105,8 @@ var compiler = (function() {
 		}
 		return target;
 	};
-	
-	var yylex = function(_yylval, yylloc, scanner) {
+
+	var next_token = function(_yylval, yylloc, scanner) {
 		parser.yylval = copy(yylval, _yylval);
 		var result = lexer.lex();
 		if (result == 1) {
@@ -59,34 +116,33 @@ var compiler = (function() {
 		return result;
 	};
 
-	var yyerror = function(yylloc, state, error) {
-		compiler.errors.push(error + " at line " + yylloc.first_line + " column " + yylloc.first_column);
-	};
-
-	var YYPRINT = function(yyoutput, yytoknum, yyvaluep) {
+	var print_node = function(yyoutput, yytoknum, yyvaluep) {
 		//object or child has print method
 		if (yyvaluep.print) {
 			yyvaluep.print();
 			return;
 		}
-
+		
 		if (typeof yyvaluep == 'object') {
 			for (var i in yyvaluep) {
 				if (yyvaluep[i] && yyvaluep[i].print) {
-					YYPRINT(yyoutput, yytoknum, yyvaluep[i]);
+					print_node(yyoutput, yytoknum, yyvaluep[i]);
 					return;
 				}
 			}
 		}
-
+		
 		if (JSON.stringify) {
-			fprintf(stdout, JSON.stringify(yyvaluep, null, 4));
+			fprintf(1, JSON.stringify(yyvaluep, null, 4));
 		} else {
-			fprintf(stdout, yyvaluep + "");
+			fprintf(1, yyvaluep + "");
 			//console.log(yyvaluep);
-		}
+		}		
 	}
 
+	var print_error = function(yylloc, state, error) {
+		compiler.errors.push(error + " at line " + yylloc.first_line + " column " + yylloc.first_column);
+	};
 
 
 	var initialize_types = function(state) {
@@ -117,9 +173,12 @@ var compiler = (function() {
 
 		setParser : function(p) {
 			this.parser = parser = p;
-			this.parser.extern('yylex', yylex);
-			this.parser.extern('yyerror', yyerror);
-			this.parser.extern('YYPRINT', YYPRINT);
+			this.parser.extern('yylex', next_token);
+			this.parser.extern('yyerror', print_error);
+			this.parser.extern('printf', printf);
+			this.parser.extern('fprintf', fprintf);
+			this.parser.extern('YYPRINT', print_node);
+			this.parser.extern('YYFPRINTF', fprintf);
 			this.parser.extern('initialize_types', initialize_types);
 			this.token = p.yytokentype;
 

@@ -1650,7 +1650,10 @@ var parser = (function() {
 
 	/* Enable debugging if requested.  */
 	if (YYDEBUG) {
-		var YYFPRINTF = fprintf;
+	
+		var YYPRINT = function(yyoutput, yytoknum, yyvaluep) {};
+
+		var YYFPRINTF = function() {};
 
 		var YYDPRINTF = function() {
 			if (yydebug) { 
@@ -1660,9 +1663,9 @@ var parser = (function() {
 
 		var YY_SYMBOL_PRINT = function(Title, Type, Value, Location) {
 			if (yydebug) {
-				YYFPRINTF(stderr, "%s ", Title);
-				yy_symbol_print(stderr, Type, Value, Location);
-				YYFPRINTF(stderr, "\n");
+				YYFPRINTF(3, "%s ", Title);
+				yy_symbol_print(3, Type, Value, Location);
+				YYFPRINTF(3, "\n");
 			}
 		}
 
@@ -1703,14 +1706,14 @@ var parser = (function() {
 			var yyi;
 			var yylno = yyrline[yyrule];
 
-			YYFPRINTF(stderr, "Reducing stack by rule %d (line %lu):\n", yyrule - 1, yylno);
+			YYFPRINTF(3, "Reducing stack by rule %d (line %lu):\n", yyrule - 1, yylno);
 			/* The symbols being reduced.  */
 			for (yyi = 0; yyi < yynrhs; yyi++) {
-				YYFPRINTF(stderr, "   $%d = ", yyi + 1);
-				yy_symbol_print(stderr, yyrhs[yyprhs[yyrule] + yyi],
+				YYFPRINTF(3, "   $%d = ", yyi + 1);
+				yy_symbol_print(3, yyrhs[yyprhs[yyrule] + yyi],
 					yyvsa[yyvsp + (yyi + 1) - (yynrhs)],
 					yylsa[yylsp + (yyi + 1) - (yynrhs)]);
-				YYFPRINTF (stderr, "\n");
+				YYFPRINTF (3, "\n");
 			}
 		}
 			
@@ -1721,12 +1724,12 @@ var parser = (function() {
 		`------------------------------------------------------------------*/
 
 		var yy_stack_print = function(yystack, yybottom, yytop) {
-			YYFPRINTF (stderr, "Stack now");
+			YYFPRINTF (3, "Stack now");
 			for (; yybottom <= yytop; yybottom++) {
 				var yybot = yybottom;
-				YYFPRINTF (stderr, " %d", yystack[yybot]);
+				YYFPRINTF (3, " %d", yystack[yybot]);
 			}
-			YYFPRINTF (stderr, "\n");
+			YYFPRINTF (3, "\n");
 		}
 
 		var YY_STACK_PRINT = function(Stack, Bottom, Top) {
@@ -1887,7 +1890,7 @@ var parser = (function() {
 		yyls = 0;
 		yystacksize = YYINITDEPTH;
 		
-		YYDPRINTF(stderr, "Starting parse\n");
+		YYDPRINTF(2, "Starting parse\n");
 
 		yystate = 0;
 		yyerrstatus = 0;
@@ -1946,7 +1949,7 @@ var parser = (function() {
 					_goto = 'yyexhaustedlab'; break;			
 				}
 
-				YYDPRINTF(stderr, "Entering state %d\n", yystate);
+				YYDPRINTF(2, "Entering state %d\n", yystate);
 			
 				if (yystate == YYFINAL) {
 					_goto = 'yyacceptlab'; break;
@@ -1972,13 +1975,13 @@ var parser = (function() {
 
 				/* YYCHAR is either YYEMPTY or YYEOF or a valid lookahead symbol.  */
 				if (yychar == YYEMPTY) {
-					YYDPRINTF(stderr, "Reading a token: ");
+					YYDPRINTF(2, "Reading a token: ");
 					yychar = yylex(yylval, yylloc/*, scanner*/);
 				}
 
 				if (yychar <= YYEOF) {
 					yychar = yytoken = YYEOF;
-					YYDPRINTF(stderr, "Now at end of input.\n");
+					YYDPRINTF(2, "Now at end of input.\n");
 				} else {
 					yytoken = YYTRANSLATE(yychar);
 					YY_SYMBOL_PRINT("Next token is", yytoken, yylval, yylloc);
