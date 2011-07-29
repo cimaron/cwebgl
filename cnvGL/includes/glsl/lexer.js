@@ -831,9 +831,8 @@ var lexer = (function () {
 			return this.KEYWORD(130, 999, ROW_MAJOR);
 			break;
 		case 207:
-			var state = yy.yyextra;
-			var ctx = state;
-			yy.yylval.identifier = yy_.yytext;
+			var state = yy.state;
+			this.yylval.identifier = yy_.yytext;
 			return this.classify_identifier(state, yy_.yytext);
 			break;
 		case 208:

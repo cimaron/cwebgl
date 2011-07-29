@@ -327,9 +327,8 @@ HASH		^{SPC}#{SPC}
 "row_major"	return this.KEYWORD(130, 999, ROW_MAJOR);
 
 [_a-zA-Z][_a-zA-Z0-9]*	{
-				var state = yy.yyextra;
-				var ctx = state;
-				yy.yylval.identifier = yytext;
+				var state = yy.state;
+				this.yylval.identifier = yytext;
 			    return this.classify_identifier(state, yytext);
 			}
 
