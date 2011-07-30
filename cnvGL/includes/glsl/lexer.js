@@ -249,8 +249,8 @@ var lexer = (function () {
 			return 'EOL';
 			break;
 		case 20:
-			yy_.yylineno++;
-			yycolumn = 0;
+			/*yy_.yylineno++;
+			yycolumn = 0;*/
 			break;
 		case 21:
 			return 122;

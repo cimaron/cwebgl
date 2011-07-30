@@ -38,7 +38,7 @@ var ast = (function() {
 		}
 
 		//public:
-		
+
 		ast_node.ast_node = function() {
 			this.location.source = 0;
 			this.location.line = 0;
@@ -74,6 +74,10 @@ var ast = (function() {
 		//Class Inheritance
 		Constructor.prototype = ast_node;
 		Constructor.extend = function(obj) { obj.parent = obj.__proto__ = ast_node; };
+		ast_node.typeof = function(t) {
+			var n = (this.prototype.name ? this.prototype.name : this.prototype.constructor.name);
+			return t ? t == n : n;
+		}
 
 		return Constructor;
 	})();
@@ -496,8 +500,8 @@ var ast = (function() {
 
 		//public:
 
-		ast_fully_specified_type.has_qualifers = function() {
-			return this.qualifer.flags.i != 0;
+		ast_fully_specified_type.has_qualifiers = function() {
+			return this.qualifier.flags.i != 0;
 		}
 
 		ast_fully_specified_type.print = function() {
@@ -526,12 +530,12 @@ var ast = (function() {
 			this.parent();
 			this.identifier = null;
 			this.is_array = 0;
-			this.array_Size = null;
+			this.array_size = null;
 			this.initializer = null;
 		}
 
 		//public:
-		ast_declaration.ast_declaration = function(identifier, is_array, ast_expression, initializer) {
+		ast_declaration.ast_declaration = function(identifier, is_array, array_size, initializer) {
 			this.identifier = identifier;
 			this.is_array = is_array;
 			this.array_size = array_size;
@@ -548,8 +552,9 @@ var ast = (function() {
 		}
 
 		//External Constructor
-		function Constructor() {
+		function Constructor(identifier, is_array, array_size, initializer) {
 			ast_declaration.apply(this);
+			this.ast_declaration(identifier, is_array, array_size, initializer);
 		}
 
 		//Class Inheritance
@@ -726,7 +731,7 @@ var ast = (function() {
 		//Internal Constructor
 		function ast_function_definition() {
 			this.parent();
-			this.prototype = null;
+			this.proto_type = null;
 			this.body = null;
 		}
 

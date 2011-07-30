@@ -107,19 +107,18 @@ var compiler = (function() {
 		}
 		
 		symbol_table.add_variable = function(v) {	
+			this.table.variables[v.identifer] = v;
 		}
-	
+
 		symbol_table.add_type = function(name, t) {
-			
 		}
 		
 		symbol_table.add_function = function(f) {
-			debugger;
-			this.table.functions;
+			this.table.functions[f.identifer] = f;
 		}
 		
 		symbol_table.add_global_function = function(f) {
-			
+			this.table.functions[f.identifer] = f;			
 		}
 		
 		symbol_table.get_variable = function(name) {
@@ -270,16 +269,13 @@ var compiler = (function() {
 	};
 
 	var next_token = function(p_yylval, yylloc, scanner) {
-		lexer.yylval = {};
-
+		lexer.yylval = p_yylval;
 		var result = lexer.lex();
 		if (result == 1) {
 			result = 0; //YYEOF	
 		}
-
 		//references reset in lexer, copy properties into our object
 		copy(yylloc, lexer.yylloc);
-		copy(p_yylval, lexer.yylval);
 		return result;
 	};
 
@@ -336,10 +332,32 @@ var compiler = (function() {
 		},
  
 		compile : function(src) {
-			src = preprocessor.process(src);
-			lexer.setInput(src);
-			var result = parser.yyparse(state);
-			return result;
+			var parse_result,
+				gen_result,
+				processed_src, object_code;
+			
+			//preprocess
+			processed_src = preprocessor.process(src);
+
+			//parse
+			if (processed_src) {
+				lexer.setInput(processed_src);
+				parse_result = parser.yyparse(state);
+			}
+
+			//generate
+			if (parse_result == 0) {
+				glsl_compiler_generator.createObjectCode(this.state);
+				gen_result = glsl_compiler_generator.status;
+				if (gen_result) {
+					object_code = glsl_compiler_generator.objectCode;
+				} else {
+					this.errors.push(glsl_compiler_generator.errorMsg);	
+					console.log(this.errors[0]);
+				}
+			}
+
+			return object_code;
 		}
 	}
 	

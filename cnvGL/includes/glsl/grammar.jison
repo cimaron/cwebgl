@@ -91,7 +91,7 @@ HASH		^{SPC}#{SPC}
 				}
 <PP>[\n]				{ this.begin('INITIAL'); yylineno++; yycolumn = 0; return 'EOL'; }
 
-[\n]		{ yylineno++; yycolumn = 0; }
+[\n]		{ /*yylineno++; yycolumn = 0;*/ }
 
 "attribute"	return 'ATTRIBUTE';
 "const"		return 'CONST_TOK';

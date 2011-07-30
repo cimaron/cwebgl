@@ -1662,8 +1662,10 @@ var parser = (function() {
 			}
 		
 			YY_LOCATION_PRINT(yyoutput, yylocationp);
-			YYFPRINTF(yyoutput, ": ");
-			yy_symbol_value_print(yyoutput, yytype, yyvaluep, yylocationp);
+			if (yyvaluep && yytype < YYNTOKENS) {
+				YYFPRINTF(yyoutput, ": ");
+				yy_symbol_value_print(yyoutput, yytype, yyvaluep, yylocationp);
+			}
 			YYFPRINTF(yyoutput, ")");
 		};			
 
@@ -2097,7 +2099,6 @@ var parser = (function() {
 						yyval['function'].set_location(yylloc);
 						yyval['function'].return_type = yyvsa[yyvsp - 2].fully_specified_type;
 						yyval['function'].identifier = yyvsa[yyvsp - 1].identifier;
-						debugger;
 						state.symbols.add_function(yyvsa[yyvsp - 1]);
 						state.symbols.push_scope();
 						break;
@@ -2213,7 +2214,7 @@ var parser = (function() {
 						yyval = {};
 						yyval.function_definition = new ast.function_definition();
 						yyval.function_definition.set_location(yylloc);
-						yyval.function_definition.prototype = yyvsa[yyvsp - 1]['function'];
+						yyval.function_definition.proto_type = yyvsa[yyvsp - 1]['function'];
 						yyval.function_definition.body = yyvsa[yyvsp].compound_statement;
 						state.symbols.pop_scope();
 						break;
