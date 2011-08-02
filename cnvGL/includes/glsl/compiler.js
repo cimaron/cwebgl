@@ -19,12 +19,11 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-var compiler = (function() {
+var glsl = (function() {
 
-	var preprocessor;
-	var lexer;
-	var parser;
+	var initialized;
 
+	//#IF DEBUG
 	//stdin, stdout, stderr, buffer
 	var output = [null, '', ''];
 	var log = [null, '', ''];
@@ -59,7 +58,7 @@ var compiler = (function() {
 		args.unshift(1);
 		fprintf.apply(null, args);
 	}
-	
+
 	var fprintf = function(file, str) {
 		var args = [].splice.call(arguments, 1);	
 		str = sprintf.apply(null, args);
@@ -68,7 +67,6 @@ var compiler = (function() {
 	};
 
 	var ob_stream = function(file, str) {
-		debugger;
 		var i;
 		str = log[file] + str;
 		while ((i = str.indexOf("\n")) != -1) {
@@ -81,6 +79,7 @@ var compiler = (function() {
 		}
 		log[file] = str;
 	};
+	//#ENDIF
 
 	var symbol_table_entry;
 
@@ -149,7 +148,6 @@ var compiler = (function() {
 		return Constructor;	
 	
 	})();
-
 
 
 	var parse_state = function() {
@@ -279,21 +277,21 @@ var compiler = (function() {
 		return result;
 	};
 
+	//#IF DEBUG
 	var print_token_value = function(yyoutput, yytoknum, yyvaluep) {
 		fprintf(2, JSON.stringify(yyvaluep).replace(/"/g, ''));
 	}
 
 	var print_error = function(yylloc, state, error) {
-		compiler.errors.push(error + " at line " + yylloc.first_line + " column " + yylloc.first_column);
+		glsl.errors.push(error + " at line " + yylloc.first_line + " column " + yylloc.first_column);
 	};
-
+	//#ENDIF
 
 	var initialize_types = function(state) {
-		
 	}
 
 
-	var compiler = {
+	var glsl = {
 
 		errors : [],
 
@@ -305,20 +303,14 @@ var compiler = (function() {
 			yyerror(lexer.yylloc, state, str);
 		},
 
-		setPreprocessor : function(p) {
-			this.preprocessor = preprocessor = p;
-		},
+		initialize : function() {
 
-		setLexer : function(l) {
-			this.lexer = lexer = l;
-			l.yy = this;
-			lexer_extern(l);
-			state.scanner = l;
-		},
+			//lexer
+			this.lexer.yy = this;
+			state.scanner = this.lexer;
 
-		setParser : function(p) {
-			this.parser = parser = p;
-			p.yy = this;
+			//parser
+			this.parser.yy = this;
 
 			this.parser.extern('yylex', next_token);
 			this.parser.extern('yyerror', print_error);
@@ -328,31 +320,36 @@ var compiler = (function() {
 			this.parser.extern('YYFPRINTF', fprintf);
 			this.parser.extern('initialize_types', initialize_types);
 
-			this.token = p.yytokentype;			
+			this.token = this.parser.yytokentype;
 		},
  
 		compile : function(src) {
+			
+			if (!initialized) {
+				this.initialize();
+			}
+			
 			var parse_result,
 				gen_result,
 				processed_src, object_code;
 			
 			//preprocess
-			processed_src = preprocessor.process(src);
+			processed_src = this.preprocessor.process(src);
 
 			//parse
 			if (processed_src) {
 				lexer.setInput(processed_src);
-				parse_result = parser.yyparse(state);
+				parse_result = this.parser.yyparse(state);
 			}
 
 			//generate
 			if (parse_result == 0) {
-				glsl_compiler_generator.createObjectCode(this.state);
-				gen_result = glsl_compiler_generator.status;
+				this.generator.createObjectCode(this.state);
+				gen_result = this.generator.status;
 				if (gen_result) {
-					object_code = glsl_compiler_generator.objectCode;
+					object_code = this.generator.objectCode;
 				} else {
-					this.errors.push(glsl_compiler_generator.errorMsg);	
+					this.errors.push(this.generator.errorMsg);	
 					console.log(this.errors[0]);
 				}
 			}
@@ -361,7 +358,7 @@ var compiler = (function() {
 		}
 	}
 	
-	return compiler;
+	return glsl;
 })();
 
 

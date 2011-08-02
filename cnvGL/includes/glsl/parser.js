@@ -19,7 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-var parser = (function() {
+glsl.parser = (function() {
 
 	var yydebug = 1;
 
@@ -313,7 +313,7 @@ var parser = (function() {
 		 195
 	];
 
-	if (YYDEBUG) {
+	//#IF DEBUG
 
 		var yyprhs = [
 			   0,     0,     3,     4,     9,    10,    14,    17,    20,    23,
@@ -468,120 +468,118 @@ var parser = (function() {
 			1663,  1669,  1674,  1683,  1689,  1695,  1701,  1707,  1716,  1717,
 			1718,  1722
 		];
-	}
+	//#ENDIF
 
-	if (YYDEBUG || YYERROR_VERBOSE || YYTOKEN_TABLE) {
-	/* YYTNAME[SYMBOL-NUM] -- String name of the symbol SYMBOL-NUM.
-	   First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
+	//#IF YYDEBUG || YYERROR_VERBOSE || YYTOKEN_TABLE
+		/* YYTNAME[SYMBOL-NUM] -- String name of the symbol SYMBOL-NUM.
+		   First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
+	
+		var yytname = [
+			"$end", "error", "$undefined", "ATTRIBUTE", "CONST_TOK", "BOOL_TOK",
+			"FLOAT_TOK", "INT_TOK", "UINT_TOK", "BREAK", "CONTINUE", "DO", "ELSE",
+			"FOR", "IF", "DISCARD", "RETURN", "SWITCH", "CASE", "DEFAULT", "BVEC2",
+			"BVEC3", "BVEC4", "IVEC2", "IVEC3", "IVEC4", "UVEC2", "UVEC3", "UVEC4",
+			"VEC2", "VEC3", "VEC4", "CENTROID", "IN_TOK", "OUT_TOK", "INOUT_TOK",
+			"UNIFORM", "VARYING", "NOPERSPECTIVE", "FLAT", "SMOOTH", "MAT2X2",
+			"MAT2X3", "MAT2X4", "MAT3X2", "MAT3X3", "MAT3X4", "MAT4X2", "MAT4X3",
+			"MAT4X4", "SAMPLER1D", "SAMPLER2D", "SAMPLER3D", "SAMPLERCUBE",
+			"SAMPLER1DSHADOW", "SAMPLER2DSHADOW", "SAMPLERCUBESHADOW",
+			"SAMPLER1DARRAY", "SAMPLER2DARRAY", "SAMPLER1DARRAYSHADOW",
+			"SAMPLER2DARRAYSHADOW", "ISAMPLER1D", "ISAMPLER2D", "ISAMPLER3D",
+			"ISAMPLERCUBE", "ISAMPLER1DARRAY", "ISAMPLER2DARRAY", "USAMPLER1D",
+			"USAMPLER2D", "USAMPLER3D", "USAMPLERCUBE", "USAMPLER1DARRAY",
+			"USAMPLER2DARRAY", "STRUCT", "VOID_TOK", "WHILE", "IDENTIFIER",
+			"TYPE_IDENTIFIER", "NEW_IDENTIFIER", "FLOATCONSTANT", "INTCONSTANT",
+			"UINTCONSTANT", "BOOLCONSTANT", "FIELD_SELECTION", "LEFT_OP", "RIGHT_OP",
+			"INC_OP", "DEC_OP", "LE_OP", "GE_OP", "EQ_OP", "NE_OP", "AND_OP",
+			"OR_OP", "XOR_OP", "MUL_ASSIGN", "DIV_ASSIGN", "ADD_ASSIGN",
+			"MOD_ASSIGN", "LEFT_ASSIGN", "RIGHT_ASSIGN", "AND_ASSIGN", "XOR_ASSIGN",
+			"OR_ASSIGN", "SUB_ASSIGN", "INVARIANT", "LOWP", "MEDIUMP", "HIGHP",
+			"SUPERP", "PRECISION", "VERSION", "EXTENSION", "LINE", "COLON", "EOL",
+			"INTERFACE", "OUTPUT", "PRAGMA_DEBUG_ON", "PRAGMA_DEBUG_OFF",
+			"PRAGMA_OPTIMIZE_ON", "PRAGMA_OPTIMIZE_OFF", "PRAGMA_INVARIANT_ALL",
+			"LAYOUT_TOK", "ASM", "CLASS", "UNION", "ENUM", "TYPEDEF", "TEMPLATE",
+			"THIS", "PACKED_TOK", "GOTO", "INLINE_TOK", "NOINLINE", "VOLATILE",
+			"PUBLIC_TOK", "STATIC", "EXTERN", "EXTERNAL", "LONG_TOK", "SHORT_TOK",
+			"DOUBLE_TOK", "HALF", "FIXED_TOK", "UNSIGNED", "INPUT_TOK", "OUPTUT",
+			"HVEC2", "HVEC3", "HVEC4", "DVEC2", "DVEC3", "DVEC4", "FVEC2", "FVEC3",
+			"FVEC4", "SAMPLER2DRECT", "SAMPLER3DRECT", "SAMPLER2DRECTSHADOW",
+			"SIZEOF", "CAST", "NAMESPACE", "USING", "ERROR_TOK", "COMMON",
+			"PARTITION", "ACTIVE", "SAMPLERBUFFER", "FILTER", "IMAGE1D", "IMAGE2D",
+			"IMAGE3D", "IMAGECUBE", "IMAGE1DARRAY", "IMAGE2DARRAY", "IIMAGE1D",
+			"IIMAGE2D", "IIMAGE3D", "IIMAGECUBE", "IIMAGE1DARRAY", "IIMAGE2DARRAY",
+			"UIMAGE1D", "UIMAGE2D", "UIMAGE3D", "UIMAGECUBE", "UIMAGE1DARRAY",
+			"UIMAGE2DARRAY", "IMAGE1DSHADOW", "IMAGE2DSHADOW", "IMAGEBUFFER",
+			"IIMAGEBUFFER", "UIMAGEBUFFER", "IMAGE1DARRAYSHADOW",
+			"IMAGE2DARRAYSHADOW", "ROW_MAJOR", "'('", "')'", "'['", "']'", "'.'",
+			"','", "'+'", "'-'", "'!'", "'~'", "'*'", "'/'", "'%'", "'<'", "'>'",
+			"'&'", "'^'", "'|'", "'?'", "':'", "'='", "';'", "'{'", "'}'", "$accept",
+			"translation_unit", "$@1", "version_statement", "pragma_statement",
+			"extension_statement_list", "any_identifier", "extension_statement",
+			"external_declaration_list", "variable_identifier", "primary_expression",
+			"postfix_expression", "integer_expression", "function_call",
+			"function_call_or_method", "function_call_generic",
+			"function_call_header_no_parameters",
+			"function_call_header_with_parameters", "function_call_header",
+			"function_identifier", "method_call_generic",
+			"method_call_header_no_parameters", "method_call_header_with_parameters",
+			"method_call_header", "unary_expression", "unary_operator",
+			"multiplicative_expression", "additive_expression", "shift_expression",
+			"relational_expression", "equality_expression", "and_expression",
+			"exclusive_or_expression", "inclusive_or_expression",
+			"logical_and_expression", "logical_xor_expression",
+			"logical_or_expression", "conditional_expression",
+			"assignment_expression", "assignment_operator", "expression",
+			"constant_expression", "declaration", "function_prototype",
+			"function_declarator", "function_header_with_parameters",
+			"function_header", "parameter_declarator", "parameter_declaration",
+			"parameter_qualifier", "parameter_type_specifier",
+			"init_declarator_list", "single_declaration", "fully_specified_type",
+			"layout_qualifier", "layout_qualifier_id_list", "layout_qualifier_id",
+			"interpolation_qualifier", "parameter_type_qualifier", "type_qualifier",
+			"storage_qualifier", "type_specifier", "type_specifier_no_prec",
+			"type_specifier_nonarray", "basic_type_specifier_nonarray",
+			"precision_qualifier", "struct_specifier", "struct_declaration_list",
+			"struct_declaration", "struct_declarator_list", "struct_declarator",
+			"initializer", "declaration_statement", "statement", "simple_statement",
+			"compound_statement", "$@2", "statement_no_new_scope",
+			"compound_statement_no_new_scope", "statement_list",
+			"expression_statement", "selection_statement",
+			"selection_rest_statement", "condition", "switch_statement",
+			"case_label", "iteration_statement", "for_init_statement",
+			"conditionopt", "for_rest_statement", "jump_statement",
+			"external_declaration", "function_definition", 0
+		];
+	//#ENDIF
 
-	var yytname = [
-		"$end", "error", "$undefined", "ATTRIBUTE", "CONST_TOK", "BOOL_TOK",
-		"FLOAT_TOK", "INT_TOK", "UINT_TOK", "BREAK", "CONTINUE", "DO", "ELSE",
-		"FOR", "IF", "DISCARD", "RETURN", "SWITCH", "CASE", "DEFAULT", "BVEC2",
-		"BVEC3", "BVEC4", "IVEC2", "IVEC3", "IVEC4", "UVEC2", "UVEC3", "UVEC4",
-		"VEC2", "VEC3", "VEC4", "CENTROID", "IN_TOK", "OUT_TOK", "INOUT_TOK",
-		"UNIFORM", "VARYING", "NOPERSPECTIVE", "FLAT", "SMOOTH", "MAT2X2",
-		"MAT2X3", "MAT2X4", "MAT3X2", "MAT3X3", "MAT3X4", "MAT4X2", "MAT4X3",
-		"MAT4X4", "SAMPLER1D", "SAMPLER2D", "SAMPLER3D", "SAMPLERCUBE",
-		"SAMPLER1DSHADOW", "SAMPLER2DSHADOW", "SAMPLERCUBESHADOW",
-		"SAMPLER1DARRAY", "SAMPLER2DARRAY", "SAMPLER1DARRAYSHADOW",
-		"SAMPLER2DARRAYSHADOW", "ISAMPLER1D", "ISAMPLER2D", "ISAMPLER3D",
-		"ISAMPLERCUBE", "ISAMPLER1DARRAY", "ISAMPLER2DARRAY", "USAMPLER1D",
-		"USAMPLER2D", "USAMPLER3D", "USAMPLERCUBE", "USAMPLER1DARRAY",
-		"USAMPLER2DARRAY", "STRUCT", "VOID_TOK", "WHILE", "IDENTIFIER",
-		"TYPE_IDENTIFIER", "NEW_IDENTIFIER", "FLOATCONSTANT", "INTCONSTANT",
-		"UINTCONSTANT", "BOOLCONSTANT", "FIELD_SELECTION", "LEFT_OP", "RIGHT_OP",
-		"INC_OP", "DEC_OP", "LE_OP", "GE_OP", "EQ_OP", "NE_OP", "AND_OP",
-		"OR_OP", "XOR_OP", "MUL_ASSIGN", "DIV_ASSIGN", "ADD_ASSIGN",
-		"MOD_ASSIGN", "LEFT_ASSIGN", "RIGHT_ASSIGN", "AND_ASSIGN", "XOR_ASSIGN",
-		"OR_ASSIGN", "SUB_ASSIGN", "INVARIANT", "LOWP", "MEDIUMP", "HIGHP",
-		"SUPERP", "PRECISION", "VERSION", "EXTENSION", "LINE", "COLON", "EOL",
-		"INTERFACE", "OUTPUT", "PRAGMA_DEBUG_ON", "PRAGMA_DEBUG_OFF",
-		"PRAGMA_OPTIMIZE_ON", "PRAGMA_OPTIMIZE_OFF", "PRAGMA_INVARIANT_ALL",
-		"LAYOUT_TOK", "ASM", "CLASS", "UNION", "ENUM", "TYPEDEF", "TEMPLATE",
-		"THIS", "PACKED_TOK", "GOTO", "INLINE_TOK", "NOINLINE", "VOLATILE",
-		"PUBLIC_TOK", "STATIC", "EXTERN", "EXTERNAL", "LONG_TOK", "SHORT_TOK",
-		"DOUBLE_TOK", "HALF", "FIXED_TOK", "UNSIGNED", "INPUT_TOK", "OUPTUT",
-		"HVEC2", "HVEC3", "HVEC4", "DVEC2", "DVEC3", "DVEC4", "FVEC2", "FVEC3",
-		"FVEC4", "SAMPLER2DRECT", "SAMPLER3DRECT", "SAMPLER2DRECTSHADOW",
-		"SIZEOF", "CAST", "NAMESPACE", "USING", "ERROR_TOK", "COMMON",
-		"PARTITION", "ACTIVE", "SAMPLERBUFFER", "FILTER", "IMAGE1D", "IMAGE2D",
-		"IMAGE3D", "IMAGECUBE", "IMAGE1DARRAY", "IMAGE2DARRAY", "IIMAGE1D",
-		"IIMAGE2D", "IIMAGE3D", "IIMAGECUBE", "IIMAGE1DARRAY", "IIMAGE2DARRAY",
-		"UIMAGE1D", "UIMAGE2D", "UIMAGE3D", "UIMAGECUBE", "UIMAGE1DARRAY",
-		"UIMAGE2DARRAY", "IMAGE1DSHADOW", "IMAGE2DSHADOW", "IMAGEBUFFER",
-		"IIMAGEBUFFER", "UIMAGEBUFFER", "IMAGE1DARRAYSHADOW",
-		"IMAGE2DARRAYSHADOW", "ROW_MAJOR", "'('", "')'", "'['", "']'", "'.'",
-		"','", "'+'", "'-'", "'!'", "'~'", "'*'", "'/'", "'%'", "'<'", "'>'",
-		"'&'", "'^'", "'|'", "'?'", "':'", "'='", "';'", "'{'", "'}'", "$accept",
-		"translation_unit", "$@1", "version_statement", "pragma_statement",
-		"extension_statement_list", "any_identifier", "extension_statement",
-		"external_declaration_list", "variable_identifier", "primary_expression",
-		"postfix_expression", "integer_expression", "function_call",
-		"function_call_or_method", "function_call_generic",
-		"function_call_header_no_parameters",
-		"function_call_header_with_parameters", "function_call_header",
-		"function_identifier", "method_call_generic",
-		"method_call_header_no_parameters", "method_call_header_with_parameters",
-		"method_call_header", "unary_expression", "unary_operator",
-		"multiplicative_expression", "additive_expression", "shift_expression",
-		"relational_expression", "equality_expression", "and_expression",
-		"exclusive_or_expression", "inclusive_or_expression",
-		"logical_and_expression", "logical_xor_expression",
-		"logical_or_expression", "conditional_expression",
-		"assignment_expression", "assignment_operator", "expression",
-		"constant_expression", "declaration", "function_prototype",
-		"function_declarator", "function_header_with_parameters",
-		"function_header", "parameter_declarator", "parameter_declaration",
-		"parameter_qualifier", "parameter_type_specifier",
-		"init_declarator_list", "single_declaration", "fully_specified_type",
-		"layout_qualifier", "layout_qualifier_id_list", "layout_qualifier_id",
-		"interpolation_qualifier", "parameter_type_qualifier", "type_qualifier",
-		"storage_qualifier", "type_specifier", "type_specifier_no_prec",
-		"type_specifier_nonarray", "basic_type_specifier_nonarray",
-		"precision_qualifier", "struct_specifier", "struct_declaration_list",
-		"struct_declaration", "struct_declarator_list", "struct_declarator",
-		"initializer", "declaration_statement", "statement", "simple_statement",
-		"compound_statement", "$@2", "statement_no_new_scope",
-		"compound_statement_no_new_scope", "statement_list",
-		"expression_statement", "selection_statement",
-		"selection_rest_statement", "condition", "switch_statement",
-		"case_label", "iteration_statement", "for_init_statement",
-		"conditionopt", "for_rest_statement", "jump_statement",
-		"external_declaration", "function_definition", 0
-	];
-	}
-
-
-
-	//# ifdef YYPRINT
-	/* YYTOKNUM[YYLEX-NUM] -- Internal token number corresponding to
-	   token YYLEX-NUM.  */
-	var yytoknum = [
-		   0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
-		 265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
-		 275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
-		 285,   286,   287,   288,   289,   290,   291,   292,   293,   294,
-		 295,   296,   297,   298,   299,   300,   301,   302,   303,   304,
-		 305,   306,   307,   308,   309,   310,   311,   312,   313,   314,
-		 315,   316,   317,   318,   319,   320,   321,   322,   323,   324,
-		 325,   326,   327,   328,   329,   330,   331,   332,   333,   334,
-		 335,   336,   337,   338,   339,   340,   341,   342,   343,   344,
-		 345,   346,   347,   348,   349,   350,   351,   352,   353,   354,
-		 355,   356,   357,   358,   359,   360,   361,   362,   363,   364,
-		 365,   366,   367,   368,   369,   370,   371,   372,   373,   374,
-		 375,   376,   377,   378,   379,   380,   381,   382,   383,   384,
-		 385,   386,   387,   388,   389,   390,   391,   392,   393,   394,
-		 395,   396,   397,   398,   399,   400,   401,   402,   403,   404,
-		 405,   406,   407,   408,   409,   410,   411,   412,   413,   414,
-		 415,   416,   417,   418,   419,   420,   421,   422,   423,   424,
-		 425,   426,   427,   428,   429,   430,   431,   432,   433,   434,
-		 435,   436,   437,   438,   439,   440,   441,   442,   443,   444,
-		 445,   446,   447,   448,   449,   450,    40,    41,    91,    93,
-		  46,    44,    43,    45,    33,   126,    42,    47,    37,    60,
-		  62,    38,    94,   124,    63,    58,    61,    59,   123,   125
-	];
-	//# endif
+	//#IF YYPRINT
+		/* YYTOKNUM[YYLEX-NUM] -- Internal token number corresponding to
+		   token YYLEX-NUM.  */
+		var yytoknum = [
+			   0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
+			 265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
+			 275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
+			 285,   286,   287,   288,   289,   290,   291,   292,   293,   294,
+			 295,   296,   297,   298,   299,   300,   301,   302,   303,   304,
+			 305,   306,   307,   308,   309,   310,   311,   312,   313,   314,
+			 315,   316,   317,   318,   319,   320,   321,   322,   323,   324,
+			 325,   326,   327,   328,   329,   330,   331,   332,   333,   334,
+			 335,   336,   337,   338,   339,   340,   341,   342,   343,   344,
+			 345,   346,   347,   348,   349,   350,   351,   352,   353,   354,
+			 355,   356,   357,   358,   359,   360,   361,   362,   363,   364,
+			 365,   366,   367,   368,   369,   370,   371,   372,   373,   374,
+			 375,   376,   377,   378,   379,   380,   381,   382,   383,   384,
+			 385,   386,   387,   388,   389,   390,   391,   392,   393,   394,
+			 395,   396,   397,   398,   399,   400,   401,   402,   403,   404,
+			 405,   406,   407,   408,   409,   410,   411,   412,   413,   414,
+			 415,   416,   417,   418,   419,   420,   421,   422,   423,   424,
+			 425,   426,   427,   428,   429,   430,   431,   432,   433,   434,
+			 435,   436,   437,   438,   439,   440,   441,   442,   443,   444,
+			 445,   446,   447,   448,   449,   450,    40,    41,    91,    93,
+			  46,    44,    43,    45,    33,   126,    42,    47,    37,    60,
+			  62,    38,    94,   124,    63,    58,    61,    59,   123,   125
+		];
+	//#ENDIF
 
 	/* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 	var yyr1 = [
@@ -1608,14 +1606,13 @@ var parser = (function() {
 	   This macro was not mandated originally: define only if we know
 	   we won't break user code: when these are the locations we know.  */
 
-	if (YYLTYPE_IS_TRIVIAL) {
-		var YY_LOCATION_PRINT = function(File, Loc) {
-			fprintf(File, "%d.%d-%d.%d", Loc.first_line, Loc.first_column, Loc.last_line, Loc.last_column);
-		}
+	var YY_LOCATION_PRINT = function(File, Loc) {
+		fprintf(File, "%d.%d-%d.%d", Loc.first_line, Loc.first_column, Loc.last_line, Loc.last_column);
 	}
 
 	/* Enable debugging if requested.  */
-	if (YYDEBUG) {
+
+	//#IF YYDEBUG
 	
 		var YYPRINT = function(yyoutput, yytoknum, yyvaluep) {};
 
@@ -1689,11 +1686,14 @@ var parser = (function() {
 			}
 		}	
 
-	} else {
+	//#ELSE
+		if (!YYDEBUG) {
 		var YYDPRINTF = function() {};
 		var YY_SYMBOL_PRINT = function() {};
 		var YY_STACK_PRINT = function() {};
-	}
+		}
+	//#ENDIF
+
 
 	/* YYINITDEPTH -- initial size of the parser's stacks.  */
 	var YYINITDEPTH = 200;
@@ -1707,7 +1707,7 @@ var parser = (function() {
 	
 	var YYMAXDEPTH = 10000;
 
-	if (YYERROR_VERBOSE) {
+	//#IF YYERROR_VERBOSE
 		
 		/* Copy to YYRES the contents of YYSTR after stripping away unnecessary
 		quotes and backslashes, so that it's suitable for yyerror.  The
@@ -1765,7 +1765,8 @@ var parser = (function() {
 				return yyresult;
 			}
 		}
-	}
+
+	//#ENDIF
 
 	/*-----------------------------------------------.
 	| Release the memory associated to this symbol.  |
@@ -1824,10 +1825,10 @@ var parser = (function() {
 		var yyval = {};
 		var yyloc = YYLTYPE();
 
-		if (YYERROR_VERBOSE) {
+		//#IF YYERROR_VERBOSE
 			/* Buffer for error messages, and its allocated size.  */
 			var yymsg;
-		}
+		//#ENDIF
 		
 		var YYPOPSTACK = function(N) { (yyvsp -= (N), yyssp -= (N), yylsp -= (N)); };
 
@@ -2054,20 +2055,20 @@ var parser = (function() {
 
 					case 21:
 						yyval = {};
-						yyval.expression = new ast.expression(ast.identifier, null, null, null);
+						yyval.expression = new glsl.ast.expression(glsl.ast.identifier, null, null, null);
 						yyval.expression.set_location(yylloc);
 						yyval.expression.primary_expression.identifier = yyvsa[yyvsp].identifier;
 						break;
 					
 					case 95:
 						yyval = {};
-						yyval.expression = new ast.expression(yyvsa[yyvsp - 1].n, yyvsa[yyvsp - 2].expression, yyvsa[yyvsp].expression, null);
+						yyval.expression = new glsl.ast.expression(yyvsa[yyvsp - 1].n, yyvsa[yyvsp - 2].expression, yyvsa[yyvsp].expression, null);
 						yyval.expression.set_location(yylloc);
 						break;
 
 					case 96:
 						yyval = {};
-						yyval.n = ast.operators.assign;
+						yyval.n = glsl.ast.operators.assign;
 						break;
 						
 					case 107:
@@ -2095,7 +2096,7 @@ var parser = (function() {
 
 					case 118:
 						yyval = {};
-						yyval['function'] = new ast['function']();
+						yyval['function'] = new glsl.ast['function']();
 						yyval['function'].set_location(yylloc);
 						yyval['function'].return_type = yyvsa[yyvsp - 2].fully_specified_type;
 						yyval['function'].identifier = yyvsa[yyvsp - 1].identifier;
@@ -2105,36 +2106,36 @@ var parser = (function() {
 
 					case 124:
 						yyval = {};
-						yyval.parameter_declarator = new ast.parameter_declarator();
+						yyval.parameter_declarator = new glsl.ast.parameter_declarator();
 						yyval.parameter_declarator.set_location(yylloc);
-						yyval.parameter_declarator.type = new ast.fully_specified_type();
+						yyval.parameter_declarator.type = new glsl.ast.fully_specified_type();
 						yyval.parameter_declarator.type.qualifier = yyvsa[yyvsp - 1].type_qualifier;
 						yyval.parameter_declarator.type.specifier = yyvsa[yyvsp].type_specifier;
 						break;
 
 					case 125:
 						yyval = {};
-						yyval.type_qualifier = new ast.type_qualifier();
+						yyval.type_qualifier = new glsl.ast.type_qualifier();
 						break;
 
 					case 138:
-						var decl = new ast.declaration(yyvsa[yyvsp].identifier, false, null, null);
+						var decl = new glsl.ast.declaration(yyvsa[yyvsp].identifier, false, null, null);
 						yyval = {};
-						yyval.declarator_list = new ast.declarator_list(yyvsa[yyvsp - 1].fully_specified_type);
+						yyval.declarator_list = new glsl.ast.declarator_list(yyvsa[yyvsp - 1].fully_specified_type);
 						yyval.declarator_list.set_location(yylloc);
 						yyval.declarator_list.declarations.push(decl);
 						break;
 
 					case 145:
 						yyval = {};
-						yyval.fully_specified_type = new ast.fully_specified_type();
+						yyval.fully_specified_type = new glsl.ast.fully_specified_type();
 						yyval.fully_specified_type.set_location(yylloc);
 						yyval.fully_specified_type.specifier = yyvsa[yyvsp].type_specifier;
 						break;
 
 					case 146:
 						yyval = {};
-						yyval.fully_specified_type = new ast.fully_specified_type();
+						yyval.fully_specified_type = new glsl.ast.fully_specified_type();
 						yyval.fully_specified_type.set_location(yylloc);
 						yyval.fully_specified_type.qualifier = yyvsa[yyvsp - 1].type_qualifier;
 						yyval.fully_specified_type.specifier = yyvsa[yyvsp].type_specifier;
@@ -2142,8 +2143,8 @@ var parser = (function() {
 
 					case 166:
 						yyval = {};
-						yyval.type_qualifier = new ast.type_qualifier();
-						yyval.type_qualifier.flags.q = ast.type_qualifier.flags.varying;
+						yyval.type_qualifier = new glsl.ast.type_qualifier();
+						yyval.type_qualifier.flags.q = glsl.ast.type_qualifier.flags.varying;
 						break;
 
 					case 173:
@@ -2153,23 +2154,23 @@ var parser = (function() {
 
 					case 178:
 						yyval = {};
-						yyval.type_specifier = new ast.type_specifier(yyvsa[yyvsp].n);
+						yyval.type_specifier = new glsl.ast.type_specifier(yyvsa[yyvsp].n);
 						yyval.type_specifier.set_location(yylloc);
 					    break;
 					
 					case 181:
 						yyval = {};
-						yyval.n = ast['void'];
+						yyval.n = glsl.ast['void'];
 						break;
 
 					case 182:
 						yyval = {};
-						yyval.n = ast.types.float;
+						yyval.n = glsl.ast.types.float;
 					    break;
 
 					case 188:
 						yyval = {};
-						yyval.n = ast.types.vec4;
+						yyval.n = glsl.ast.types.vec4;
 						break;
 
 					case 232:
@@ -2177,12 +2178,12 @@ var parser = (function() {
 							yyerror(yylsa[yylsp], state, "precision qualifier forbidden in %s (1.30 or later required)\n", state.version_string);
 						}
 						yyval = {};
-						yyval.n = ast.precision.high;
+						yyval.n = glsl.ast.precision.high;
 						break;
 					
 					case 261:
 						yyval = {};
-						yyval.compound_statement = new ast.compound_statement(false, yyvsa[yyvsp - 1].node);
+						yyval.compound_statement = new glsl.ast.compound_statement(false, yyvsa[yyvsp - 1].node);
 						yyval.compound_statement.set_location(yylloc);
 						break;
 
@@ -2196,7 +2197,7 @@ var parser = (function() {
 
 					case 265:
 						yyval = {};
-						yyval.node = new ast.expression_statement(yyvsa[yyvsp - 1].expression);
+						yyval.node = new glsl.ast.expression_statement(yyvsa[yyvsp - 1].expression);
 						yyval.node.set_location(yylloc);
 						break;
 
@@ -2212,7 +2213,7 @@ var parser = (function() {
 
 					case 291:
 						yyval = {};
-						yyval.function_definition = new ast.function_definition();
+						yyval.function_definition = new glsl.ast.function_definition();
 						yyval.function_definition.set_location(yylloc);
 						yyval.function_definition.proto_type = yyvsa[yyvsp - 1]['function'];
 						yyval.function_definition.body = yyvsa[yyvsp].compound_statement;
@@ -2454,12 +2455,15 @@ var parser = (function() {
 					if (!yyerrstatus) {
 						++yynerrs;
 						
-						if (!YYERROR_VERBOSE) {
-							yyerror(yylloc, state, YY_("syntax error"));
-						} else {
-							yymsg = yysyntax_error(yystate, yychar);
-							yyerror(yylloc, state, yymsg);
-						}
+						//#IF !YYERROR_VERBOSE
+							if (!YYERROR_VERBOSE) {
+								yyerror(yylloc, state, YY_("syntax error"));
+							} else {
+						//#ELSE
+								yymsg = yysyntax_error(yystate, yychar);
+								yyerror(yylloc, state, yymsg);
+						//#ENDIF
+							}
 					}
 
 					yyerror_range[1] = yylloc;
@@ -2546,11 +2550,11 @@ var parser = (function() {
 				| yyexhaustedlab -- memory exhaustion comes here.  |
 				`-------------------------------------------------*/
 				case 'yyexhaustedlab':
-				if (YYERROR_VERBOSE) {
+				//#IF YYERROR_VERBOSE
 					yyerror(yylloc, state, YY_("memory exhausted"));
 					yyresult = 2;
 					/* Fall through.  */
-				}
+				//#ENDIF
 
 				case 'yyreturn':
 					if (yychar != YYEMPTY) {

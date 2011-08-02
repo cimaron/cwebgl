@@ -19,7 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-var glsl_compiler_generator = (function() {
+glsl.generator = (function() {
 
 	//-------------------------------------------------
 	//	Code Generation Options/Data
@@ -27,11 +27,11 @@ var glsl_compiler_generator = (function() {
 
 	//Type qualifier global variables
 	var g_type_qualifier_globals = [];
-	g_type_qualifier_globals[ast.type_qualifier.flags.varying] = '__varying';
+	g_type_qualifier_globals[glsl.ast.type_qualifier.flags.varying] = '__varying';
 
 	function g_type_default_value(type) {
 		switch (type.type_specifier) {
-			case ast.types.vec4:
+			case glsl.ast.types.vec4:
 				return '[0,0,0,0]';
 			default:
 				return g_error('Cannot generate default value for type ' + type.type_name, type);
@@ -57,7 +57,7 @@ var glsl_compiler_generator = (function() {
 	}
 
 	function g_indent() {
-		return new Array(glsl_compiler_generator.depth + 1).join("\t");
+		return new Array(generator.depth + 1).join("\t");
 	}
 
 	//-------------------------------------------------
@@ -132,7 +132,7 @@ var glsl_compiler_generator = (function() {
 		var t1 = g_get_type(se1), t2 = g_get_type(se2), t3 = g_get_type(se3);
 		
 		switch (op) {
-			case ast.operators.assign:
+			case glsl.ast.operators.assign:
 				if (t1 != t2) {
 					return g_error("Could not assign value of type " + t2 + " to " + t1, e);
 				}
@@ -162,7 +162,7 @@ var glsl_compiler_generator = (function() {
 	function g_ast_compound_statement(cs) {
 		var code = '';
 		var stmts = cs.statements;
-		glsl_compiler_generator.depth++;
+		generator.depth++;
 		for (var i = 0; i < stmts.length; i++) {
 			var stmt = stmts[i];
 			switch (stmt.typeof()) {
@@ -178,7 +178,7 @@ var glsl_compiler_generator = (function() {
 			}
 		}
 		
-		glsl_compiler_generator.depth--;
+		generator.depth--;
 		code = g_indent() + "{\n" + code + g_indent() + "}\n";
 		return code;
 	}
@@ -217,15 +217,15 @@ var glsl_compiler_generator = (function() {
 
 	
 	function g_error(msg, n) {
-		glsl_compiler_generator.errorMsg = msg;
+		generator.errorMsg = msg;
 		if (n && n.location) {
-			glsl_compiler_generator.errorMsg += " at line " + n.location.line + ", column " + n.location.column;	
+			generator.errorMsg += " at line " + n.location.line + ", column " + n.location.column;	
 		}
-		glsl_compiler_generator.status = false;
+		generator.status = false;
 		return false;
 	}
 	
-	var glsl_compiler_generator = {
+	var generator = {
 		
 		depth : 0,
 		status : false,
@@ -257,5 +257,5 @@ var glsl_compiler_generator = (function() {
 		
 	};
 
-	return glsl_compiler_generator;
+	return generator;
 })();
