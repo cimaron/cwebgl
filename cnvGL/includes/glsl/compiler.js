@@ -315,6 +315,7 @@ var glsl = (function() {
 			this.parser.extern('yylex', next_token);
 			this.parser.extern('yyerror', print_error);
 			this.parser.extern('printf', printf);
+			this.parser.extern('sprintf', sprintf);
 			this.parser.extern('fprintf', fprintf);
 			this.parser.extern('YYPRINT', print_token_value);
 			this.parser.extern('YYFPRINTF', fprintf);

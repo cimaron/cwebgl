@@ -60,6 +60,9 @@ glsl.lexer_extern = (function(lexer) {
 	lexer.KEYWORD = KEYWORD;
 	lexer.classify_identifier = classify_identifier;
 	lexer.yylval = {};
-	
+	lexer.IS_UINT = function(yytext) {
+		return yytext.substr(yytext.length - 1).toUpperCase() == 'U';
+	}
+
 })(lexer);
 

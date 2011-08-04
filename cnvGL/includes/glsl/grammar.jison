@@ -93,7 +93,7 @@ HASH		^{SPC}#{SPC}
 
 [\n]		{ /*yylineno++; yycolumn = 0;*/ }
 
-"attribute"	return 'ATTRIBUTE';
+"attribute"	return yy.token.ATTRIBUTE;
 "const"		return 'CONST_TOK';
 "bool"		return 'BOOL_TOK';
 "float"		return yy.token.FLOAT_TOK;
@@ -120,11 +120,11 @@ HASH		^{SPC}#{SPC}
 "uvec3"		return this.KEYWORD(130, 130, UVEC3);
 "uvec4"		return this.KEYWORD(130, 130, UVEC4);
 "vec2"		return 'VEC2';
-"vec3"		return 'VEC3';
+"vec3"		return yy.token.VEC3;
 "vec4"		return yy.token.VEC4;
 "mat2"		return 'MAT2X2';
 "mat3"		return 'MAT3X3';
-"mat4"		return 'MAT4X4';
+"mat4"		return yy.token.MAT4X4;
 "mat2x2"		return this.KEYWORD(120, 120, MAT2X2);
 "mat2x3"		return this.KEYWORD(120, 120, MAT2X3);
 "mat2x4"		return this.KEYWORD(120, 120, MAT2X4);
@@ -138,7 +138,7 @@ HASH		^{SPC}#{SPC}
 "in"		return 'IN_TOK';
 "out"		return 'OUT_TOK';
 "inout"		return 'INOUT_TOK';
-"uniform"		return 'UNIFORM';
+"uniform"		return yy.token.UNIFORM;
 "varying"		return yy.token.VARYING;
 "centroid"	return this.KEYWORD(120, 120, CENTROID);
 "invariant"	return this.KEYWORD([120, 1], [120, 1], INVARIANT, true, true);
@@ -200,8 +200,8 @@ HASH		^{SPC}#{SPC}
 "-="		return 'SUB_ASSIGN';
 
 [1-9][0-9]*[uU]?	{
-			    yylval.n = strtol(yytext, NULL, 10);
-			    return IS_UINT ? UINTCONSTANT : INTCONSTANT;
+				this.yylval.n = parseInt(yytext);
+				this.IS_UINT(yytext) ? yy.token.UINTCONSTANT : yy.token.INTCONSTANT;
 			}
 "0"[xX][0-9a-fA-F]+[uU]?	{
 			    yylval.n = strtol(yytext + 2, NULL, 16);
@@ -217,8 +217,8 @@ HASH		^{SPC}#{SPC}
 			    return 'FLOATCONSTANT';
 			}
 \.[0-9]+([eE][+-]?[0-9]+)?[fF]?		{
-			    yylval.real = glsl_strtod(yytext, NULL);
-			    return 'FLOATCONSTANT';
+				this.yylval.real = parseInt(yytext);
+				return yy.token.FLOATCONSTANT;
 			}
 [0-9]+\.([eE][+-]?[0-9]+)?[fF]?		{
 			    yylval.real = glsl_strtod(yytext, NULL);
@@ -407,7 +407,7 @@ function_call_header:
 		;
 
 /* Grammar Note: Constructors look like functions, but lexical analysis recognized most of them as
-   keywords. They are now recognized through “type_specifier”.
+   keywords. They are now recognized through â€œtype_specifierâ€�.
 */
 
 function_identifier:

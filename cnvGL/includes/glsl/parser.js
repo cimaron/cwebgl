@@ -2059,6 +2059,45 @@ glsl.parser = (function() {
 						yyval.expression.set_location(yylloc);
 						yyval.expression.primary_expression.identifier = yyvsa[yyvsp].identifier;
 						break;
+
+					case 24:
+						yyval = {};
+						yyval.expression = new glsl.ast.expression(glsl.ast.types.float_constant, null, null, null);
+						yyval.expression.set_location(yylloc);
+						yyval.expression.primary_expression.float_constant = yyvsa[yyvsp].real;
+						break;
+					
+					case 29:
+						yyval = {};
+						yyval.expression = yyvsa[yyvsp].expression;
+						break;
+				
+					case 41:
+						yyval = {};
+						yyval.expression = yyvsa[yyvsp - 1].expression;
+						yyval.expression.set_location(yylloc);
+						yyval.expression.expressions.push(yyvsa[yyvsp].expression);
+						break;
+
+					case 42:
+						yyval = {};
+						yyval.expression = yyvsa[yyvsp - 2].expression;
+						yyval.expression.set_location(yylloc);
+						yyval.expression.expressions.push(yyvsa[yyvsp].expression);
+						break;
+
+					case 44:
+						yyval = {};
+						yyval.expression = new glsl.ast.function_expression(yyvsa[yyvsp].type_specifier);
+						yyval.expression.set_location(yylloc);
+						break;
+
+					case 63:
+						var ctx = state;
+						yyval = {};
+						yyval.expression = new glsl.ast.expression_bin(glsl.ast.types.mul, yyvsa[yyvsp - 2].expression, yyvsa[yyvsp].expression);
+						yyval.expression.set_location(yylloc);
+						break;
 					
 					case 95:
 						yyval = {};
@@ -2141,13 +2180,25 @@ glsl.parser = (function() {
 						yyval.fully_specified_type.specifier = yyvsa[yyvsp].type_specifier;
 					    break;
 
+					case 165:
+						yyval = {};
+						yyval.type_qualifier = new glsl.ast.type_qualifier();
+						yyval.type_qualifier.flags.q = glsl.ast.type_qualifier.flags.attribute;
+						break;
+
 					case 166:
 						yyval = {};
 						yyval.type_qualifier = new glsl.ast.type_qualifier();
 						yyval.type_qualifier.flags.q = glsl.ast.type_qualifier.flags.varying;
 						break;
+					
+					case 172:
+						yyval = {};
+						yyval.type_qualifier = new glsl.ast.type_qualifier();
+						yyval.type_qualifier.flags.q = glsl.ast.type_qualifier.flags.uniform;
+						break;
 
-					case 173:
+					  case 173:
 						yyval = {};
 						yyval.type_specifier = yyvsa[yyvsp].type_specifier;
 						break;
@@ -2168,10 +2219,20 @@ glsl.parser = (function() {
 						yyval.n = glsl.ast.types.float;
 					    break;
 
+					case 187:
+						yyval = {};
+						yyval.n = glsl.ast.types.vec3;
+						break;
+					    
 					case 188:
 						yyval = {};
 						yyval.n = glsl.ast.types.vec4;
 						break;
+					
+					case 206:
+						yyval = {};
+						yyval.n = glsl.ast.mat4;
+						break;						
 
 					case 232:
 						if (!state.es_shader && state.language_version < 130) {
@@ -2229,18 +2290,13 @@ glsl.parser = (function() {
 					case 16:
 					case 22:
 					case 23:
-					case 24:
 					case 25:
 					case 26:
 					case 28:
-					case 29:
 					case 30:
 					case 31:
 					case 32:
 					case 36:
-					case 41:
-					case 42:
-					case 44:
 					case 45:
 					case 46:
 					case 51:
@@ -2253,7 +2309,6 @@ glsl.parser = (function() {
 					case 59:
 					case 60:
 					case 61:
-					case 63:
 					case 64:
 					case 65:
 					case 67:
@@ -2321,13 +2376,11 @@ glsl.parser = (function() {
 					case 162:
 					case 163:
 					case 164:
-					case 165:
 					case 167:
 					case 168:
 					case 169:
 					case 170:
 					case 171:
-					case 172:
 					case 174:
 					case 176:
 					case 177:
@@ -2355,7 +2408,6 @@ glsl.parser = (function() {
 					case 203:
 					case 204:
 					case 205:
-					case 206:
 					case 207:
 					case 208:
 					case 209:
@@ -2579,7 +2631,7 @@ glsl.parser = (function() {
 	var yylex;
 	var yyerror;
 	var initialize_types;
-
+	var sprintf, printf, fprintf;
 	
 	var parser = {
 

@@ -26,6 +26,12 @@ glsl.ast = (function() {
 	 */
 	var ast_node = (function() {
 
+		//External Constructor
+		function Constructor() {
+			ast_node.apply(this);
+			this.ast_node();
+		}
+
 		//Internal Constructor
 		function ast_node() {
 			//public:
@@ -36,6 +42,9 @@ glsl.ast = (function() {
 			};
 			this.link = null;
 		}
+
+		//Class Inheritance
+		Constructor.prototype = ast_node;
 
 		//public:
 
@@ -65,15 +74,6 @@ glsl.ast = (function() {
 			printf("unhandled node");	
 		}
 
-		//External Constructor
-		function Constructor() {
-			ast_node.apply(this);
-			this.ast_node();
-		}
-
-		//Class Inheritance
-		Constructor.prototype = ast_node;
-		Constructor.extend = function(obj) { obj.parent = obj.__proto__ = ast_node; };
 		ast_node.typeof = function(t) {
 			var n = (this.prototype.name ? this.prototype.name : this.prototype.constructor.name);
 			return t ? t == n : n;
@@ -147,15 +147,6 @@ glsl.ast = (function() {
 
 	var ast_declaration = (function() {
 
-		//Internal Constructor
-		function ast_declaration() {
-			this.parent();
-			this.identifier = null;
-			this.is_array = 0;
-			this.array_size = null;
-			this.initializer = null;
-		}
-
 		//External Constructor
 		function Constructor(identifier, is_array, array_size, initializer) {
 			ast_declaration.apply(this);
@@ -164,7 +155,16 @@ glsl.ast = (function() {
 
 		//Class Inheritance
 		Constructor.prototype = ast_declaration;
-		ast_node.extend(ast_declaration);
+		ast_declaration.__proto__ = ast_node.prototype;
+
+		//Internal Constructor
+		function ast_declaration() {
+			ast_node.prototype.apply(this);
+			this.identifier = null;
+			this.is_array = 0;
+			this.array_size = null;
+			this.initializer = null;
+		}
 		
 		return Constructor;
 
@@ -237,9 +237,15 @@ glsl.ast = (function() {
 
 	var ast_type_specifier = (function() {
 	
+		//External Constructor
+		function Constructor(specifier) {
+			ast_type_specifier.apply(this);
+			this.ast_type_specifier(specifier);
+		}
+
 		//Internal Constructor
 		function ast_type_specifier() {
-			this.parent();
+			ast_node.prototype.apply(this);
 			this.type_specifier = null;
 			this.type_name = null;
 			this.structure = null;
@@ -248,6 +254,10 @@ glsl.ast = (function() {
 			this.precision = 2;
 			this.is_precision_statement = null;
 		}
+
+		//Class Inheritance
+		Constructor.prototype = ast_type_specifier;
+		ast_type_specifier.__proto__ = ast_node.prototype;
 
 		//public:
 		ast_type_specifier.ast_type_specifier = function(specifier) {
@@ -353,16 +363,6 @@ glsl.ast = (function() {
 			}
 		}
 
-		//External Constructor
-		function Constructor(specifier) {
-			ast_type_specifier.apply(this);
-			this.ast_type_specifier(specifier);
-		}
-
-		//Class Inheritance
-		Constructor.prototype = ast_type_specifier;
-		ast_node.extend(ast_type_specifier);
-
 		return Constructor;
 
 	})();
@@ -372,9 +372,15 @@ glsl.ast = (function() {
 
 	var ast_function = (function() {
 
+		//External Constructor
+		function Constructor() {
+			ast_function.apply(this);
+			this.ast_function();
+		}
+
 		//Internal Constructor
 		function ast_function() {
-			this.parent();
+			ast_node.prototype.apply(this);
 			this.return_type = null;
 			this.identifier = null;
 			this.parameters = [];
@@ -382,6 +388,10 @@ glsl.ast = (function() {
 			this.signature = null;
 		}
 
+		//Class Inheritance
+		Constructor.prototype = ast_function;
+		ast_function.__proto__ = ast_node.prototype;
+		
 		//public:
 		ast_function.ast_function = function() {
 			this.is_definition = false;
@@ -398,16 +408,6 @@ glsl.ast = (function() {
 			printf(")");
 		}
 
-		//External Constructor
-		function Constructor() {
-			ast_function.apply(this);
-			this.ast_function();
-		}
-
-		//Class Inheritance
-		Constructor.prototype = ast_function;
-		ast_node.extend(ast_function);
-		
 		return Constructor;
 
 	})();
@@ -418,14 +418,23 @@ glsl.ast = (function() {
 	 */
 	var ast_expression = (function() {
 
+		//External Constructor
+		function Constructor() {
+			ast_expression.apply(this);
+			this.ast_expression.apply(this, arguments);
+		}
+
 		//Internal Constructor
 		function ast_expression() {
-			this.parent();
+			ast_node.prototype.apply(this);
 			this.oper = null;
 			this.subexpressions = new Array(3);
 			this.primary_expression = {};
 			this.expressions = [];
 		}
+
+		Constructor.prototype = ast_expression;
+		ast_expression.__proto__ = ast_node.prototype;
 
 		//public:
 		ast_expression.ast_expression = function() {
@@ -451,16 +460,6 @@ glsl.ast = (function() {
 		ast_expression.print = function() {			
 		}
 
-		//External Constructor
-		function Constructor() {
-			ast_expression.apply(this);
-			this.ast_expression.apply(this, arguments);
-		}
-
-		//Class Inheritance
-		Constructor.prototype = ast_expression;
-		ast_node.extend(ast_expression);
-		
 		return Constructor;
 
 	})();
@@ -491,12 +490,21 @@ glsl.ast = (function() {
 
 	var ast_fully_specified_type = (function() {
 
+		//External Constructor
+		function Constructor() {
+			ast_fully_specified_type.apply(this);
+		}
+
 		//Internal Constructor
 		function ast_fully_specified_type() {
-			this.parent();
+			ast_node.prototype.apply(this);
 			this.qualifier = null;
 			this.specifier = null;
 		}
+
+		//Class Inheritance
+		Constructor.prototype = ast_fully_specified_type;
+		ast_fully_specified_type.__proto__ = ast_node.prototype;
 
 		//public:
 
@@ -509,15 +517,6 @@ glsl.ast = (function() {
 			this.specifier.print();	
 		}
 
-		//External Constructor
-		function Constructor() {
-			ast_fully_specified_type.apply(this);
-		}
-
-		//Class Inheritance
-		Constructor.prototype = ast_fully_specified_type;
-		ast_node.extend(ast_fully_specified_type);
-
 		return Constructor;
 	
 	})();
@@ -525,16 +524,28 @@ glsl.ast = (function() {
 
 	var ast_declaration = (function() {
 	
+
+		//External Constructor
+		function Constructor(identifier, is_array, array_size, initializer) {
+			ast_declaration.apply(this);
+			this.ast_declaration(identifier, is_array, array_size, initializer);
+		}
+
 		//Internal Constructor
 		function ast_declaration() {
-			this.parent();
+			ast_node.prototype.apply(this);
 			this.identifier = null;
 			this.is_array = 0;
 			this.array_size = null;
 			this.initializer = null;
 		}
 
+		//Class Inheritance
+		Constructor.prototype = ast_declaration;
+		ast_declaration.__proto__ = ast_node.prototype;
+
 		//public:
+
 		ast_declaration.ast_declaration = function(identifier, is_array, array_size, initializer) {
 			this.identifier = identifier;
 			this.is_array = is_array;
@@ -551,33 +562,33 @@ glsl.ast = (function() {
 			}
 		}
 
-		//External Constructor
-		function Constructor(identifier, is_array, array_size, initializer) {
-			ast_declaration.apply(this);
-			this.ast_declaration(identifier, is_array, array_size, initializer);
-		}
-
-		//Class Inheritance
-		Constructor.prototype = ast_declaration;
-		ast_node.extend(ast_declaration);
-
 		return Constructor;		
 	
 	})();
-	
-	
+
 
 	var ast_declarator_list = (function() {
 	
+		//External Constructor
+		function Constructor(type) {
+			ast_declarator_list.apply(this);
+			this.ast_declarator_list(type);
+		}
+
 		//Internal Constructor
 		function ast_declarator_list() {
-			this.parent();
+			ast_node.prototype.apply(this);
 			this.type = null;
 			this.declarations = [];
 			this.invariant = 0;
 		}
 
+		//Class Inheritance
+		Constructor.prototype = ast_declarator_list;
+		ast_declarator_list.__proto__ = ast_node.prototype;
+
 		//public:
+
 		ast_declarator_list.ast_declarator_list = function(type) {
 			this.type = type;
 			this.invariant = 0;
@@ -600,27 +611,21 @@ glsl.ast = (function() {
 			printf("; ");
 		}
 
-		//External Constructor
-		function Constructor(type) {
-			ast_declarator_list.apply(this);
-			this.ast_declarator_list(type);
-		}
-
-		//Class Inheritance
-		Constructor.prototype = ast_declarator_list;
-		ast_node.extend(ast_declarator_list);
-
 		return Constructor;		
 
 	})();
 
 
-
 	var ast_parameter_declarator = (function() {
+
+		//External Constructor
+		function Constructor() {
+			ast_parameter_declarator.apply(this);
+		}
 
 		//Internal Constructor
 		function ast_parameter_declarator() {
-			this.parent();
+			ast_node.apply(this);
 			this.type = null;
 			this.identifier = null;
 			this.is_array = 0;
@@ -628,6 +633,10 @@ glsl.ast = (function() {
 			this.formal_parameter = null;
 			this.is_void = null;
 		}
+
+		//Class Inheritance
+		Constructor.prototype = ast_parameter_declarator;
+		ast_parameter_declarator.__proto__ = ast_node.prototype;
 
 		//public:
 
@@ -641,37 +650,12 @@ glsl.ast = (function() {
 			
 		}
 
-		//External Constructor
-		function Constructor() {
-			ast_parameter_declarator.apply(this);
-		}
-
-		//Class Inheritance
-		Constructor.prototype = ast_parameter_declarator;
-		ast_node.extend(ast_parameter_declarator);
-
 		return Constructor;
 	
 	})();
 
 
-
-
 	var ast_expression_statement = (function() {
-
-		//Internal Constructor
-		function ast_expression_statement() {
-			this.parent();
-			this.expression = null;
-		}
-
-		//public:
-		ast_expression_statement.ast_expression_statement = function(ex) {
-			this.expression = ex;
-		}
-
-		ast_expression_statement.print = function() {			
-		}
 
 		//External Constructor
 		function Constructor(ex) {
@@ -679,26 +663,51 @@ glsl.ast = (function() {
 			this.ast_expression_statement(ex);
 		}
 
+		//Internal Constructor
+		function ast_expression_statement() {
+			ast_node.prototype.apply(this);
+			this.expression = null;
+		}
+
 		//Class Inheritance
 		Constructor.prototype = ast_expression_statement;
-		ast_node.extend(ast_expression_statement);
+		ast_expression_statement.__proto__ = ast_node.prototype;
+
+		//public:
+
+		ast_expression_statement.ast_expression_statement = function(ex) {
+			this.expression = ex;
+		}
+
+		ast_expression_statement.print = function() {			
+		}
 
 		return Constructor;
 	
 	})();
 
 
-
 	var ast_compound_statement = (function() {
+
+		//External Constructor
+		function Constructor(new_scope, statements) {
+			ast_compound_statement.apply(this);
+			this.ast_compound_statement(new_scope, statements);
+		}
 
 		//Internal Constructor
 		function ast_compound_statement() {
-			this.parent();
+			ast_node.prototype.apply(this);
 			this.new_scope = null;
 			this.statements = [];
 		}
 
+		//Class Inheritance
+		Constructor.prototype = ast_compound_statement;
+		ast_compound_statement.__proto__ = ast_node.prototype;
+
 		//public:
+
 		ast_compound_statement.ast_compound_statement = function(new_scope, statements) {
 			this.new_scope = new_scope;
 			if (statements) {
@@ -709,38 +718,12 @@ glsl.ast = (function() {
 		ast_compound_statement.print = function() {			
 		}
 
-		//External Constructor
-		function Constructor(new_scope, statements) {
-			ast_compound_statement.apply(this);
-			this.ast_compound_statement(new_scope, statements);
-		}
-
-		//Class Inheritance
-		Constructor.prototype = ast_compound_statement;
-		ast_node.extend(ast_compound_statement);
-
 		return Constructor;
 	
 	})();
 
 
-
-
 	var ast_function_definition = (function() {
-
-		//Internal Constructor
-		function ast_function_definition() {
-			this.parent();
-			this.proto_type = null;
-			this.body = null;
-		}
-
-		//public:
-		ast_function_definition.ast_function_definition = function() {
-		}
-
-		ast_function_definition.print = function() {			
-		}
 
 		//External Constructor
 		function Constructor() {
@@ -748,14 +731,110 @@ glsl.ast = (function() {
 			this.ast_function_definition();
 		}
 
+		//Internal Constructor
+		function ast_function_definition() {
+			ast_node.prototype.apply(this);
+			this.proto_type = null;
+			this.body = null;
+		}
+
 		//Class Inheritance
 		Constructor.prototype = ast_function_definition;
-		ast_node.extend(ast_function_definition);
+		ast_function_definition.__proto__ = ast_node.prototype;
+
+		//public:
+
+		ast_function_definition.ast_function_definition = function() {
+		}
+
+		ast_function_definition.print = function() {			
+		}
 
 		return Constructor;
 	
 	})();
 
+	
+	var ast_expression_bin = (function() {
+
+		//External Constructor
+		function Constructor(oper, ex0, ex1) {
+			ast_expression_bin.apply(this);
+			this.ast_expression_bin(oper, ex0, ex1);
+		}
+
+		//Internal Constructor
+		function ast_expression_bin() {
+			ast_expression.prototype.apply(this);
+		}
+
+		//Class Inheritance
+		Constructor.prototype = ast_expression_bin;
+		ast_expression_bin.__proto__ = ast_expression.prototype;
+
+		//public:
+		ast_expression_bin.ast_expression_bin = function(oper, ex0, ex1) {
+			this.ast_expression(oper, ex0, ex1, null);
+			//assert(oper >= ast.operators.plus && oper <= ast.operators.logic_not);
+		}
+
+		ast_expression_bin.print = function() {	
+		}
+
+		return Constructor;
+	
+	})();
+
+
+	var ast_function_expression = (function() {
+
+		//External Constructor
+		function Constructor() {
+			ast_function_expression.apply(this);
+			this.ast_function_expression.apply(this, arguments);
+		}
+
+		//Internal Constructor
+		function ast_function_expression() {
+			ast_expression.prototype.apply(this);
+			this.cons = false;
+		}
+
+		//Class Inheritance
+		Constructor.prototype = ast_function_expression;
+		ast_function_expression.__proto__ = ast_expression.prototype;
+
+		//public:
+		ast_function_expression.ast_function_expression = function() {
+			
+			if (arguments[0].typeof('ast_expression')) {
+				ast_function_expression.ast_function_expression.ast_expression.apply(this, arguments);
+			} else {
+				ast_function_expression.ast_function_expression.ast_type_specifier.apply(this, arguments);				
+			}
+		}
+
+		ast_function_expression.ast_function_expression.ast_expression = function(callee) {
+			this.ast_expression(ast_operators.function_call, callee, null, null);
+			cons = false;
+		}
+
+		ast_function_expression.ast_function_expression.ast_type_specifier = function(type) {
+			this.ast_expression(ast_operators.function_call, type, null, null);
+			cons = true;			
+		}
+
+
+		ast_function_expression.print = function() {
+		}
+
+		ast_function_expression.is_constructor = function() {
+			return this.cons;
+		}
+
+		return Constructor;
+	
+	})();
 
 
 	var ast = {
@@ -772,7 +851,9 @@ glsl.ast = (function() {
 		operators : ast_operators,
 		expression_statement : ast_expression_statement,
 		compound_statement : ast_compound_statement,
-		function_definition : ast_function_definition
+		function_definition : ast_function_definition,
+		expression_bin : ast_expression_bin,
+		function_expression : ast_function_expression
 	}
 
 	return ast;

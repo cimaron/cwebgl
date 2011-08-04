@@ -249,11 +249,10 @@ var lexer = (function () {
 			return 'EOL';
 			break;
 		case 20:
-			/*yy_.yylineno++;
-			yycolumn = 0;*/
+            /*yy_.yylineno++; yycolumn = 0;*/
 			break;
 		case 21:
-			return 122;
+			return yy.token.ATTRIBUTE;
 			break;
 		case 22:
 			return 'CONST_TOK';
@@ -328,7 +327,7 @@ var lexer = (function () {
 			return 134;
 			break;
 		case 46:
-			return 135;
+			return yy.token.VEC3;
 			break;
 		case 47:
 			return yy.token.VEC4;
@@ -340,7 +339,7 @@ var lexer = (function () {
 			return 156;
 			break;
 		case 50:
-			return 160;
+			return yy.token.MAT4X4;
 			break;
 		case 51:
 			return this.KEYWORD(120, 120, MAT2X2);
@@ -379,7 +378,7 @@ var lexer = (function () {
 			return 'INOUT_TOK';
 			break;
 		case 63:
-			return 127;
+			return yy.token.UNIFORM;
 			break;
 		case 64:
 			return yy.token.VARYING;
@@ -541,9 +540,8 @@ var lexer = (function () {
 			return 78;
 			break;
 		case 117:
-			yylval.n = strtol(yy_.yytext, NULL, 10);
-			return IS_UINT ? UINTCONSTANT : INTCONSTANT;
-
+			this.yylval.n = parseInt(yy_.yytext);
+			this.IS_UINT(yy_.yytext) ? yy.token.UINTCONSTANT : yy.token.INTCONSTANT;
 			break;
 		case 118:
 			yylval.n = strtol(yy_.yytext + 2, NULL, 16);
@@ -561,8 +559,8 @@ var lexer = (function () {
 
 			break;
 		case 121:
-			yylval.real = glsl_strtod(yy_.yytext, NULL);
-			return 11;
+			this.yylval.real = parseInt(yy_.yytext);
+			return yy.token.FLOATCONSTANT;
 
 			break;
 		case 122:
