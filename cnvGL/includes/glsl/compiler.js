@@ -81,80 +81,11 @@ var glsl = (function() {
 	};
 	//#ENDIF
 
-	var symbol_table_entry;
-
-
-	var symbol_table = (function() {
-
-		//Internal Constructor
-		function symbol_table() {
-			this.table = {
-				functions : {},
-				types : {},
-				variables : {}
-			};
-		}
-		
-		//public:	
-		symbol_table.push_scope = function() {	
-		}
-		
-		symbol_table.pop_scope = function() {
-		}
-		
-		symbol_table.name_declared_this_scope = function(name) {	
-		}
-		
-		symbol_table.add_variable = function(v) {	
-			this.table.variables[v.identifer] = v;
-		}
-
-		symbol_table.add_type = function(name, t) {
-		}
-		
-		symbol_table.add_function = function(f) {
-			this.table.functions[f.identifer] = f;
-		}
-		
-		symbol_table.add_global_function = function(f) {
-			this.table.functions[f.identifer] = f;			
-		}
-		
-		symbol_table.get_variable = function(name) {
-			
-		}
-		
-		symbol_table.get_type = function(name) {
-			
-		}
-		
-		symbol_table.get_function = function(name) {
-			
-		}
-		
-		//private:
-		symbol_table.get_entry = function(name) {
-			
-		}
-
-		//External Constructor
-		function Constructor() {
-			symbol_table.apply(this);
-		}
-
-		//Class Inheritance
-		Constructor.prototype = symbol_table;
-
-		return Constructor;	
-	
-	})();
-
-
 	var parse_state = function() {
 
 		this.scanner = null;
 		this.translation_unit = [];
-		this.symbols = new symbol_table();
+		this.symbols = new glsl.symbol_table();
 		this.es_shader = false;
 		this.language_version = 0;
 		this.version_string = null;
@@ -249,11 +180,6 @@ var glsl = (function() {
 		this.num_builtines_to_link = 0;
 	};
 
-	var state = new parse_state();
-	state.es_shader = true;
-	state.language_version = 110;
-
-
 	var token;
 
 	var copy = function(target, source) {
@@ -290,20 +216,25 @@ var glsl = (function() {
 	var initialize_types = function(state) {
 	}
 
+	var state = null;
 
 	var glsl = {
 
 		errors : [],
 
 		//expose to lexer/parser
-		symbol_table : symbol_table,
-		state : state,
+		state : null,
 		token : token,
 		parseError : function(str, hash) {
 			yyerror(lexer.yylloc, state, str);
 		},
 
 		initialize : function() {
+
+			state = new parse_state();
+			this.state = state;
+			state.es_shader = true;
+			state.language_version = 110;			
 
 			//lexer
 			this.lexer.yy = this;
@@ -325,7 +256,7 @@ var glsl = (function() {
 		},
  
 		compile : function(src) {
-			
+		
 			if (!initialized) {
 				this.initialize();
 			}
@@ -333,7 +264,7 @@ var glsl = (function() {
 			var parse_result,
 				gen_result,
 				processed_src, object_code;
-			
+
 			//preprocess
 			processed_src = this.preprocessor.process(src);
 
@@ -361,7 +292,4 @@ var glsl = (function() {
 	
 	return glsl;
 })();
-
-
-
 

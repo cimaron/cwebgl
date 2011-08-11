@@ -2029,8 +2029,10 @@ glsl.parser = (function() {
 						break;
 
 					case 3:
+						/*
 						delete state.symbols;
 						state.symbols = new this.yy.symbol_table();						
+						*/
 						initialize_types(state);
 					    break;
 
@@ -2095,7 +2097,7 @@ glsl.parser = (function() {
 					case 63:
 						var ctx = state;
 						yyval = {};
-						yyval.expression = new glsl.ast.expression_bin(glsl.ast.types.mul, yyvsa[yyvsp - 2].expression, yyvsa[yyvsp].expression);
+						yyval.expression = new glsl.ast.expression_bin(glsl.ast.operators.mul, yyvsa[yyvsp - 2].expression, yyvsa[yyvsp].expression);
 						yyval.expression.set_location(yylloc);
 						break;
 					
@@ -2139,7 +2141,7 @@ glsl.parser = (function() {
 						yyval['function'].set_location(yylloc);
 						yyval['function'].return_type = yyvsa[yyvsp - 2].fully_specified_type;
 						yyval['function'].identifier = yyvsa[yyvsp - 1].identifier;
-						state.symbols.add_function(yyvsa[yyvsp - 1]);
+						state.symbols.add_function(yyvsa[yyvsp - 1].identifier);
 						state.symbols.push_scope();
 						break;
 
@@ -2163,6 +2165,9 @@ glsl.parser = (function() {
 						yyval.declarator_list = new glsl.ast.declarator_list(yyvsa[yyvsp - 1].fully_specified_type);
 						yyval.declarator_list.set_location(yylloc);
 						yyval.declarator_list.declarations.push(decl);
+						//note this doesn't appear in the Mesa glsl compiler parser, which I think is a bug
+						var symbol = state.symbols.add_variable(yyvsa[yyvsp].identifier);
+						symbol.definition = yyvsa[yyvsp - 1];
 						break;
 
 					case 145:
@@ -2231,7 +2236,7 @@ glsl.parser = (function() {
 					
 					case 206:
 						yyval = {};
-						yyval.n = glsl.ast.mat4;
+						yyval.n = glsl.ast.types.mat4;
 						break;						
 
 					case 232:
@@ -2241,7 +2246,7 @@ glsl.parser = (function() {
 						yyval = {};
 						yyval.n = glsl.ast.precision.high;
 						break;
-					
+
 					case 261:
 						yyval = {};
 						yyval.compound_statement = new glsl.ast.compound_statement(false, yyvsa[yyvsp - 1].node);
@@ -2253,7 +2258,7 @@ glsl.parser = (function() {
 							_mesa_glsl_error(yylsa[yylsp], state, "<nil> statement\n");
 						}
 						yyval = {};
-						yyval.node = yyvsa[yyvsp].node;
+						yyval.node =	 yyvsa[yyvsp].node;
 						break;
 
 					case 265:
@@ -2273,7 +2278,7 @@ glsl.parser = (function() {
 						break;
 
 					case 291:
-						yyval = {};
+						yyval = {};	
 						yyval.function_definition = new glsl.ast.function_definition();
 						yyval.function_definition.set_location(yylloc);
 						yyval.function_definition.proto_type = yyvsa[yyvsp - 1]['function'];
