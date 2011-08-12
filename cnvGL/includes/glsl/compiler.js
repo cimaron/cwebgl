@@ -214,6 +214,9 @@ var glsl = (function() {
 	//#ENDIF
 
 	var initialize_types = function(state) {
+		//gl_Position
+		var entry = state.symbols.add_variable('gl_Position');
+		entry.type = 'vec4';
 	}
 
 	var state = null;
@@ -282,7 +285,8 @@ var glsl = (function() {
 					object_code = this.generator.objectCode;
 				} else {
 					this.errors.push(this.generator.errorMsg);	
-					console.log(this.errors[0]);
+					console.warn(this.errors[0].message);
+					console.error(this.errors[0]);
 				}
 			}
 

@@ -199,9 +199,25 @@ HASH		^{SPC}#{SPC}
 "|="		return 'OR_ASSIGN';
 "-="		return 'SUB_ASSIGN';
 
-[1-9][0-9]*[uU]?	{
-				this.yylval.n = parseInt(yytext);
-				this.IS_UINT(yytext) ? yy.token.UINTCONSTANT : yy.token.INTCONSTANT;
+[0-9]+\.[0-9]+([eE][+-]?[0-9]+)?[fF]?	{
+			    this.yylval.real = parseFloat(yytext);
+			    return yy.token.FLOATCONSTANT;
+			}
+\.[0-9]+([eE][+-]?[0-9]+)?[fF]?		{
+				this.yylval.real = parseFloat(yytext);
+				return yy.token.FLOATCONSTANT;
+			}
+[0-9]+\.([eE][+-]?[0-9]+)?[fF]?		{
+			    this.yylval.real = parseFloat(yytext);
+			    return yy.token.FLOATCONSTANT;;
+			}
+[0-9]+[eE][+-]?[0-9]+[fF]?		{
+			    this.yylval.real = parseFloat(yytext);
+			    return yy.token.FLOATCONSTANT;;
+			}
+[0-9]+[fF]		{
+			    this.yylval.real = parseFloat(yytext);
+			    return yy.token.FLOATCONSTANT;;
 			}
 "0"[xX][0-9a-fA-F]+[uU]?	{
 			    yylval.n = strtol(yytext + 2, NULL, 16);
@@ -211,28 +227,10 @@ HASH		^{SPC}#{SPC}
 			    yylval.n = strtol(yytext, NULL, 8);
 			    return IS_UINT ? UINTCONSTANT : INTCONSTANT;
 			}
-
-[0-9]+\.[0-9]+([eE][+-]?[0-9]+)?[fF]?	{
-			    yylval.real = glsl_strtod(yytext, NULL);
-			    return 'FLOATCONSTANT';
+[1-9][0-9]*[uU]?	{
+				this.yylval.n = parseInt(yytext);
+				return this.IS_UINT(yytext) ? yy.token.UINTCONSTANT : yy.token.INTCONSTANT;
 			}
-\.[0-9]+([eE][+-]?[0-9]+)?[fF]?		{
-				this.yylval.real = parseInt(yytext);
-				return yy.token.FLOATCONSTANT;
-			}
-[0-9]+\.([eE][+-]?[0-9]+)?[fF]?		{
-			    yylval.real = glsl_strtod(yytext, NULL);
-			    return 'FLOATCONSTANT';
-			}
-[0-9]+[eE][+-]?[0-9]+[fF]?		{
-			    yylval.real = glsl_strtod(yytext, NULL);
-			    return 'FLOATCONSTANT';
-			}
-[0-9]+[fF]		{
-			    yylval.real = glsl_strtod(yytext, NULL);
-			    return 'FLOATCONSTANT';
-			}
-
 "true"			{
 			    yylval.n = 1;
 			    return 'BOOLCONSTANT';
