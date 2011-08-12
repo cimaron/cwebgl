@@ -45,20 +45,17 @@ ShaderLinker.prototype = __ShaderLinker;
 __ShaderLinker.ShaderLinker = function() {
 	this.executable = new ShaderLinkerExecutable();
 	this.object_code = [];
-
-	var include = new ShaderCompilerObject();
-	include.object_code = this.include_code;
-	
-	this.addObjectCode(include);
 }
 
 //public:
-
+		
 __ShaderLinker.addObjectCode = function(shader_obj) {
 	this.object_code.push(shader_obj);
 }
 
 __ShaderLinker.link = function() {
+
+	debugger;	
 	
 	for (var i = 0; i < this.object_code.length; i++) {
 		this.executable.object_code += this.object_code[i].object_code;

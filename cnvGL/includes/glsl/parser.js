@@ -21,11 +21,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 glsl.parser = (function() {
 
-	var yydebug = 1;
+	var yydebug = 0;
 
 	//parser specific
-	var YYDEBUG = 1;
-	var YYERROR_VERBOSE = 1;
+	var YYDEBUG = 0;
+	var YYERROR_VERBOSE = 0	;
 
 	var YYTOKENTYPE = 1;
 	var yytokentype = {

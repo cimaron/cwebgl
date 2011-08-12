@@ -187,7 +187,6 @@ glsl.generator = (function() {
 
 			//case glsl.ast.operators.*
 			case glsl.ast.operators.mul:
-				debugger;
 				var op = g_get_operation(e.oper, left.type, right.type);
 				if (!(exp.type = op.type)) {
 					throw new Error(g_error("Cannot apply operation to " + left.type + " and " + right.type, e));
@@ -213,7 +212,7 @@ glsl.generator = (function() {
 				throw new Error(g_error("Could not translate unknown expression " + e.typeof() + '(' + e.oper + ')', e));
 		}
 	}
-	
+		
 	function g_ast_expression_simple(e) {
 		var exp = {};
 		
