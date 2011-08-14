@@ -34,7 +34,6 @@ function cnvgl_program() {
 	this.attached_shaders_count = 0;
 	this.attached_shaders = [];
 
-	
 	//uniforms
 	this.active_uniforms_count = 0;
 	this.active_uniforms = [];
@@ -43,6 +42,10 @@ function cnvgl_program() {
 	//attributes
 	this.active_attributes_count = 0;
 	this.active_attributes = [];
+
+	//programs
+	this.fragment_program = null;
+	this.vertex_program = null;
 
 	this.construct();
 }

@@ -22,5 +22,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 function GlslObject() {
 	this.symbol_table = null;
 	this.object_code = '';
+	this.mode = 0;
 }
 

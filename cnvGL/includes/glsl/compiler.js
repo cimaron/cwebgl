@@ -156,6 +156,8 @@ var glsl = (function() {
 		output : null,
 		status : false,
 		errors : [],
+		
+		mode : 0,
 
 		//expose to lexer/parser
 		state : null,
@@ -169,7 +171,7 @@ var glsl = (function() {
 			state = new parse_state();
 			this.state = state;
 			state.es_shader = true;
-			state.language_version = 110;			
+			state.language_version = 110;
 
 			//lexer
 			this.lexer.yy = this;
@@ -186,7 +188,7 @@ var glsl = (function() {
 			this.token = this.parser.yytokentype;
 		},
  
-		compile : function(source) {
+		compile : function(source, mode) {
 
 			if (!initialized) {
 				this.initialize();
@@ -195,6 +197,7 @@ var glsl = (function() {
 			this.output = null;
 			this.status = false;
 			this.errors = [];
+			this.mode = (typeof mode != 'undefined') ? mode : this.mode;
 
 			var parse_tree = null;
 
@@ -223,6 +226,7 @@ var glsl = (function() {
 			this.output = new GlslObject();
 			this.output.object_code = this.generator.output;
 			this.output.symbol_table = this.state.symbols;
+			this.output.mode = this.mode;
 
 			this.status = true;
 			return true;

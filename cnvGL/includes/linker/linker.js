@@ -19,83 +19,91 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-//----------------------------------------------------------------------------------------
-//	class ShaderLinker
-//----------------------------------------------------------------------------------------
 
-function ShaderLinker() {
+ShaderLinker = (function() {
 
-	//member variables:
+	//External Constructor
+	function Constructor() {
+		linker.apply(this);
+		this.linker();
+	}
 
-	//Call constructor
-	this.construct();
-}
+	//Internal Constructor
+	function linker() {
+		//public:
+		this.input = [];
+		this.output = [];
+		this.status = false;
+		this.errors = [];
+	}
 
-//----------------------------------------------------------------------------------------
-//	Class Magic
-//----------------------------------------------------------------------------------------
+	//Class Inheritance
+	Constructor.prototype = linker;
 
-__ShaderLinker = new pClass('ShaderLinker');
-ShaderLinker.prototype = __ShaderLinker;
+	//public:
 
-//----------------------------------------------------------------------------------------
-//	Methods
-//----------------------------------------------------------------------------------------
+	linker.linker = function() {
+	}
 
-__ShaderLinker.ShaderLinker = function() {
-	this.executable = new ShaderLinkerExecutable();
-	this.object_code = [];
-}
+	linker.link = function() {
 
-//public:
+		this.status = false;
+		this.errors = [];
+		this.output[1] = new GlslExecutable();
+		this.output[2] = new GlslExecutable();
+
+		for (var i = 0; i < this.input.length; i++) {
+			this.merge(this.input[i]);
+		}
+
+		this.replaceSymbols(this.output[1]);
+		this.replaceSymbols(this.output[2]);
+
+		this.buildExecutable(this.output[1]);
+		this.buildExecutable(this.output[2]);
 		
-__ShaderLinker.addObjectCode = function(shader_obj) {
-	this.object_code.push(shader_obj);
-}
-
-__ShaderLinker.link = function() {
-
-	debugger;	
-	
-	for (var i = 0; i < this.object_code.length; i++) {
-		this.executable.object_code += this.object_code[i].object_code;
-		this.addSymbols(this.object_code[i].symbol_table);
+		this.status = 1;
 	}
 
-	var code = this.buildExecutable(this.executable.object_code);
-	this.executable.vertex_entry = code.vertex_entry;
-	this.executable.fragment_entry = code.fragment_entry;
-	this.executable.access = code.access;
-
-	return this.executable;
-}
-
-//private:
-
-__ShaderLinker.addSymbols = function(symbols) {
-	//@todo: generate errors for surpassing the maximum allowable amount of each type of variable
-	for (var i in symbols) {
-		this.executable.symbol_table[i] = symbols[i];	
+	linker.addObjectCode = function(object) {
+		this.input.push(object);
 	}
-}
 
-__ShaderLinker.buildExecutable = function(__object_code) {
+	linker.merge = function(shader) {
+		this.output[shader.mode].text += shader.object_code;
+		this.addSymbols(shader.symbol_table, shader.mode);
+	}
 
-	//special variables and functions form the basic storage and input/output mechanism of
-	//the program "executable" (closure)
+	linker.addSymbols = function(symbols, mode) {
+		var data = this.output[mode].data;
+		var data_table = this.output[mode].symbols;
+		var symbol_table = symbols.table.data;
 
-	eval(__object_code);
-	
-	return {
-		access : {
-			getUniform : __getUniform,
-			setUniform : __setUniform,
-			getAttribute : __getAttribute,
-			setAttribute : __setAttribute,
-			getOut : __getOut
-		},
-		vertex_entry : __vertexEntry,
-		fragment_entry : __fragmentEntry
-	};
-}
+		for (var name in symbol_table) {
+			var entry = symbol_table[name];
+			if (entry.typedef != 0) {
+				continue;	
+			}
+			if (!data_table[name]) {
+				data_table[name] = { index : data.length, type : null };
+				data.push(null);
+			}
+		}
+	}
+
+	linker.replaceSymbols = function(exec) {
+		for (var name in exec.symbols) {
+			var index = exec.symbols[name].index;
+			exec.text = exec.text.replace(new RegExp('@' + name + '@', 'g'), '__data[' + index + ']');
+		}
+	}
+
+	linker.buildExecutable = function(__exec) {
+		var __data = __exec.data;
+		eval(__exec.text);
+	}
+
+	return Constructor;
+
+})();
 

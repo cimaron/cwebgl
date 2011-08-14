@@ -53,7 +53,6 @@ __cnvgl_vertex_processor.cnvgl_vertex_processor = function() {
 
 __cnvgl_vertex_processor.setProgram = function(program) {
 	this.program = program;
-	this.access = this.program.access;
 }
 
 __cnvgl_vertex_processor.setMode = function(mode) {

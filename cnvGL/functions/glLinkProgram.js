@@ -25,7 +25,7 @@ function glLinkProgram(/*GLuint*/ program) {
 	//if (not supported) then
 	//	cnvgl_throw_error(GL_INVALID_OPERATION);
 	//endif
-	
+
 	//get program
 	var program_obj = cnvgl_objects[program];
 
@@ -46,26 +46,26 @@ function glLinkProgram(/*GLuint*/ program) {
 
 	//reset
 	program_obj.link_status = false;
-	program_obj.executable = null;
+	program_obj.fragment_program = null;
+	program_obj.vertex_program = null;
 
 	var linker = new ShaderLinker();
-	
+
 	for (var i = 0; i < program_obj.attached_shaders_count; i++) {
 		var location = program_obj.attached_shaders[i];
 		var shader_obj = cnvgl_objects[location];
 		linker.addObjectCode(shader_obj.object_code);
 	}
 
-	var executable = linker.link();
-	if (executable) {
+	linker.link();
+
+	if (linker.status) {
 		program_obj.link_status = true;
-		program_obj.executable = executable;
+		program_obj.fragment_program = linker.output[1];
+		program_obj.vertex_program = linker.output[2];
 	} else {
 		return;	
 	}
-
-	//pull in symbols
-	var symbols = executable.symbol_table;
 
 	//reset uniforms
 	program_obj.active_uniforms_count = 0;
@@ -75,6 +75,10 @@ function glLinkProgram(/*GLuint*/ program) {
 	//reset attributes
 	program_obj.active_attributes_count = 0;
 	program_obj.active_attributes = [];
+
+	//pull in symbols
+	/*
+	var symbols = executable.symbol_table;
 
 	for (var i in symbols) {
 		var symbol = symbols[i];
@@ -87,18 +91,17 @@ function glLinkProgram(/*GLuint*/ program) {
 				program_obj.active_uniforms_count++;
 				program_obj.active_uniforms_values[uniform_obj.location] = [0, 0, 0, 0];
 				break;
-
 			case 'attribute':
 				var attribute_obj = new cnvgl_attribute(symbol);
 				attribute_obj.location = program_obj.active_attributes_count;
 				program_obj.active_attributes.push(attribute_obj);
 				program_obj.active_attributes_count++;
 				break;
-
 			default:
 				debugger;
 		}
 	}
+	*/
 
 }
 

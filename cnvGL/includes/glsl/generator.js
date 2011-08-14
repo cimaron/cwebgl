@@ -42,34 +42,25 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 	}
 
-	function g_type_qualifier_global(qualifier) {
-		var qual = '';
-		for (var i in g_type_qualifier_globals) {
-			if (qualifier.flags.q & i) {
-				qual = g_type_qualifier_globals[i];
-			}
-		}
-		return qual;
-	}
-
 	//table for valid type operations
 	var g_valid_type_operations = {};
 	var g_operations_types = {
 		'cast' : {
-			vec3 : {
-				vec4 : { type : 'vec4', func : '__cast_vec3_vec4' }
-			}
+			vec4 : { type : 'vec4', func : 'vec4.construct(%s)' }
 		},
 		5 : { //glsl.ast.operators.mul
 			mat4 : {
-				mat4 : { type : 'mat4', func : 'mat4.multiply' },
-				vec4 : { type : 'vec4', func : 'mat4.multiplyVec4' }
+				mat4 : { type : 'mat4', func : 'mat4.multiply(%s,%s,[])' },
+				vec4 : { type : 'vec4', func : 'mat4.multiplyVec4(%s,%s,[])' }
 			}
 		}
 	}
 
 	function g_get_operation(op, type1, type2) {
 		var op = g_operations_types[op];
+		if (op[type1] && !type2) {
+			return op[type1];
+		}
 		if (op[type1] && op[type1][type2]) {
 			return op[type1][type2];
 		}
@@ -93,34 +84,27 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	function g_ast_declarator_list(dl) {
 
-		var code = '', q_code = '', d_code;
-		
-		//generate qualifier global vars for external communication
-		var type = dl.type;
-		var q = type.has_qualifiers();
-		if (q) {
-			q_code = g_type_qualifier_global(type.qualifier);
-		}
+		var code = '', d_code;
 
 		//get default initialization values
+		var type = dl.type;
 		var specifier = type.specifier;
-		
+
 		d_code = g_type_default_value(specifier);
 		if (!d_code) {
 			return false;
 		}
-		
+
 		var list = dl.declarations;
 		for (var i = 0; i < list.length; i++) {
 			var decl = list[i];
 			var name = decl.identifier;
-			
+
 			//update symbol table entry type
 			var entry = glsl.state.symbols.get_variable(name);
 			entry.type = specifier.type_name;
-			
-			//qualifier?[name] = default_value
-			code += (q ? (q_code + "['" + name + "']") : name) + " = " + d_code + ";\n";
+
+			code += entry.object_name + " = " + d_code + ";\n";
 		}
 		return code;
 	}
@@ -129,6 +113,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		var code = '', p_code = '';
 
 		var name = f.identifier;
+		var entry = glsl.state.symbols.get_function(name);
+
 		var parameters = f.parameters;
 
 		var params = [];
@@ -141,11 +127,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 		p_code = params.join(", ");
 
-		code = "function " + name + "(" + p_code + ")";
+		code = "function " + entry.object_name + "(" + p_code + ")";
 
 		return code;
 	}
-	
+
 	function g_ast_expression_op(e) {
 
 		var exp = {};
@@ -191,7 +177,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				if (!(exp.type = op.type)) {
 					throw new Error(g_error("Cannot apply operation to " + left.type + " and " + right.type, e));
 				}
-				exp.code = op.func + '(' + left.code + ',' + right.code + ')';
+				exp.code = glsl.sprintf(op.func, left.code, right.code);				
 				return exp;
 
 			case glsl.ast.operators.function_call:
@@ -203,8 +189,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 				//cast
 				if (left) {
-					exp.type = left.type;
-					exp.code = '__cast_' + left.type + '(' + es.join(',') + ')';
+					var op = g_get_operation('cast', left.type);
+					exp.type = op.type;
+					exp.code = glsl.sprintf(op.func, es.join(','));
 					return exp;
 				}
 
@@ -219,14 +206,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		//identifier
 		if (e.primary_expression.identifier) {
 
-			exp.code = e.primary_expression.identifier;
-
+			var identifier = e.primary_expression.identifier;
 			//lookup type in symbol table
-			var symbol = glsl.state.symbols.get_variable(e.primary_expression.identifier);
-			if (!symbol || !symbol.type) {
+			var entry = glsl.state.symbols.get_variable(identifier);
+
+			if (!entry || !entry.type) {
 				throw new Error(g_error(e.primary_expression.identifier + " is undefined", e));
 			}
-			exp.type = symbol.type;
+
+			exp.code = entry.object_name;
+			exp.type = entry.type;
+
 			return exp;
 		}
 

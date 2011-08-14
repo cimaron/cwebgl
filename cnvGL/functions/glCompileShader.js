@@ -5,7 +5,7 @@ function glCompileShader(/*GLuint*/ shader) {
 	//if (shader compiler not supported) then
 	//	cnvgl_throw_error(GL_INVALID_OPERATION);
 	//endif
-	
+
 	//get shader
 	var shader_obj = cnvgl_objects[shader];
 
@@ -27,17 +27,17 @@ function glCompileShader(/*GLuint*/ shader) {
 
 	//get source
 	var shader_string = shader_obj.shader_string;
-	
-	var compiler = new ShaderCompiler();
-	var object_code = compiler.compile(shader_string);
 
-	if (object_code) {
+	var glsl_mode = (shader_obj.type == GL_FRAGMENT_SHADER) ? 1 : 2;
+
+	glsl.compile(shader_string, glsl_mode);
+
+	if (glsl.status) {
 		shader_obj.compile_status = GL_TRUE;
-		shader_obj.object_code = object_code;
+		shader_obj.object_code = glsl.output;
 	} else {
-		shader_obj.information_log = compiler.getErrors();
+		shader_obj.information_log = glsl.errors.join("\n");
 		shader_obj.information_log_length = shader_obj.information_log.length;
 	}
-
 }
 

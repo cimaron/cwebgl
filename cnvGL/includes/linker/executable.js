@@ -23,15 +23,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //	class ShaderLinkerExecutable
 //----------------------------------------------------------------------------------------
 
-function ShaderLinkerExecutable() {
-
-	//used in compilation/communication with GL
-	this.symbol_table = {};
-	this.object_code = '';
-	
-	//actual program
-	this.data = null;
-	this.vertex_entry = null;
-	this.fragment_entry = null;
+function GlslExecutable() {
+	//executable
+	this.symbols = {};
+	this.data = [];
+	this.text = '';
 }
 

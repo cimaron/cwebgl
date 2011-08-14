@@ -26,7 +26,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		this.typedef = typedef;
 		this.type = null;
 		this.definition = null;
-		this.uid = "__" + name;
+		this.object_name = null;
 	};
 
 	SymbolTableEntry.typedef = {
@@ -63,9 +63,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		symbol_table.name_declared_this_scope = function(name) {
 			return (this.table.data[name] ? true : false);
 		}
-	
+
 		symbol_table.add_variable = function(name) {
 			var entry = new SymbolTableEntry(name, SymbolTableEntry.typedef.variable);
+			entry.object_name = '@' + name + '@';
 			return this.add_entry(entry);
 		}
 	
@@ -77,6 +78,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		symbol_table.add_function = function(name) {
 			var entry = new SymbolTableEntry(name, SymbolTableEntry.typedef.func);
+			entry.object_name = name;
 			return this.add_entry(entry);
 		}
 

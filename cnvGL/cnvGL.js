@@ -13,18 +13,21 @@ include('cnvGL/objects/cnvgl_uniform.js');
 include('cnvGL/objects/cnvgl_vertex.js');
 
 //Compiler
-include('cnvGL/includes/shaderCompiler/ast.js');
-include('cnvGL/includes/shaderCompiler/compiler.js');
-include('cnvGL/includes/shaderCompiler/object.js');
-include('cnvGL/includes/shaderCompiler/parser.js');
-include('cnvGL/includes/shaderCompiler/preprocessor.js');
-include('cnvGL/includes/shaderCompiler/symbol.js');
+include('cnvGL/includes/glsl/object.js');
+include('cnvGL/includes/glsl/compiler.js');
+include('cnvGL/includes/glsl/output.js');
+include('cnvGL/includes/glsl/symbol.js');
+include('cnvGL/includes/glsl/preprocessor.js');
+include('cnvGL/includes/glsl/lexer.js');
+include('cnvGL/includes/glsl/lexer_extern.js');
+include('cnvGL/includes/glsl/parser.js');
+include('cnvGL/includes/glsl/ast.js');
+include('cnvGL/includes/glsl/generator.js');
 
 //Linker
-include('cnvGL/includes/shaderLinker/linker.js');
-include('cnvGL/includes/shaderLinker/executable.js');
-
-include('cnvGL/includes/include.php');
+include('cnvGL/includes/linker/linker.js');
+include('cnvGL/includes/linker/executable.js');
+include('cnvGL/includes/includes/glsl/includes/glsl.js');
 
 include('cnvGL/includes/vertex_processor.js');
 include('cnvGL/includes/fragment_processor.js');
