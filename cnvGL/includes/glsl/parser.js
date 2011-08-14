@@ -21,10 +21,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 (function(glsl) {
 
-	var yydebug = 1;
+	var yydebug = 0;
 
 	//parser specific
-	var YYDEBUG = 1;
+	var YYDEBUG = 0;
 	var YYERROR_VERBOSE = 0	;
 
 	var YYTOKENTYPE = 1;
@@ -312,274 +312,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		 185,   186,   187,   188,   189,   190,   191,   192,   193,   194,
 		 195
 	];
-
-	//#IF DEBUG
-
-		var yyprhs = [
-			   0,     0,     3,     4,     9,    10,    14,    17,    20,    23,
-			  26,    29,    30,    33,    35,    37,    39,    45,    47,    50,
-			  52,    54,    56,    58,    60,    62,    64,    68,    70,    75,
-			  77,    81,    84,    87,    89,    91,    93,    97,   100,   103,
-			 106,   108,   111,   115,   118,   120,   122,   124,   127,   130,
-			 133,   135,   138,   142,   145,   147,   150,   153,   156,   158,
-			 160,   162,   164,   166,   170,   174,   178,   180,   184,   188,
-			 190,   194,   198,   200,   204,   208,   212,   216,   218,   222,
-			 226,   228,   232,   234,   238,   240,   244,   246,   250,   252,
-			 256,   258,   262,   264,   270,   272,   276,   278,   280,   282,
-			 284,   286,   288,   290,   292,   294,   296,   298,   300,   304,
-			 306,   309,   312,   317,   320,   322,   324,   327,   331,   335,
-			 338,   344,   348,   351,   355,   358,   359,   361,   363,   365,
-			 367,   369,   373,   379,   386,   394,   403,   409,   411,   414,
-			 419,   425,   432,   440,   445,   448,   450,   453,   458,   460,
-			 464,   466,   470,   472,   474,   476,   478,   480,   482,   485,
-			 487,   490,   493,   497,   499,   501,   503,   505,   508,   510,
-			 512,   515,   518,   520,   522,   525,   527,   531,   536,   538,
-			 540,   542,   544,   546,   548,   550,   552,   554,   556,   558,
-			 560,   562,   564,   566,   568,   570,   572,   574,   576,   578,
-			 580,   582,   584,   586,   588,   590,   592,   594,   596,   598,
-			 600,   602,   604,   606,   608,   610,   612,   614,   616,   618,
-			 620,   622,   624,   626,   628,   630,   632,   634,   636,   638,
-			 640,   642,   644,   646,   648,   650,   656,   661,   663,   666,
-			 670,   672,   676,   678,   683,   685,   687,   689,   691,   693,
-			 695,   697,   699,   701,   703,   705,   708,   709,   714,   716,
-			 718,   721,   725,   727,   730,   732,   735,   741,   745,   747,
-			 749,   754,   760,   764,   767,   773,   781,   788,   790,   792,
-			 794,   795,   798,   802,   805,   808,   811,   815,   818,   820,
-			 822,   824
-		];
-		
-		/* YYRHS -- A `-1'-separated list of the rules' RHS.  */
-		var yyrhs = [
-			 221,     0,    -1,    -1,   223,   225,   222,   228,    -1,    -1,
-			 111,    80,   115,    -1,   118,   115,    -1,   119,   115,    -1,
-			 120,   115,    -1,   121,   115,    -1,   122,   115,    -1,    -1,
-			 225,   227,    -1,    76,    -1,    77,    -1,    78,    -1,   112,
-			 226,   114,   226,   115,    -1,   311,    -1,   228,   311,    -1,
-			  76,    -1,    78,    -1,   229,    -1,    80,    -1,    81,    -1,
-			  79,    -1,    82,    -1,   196,   260,   197,    -1,   230,    -1,
-			 231,   198,   232,   199,    -1,   233,    -1,   231,   200,   226,
-			  -1,   231,    86,    -1,   231,    87,    -1,   260,    -1,   234,
-			  -1,   235,    -1,   231,   200,   240,    -1,   237,   197,    -1,
-			 236,   197,    -1,   238,    74,    -1,   238,    -1,   238,   258,
-			  -1,   237,   201,   258,    -1,   239,   196,    -1,   281,    -1,
-			 229,    -1,    83,    -1,   242,   197,    -1,   241,   197,    -1,
-			 243,    74,    -1,   243,    -1,   243,   258,    -1,   242,   201,
-			 258,    -1,   229,   196,    -1,   231,    -1,    86,   244,    -1,
-			  87,   244,    -1,   245,   244,    -1,   202,    -1,   203,    -1,
-			 204,    -1,   205,    -1,   244,    -1,   246,   206,   244,    -1,
-			 246,   207,   244,    -1,   246,   208,   244,    -1,   246,    -1,
-			 247,   202,   246,    -1,   247,   203,   246,    -1,   247,    -1,
-			 248,    84,   247,    -1,   248,    85,   247,    -1,   248,    -1,
-			 249,   209,   248,    -1,   249,   210,   248,    -1,   249,    88,
-			 248,    -1,   249,    89,   248,    -1,   249,    -1,   250,    90,
-			 249,    -1,   250,    91,   249,    -1,   250,    -1,   251,   211,
-			 250,    -1,   251,    -1,   252,   212,   251,    -1,   252,    -1,
-			 253,   213,   252,    -1,   253,    -1,   254,    92,   253,    -1,
-			 254,    -1,   255,    94,   254,    -1,   255,    -1,   256,    93,
-			 255,    -1,   256,    -1,   256,   214,   260,   215,   258,    -1,
-			 257,    -1,   244,   259,   258,    -1,   216,    -1,    95,    -1,
-			  96,    -1,    98,    -1,    97,    -1,   104,    -1,    99,    -1,
-			 100,    -1,   101,    -1,   102,    -1,   103,    -1,   258,    -1,
-			 260,   201,   258,    -1,   257,    -1,   263,   217,    -1,   271,
-			 217,    -1,   110,   285,   282,   217,    -1,   264,   197,    -1,
-			 266,    -1,   265,    -1,   266,   268,    -1,   265,   201,   268,
-			  -1,   273,   229,   196,    -1,   281,   226,    -1,   281,   226,
-			 198,   261,   199,    -1,   278,   269,   267,    -1,   269,   267,
-			  -1,   278,   269,   270,    -1,   269,   270,    -1,    -1,    33,
-			  -1,    34,    -1,    35,    -1,   281,    -1,   272,    -1,   271,
-			 201,   226,    -1,   271,   201,   226,   198,   199,    -1,   271,
-			 201,   226,   198,   261,   199,    -1,   271,   201,   226,   198,
-			 199,   216,   291,    -1,   271,   201,   226,   198,   261,   199,
-			 216,   291,    -1,   271,   201,   226,   216,   291,    -1,   273,
-			  -1,   273,   226,    -1,   273,   226,   198,   199,    -1,   273,
-			 226,   198,   261,   199,    -1,   273,   226,   198,   199,   216,
-			 291,    -1,   273,   226,   198,   261,   199,   216,   291,    -1,
-			 273,   226,   216,   291,    -1,   105,   229,    -1,   281,    -1,
-			 279,   281,    -1,   123,   196,   275,   197,    -1,   276,    -1,
-			 275,   201,   276,    -1,   226,    -1,   226,   216,    80,    -1,
-			  40,    -1,    39,    -1,    38,    -1,     4,    -1,   280,    -1,
-			 274,    -1,   274,   280,    -1,   277,    -1,   277,   280,    -1,
-			 105,   280,    -1,   105,   277,   280,    -1,   105,    -1,     4,
-			  -1,     3,    -1,    37,    -1,    32,    37,    -1,    33,    -1,
-			  34,    -1,    32,    33,    -1,    32,    34,    -1,    36,    -1,
-			 282,    -1,   285,   282,    -1,   283,    -1,   283,   198,   199,
-			  -1,   283,   198,   261,   199,    -1,   284,    -1,   286,    -1,
-			  77,    -1,    74,    -1,     6,    -1,     7,    -1,     8,    -1,
-			   5,    -1,    29,    -1,    30,    -1,    31,    -1,    20,    -1,
-			  21,    -1,    22,    -1,    23,    -1,    24,    -1,    25,    -1,
-			  26,    -1,    27,    -1,    28,    -1,    41,    -1,    42,    -1,
-			  43,    -1,    44,    -1,    45,    -1,    46,    -1,    47,    -1,
-			  48,    -1,    49,    -1,    50,    -1,    51,    -1,   157,    -1,
-			  52,    -1,    53,    -1,    54,    -1,    55,    -1,   159,    -1,
-			  56,    -1,    57,    -1,    58,    -1,    59,    -1,    60,    -1,
-			  61,    -1,    62,    -1,    63,    -1,    64,    -1,    65,    -1,
-			  66,    -1,    67,    -1,    68,    -1,    69,    -1,    70,    -1,
-			  71,    -1,    72,    -1,   108,    -1,   107,    -1,   106,    -1,
-			  73,   226,   218,   287,   219,    -1,    73,   218,   287,   219,
-			  -1,   288,    -1,   287,   288,    -1,   281,   289,   217,    -1,
-			 290,    -1,   289,   201,   290,    -1,   226,    -1,   226,   198,
-			 261,   199,    -1,   258,    -1,   262,    -1,   295,    -1,   294,
-			  -1,   292,    -1,   300,    -1,   301,    -1,   304,    -1,   305,
-			  -1,   306,    -1,   310,    -1,   218,   219,    -1,    -1,   218,
-			 296,   299,   219,    -1,   298,    -1,   294,    -1,   218,   219,
-			  -1,   218,   299,   219,    -1,   293,    -1,   299,   293,    -1,
-			 217,    -1,   260,   217,    -1,    14,   196,   260,   197,   302,
-			  -1,   293,    12,   293,    -1,   293,    -1,   260,    -1,   273,
-			 226,   216,   291,    -1,    17,   196,   260,   197,   295,    -1,
-			  18,   260,   215,    -1,    19,   215,    -1,    75,   196,   303,
-			 197,   297,    -1,    11,   293,    75,   196,   260,   197,   217,
-			  -1,    13,   196,   307,   309,   197,   297,    -1,   300,    -1,
-			 292,    -1,   303,    -1,    -1,   308,   217,    -1,   308,   217,
-			 260,    -1,    10,   217,    -1,     9,   217,    -1,    16,   217,
-			  -1,    16,   260,   217,    -1,    15,   217,    -1,   312,    -1,
-			 262,    -1,   224,    -1,   263,   298,    -1
-		];
-
-		/* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
-		var yyrline = [
-			   0,   218,   218,   217,   229,   231,   271,   272,   273,   274,
-			 275,   287,   289,   293,   294,   295,   299,   308,   316,   327,
-			 328,   332,   339,   346,   353,   360,   367,   374,   375,   381,
-			 385,   392,   398,   407,   411,   415,   416,   425,   426,   430,
-			 431,   435,   441,   453,   457,   463,   470,   480,   481,   485,
-			 486,   490,   496,   508,   519,   520,   526,   532,   542,   543,
-			 544,   545,   549,   550,   556,   562,   571,   572,   578,   587,
-			 588,   594,   603,   604,   610,   616,   622,   631,   632,   638,
-			 647,   648,   657,   658,   667,   668,   677,   678,   687,   688,
-			 697,   698,   707,   708,   717,   718,   727,   728,   729,   730,
-			 731,   732,   733,   734,   735,   736,   737,   741,   745,   761,
-			 765,   770,   774,   783,   787,   788,   792,   797,   805,   819,
-			 829,   844,   851,   856,   867,   880,   883,   888,   893,   902,
-			 906,   907,   917,   927,   937,   947,   957,   971,   982,   991,
-			1000,  1009,  1018,  1027,  1036,  1050,  1057,  1068,  1075,  1076,
-			1095,  1124,  1165,  1170,  1175,  1183,  1191,  1192,  1193,  1198,
-			1199,  1204,  1209,  1215,  1223,  1228,  1233,  1238,  1244,  1249,
-			1254,  1259,  1264,  1272,  1276,  1284,  1285,  1291,  1300,  1306,
-			1312,  1321,  1322,  1323,  1324,  1325,  1326,  1327,  1328,  1329,
-			1330,  1331,  1332,  1333,  1334,  1335,  1336,  1337,  1338,  1339,
-			1340,  1341,  1342,  1343,  1344,  1345,  1346,  1347,  1348,  1349,
-			1350,  1351,  1352,  1353,  1354,  1355,  1356,  1357,  1358,  1359,
-			1360,  1361,  1362,  1363,  1364,  1365,  1366,  1367,  1368,  1369,
-			1370,  1371,  1375,  1385,  1395,  1408,  1415,  1424,  1429,  1437,
-			1452,  1457,  1465,  1472,  1481,  1485,  1491,  1492,  1496,  1497,
-			1498,  1499,  1500,  1501,  1502,  1506,  1513,  1512,  1526,  1527,
-			1531,  1537,  1546,  1556,  1568,  1574,  1583,  1592,  1597,  1605,
-			1609,  1623,  1627,  1628,  1632,  1639,  1646,  1656,  1657,  1661,
-			1663,  1669,  1674,  1683,  1689,  1695,  1701,  1707,  1716,  1717,
-			1718,  1722
-		];
-	//#ENDIF
-
-	//#IF YYDEBUG || YYERROR_VERBOSE || YYTOKEN_TABLE
-		/* YYTNAME[SYMBOL-NUM] -- String name of the symbol SYMBOL-NUM.
-		   First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
-	
-		var yytname = [
-			"$end", "error", "$undefined", "ATTRIBUTE", "CONST_TOK", "BOOL_TOK",
-			"FLOAT_TOK", "INT_TOK", "UINT_TOK", "BREAK", "CONTINUE", "DO", "ELSE",
-			"FOR", "IF", "DISCARD", "RETURN", "SWITCH", "CASE", "DEFAULT", "BVEC2",
-			"BVEC3", "BVEC4", "IVEC2", "IVEC3", "IVEC4", "UVEC2", "UVEC3", "UVEC4",
-			"VEC2", "VEC3", "VEC4", "CENTROID", "IN_TOK", "OUT_TOK", "INOUT_TOK",
-			"UNIFORM", "VARYING", "NOPERSPECTIVE", "FLAT", "SMOOTH", "MAT2X2",
-			"MAT2X3", "MAT2X4", "MAT3X2", "MAT3X3", "MAT3X4", "MAT4X2", "MAT4X3",
-			"MAT4X4", "SAMPLER1D", "SAMPLER2D", "SAMPLER3D", "SAMPLERCUBE",
-			"SAMPLER1DSHADOW", "SAMPLER2DSHADOW", "SAMPLERCUBESHADOW",
-			"SAMPLER1DARRAY", "SAMPLER2DARRAY", "SAMPLER1DARRAYSHADOW",
-			"SAMPLER2DARRAYSHADOW", "ISAMPLER1D", "ISAMPLER2D", "ISAMPLER3D",
-			"ISAMPLERCUBE", "ISAMPLER1DARRAY", "ISAMPLER2DARRAY", "USAMPLER1D",
-			"USAMPLER2D", "USAMPLER3D", "USAMPLERCUBE", "USAMPLER1DARRAY",
-			"USAMPLER2DARRAY", "STRUCT", "VOID_TOK", "WHILE", "IDENTIFIER",
-			"TYPE_IDENTIFIER", "NEW_IDENTIFIER", "FLOATCONSTANT", "INTCONSTANT",
-			"UINTCONSTANT", "BOOLCONSTANT", "FIELD_SELECTION", "LEFT_OP", "RIGHT_OP",
-			"INC_OP", "DEC_OP", "LE_OP", "GE_OP", "EQ_OP", "NE_OP", "AND_OP",
-			"OR_OP", "XOR_OP", "MUL_ASSIGN", "DIV_ASSIGN", "ADD_ASSIGN",
-			"MOD_ASSIGN", "LEFT_ASSIGN", "RIGHT_ASSIGN", "AND_ASSIGN", "XOR_ASSIGN",
-			"OR_ASSIGN", "SUB_ASSIGN", "INVARIANT", "LOWP", "MEDIUMP", "HIGHP",
-			"SUPERP", "PRECISION", "VERSION", "EXTENSION", "LINE", "COLON", "EOL",
-			"INTERFACE", "OUTPUT", "PRAGMA_DEBUG_ON", "PRAGMA_DEBUG_OFF",
-			"PRAGMA_OPTIMIZE_ON", "PRAGMA_OPTIMIZE_OFF", "PRAGMA_INVARIANT_ALL",
-			"LAYOUT_TOK", "ASM", "CLASS", "UNION", "ENUM", "TYPEDEF", "TEMPLATE",
-			"THIS", "PACKED_TOK", "GOTO", "INLINE_TOK", "NOINLINE", "VOLATILE",
-			"PUBLIC_TOK", "STATIC", "EXTERN", "EXTERNAL", "LONG_TOK", "SHORT_TOK",
-			"DOUBLE_TOK", "HALF", "FIXED_TOK", "UNSIGNED", "INPUT_TOK", "OUPTUT",
-			"HVEC2", "HVEC3", "HVEC4", "DVEC2", "DVEC3", "DVEC4", "FVEC2", "FVEC3",
-			"FVEC4", "SAMPLER2DRECT", "SAMPLER3DRECT", "SAMPLER2DRECTSHADOW",
-			"SIZEOF", "CAST", "NAMESPACE", "USING", "ERROR_TOK", "COMMON",
-			"PARTITION", "ACTIVE", "SAMPLERBUFFER", "FILTER", "IMAGE1D", "IMAGE2D",
-			"IMAGE3D", "IMAGECUBE", "IMAGE1DARRAY", "IMAGE2DARRAY", "IIMAGE1D",
-			"IIMAGE2D", "IIMAGE3D", "IIMAGECUBE", "IIMAGE1DARRAY", "IIMAGE2DARRAY",
-			"UIMAGE1D", "UIMAGE2D", "UIMAGE3D", "UIMAGECUBE", "UIMAGE1DARRAY",
-			"UIMAGE2DARRAY", "IMAGE1DSHADOW", "IMAGE2DSHADOW", "IMAGEBUFFER",
-			"IIMAGEBUFFER", "UIMAGEBUFFER", "IMAGE1DARRAYSHADOW",
-			"IMAGE2DARRAYSHADOW", "ROW_MAJOR", "'('", "')'", "'['", "']'", "'.'",
-			"','", "'+'", "'-'", "'!'", "'~'", "'*'", "'/'", "'%'", "'<'", "'>'",
-			"'&'", "'^'", "'|'", "'?'", "':'", "'='", "';'", "'{'", "'}'", "$accept",
-			"translation_unit", "$@1", "version_statement", "pragma_statement",
-			"extension_statement_list", "any_identifier", "extension_statement",
-			"external_declaration_list", "variable_identifier", "primary_expression",
-			"postfix_expression", "integer_expression", "function_call",
-			"function_call_or_method", "function_call_generic",
-			"function_call_header_no_parameters",
-			"function_call_header_with_parameters", "function_call_header",
-			"function_identifier", "method_call_generic",
-			"method_call_header_no_parameters", "method_call_header_with_parameters",
-			"method_call_header", "unary_expression", "unary_operator",
-			"multiplicative_expression", "additive_expression", "shift_expression",
-			"relational_expression", "equality_expression", "and_expression",
-			"exclusive_or_expression", "inclusive_or_expression",
-			"logical_and_expression", "logical_xor_expression",
-			"logical_or_expression", "conditional_expression",
-			"assignment_expression", "assignment_operator", "expression",
-			"constant_expression", "declaration", "function_prototype",
-			"function_declarator", "function_header_with_parameters",
-			"function_header", "parameter_declarator", "parameter_declaration",
-			"parameter_qualifier", "parameter_type_specifier",
-			"init_declarator_list", "single_declaration", "fully_specified_type",
-			"layout_qualifier", "layout_qualifier_id_list", "layout_qualifier_id",
-			"interpolation_qualifier", "parameter_type_qualifier", "type_qualifier",
-			"storage_qualifier", "type_specifier", "type_specifier_no_prec",
-			"type_specifier_nonarray", "basic_type_specifier_nonarray",
-			"precision_qualifier", "struct_specifier", "struct_declaration_list",
-			"struct_declaration", "struct_declarator_list", "struct_declarator",
-			"initializer", "declaration_statement", "statement", "simple_statement",
-			"compound_statement", "$@2", "statement_no_new_scope",
-			"compound_statement_no_new_scope", "statement_list",
-			"expression_statement", "selection_statement",
-			"selection_rest_statement", "condition", "switch_statement",
-			"case_label", "iteration_statement", "for_init_statement",
-			"conditionopt", "for_rest_statement", "jump_statement",
-			"external_declaration", "function_definition", 0
-		];
-	//#ENDIF
-
-	//#IF YYPRINT
-		/* YYTOKNUM[YYLEX-NUM] -- Internal token number corresponding to
-		   token YYLEX-NUM.  */
-		var yytoknum = [
-			   0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
-			 265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
-			 275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
-			 285,   286,   287,   288,   289,   290,   291,   292,   293,   294,
-			 295,   296,   297,   298,   299,   300,   301,   302,   303,   304,
-			 305,   306,   307,   308,   309,   310,   311,   312,   313,   314,
-			 315,   316,   317,   318,   319,   320,   321,   322,   323,   324,
-			 325,   326,   327,   328,   329,   330,   331,   332,   333,   334,
-			 335,   336,   337,   338,   339,   340,   341,   342,   343,   344,
-			 345,   346,   347,   348,   349,   350,   351,   352,   353,   354,
-			 355,   356,   357,   358,   359,   360,   361,   362,   363,   364,
-			 365,   366,   367,   368,   369,   370,   371,   372,   373,   374,
-			 375,   376,   377,   378,   379,   380,   381,   382,   383,   384,
-			 385,   386,   387,   388,   389,   390,   391,   392,   393,   394,
-			 395,   396,   397,   398,   399,   400,   401,   402,   403,   404,
-			 405,   406,   407,   408,   409,   410,   411,   412,   413,   414,
-			 415,   416,   417,   418,   419,   420,   421,   422,   423,   424,
-			 425,   426,   427,   428,   429,   430,   431,   432,   433,   434,
-			 435,   436,   437,   438,   439,   440,   441,   442,   443,   444,
-			 445,   446,   447,   448,   449,   450,    40,    41,    91,    93,
-			  46,    44,    43,    45,    33,   126,    42,    47,    37,    60,
-			  62,    38,    94,   124,    63,    58,    61,    59,   123,   125
-		];
-	//#ENDIF
 
 	/* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 	var yyr1 = [
@@ -1610,88 +1342,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		glsl.fprintf(File, "%d.%d-%d.%d", Loc.first_line, Loc.first_column, Loc.last_line, Loc.last_column);
 	}
 
-	/* Enable debugging if requested.  */
-
-	//#IF YYDEBUG
-	
-		var YYPRINT = function(yyoutput, yytoknum, yyvaluep) {};
-
-		var YYDPRINTF = function() {
-			if (yydebug) {
-				glsl.fprintf.apply(null, arguments);
-			}
-		};
-
-		var YY_SYMBOL_PRINT = function(Title, Type, Value, Location) {
-			if (yydebug) {
-				glsl.fprintf(2, "%s ", Title);
-				yy_symbol_print(2, Type, Value, Location);
-				glsl.fprintf(2, "\n");
-			}
-		}
-
-		/*--------------------------------.
-		| Print this symbol on YYOUTPUT.  |
-		`--------------------------------*/
-	
-		var yy_symbol_value_print = function(yyoutput, yytype, yyvaluep, yylocationp) {
-			if (!yyvaluep) {
-				return;
-			}
-			if (YYPRINT) {
-				if (yytype < YYNTOKENS) {
-					YYPRINT(yyoutput, yytoknum[yytype], yyvaluep);
-				}
-			}
-		}
-
-		/*--------------------------------.
-		| Print this symbol on YYOUTPUT.  |
-		`--------------------------------*/
-	
-		var yy_symbol_print = function(yyoutput, yytype, yyvaluep, yylocationp) {
-			if (yytype < YYNTOKENS) {
-				glsl.fprintf(yyoutput, "token %s (", yytname[yytype]);
-			} else {
-				glsl.fprintf(yyoutput, "nterm %s (", yytname[yytype]);
-			}
-		
-			YY_LOCATION_PRINT(yyoutput, yylocationp);
-			if (yyvaluep && yytype < YYNTOKENS) {
-				glsl.fprintf(yyoutput, ": ");
-				yy_symbol_value_print(yyoutput, yytype, yyvaluep, yylocationp);
-			}
-			glsl.fprintf(yyoutput, ")");
-		};			
-
-		/*------------------------------------------------------------------.
-		| yy_stack_print -- Print the state stack from its BOTTOM up to its |
-		| TOP (included).                                                   |
-		`------------------------------------------------------------------*/
-
-		var yy_stack_print = function(yystack, yybottom, yytop) {
-			glsl.fprintf(2, "Stack now");
-			for (; yybottom <= yytop; yybottom++) {
-				var yybot = yybottom;
-				glsl.fprintf(2, " %d", yystack[yybot]);
-			}
-			glsl.fprintf(2, "\n");
-		}
-
-		var YY_STACK_PRINT = function(Stack, Bottom, Top) {
-			if (yydebug) {
-				yy_stack_print((Stack), (Bottom), (Top));	
-			}
-		}	
-
-	//#ELSE
-		if (!YYDEBUG) {
-		var YYDPRINTF = function() {};
-		var YY_SYMBOL_PRINT = function() {};
-		var YY_STACK_PRINT = function() {};
-		}
-	//#ENDIF
-
+	var YYDPRINTF = function() {};
+	var YY_SYMBOL_PRINT = function() {};
+	var YY_STACK_PRINT = function() {};
 
 	/* YYINITDEPTH -- initial size of the parser's stacks.  */
 	var YYINITDEPTH = 200;
@@ -1705,66 +1358,62 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 	var YYMAXDEPTH = 10000;
 
-	//#IF YYERROR_VERBOSE
-		
-		/* Copy to YYRES the contents of YYSTR after stripping away unnecessary
-		quotes and backslashes, so that it's suitable for yyerror.  The
-		heuristic is that double-quoting is unnecessary unless the string
-		contains an apostrophe, a comma, or backslash (other than
-		backslash-backslash).  YYSTR is taken from yytname.  If YYRES is
-		null, do not copy; instead, return the length of what the result
-		would have been.  */
-		var yytnamerr = function(yyres, yystr) {};
+	/* Copy to YYRES the contents of YYSTR after stripping away unnecessary
+	quotes and backslashes, so that it's suitable for yyerror.  The
+	heuristic is that double-quoting is unnecessary unless the string
+	contains an apostrophe, a comma, or backslash (other than
+	backslash-backslash).  YYSTR is taken from yytname.  If YYRES is
+	null, do not copy; instead, return the length of what the result
+	would have been.  */
+	var yytnamerr = function(yyres, yystr) {};
 
-		/* Copy into YYRESULT an error message about the unexpected token
-		YYCHAR while in state YYSTATE.  Return the number of bytes copied,
-		including the terminating null byte.  If YYRESULT is null, do not
-		copy anything; just return the number of bytes that would be
-		copied.  As a special case, return 0 if an ordinary "syntax error"
-		message will do.  Return YYSIZE_MAXIMUM if overflow occurs during
-		size calculation.  */
-		var yysyntax_error = function(yystate, yychar) {
+	/* Copy into YYRESULT an error message about the unexpected token
+	YYCHAR while in state YYSTATE.  Return the number of bytes copied,
+	including the terminating null byte.  If YYRESULT is null, do not
+	copy anything; just return the number of bytes that would be
+	copied.  As a special case, return 0 if an ordinary "syntax error"
+	message will do.  Return YYSIZE_MAXIMUM if overflow occurs during
+	size calculation.  */
+	var yysyntax_error = function(yystate, yychar) {
 
-			var yyn = yypact[yystate];
-			if (!(YYPACT_NINF < yyn && yyn <= YYLAST)) {
-				return '';
-			} else {
-				var yytype = YYTRANSLATE(yychar);
+		var yyn = yypact[yystate];
+		if (!(YYPACT_NINF < yyn && yyn <= YYLAST)) {
+			return '';
+		} else {
+			var yytype = YYTRANSLATE(yychar);
 
-				var YYERROR_VERBOSE_ARGS_MAXIMUM = 5;
+			var YYERROR_VERBOSE_ARGS_MAXIMUM = 5;
 
-				var yyunexpected = "syntax error, unexpected %s";
-				var yyexpecting = ", expecting %s";
-				var yyor = " or %s";
+			var yyunexpected = "syntax error, unexpected %s";
+			var yyexpecting = ", expecting %s";
+			var yyor = " or %s";
 
-				var yyprefix = yyexpecting;
+			var yyprefix = yyexpecting;
 
-				/* Start YYX at -YYN if negative to avoid negative indexes in
-				YYCHECK.  */
-				var yyxbegin = yyn < 0 ? -yyn : 0;
+			/* Start YYX at -YYN if negative to avoid negative indexes in
+			YYCHECK.  */
+			var yyxbegin = yyn < 0 ? -yyn : 0;
 
-				/* Stay within bounds of both yycheck and yytname.  */
-				var yychecklim = YYLAST - yyn + 1;
-				var yyxend = yychecklim < YYNTOKENS ? yychecklim : YYNTOKENS;
+			/* Stay within bounds of both yycheck and yytname.  */
+			var yychecklim = YYLAST - yyn + 1;
+			var yyxend = yychecklim < YYNTOKENS ? yychecklim : YYNTOKENS;
 
-				var yyresult = glsl.sprintf(yyunexpected, yytname[yytype]);
+			var yyresult = glsl.sprintf(yyunexpected, yytname[yytype]);
 
-				var yycount = 1;
-				for (var yyx = yyxbegin; yyx < yyxend; ++yyx) {
-					if (yycheck[yyx + yyn] == yyx && yyx != YYTERROR) {
-						if (yycount == YYERROR_VERBOSE_ARGS_MAXIMUM) {
-							break;
-						}
-						yyresult += glsl.sprintf(yyprefix, yytname[yyx]);
-						yyprefix = yyor;
+			var yycount = 1;
+			for (var yyx = yyxbegin; yyx < yyxend; ++yyx) {
+				if (yycheck[yyx + yyn] == yyx && yyx != YYTERROR) {
+					if (yycount == YYERROR_VERBOSE_ARGS_MAXIMUM) {
+						break;
 					}
+					yyresult += glsl.sprintf(yyprefix, yytname[yyx]);
+					yyprefix = yyor;
 				}
-
-				return yyresult;
 			}
-		}
 
-	//#ENDIF
+			return yyresult;
+		}
+	}
 
 	/*-----------------------------------------------.
 	| Release the memory associated to this symbol.  |
