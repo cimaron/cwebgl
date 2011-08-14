@@ -19,7 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-glsl.generator = (function() {
+(function(glsl) {
 
 	//-------------------------------------------------
 	//	Code Generation Options/Data
@@ -77,7 +77,7 @@ glsl.generator = (function() {
 	}
 
 	function g_indent() {
-		return new Array(generator.depth + 1).join("\t");
+		return new Array(glsl.generator.depth + 1).join("\t");
 	}
 
 	//-------------------------------------------------
@@ -275,7 +275,7 @@ glsl.generator = (function() {
 	function g_ast_compound_statement(cs) {
 		var code = '';
 		var stmts = cs.statements;
-		generator.depth++;
+		glsl.generator.depth++;
 		for (var i = 0; i < stmts.length; i++) {
 			var stmt = stmts[i];
 			switch (stmt.typeof()) {
@@ -291,7 +291,7 @@ glsl.generator = (function() {
 			}
 		}
 		
-		generator.depth--;
+		glsl.generator.depth--;
 		code = g_indent() + "{\n" + code + g_indent() + "}\n";
 		return code;
 	}
@@ -335,45 +335,38 @@ glsl.generator = (function() {
 		return msg;
 	}
 	
-	var generator = {
+	//-----------------------------------------------------------
+	//External interface
+
+	glsl.generator = {
 		
 		depth : 0,
+
+		output : '',
 		status : false,
-		objectCode : '',
-		errorMsg : '',
+		errors : [],
 
 		createObjectCode : function(state) {
 
-			this.objectCode = '';
-			this.errorMsg = '';
+			//initialize
+			this.output = '';
 			this.status = false;
-			
+			this.errors = [];
+
 			try {
-
 				for (var i = 0; i < state.translation_unit.length; i++) {
-	
 					var tu = state.translation_unit[i];
-	
-					var res = g_translation_unit(tu);
-					if (res) {
-						this.objectCode += res;	
-					} else {
-						return false;
-					}
-				}	
-
+					this.output += g_translation_unit(tu);					
+				}
 			} catch (e) {
-				generator.status = false;
-				generator.errorMsg = e;
+				this.errors.push(e);
 				return false;
 			}
 
 			this.status = true;
 			return true;
-		}
-		
-		
+		}		
 	};
 
-	return generator;
-})();
+})(glsl);
+

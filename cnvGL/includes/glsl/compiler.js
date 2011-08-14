@@ -23,64 +23,6 @@ var glsl = (function() {
 
 	var initialized;
 
-	//#IF DEBUG
-	//stdin, stdout, stderr, buffer
-	var output = [null, '', ''];
-	var log = [null, '', ''];
-
-	var sprintf = function(str) {
-		var i = 1, m, rest = str; str = '';
-		while (m = rest.match('%([l]?)([dus%])')) {
-			var d = m[0];
-			switch (m[2]) {
-				case 'u':
-				case 'd':
-					d = parseInt(arguments[i]);
-					break;
-				case 's':
-					d = arguments[i];
-					break;
-				case '%':
-					d = '%';
-					break;
-				default:
-			}
-			i++;
-			str += rest.slice(0, m.index) + d;
-			rest = rest.slice(m.index + m[0].length);
-		}
-		str += rest;
-		return str;
-	};
-
-	var printf = function() {
-		var args = [].splice.call(arguments, 0);
-		args.unshift(1);
-		fprintf.apply(null, args);
-	}
-
-	var fprintf = function(file, str) {
-		var args = [].splice.call(arguments, 1);	
-		str = sprintf.apply(null, args);
-		output[file ? file : 1] = str;
-		ob_stream(file, str);
-	};
-
-	var ob_stream = function(file, str) {
-		var i;
-		str = log[file] + str;
-		while ((i = str.indexOf("\n")) != -1) {
-			if (file == 1) {
-				console.log(str.slice(0, i));
-			} else {
-				console.info(str.slice(0, i));	
-			}
-			str = str.slice(i + 1);
-		}
-		log[file] = str;
-	};
-	//#ENDIF
-
 	var parse_state = function() {
 
 		this.scanner = null;
@@ -153,32 +95,13 @@ var glsl = (function() {
 		this.user_structures = null;
 		this.num_user_structures = 0;
 		this.info_log = null;
-		
-		/**
-		* \name Enable bits for GLSL extensions
-		*/
-		/*@{
-		unsigned ARB_draw_buffers_enable:1;
-		unsigned ARB_draw_buffers_warn:1;
-		unsigned ARB_explicit_attrib_location_enable:1;
-		unsigned ARB_explicit_attrib_location_warn:1;
-		unsigned ARB_fragment_coord_conventions_enable:1;
-		unsigned ARB_fragment_coord_conventions_warn:1;
-		unsigned ARB_texture_rectangle_enable:1;
-		unsigned ARB_texture_rectangle_warn:1;
-		unsigned EXT_texture_array_enable:1;
-		unsigned EXT_texture_array_warn:1;
-		unsigned ARB_shader_stencil_export_enable:1;
-		unsigned ARB_shader_stencil_export_warn:1;
-		/*@}*/
-		
-		/** Extensions supported by the OpenGL implementation. */
-		this.gl_extensions = null;
-		
+
 		/** Shaders containing built-in functions that are used for linking. */
-		this.buultins_to_link = new Array(16);
+		this.builtins_to_link = new Array(16);
 		this.num_builtines_to_link = 0;
 	};
+
+
 
 	var token;
 
@@ -205,7 +128,7 @@ var glsl = (function() {
 
 	//#IF DEBUG
 	var print_token_value = function(yyoutput, yytoknum, yyvaluep) {
-		fprintf(2, JSON.stringify(yyvaluep).replace(/"/g, ''));
+		glsl.fprintf(2, JSON.stringify(yyvaluep).replace(/"/g, ''));
 	}
 
 	var print_error = function(yylloc, state, error) {
@@ -230,6 +153,8 @@ var glsl = (function() {
 
 	var glsl = {
 
+		output : null,
+		status : false,
 		errors : [],
 
 		//expose to lexer/parser
@@ -255,51 +180,54 @@ var glsl = (function() {
 
 			this.parser.extern('yylex', next_token);
 			this.parser.extern('yyerror', print_error);
-			this.parser.extern('printf', printf);
-			this.parser.extern('sprintf', sprintf);
-			this.parser.extern('fprintf', fprintf);
 			this.parser.extern('YYPRINT', print_token_value);
-			this.parser.extern('YYFPRINTF', fprintf);
 			this.parser.extern('initialize_types', initialize_types);
 
 			this.token = this.parser.yytokentype;
 		},
  
-		compile : function(src) {
-		
+		compile : function(source) {
+
 			if (!initialized) {
 				this.initialize();
 			}
-			
-			var parse_result,
-				gen_result,
-				processed_src, object_code;
+
+			this.output = null;
+			this.status = false;
+			this.errors = [];
+
+			var parse_tree = null;
 
 			//preprocess
-			processed_src = this.preprocessor.process(src);
+			this.preprocessor.preprocess(source);
+			this.errors.concat(this.preprocessor.errors);
+			if (!this.preprocessor.status) {
+				return false;
+			}
 
 			//parse
-			if (processed_src) {
-				lexer.setInput(processed_src);
-				parse_result = this.parser.yyparse(state);
+			lexer.setInput(this.preprocessor.output);
+			parse_tree = this.parser.yyparse(state);
+			//need to get errors here
+			if (parse_tree != 0) {
+				return false;
 			}
 
 			//generate
-			if (parse_result == 0) {
-				this.generator.createObjectCode(this.state);
-				gen_result = this.generator.status;
-				if (gen_result) {
-					object_code = this.generator.objectCode;
-				} else {
-					this.errors.push(this.generator.errorMsg);	
-					//console.warn(this.errors[0].message);
-					//console.error(this.errors[0]);
-				}
+			this.generator.createObjectCode(this.state);
+			this.errors.concat(this.generator.errors);
+			if (!this.generator.status) {
+				return false;	
 			}
 
-			return object_code;
+			this.output = new GlslObject();
+			this.output.object_code = this.generator.output;
+			this.output.symbol_table = this.state.symbols;
+
+			this.status = true;
+			return true;
 		}
-	}
+	};
 	
 	return glsl;
 })();

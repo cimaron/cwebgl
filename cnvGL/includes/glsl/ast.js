@@ -19,7 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-glsl.ast = (function() {
+(function(glsl) {
 
 	/**
 	 * Base class of all abstract syntax tree nodes
@@ -836,8 +836,10 @@ glsl.ast = (function() {
 	
 	})();
 
+	//-----------------------------------------------------------
+	//	External interface
 
-	var ast = {
+	glsl.ast = {
 		types : ast_types,
 		precision : ast_precision,
 		type_qualifier : ast_type_qualifier,
@@ -854,8 +856,7 @@ glsl.ast = (function() {
 		function_definition : ast_function_definition,
 		expression_bin : ast_expression_bin,
 		function_expression : ast_function_expression
-	}
+	};
 
-	return ast;
-})();
+})(glsl);
 

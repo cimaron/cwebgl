@@ -19,18 +19,30 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-glsl.preprocessor = (function() {
+(function(glsl) {
 
-	var preprocessor = {
+	//-----------------------------------------------------------
+	//External interface
 
-		process : function(source) {
+	glsl.preprocessor = {
+
+		output : '',
+		status : false,
+		errors : [],
+
+		preprocess : function(source) {
+			
+			//reinitialize
+			this.status = false;
+			this.errors = [];
+			
 			//pretty basic, just want to make it work for right now
-			source = source.replace(/[ \t]*\#[^\n]+/g, '');
-			return source;
+			this.output = source.replace(/[ \t]*\#[^\n]+/g, '');
+
+			this.status = true;
+			return true;
 		}
-	
 	};
 
-	return preprocessor;
-})();
+})(glsl);
 

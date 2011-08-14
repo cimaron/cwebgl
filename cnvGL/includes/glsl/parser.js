@@ -19,12 +19,12 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-glsl.parser = (function() {
+(function(glsl) {
 
-	var yydebug = 0;
+	var yydebug = 1;
 
 	//parser specific
-	var YYDEBUG = 0;
+	var YYDEBUG = 1;
 	var YYERROR_VERBOSE = 0	;
 
 	var YYTOKENTYPE = 1;
@@ -1607,7 +1607,7 @@ glsl.parser = (function() {
 	   we won't break user code: when these are the locations we know.  */
 
 	var YY_LOCATION_PRINT = function(File, Loc) {
-		fprintf(File, "%d.%d-%d.%d", Loc.first_line, Loc.first_column, Loc.last_line, Loc.last_column);
+		glsl.fprintf(File, "%d.%d-%d.%d", Loc.first_line, Loc.first_column, Loc.last_line, Loc.last_column);
 	}
 
 	/* Enable debugging if requested.  */
@@ -1616,19 +1616,17 @@ glsl.parser = (function() {
 	
 		var YYPRINT = function(yyoutput, yytoknum, yyvaluep) {};
 
-		var YYFPRINTF = function() {};
-
 		var YYDPRINTF = function() {
-			if (yydebug) { 
-				YYFPRINTF.apply(null, arguments);
+			if (yydebug) {
+				glsl.fprintf.apply(null, arguments);
 			}
 		};
 
 		var YY_SYMBOL_PRINT = function(Title, Type, Value, Location) {
 			if (yydebug) {
-				YYFPRINTF(2, "%s ", Title);
+				glsl.fprintf(2, "%s ", Title);
 				yy_symbol_print(2, Type, Value, Location);
-				YYFPRINTF(2, "\n");
+				glsl.fprintf(2, "\n");
 			}
 		}
 
@@ -1653,17 +1651,17 @@ glsl.parser = (function() {
 	
 		var yy_symbol_print = function(yyoutput, yytype, yyvaluep, yylocationp) {
 			if (yytype < YYNTOKENS) {
-				YYFPRINTF(yyoutput, "token %s (", yytname[yytype]);
+				glsl.fprintf(yyoutput, "token %s (", yytname[yytype]);
 			} else {
-				YYFPRINTF(yyoutput, "nterm %s (", yytname[yytype]);
+				glsl.fprintf(yyoutput, "nterm %s (", yytname[yytype]);
 			}
 		
 			YY_LOCATION_PRINT(yyoutput, yylocationp);
 			if (yyvaluep && yytype < YYNTOKENS) {
-				YYFPRINTF(yyoutput, ": ");
+				glsl.fprintf(yyoutput, ": ");
 				yy_symbol_value_print(yyoutput, yytype, yyvaluep, yylocationp);
 			}
-			YYFPRINTF(yyoutput, ")");
+			glsl.fprintf(yyoutput, ")");
 		};			
 
 		/*------------------------------------------------------------------.
@@ -1672,12 +1670,12 @@ glsl.parser = (function() {
 		`------------------------------------------------------------------*/
 
 		var yy_stack_print = function(yystack, yybottom, yytop) {
-			YYFPRINTF(2, "Stack now");
+			glsl.fprintf(2, "Stack now");
 			for (; yybottom <= yytop; yybottom++) {
 				var yybot = yybottom;
-				YYFPRINTF(2, " %d", yystack[yybot]);
+				glsl.fprintf(2, " %d", yystack[yybot]);
 			}
-			YYFPRINTF(2, "\n");
+			glsl.fprintf(2, "\n");
 		}
 
 		var YY_STACK_PRINT = function(Stack, Bottom, Top) {
@@ -1749,7 +1747,7 @@ glsl.parser = (function() {
 				var yychecklim = YYLAST - yyn + 1;
 				var yyxend = yychecklim < YYNTOKENS ? yychecklim : YYNTOKENS;
 
-				var yyresult = sprintf(yyunexpected, yytname[yytype]);
+				var yyresult = glsl.sprintf(yyunexpected, yytname[yytype]);
 
 				var yycount = 1;
 				for (var yyx = yyxbegin; yyx < yyxend; ++yyx) {
@@ -1757,11 +1755,11 @@ glsl.parser = (function() {
 						if (yycount == YYERROR_VERBOSE_ARGS_MAXIMUM) {
 							break;
 						}
-						yyresult += sprintf(yyprefix, yytname[yyx]);
+						yyresult += glsl.sprintf(yyprefix, yytname[yyx]);
 						yyprefix = yyor;
 					}
 				}
-				
+
 				return yyresult;
 			}
 		}
@@ -2010,14 +2008,14 @@ glsl.parser = (function() {
 						var yyi;
 						var yylno = yyrline[yyn];
 
-						YYFPRINTF(2, "Reducing stack by rule %d (line %lu):\n", yyn - 1, yylno);
+						glsl.fprintf(2, "Reducing stack by rule %d (line %lu):\n", yyn - 1, yylno);
 						/* The symbols being reduced.  */
 						for (yyi = 0; yyi < yynrhs; yyi++) {
-							YYFPRINTF(2, "   $%d = ", yyi + 1);
+							glsl.fprintf(2, "   $%d = ", yyi + 1);
 							yy_symbol_print(2, yyrhs[yyprhs[yyn] + yyi],
 								yyvsa[yyvsp + (yyi + 1) - (yynrhs)],
 								yylsa[yylsp + (yyi + 1) - (yynrhs)]);
-							YYFPRINTF(2, "\n");
+							glsl.fprintf(2, "\n");
 						}
 					}
 				}
@@ -2628,28 +2626,23 @@ glsl.parser = (function() {
 
 	}
 
+	//-----------------------------------------------------------
+	//	External interface
 
-
-	//external interface
-	
 	var YYPRINT;
 	var yylex;
 	var yyerror;
 	var initialize_types;
-	var sprintf, printf, fprintf;
 	
-	var parser = {
+	glsl.parser = {
 
 		extern : function(varname, value) {
 			eval(varname + " = value;");
 		},
 
-		//external visibility
 		yytokentype : yytokentype,
-		yyparse : yyparse,
+		yyparse : yyparse
 	};
 
-	return parser;
-
-})();
+})(glsl);
 

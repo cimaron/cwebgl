@@ -19,127 +19,121 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-/*
-//----------------------------------------------------------------------------------------
-//	class ShaderCompilerSymbol
-//----------------------------------------------------------------------------------------
+(function(glsl) {
 
-function ShaderCompilerSymbol(type, data_type, name, pointer) {
-	this.type = type;
-	this.data_type = data_type;
-	this.name = name;
-	this.pointer = pointer ? true : false;
-}
-*/
+	SymbolTableEntry = function(name, typedef) {
+		this.name = name;
+		this.typedef = typedef;
+		this.type = null;
+		this.definition = null;
+		this.uid = "__" + name;
+	};
+
+	SymbolTableEntry.typedef = {
+		variable : 0,
+		func : 1,
+		type : 2
+	};
 
 
-glsl.symbol_table_entry = function(name, typedef) {
-	this.name = name;
-	this.typedef = typedef;
-	this.type = null;
-	this.definition = null;
-	this.uid = "__" + name;
-}
+	SymbolTable = (function() {
 
-glsl.symbol_table_entry.typedef = {
-	variable : 0,
-	func : 1,
-	type : 2
-};
-
-glsl.symbol_table = (function() {
-
-	//Internal Constructor
-	function symbol_table() {
-		this.table = {
-			depth : 0,
-			parent : null,
-			data : {}
-		};
-	}
-
-	//public:	
-	symbol_table.push_scope = function() {
-		this.table = {
-			depth : this.table.depth + 1,
-			parent : this.table,
-			data : {}
-		};
-	}
-
-	symbol_table.pop_scope = function() {
-		this.table = this.table.parent;
-	}
-
-	symbol_table.name_declared_this_scope = function(name) {
-		return (this.table.data[name] ? true : false);
-	}
-
-	symbol_table.add_variable = function(name) {
-		var entry = new glsl.symbol_table_entry(name, glsl.symbol_table_entry.typedef.variable);
-		return this.add_entry(entry);
-	}
-
-	symbol_table.add_type = function(name, t) {
-		var entry = new symbol_table_entry(name, glsl.symbol_table_entry.typedef.type);
-		entry.definition = t;
-		return this.add_entry(entry);
-	}
-
-	symbol_table.add_function = function(name) {
-		var entry = new glsl.symbol_table_entry(name, glsl.symbol_table_entry.typedef.func);
-		return this.add_entry(entry);
-	}
-
-	/*
-	symbol_table.add_global_function = function(f) {
-		var entry = new symbol_table_entry(0, f, 0);
-		this.table.data[f.name] = entry;
-		return true;
-	}
-	*/
-	
-	symbol_table.get_variable = function(name) {
-		var entry = this.get_entry(name, glsl.symbol_table_entry.typedef.variable);
-		return entry;
-	}
-
-	symbol_table.get_type = function(name) {
-		var entry = this.get_entry(name, glsl.symbol_table_entry.typedef.type);
-		return entry;
-	}
-
-	symbol_table.get_function = function(name) {
-		var entry = this.get_entry(name, glsl.symbol_table_entry.typedef.func);
-		return entry;
-	}
-
-	//private:
-	
-	symbol_table.add_entry = function(entry) {
-		this.table.data[entry.name] = entry;
-		return entry;
-	}
-	
-	symbol_table.get_entry = function(name, typedef) {
-		var table = this.table;
-		while (table != null) {
-			if (table.data[name]) {
-				return table.data[name];
-			}
-			table = table.parent;
+		//Internal Constructor
+		function symbol_table() {
+			this.table = {
+				depth : 0,
+				parent : null,
+				data : {}
+			};
 		}
-		return null;
-	}
+	
+		//public:	
+		symbol_table.push_scope = function() {
+			this.table = {
+				depth : this.table.depth + 1,
+				parent : this.table,
+				data : {}
+			};
+		}
+	
+		symbol_table.pop_scope = function() {
+			this.table = this.table.parent;
+		}
+	
+		symbol_table.name_declared_this_scope = function(name) {
+			return (this.table.data[name] ? true : false);
+		}
+	
+		symbol_table.add_variable = function(name) {
+			var entry = new SymbolTableEntry(name, SymbolTableEntry.typedef.variable);
+			return this.add_entry(entry);
+		}
+	
+		symbol_table.add_type = function(name, t) {
+			var entry = new SymbolTableEntry(name, SymbolTableEntry.typedef.type);
+			entry.definition = t;
+			return this.add_entry(entry);
+		}
+	
+		symbol_table.add_function = function(name) {
+			var entry = new SymbolTableEntry(name, SymbolTableEntry.typedef.func);
+			return this.add_entry(entry);
+		}
 
-	//External Constructor
-	function Constructor() {
-		symbol_table.apply(this);
-	}
+		/*
+		symbol_table.add_global_function = function(f) {
+		}
+		*/
+		
+		symbol_table.get_variable = function(name) {
+			var entry = this.get_entry(name, SymbolTableEntry.typedef.variable);
+			return entry;
+		}
+	
+		symbol_table.get_type = function(name) {
+			var entry = this.get_entry(name, SymbolTableEntry.typedef.type);
+			return entry;
+		}
+	
+		symbol_table.get_function = function(name) {
+			var entry = this.get_entry(name, SymbolTableEntry.typedef.func);
+			return entry;
+		}
+	
+		//private:
+		
+		symbol_table.add_entry = function(entry) {
+			this.table.data[entry.name] = entry;
+			return entry;
+		}
+		
+		symbol_table.get_entry = function(name, typedef) {
+			var table = this.table;
+			while (table != null) {
+				if (table.data[name]) {
+					return table.data[name];
+				}
+				table = table.parent;
+			}
+			return null;
+		}
 
-	//Class Inheritance
-	Constructor.prototype = symbol_table;
+		//External Constructor
+		function Constructor() {
+			symbol_table.apply(this);
+		}
+	
+		//Class Inheritance
+		Constructor.prototype = symbol_table;
+	
+		return Constructor;	
+	
+	})();
 
-	return Constructor;	
+	//-----------------------------------------------------------
+	//External interface
 
-})();
+	glsl.symbol_table = SymbolTable;
+	glsl.symbol_table_entry = SymbolTableEntry;
+
+})(glsl);
