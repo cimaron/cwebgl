@@ -21,20 +21,32 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-$debug = !(int)$_GET['debug'];
+$debug = (int)$_GET['debug'];
 $base = dirname($_SERVER['SCRIPT_NAME']);
 
 function cWebGLInclude($file) {
+	$output = cWebGLIncludeFile($file);
+	echo $output;
+}
+
+function cWebGLIncludeFile($file) {
 	if (!file_exists($file)) {
+		echo "alert('Could not find \'$file\'');";
 		//should we provide an error to the end user?
-		return;
+		continue;
 	}
+
 	$output = file_get_contents($file);
 	$output = preg_replace('#//.*\n#', '', $output);	
 	$output = preg_replace('#/\*(.|[\r\n])*?\*/#', '', $output);
 
-	preg_replace_callback('#cWebGLInclude\(([^\)]+)#', 'cWebGLInclude', $output);
-	echo $output;
+	$output = preg_replace_callback('#include\(\'([^\']+)\'\);#', 'cWebGLIncludeCallback', $output);
+	return $output;
+}
+
+function cWebGLIncludeCallback($matches) {
+	$output = cWebGLIncludeFile($matches[1]);
+	return $output;
 }
 
 function cWebGLIncludeDebug($file) {
@@ -45,9 +57,7 @@ function cWebGLIncludeDebug($file) {
 $include = 'cWebGLInclude';
 
 header('Content-Type: text/javascript');
-
-if ($debug) {
-	?>
+if ($debug) { ?>
 function include(file) {
 	document.write('<scr'+'ipt type="text/javascript" src="<? echo $base; ?>/'+file+'"></script>');
 }
