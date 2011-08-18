@@ -33,7 +33,7 @@ cnvgl_vertex_processor = (function() {
 		this.mode = null;
 		this.buffer = null;
 		this.program = null;
-		
+
 		this.access = {
 			_in : {
 				gl_VertexID : 0,
@@ -42,7 +42,8 @@ cnvgl_vertex_processor = (function() {
 			_out : {
 				gl_Position : [0,0,0,0]
 			},
-			_inout : {}
+			_inout : {},
+			gl_PerVertex : {}
 		};
 	}
 
@@ -64,7 +65,7 @@ cnvgl_vertex_processor = (function() {
 		this.mode = mode;
 	}
 
-	processor.sendVertex = function(attributes) {
+	processor.sendVertex = function() {
 
 		var out = this.access._out;
 
@@ -78,7 +79,7 @@ cnvgl_vertex_processor = (function() {
 		this.processVertex(vertex);
 	
 		this.buffer.push(vertex);
-	
+
 		if (this.mode == GL_TRIANGLES && this.buffer.length >= 3) {
 			this.processTriangle();
 			this.buffer = [];

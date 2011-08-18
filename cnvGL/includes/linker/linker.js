@@ -109,7 +109,7 @@ GlslLinker = (function() {
 					attribute_obj.location = this.program.active_attributes_count;
 					this.program.active_attributes.push(attribute_obj);
 					this.program.active_attributes_count++;
-					code = this.replaceSymbol(code, entry.object_name, '__attribute['+attribute_obj.location+']');
+					code = this.replaceSymbol(code, entry.object_name, 'this.gl_PerVertex['+attribute_obj.location+']');
 					break;
 
 				case 'out':
@@ -131,8 +131,8 @@ GlslLinker = (function() {
 	}
 
 	linker.buildExecutable = function(__code, __mode) {
+
 		var __uniform = this.program.active_uniforms_values;
-		var __attribute = this.program.active_attributes_values;
 
 		eval(__code);
 

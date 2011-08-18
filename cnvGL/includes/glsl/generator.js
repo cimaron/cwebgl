@@ -107,11 +107,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			entry.type = specifier.type_name;
 			if (type.qualifier) {
 				entry.qualifier_name = g_type_qualifiers[type.qualifier.flags.q];
-				code += entry.object_name + " = " + d_code + ";\n";
+				//code += entry.object_name + " = " + d_code + ";\n";
+				code += "\n";
 			} else {
 				code += entry.name + " = " + d_code + ";\n";
 			}
-
 		}
 		return code;
 	}

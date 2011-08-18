@@ -49,12 +49,12 @@ function __glUniform(location, count, transpose, value, _size, _integer, _vector
 	var ftypes = ['float', 'vec2', 'vec3', 'vec4', 'mat4'];
 
 	if (location == -1) {
-		return;	
+		return;
 	}
 
 	//@todo: check for "or an array of these"
-	if ((_integer && itypes.indexOf(uniform_obj.definition.data_type) == -1) ||
-		(!_integer && ftypes.indexOf(uniform_obj.definition.data_type) == -1)) {
+	if ((_integer && itypes.indexOf(uniform_obj.definition.type) == -1) ||
+		(!_integer && ftypes.indexOf(uniform_obj.definition.type) == -1)) {
 		cnvgl_throw_error(GL_INVALID_OPERATION);
 		return;
 	}
@@ -72,8 +72,5 @@ function __glUniform(location, count, transpose, value, _size, _integer, _vector
 	} */
 
 	current_program.active_uniforms_values[location] = value;
-
-	current_program.executable.access.setUniform(uniform_obj.name, value);
-
 }
 

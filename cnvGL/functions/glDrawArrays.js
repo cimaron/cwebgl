@@ -6,20 +6,19 @@ function glDrawArrays(/*GLenum*/ mode, /*GLint*/ first, /*GLsizei*/ count) {
 	var data = buffer_object.data;
 
 	var processor = cnvgl_state.vertex_processor;
-	processor.mode = mode;
 
 	//gather vertex attributes
-	
+
 	var program = cnvgl_state.current_program;
 	var vtas = cnvgl_state.vertex_attrib_arrays;
 	var attr_buffers = [];
 
-	var attrs = {};
+	var attrs = [];
 	for (var a = 0; a < program.active_attributes_count; a++) {
 		var attr = program.active_attributes[a];
-		attrs[attr.name] = vtas[a];
+		attrs[attr.location] = vtas[a];
 		if (vtas[a].buffer_obj) {
-			attr_buffers[attr.name] = vtas[a].buffer_obj;	
+			attr_buffers[attr.location] = vtas[a].buffer_obj;	
 		}
 	}
 
@@ -29,7 +28,7 @@ function glDrawArrays(/*GLenum*/ mode, /*GLint*/ first, /*GLsizei*/ count) {
 	for (var i = first; i < count; i++) {
 
 		//build attribute set and initialize
-		var vertex_attr = {};
+		var vertex_attr = [];
 		for (var j in attrs) {
 
 			var attr = attrs[j];
@@ -39,9 +38,9 @@ function glDrawArrays(/*GLenum*/ mode, /*GLint*/ first, /*GLsizei*/ count) {
 				var buffer = buffer_obj.data;
 				var stride = attr.stride;
 				var size = attr.size;
-				
+
 				var start = attr.pointer + (i * size + stride);
-				
+
 				//allocation space for data in attributes
 				var new_buffer = [];				
 				vertex_attr[j] = new_buffer;
@@ -54,7 +53,7 @@ function glDrawArrays(/*GLenum*/ mode, /*GLint*/ first, /*GLsizei*/ count) {
 		}
 
 		//get info on how to interpret attribute data
-		processor.sendVertex(vertex_attr);
+		processor.access.gl_PerVertex = vertex_attr;
+		processor.sendVertex();
 	}
-
 }
