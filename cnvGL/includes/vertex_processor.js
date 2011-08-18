@@ -35,10 +35,6 @@ cnvgl_vertex_processor = (function() {
 		this.program = null;
 
 		this.access = {
-			_in : {
-				gl_VertexID : 0,
-				gl_InstanceID : 0
-			},
 			_out : {
 				gl_Position : [0,0,0,0]
 			},
