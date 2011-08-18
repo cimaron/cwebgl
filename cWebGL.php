@@ -57,6 +57,7 @@ function include(file) {
 
 $include('library/pClass/pClass.js');
 $include('library/glMatrix/glMatrix.js');
+$include('library/glMatrix/constructors.js');
 $include('cWebGL.js');
 
 $cnvGL = true;

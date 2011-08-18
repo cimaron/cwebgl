@@ -42,6 +42,7 @@ function cnvgl_program() {
 	//attributes
 	this.active_attributes_count = 0;
 	this.active_attributes = [];
+	this.active_attributes_values = [];
 
 	//programs
 	this.fragment_program = null;
@@ -51,3 +52,4 @@ function cnvgl_program() {
 }
 
 cnvgl_program.prototype = new pClass('cnvgl_program');
+

@@ -19,14 +19,24 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-//----------------------------------------------------------------------------------------
-//	class ShaderLinkerExecutable
-//----------------------------------------------------------------------------------------
+vec4 = {};
 
-function GlslExecutable() {
-	//executable
-	this.symbols = {};
-	this.data = [];
-	this.text = '';
+
+vec4.construct = function() {
+	var i = 0, j = 0, k = 0, v = [];
+	while (i < 4) {
+		if (typeof arguments[j] == 'number') {
+			v[i] = arguments[j]; i++; j++;
+		} else {
+			if (arguments[j].length <= k) {
+				k = 0; j++;
+				continue;
+			}
+			v[i] = arguments[j][k];
+			i++; k++;
+		}
+	}
+	return v;
 }
+
 

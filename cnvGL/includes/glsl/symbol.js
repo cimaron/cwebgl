@@ -26,7 +26,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		this.typedef = typedef;
 		this.type = null;
 		this.definition = null;
+
 		this.object_name = null;
+		this.qualifier = null;
 	};
 
 	SymbolTableEntry.typedef = {
@@ -34,7 +36,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		func : 1,
 		type : 2
 	};
-
 
 	SymbolTable = (function() {
 
@@ -55,7 +56,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				data : {}
 			};
 		}
-	
+
 		symbol_table.pop_scope = function() {
 			this.table = this.table.parent;
 		}
@@ -78,7 +79,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		symbol_table.add_function = function(name) {
 			var entry = new SymbolTableEntry(name, SymbolTableEntry.typedef.func);
-			entry.object_name = name;
+			if (name != 'main') {
+				entry.object_name = name;
+			} else {
+				entry.object_name = (glsl.mode == 1) ? '@fragment.main@' : '@vertex.main@';
+			}
 			return this.add_entry(entry);
 		}
 

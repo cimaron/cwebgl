@@ -20,7 +20,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-ShaderLinker = (function() {
+GlslLinker = (function() {
 
 	//External Constructor
 	function Constructor() {
@@ -31,10 +31,13 @@ ShaderLinker = (function() {
 	//Internal Constructor
 	function linker() {
 		//public:
-		this.input = [];
-		this.output = [];
 		this.status = false;
 		this.errors = [];
+		this.input = [];
+		this.program = null;
+
+		this.fragment = null;
+		this.vertex = null;
 	}
 
 	//Class Inheritance
@@ -45,23 +48,22 @@ ShaderLinker = (function() {
 	linker.linker = function() {
 	}
 
-	linker.link = function() {
+	linker.link = function(program) {
+
+		this.program = program;
+		this.fragment = '';
+		this.vertex = '';
 
 		this.status = false;
 		this.errors = [];
-		this.output[1] = new GlslExecutable();
-		this.output[2] = new GlslExecutable();
 
 		for (var i = 0; i < this.input.length; i++) {
 			this.merge(this.input[i]);
 		}
 
-		this.replaceSymbols(this.output[1]);
-		this.replaceSymbols(this.output[2]);
+		this.buildExecutable(this.fragment, 1);
+		this.buildExecutable(this.vertex, 2);
 
-		this.buildExecutable(this.output[1]);
-		this.buildExecutable(this.output[2]);
-		
 		this.status = 1;
 	}
 
@@ -70,37 +72,75 @@ ShaderLinker = (function() {
 	}
 
 	linker.merge = function(shader) {
-		this.output[shader.mode].text += shader.object_code;
-		this.addSymbols(shader.symbol_table, shader.mode);
+		var code = this.processSymbols(shader);
+		if (shader.mode == 1) {
+			code = code.replace(/@fragment.main@/g, '__fragment_main');
+			this.fragment += code;
+		} else {
+			code = code.replace(/@vertex.main@/g, '__vertex_main');
+			this.vertex += code;
+		}
 	}
 
-	linker.addSymbols = function(symbols, mode) {
-		var data = this.output[mode].data;
-		var data_table = this.output[mode].symbols;
-		var symbol_table = symbols.table.data;
+	linker.processSymbols = function(shader) {
+
+		var symbol_table = shader.symbol_table.table.data;
+		var code = shader.object_code;
+		var location = 0;
 
 		for (var name in symbol_table) {
+
 			var entry = symbol_table[name];
-			if (entry.typedef != 0) {
-				continue;	
-			}
-			if (!data_table[name]) {
-				data_table[name] = { index : data.length, type : null };
-				data.push(null);
+
+			switch (entry.qualifier_name) {
+
+				//external communication (special cases)
+
+				case 'uniform':
+					var uniform_obj = new cnvgl_uniform(entry);
+					uniform_obj.location = this.program.active_uniforms_count;
+					this.program.active_uniforms.push(uniform_obj);
+					this.program.active_uniforms_count++;
+					code = this.replaceSymbol(code, entry.object_name, '__uniform['+uniform_obj.location+']');						
+					break;
+
+				case 'attribute':
+					var attribute_obj = new cnvgl_attribute(entry);
+					attribute_obj.location = this.program.active_attributes_count;
+					this.program.active_attributes.push(attribute_obj);
+					this.program.active_attributes_count++;
+					code = this.replaceSymbol(code, entry.object_name, '__attribute['+attribute_obj.location+']');
+					break;
+
+				case 'out':
+					code = this.replaceSymbol(code, entry.object_name, "this._out['"+entry.name+"']");
+					break;
+
+				default:
+					if (entry.typedef == 0) {
+						code = this.replaceSymbol(code, entry.object_name, entry.name);
+					}
 			}
 		}
+
+		return code;
 	}
 
-	linker.replaceSymbols = function(exec) {
-		for (var name in exec.symbols) {
-			var index = exec.symbols[name].index;
-			exec.text = exec.text.replace(new RegExp('@' + name + '@', 'g'), '__data[' + index + ']');
+	linker.replaceSymbol = function(code, object_name, repl) {
+		return code.replace(new RegExp(object_name, 'g'), repl);
+	}
+
+	linker.buildExecutable = function(__code, __mode) {
+		var __uniform = this.program.active_uniforms_values;
+		var __attribute = this.program.active_attributes_values;
+
+		eval(__code);
+
+		if (__mode == 1) {
+			this.program.fragment_program = __fragment_main;
+		} else {
+			this.program.vertex_program = __vertex_main;
 		}
-	}
-
-	linker.buildExecutable = function(__exec) {
-		var __data = __exec.data;
-		eval(__exec.text);
 	}
 
 	return Constructor;

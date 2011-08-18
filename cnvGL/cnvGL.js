@@ -26,8 +26,7 @@ include('cnvGL/includes/glsl/generator.js');
 
 //Linker
 include('cnvGL/includes/linker/linker.js');
-include('cnvGL/includes/linker/executable.js');
-include('cnvGL/includes/includes/glsl/includes/glsl.js');
+include('cnvGL/includes/linker/symbol.js');
 
 include('cnvGL/includes/vertex_processor.js');
 include('cnvGL/includes/fragment_processor.js');

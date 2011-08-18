@@ -143,10 +143,14 @@ var glsl = (function() {
 		//gl_Position
 		var entry = state.symbols.add_variable('gl_Position');
 		entry.type = 'vec4';
+		entry.qualifier = glsl.ast.type_qualifier.flags.out;
+		entry.qualifier_name = 'out';
 
 		//gl_FragColor
 		var entry = state.symbols.add_variable('gl_FragColor');
 		entry.type = 'vec4';
+		entry.qualifier = glsl.ast.type_qualifier.flags.out;
+		entry.qualifier_name = 'out';
 	}
 
 	var state = null;

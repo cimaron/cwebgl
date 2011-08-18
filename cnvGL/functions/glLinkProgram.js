@@ -49,59 +49,29 @@ function glLinkProgram(/*GLuint*/ program) {
 	program_obj.fragment_program = null;
 	program_obj.vertex_program = null;
 
-	var linker = new ShaderLinker();
+	program_obj.active_uniforms_count = 0;
+	program_obj.active_uniforms = [];
+	program_obj.active_uniforms_values = [];
 
+	program_obj.active_attributes_count = 0;
+	program_obj.active_attributes = [];
+	program_obj.active_attributes_values = [];	
+
+	var linker = new GlslLinker();
+
+	//may want to move this into the linker itself
 	for (var i = 0; i < program_obj.attached_shaders_count; i++) {
 		var location = program_obj.attached_shaders[i];
 		var shader_obj = cnvgl_objects[location];
 		linker.addObjectCode(shader_obj.object_code);
 	}
 
-	linker.link();
+	linker.link(program_obj);
 
 	if (linker.status) {
 		program_obj.link_status = true;
-		program_obj.fragment_program = linker.output[1];
-		program_obj.vertex_program = linker.output[2];
-	} else {
-		return;	
+		program_obj.program = linker.output;
 	}
-
-	//reset uniforms
-	program_obj.active_uniforms_count = 0;
-	program_obj.active_uniforms = [];
-	program_obj.active_uniforms_values = [];
-	
-	//reset attributes
-	program_obj.active_attributes_count = 0;
-	program_obj.active_attributes = [];
-
-	//pull in symbols
-	/*
-	var symbols = executable.symbol_table;
-
-	for (var i in symbols) {
-		var symbol = symbols[i];
-
-		switch (symbol.type) {
-			case 'uniform':
-				var uniform_obj = new cnvgl_uniform(symbol);
-				uniform_obj.location = program_obj.active_uniforms_count;
-				program_obj.active_uniforms.push(uniform_obj);
-				program_obj.active_uniforms_count++;
-				program_obj.active_uniforms_values[uniform_obj.location] = [0, 0, 0, 0];
-				break;
-			case 'attribute':
-				var attribute_obj = new cnvgl_attribute(symbol);
-				attribute_obj.location = program_obj.active_attributes_count;
-				program_obj.active_attributes.push(attribute_obj);
-				program_obj.active_attributes_count++;
-				break;
-			default:
-				debugger;
-		}
-	}
-	*/
 
 }
 

@@ -19,112 +19,108 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-//----------------------------------------------------------------------------------------
-//	class cnvgl_vertex_processor
-//----------------------------------------------------------------------------------------
-function cnvgl_vertex_processor() {
-	
-	//member variables
-	this.mode = null;
-	this.buffer = null;
-	this.program = null;
+cnvgl_vertex_processor = (function() {
 
-	//Call constructor
-	this.construct();
-}
-
-//----------------------------------------------------------------------------------------
-//	Class Magic
-//----------------------------------------------------------------------------------------
-
-__cnvgl_vertex_processor = new pClass('cnvgl_vertex_processor');
-cnvgl_vertex_processor.prototype = __cnvgl_vertex_processor;
-
-//----------------------------------------------------------------------------------------
-//	Methods
-//----------------------------------------------------------------------------------------
-
-__cnvgl_vertex_processor.cnvgl_vertex_processor = function() {
-	this.buffer = [];
-	//build data heap for vertex executable
-}
-
-//public:
-
-__cnvgl_vertex_processor.setProgram = function(program) {
-	this.program = program;
-}
-
-__cnvgl_vertex_processor.setMode = function(mode) {
-	this.mode = mode;
-}
-
-__cnvgl_vertex_processor.sendVertex = function(attributes) {
-
-	for (var i in attributes) {
-		this.access.setAttribute(i, attributes[i]);	
+	//External Constructor
+	function Constructor() {
+		processor.apply(this);
+		this.processor();
 	}
 
-	//console.log('vertex in', attributes);
+	//Internal Constructor
+	function processor() {
+		//public:
+		this.mode = null;
+		this.buffer = null;
+		this.program = null;
+		
+		this.access = {
+			_in : {
+				gl_VertexID : 0,
+				gl_InstanceID : 0
+			},
+			_out : {
+				gl_Position : [0,0,0,0]
+			},
+			_inout : {}
+		};
+	}
 
-	this.program.vertex_entry();
+	//Class Inheritance
+	Constructor.prototype = processor;
 
-	var gl_PerVertex = this.access.getOut('gl_PerVertex');
-	var gl_Position = gl_PerVertex.gl_Position;
+	//public:
 
-	//console.log('vertex out', gl_PerVertex.gl_Position);
-
-	var vertex = new cnvgl_vertex(gl_Position[0], gl_Position[1], gl_Position[2], gl_Position[3]);
-
-	//@todo: clip line and split if necessary
-	this.processVertex(vertex);
-
-	this.buffer.push(vertex);
-
-	if (this.mode == GL_TRIANGLES && this.buffer.length >= 3) {
-		this.processTriangle();
+	processor.processor = function() {
+		//build data heap for vertex executable
 		this.buffer = [];
 	}
 	
-	if (this.mode == GL_TRIANGLE_STRIP && this.buffer.length >= 3) {
-		this.processTriangle();
-		this.buffer = [this.buffer[1], this.buffer[2]];
+	processor.setProgram = function(program) {
+		this.program = program;
 	}
 
-	//@todo: finish the rest of the modes
+	processor.setMode = function(mode) {
+		this.mode = mode;
+	}
 
-}
+	processor.sendVertex = function(attributes) {
 
+		var out = this.access._out;
 
-__cnvgl_vertex_processor.processVertex = function(v) {
+		this.program.vertex_program.apply(this.access);
 
-	v.x = v.x / v.w;
-	v.y = v.y / v.w;
-	v.z = v.z / v.w;
+		//console.log('vertex out', out.gl_Position);
 
-	var buffer = cnvgl_state.color_buffer;
+		var vertex = new cnvgl_vertex(out.gl_Position[0], out.gl_Position[1], out.gl_Position[2], out.gl_Position[3]);
 
-	var w = cnvgl_state.viewport_w;
-	var h = cnvgl_state.viewport_h;
+		//@todo: clip line and split if necessary
+		this.processVertex(vertex);
+	
+		this.buffer.push(vertex);
+	
+		if (this.mode == GL_TRIANGLES && this.buffer.length >= 3) {
+			this.processTriangle();
+			this.buffer = [];
+		}
+		
+		if (this.mode == GL_TRIANGLE_STRIP && this.buffer.length >= 3) {
+			this.processTriangle();
+			this.buffer = [this.buffer[1], this.buffer[2]];
+		}
+	
+		//@todo: finish the rest of the modes
+	}
+	
+	processor.processVertex = function(v) {
+		v.x = v.x / v.w;
+		v.y = v.y / v.w;
+		v.z = v.z / v.w;
+	
+		var buffer = cnvgl_state.color_buffer;
+	
+		var w = cnvgl_state.viewport_w;
+		var h = cnvgl_state.viewport_h;
+	
+		v.sx = (v.x + 1) * (w / 2);
+		v.sy = (1 - v.y) * (h / 2);
+	}
 
-	v.sx = (v.x + 1) * (w / 2);
-	v.sy = (1 - v.y) * (h / 2);
-}
+	processor.processTriangle = function() {
+		var v1 = this.buffer[0];
+		var v2 = this.buffer[1];
+		var v3 = this.buffer[2];
+	
+		//@todo: check directionality for backface culling here
+	
+		cnvgl_state.fragment_processor.processTriangle(v1, v2, v3);		
+	}
 
-__cnvgl_vertex_processor.processTriangle = function() {
-	var v1 = this.buffer[0];
-	var v2 = this.buffer[1];
-	var v3 = this.buffer[2];
+	processor.processLine = function() {
+		cnvgl_state.fragment_processor.processLine(this.buffer[0], this.buffer[1]);
+	}
 
-	//@todo: check directionality for backface culling here
+	return Constructor;
 
-	cnvgl_state.fragment_processor.processTriangle(v1, v2, v3);
-}
-
-__cnvgl_vertex_processor.processLine = function() {
-	cnvgl_state.fragment_processor.processLine(this.buffer[0], this.buffer[1]);		
-}
-
-
-
+})();
 

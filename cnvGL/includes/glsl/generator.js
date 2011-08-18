@@ -26,8 +26,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	//-------------------------------------------------
 
 	//Type qualifier global variables
-	var g_type_qualifier_globals = [];
-	g_type_qualifier_globals[glsl.ast.type_qualifier.flags.varying] = '__varying';
+	var g_type_qualifiers = [];
+	g_type_qualifiers[glsl.ast.type_qualifier.flags.attribute] = 'attribute';
+	g_type_qualifiers[glsl.ast.type_qualifier.flags.uniform] = 'uniform';
+	g_type_qualifiers[glsl.ast.type_qualifier.flags.out] = 'out';
 
 	function g_type_default_value(type) {
 		switch (type.type_specifier) {
@@ -103,8 +105,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			//update symbol table entry type
 			var entry = glsl.state.symbols.get_variable(name);
 			entry.type = specifier.type_name;
+			if (type.qualifier) {
+				entry.qualifier_name = g_type_qualifiers[type.qualifier.flags.q];
+				code += entry.object_name + " = " + d_code + ";\n";
+			} else {
+				code += entry.name + " = " + d_code + ";\n";
+			}
 
-			code += entry.object_name + " = " + d_code + ";\n";
 		}
 		return code;
 	}
