@@ -34,8 +34,5 @@ function cnvgl_shader() {
 
 	//custom state
 	this.object_code = null;
-
-	this.construct();
 }
 
-cnvgl_shader.prototype = new pClass('cnvgl_shader');

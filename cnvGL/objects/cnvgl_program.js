@@ -47,9 +47,5 @@ function cnvgl_program() {
 	//programs
 	this.fragment_program = null;
 	this.vertex_program = null;
-
-	this.construct();
 }
-
-cnvgl_program.prototype = new pClass('cnvgl_program');
 

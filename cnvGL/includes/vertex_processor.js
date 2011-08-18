@@ -21,14 +21,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 cnvgl_vertex_processor = (function() {
 
-	//External Constructor
-	function Constructor() {
-		processor.apply(this);
-		this.processor();
-	}
-
 	//Internal Constructor
-	function processor() {
+	function Initializer() {
 		//public:
 		this.mode = null;
 		this.buffer = null;
@@ -43,8 +37,7 @@ cnvgl_vertex_processor = (function() {
 		};
 	}
 
-	//Class Inheritance
-	Constructor.prototype = processor;
+	var processor = jClass('processor', Initializer);
 
 	//public:
 
@@ -117,7 +110,7 @@ cnvgl_vertex_processor = (function() {
 		cnvgl_state.fragment_processor.processLine(this.buffer[0], this.buffer[1]);
 	}
 
-	return Constructor;
+	return processor.Constructor;
 
 })();
 

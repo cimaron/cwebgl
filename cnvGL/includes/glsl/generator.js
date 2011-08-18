@@ -203,7 +203,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				}
 
 			default:
-				throw new Error(g_error("Could not translate unknown expression " + e.typeof() + '(' + e.oper + ')', e));
+				throw new Error(g_error("Could not translate unknown expression " + e.typeOf() + '(' + e.oper + ')', e));
 		}
 	}
 		
@@ -253,7 +253,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 
 		//cast
-		if (e.typeof('ast_type_specifier')) {
+		if (e.typeOf('ast_type_specifier')) {
 			exp.type = e.type_name;
 			return exp;
 		}
@@ -273,9 +273,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		var code = '';
 		var stmts = cs.statements;
 		glsl.generator.depth++;
+
 		for (var i = 0; i < stmts.length; i++) {
 			var stmt = stmts[i];
-			switch (stmt.typeof()) {
+			switch (stmt.typeOf()) {
 				case 'ast_expression_statement':
 					var es = g_ast_expression_statement(stmt)
 					if (!es) {
@@ -284,7 +285,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					code += g_indent() + es;
 					break;
 				default:
-					throw new Error(g_error("Could not translate statement type (" + stmt.typeof() + ")", stmt));
+					throw new Error(g_error("Could not translate statement type (" + stmt.typeOf() + ")", stmt));
 			}
 		}
 		
@@ -312,7 +313,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	}
 
 	function g_translation_unit(tu) {
-		var t = tu.typeof();
+		var t = tu.typeOf();
 		switch (t) {
 			case 'ast_declarator_list':
 				return g_ast_declarator_list(tu);
@@ -321,7 +322,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			case 'ast_function_definition':
 				return g_ast_function_definition(tu);
 			default:
-				throw new Error(g_error('Cannot translate syntax tree node (' + d.typeof() + ')'  , tu));
+				throw new Error(g_error('Cannot translate syntax tree node (' + d.typeOf() + ')'  , tu));
 		}
 	}
 
@@ -357,6 +358,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				}
 			} catch (e) {
 				this.errors.push(e);
+				throw e;
 				return false;
 			}
 

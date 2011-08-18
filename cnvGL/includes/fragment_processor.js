@@ -21,25 +21,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 cnvgl_fragment_processor = (function() {
 
-	//External Constructor
-	function Constructor() {
-		processor.apply(this);
-		this.processor();
-	}
-
 	//Internal Constructor
-	function processor() {
-		//public:
-		this.program = null;
-		
+	function Initializer() {
+		this.program = null;		
 		this.access = {
 			_out : {}
 		};
-		
 	}
 
-	//Class Inheritance
-	Constructor.prototype = processor;
+	var processor = jClass('cnvgl_fragment_processor', Initializer);
+
+	//public:
 
 	processor.processor = function() {	
 	}
@@ -154,7 +146,7 @@ cnvgl_fragment_processor = (function() {
 		c[2] = Math.round(gl_FragColor[2] * 255);
 	}
 
-	return Constructor;
+	return processor.Constructor;
 
 })();
 

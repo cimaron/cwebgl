@@ -19,8 +19,8 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-/*void*/
-function glLinkProgram(/*GLuint*/ program) {
+
+function glLinkProgram(program) {
 
 	//if (not supported) then
 	//	cnvgl_throw_error(GL_INVALID_OPERATION);
@@ -36,7 +36,7 @@ function glLinkProgram(/*GLuint*/ program) {
 	}
 
 	//object is not a program
-	if (!program_obj.instanceOf('cnvgl_program')) {
+	if (!program_obj instanceof cnvgl_program) {
 		cnvgl_throw_error(GL_INVALID_OPERATION);
 		return;
 	}
@@ -72,6 +72,5 @@ function glLinkProgram(/*GLuint*/ program) {
 		program_obj.link_status = true;
 		program_obj.program = linker.output;
 	}
-
 }
 

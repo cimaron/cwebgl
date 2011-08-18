@@ -22,14 +22,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 GlslLinker = (function() {
 
-	//External Constructor
-	function Constructor() {
-		linker.apply(this);
-		this.linker();
-	}
-
 	//Internal Constructor
-	function linker() {
+	function Initializer() {
 		//public:
 		this.status = false;
 		this.errors = [];
@@ -40,8 +34,7 @@ GlslLinker = (function() {
 		this.vertex = null;
 	}
 
-	//Class Inheritance
-	Constructor.prototype = linker;
+	var linker = jClass('linker', Initializer);
 
 	//public:
 
@@ -143,7 +136,7 @@ GlslLinker = (function() {
 		}
 	}
 
-	return Constructor;
+	return linker.Constructor;
 
 })();
 

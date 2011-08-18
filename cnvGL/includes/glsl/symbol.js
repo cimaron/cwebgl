@@ -40,13 +40,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	SymbolTable = (function() {
 
 		//Internal Constructor
-		function symbol_table() {
+		function Initializer() {
 			this.table = {
 				depth : 0,
 				parent : null,
 				data : {}
 			};
 		}
+		
+		var symbol_table = jClass('symbol_table', Initializer);
 	
 		//public:	
 		symbol_table.push_scope = function() {
@@ -124,16 +126,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			}
 			return null;
 		}
-
-		//External Constructor
-		function Constructor() {
-			symbol_table.apply(this);
-		}
 	
-		//Class Inheritance
-		Constructor.prototype = symbol_table;
-	
-		return Constructor;	
+		return symbol_table.Constructor;	
 	
 	})();
 

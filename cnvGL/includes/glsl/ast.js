@@ -26,14 +26,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	var ast_node = (function() {
 
-		//External Constructor
-		function Constructor() {
-			ast_node.apply(this);
-			this.ast_node();
-		}
-
 		//Internal Constructor
-		function ast_node() {
+		function Initializer() {
 			//public:
 			this.location = {
 				source : 0,
@@ -43,8 +37,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			this.link = null;
 		}
 
-		//Class Inheritance
-		Constructor.prototype = ast_node;
+		var ast_node = jClass('ast_node', Initializer);
 
 		//public:
 
@@ -71,19 +64,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 
 		ast_node.print = function() {
-			printf("unhandled node");	
+			printf("unhandled node");
 		}
 
-		ast_node.typeof = function(t) {
-			var n = (this.prototype.name ? this.prototype.name : this.prototype.constructor.name);
-			return t ? t == n : n;
-		}
+		return ast_node.Constructor;
 
-		return Constructor;
 	})();
-	
-	
-
 
 	/**
 	 * Operators for AST expression nodes.
@@ -147,26 +133,18 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	var ast_declaration = (function() {
 
-		//External Constructor
-		function Constructor(identifier, is_array, array_size, initializer) {
-			ast_declaration.apply(this);
-			this.ast_declaration(identifier, is_array, array_size, initializer);
-		}
-
-		//Class Inheritance
-		Constructor.prototype = ast_declaration;
-		ast_declaration.__proto__ = ast_node.prototype;
-
 		//Internal Constructor
-		function ast_declaration() {
-			ast_node.prototype.apply(this);
+		function Initializer() {
+			ast_node.Initializer.apply(this);
 			this.identifier = null;
 			this.is_array = 0;
 			this.array_size = null;
 			this.initializer = null;
 		}
 		
-		return Constructor;
+		var ast_declaration = jClass('ast_declaration', Initializer, ast_node);
+
+		return ast_declaration.Constructor;
 
 	})();
 
@@ -237,27 +215,19 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	var ast_type_specifier = (function() {
 	
-		//External Constructor
-		function Constructor(specifier) {
-			ast_type_specifier.apply(this);
-			this.ast_type_specifier(specifier);
-		}
-
 		//Internal Constructor
-		function ast_type_specifier() {
-			ast_node.prototype.apply(this);
+		function Initializer() {
+			ast_node.Initializer.apply(this);
 			this.type_specifier = null;
 			this.type_name = null;
 			this.structure = null;
 			this.is_array = 0;
-			this.array_size = null;			
+			this.array_size = null;	
 			this.precision = 2;
 			this.is_precision_statement = null;
 		}
 
-		//Class Inheritance
-		Constructor.prototype = ast_type_specifier;
-		ast_type_specifier.__proto__ = ast_node.prototype;
+		var ast_type_specifier = jClass('ast_type_specifier', Initializer, ast_node);	
 
 		//public:
 		ast_type_specifier.ast_type_specifier = function(specifier) {
@@ -363,24 +333,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			}
 		}
 
-		return Constructor;
+		return ast_type_specifier.Constructor;
 
 	})();
 
 
-
-
 	var ast_function = (function() {
 
-		//External Constructor
-		function Constructor() {
-			ast_function.apply(this);
-			this.ast_function();
-		}
-
 		//Internal Constructor
-		function ast_function() {
-			ast_node.prototype.apply(this);
+		function Initializer() {
+			ast_node.Initializer.apply(this);
 			this.return_type = null;
 			this.identifier = null;
 			this.parameters = [];
@@ -388,9 +350,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			this.signature = null;
 		}
 
-		//Class Inheritance
-		Constructor.prototype = ast_function;
-		ast_function.__proto__ = ast_node.prototype;
+		var ast_function = jClass('ast_function', Initializer, ast_node);
 		
 		//public:
 		ast_function.ast_function = function() {
@@ -408,7 +368,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			printf(")");
 		}
 
-		return Constructor;
+		return ast_function.Constructor;
 
 	})();
 
@@ -418,23 +378,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	var ast_expression = (function() {
 
-		//External Constructor
-		function Constructor() {
-			ast_expression.apply(this);
-			this.ast_expression.apply(this, arguments);
-		}
-
 		//Internal Constructor
-		function ast_expression() {
-			ast_node.prototype.apply(this);
+		function Initializer() {
+			ast_node.Initializer.apply(this);
 			this.oper = null;
 			this.subexpressions = new Array(3);
 			this.primary_expression = {};
 			this.expressions = [];
 		}
 
-		Constructor.prototype = ast_expression;
-		ast_expression.__proto__ = ast_node.prototype;
+		var ast_expression = jClass('ast_expression', Initializer, ast_node);
 
 		//public:
 		ast_expression.ast_expression = function() {
@@ -444,12 +397,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				this.ast_expression.four.apply(this, arguments);
 			}
 		}
-		
+
 		ast_expression.ast_expression.one = function(identifier) {
 			//this.oper = ast_identifier
 			this.primary_expression.identifier = identifier;
 		}
-		
+
 		ast_expression.ast_expression.four = function(oper, ex0, ex1, ex2) {
 			this.oper = oper;
 			this.subexpressions[0] = ex0;
@@ -460,7 +413,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		ast_expression.print = function() {			
 		}
 
-		return Constructor;
+		return ast_expression.Constructor;
 
 	})();
 
@@ -490,21 +443,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	var ast_fully_specified_type = (function() {
 
-		//External Constructor
-		function Constructor() {
-			ast_fully_specified_type.apply(this);
-		}
-
 		//Internal Constructor
-		function ast_fully_specified_type() {
-			ast_node.prototype.apply(this);
+		function Initializer() {
+			ast_node.Initializer.apply(this);
 			this.qualifier = null;
 			this.specifier = null;
 		}
 
-		//Class Inheritance
-		Constructor.prototype = ast_fully_specified_type;
-		ast_fully_specified_type.__proto__ = ast_node.prototype;
+		var ast_fully_specified_type = jClass('ast_fully_specified_type', Initializer, ast_node);
 
 		//public:
 
@@ -517,32 +463,23 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			this.specifier.print();	
 		}
 
-		return Constructor;
-	
+		return ast_fully_specified_type.Constructor;
+
 	})();
 
 
 	var ast_declaration = (function() {
-	
-
-		//External Constructor
-		function Constructor(identifier, is_array, array_size, initializer) {
-			ast_declaration.apply(this);
-			this.ast_declaration(identifier, is_array, array_size, initializer);
-		}
 
 		//Internal Constructor
-		function ast_declaration() {
-			ast_node.prototype.apply(this);
+		function Initializer() {
+			ast_node.Initializer.apply(this);
 			this.identifier = null;
 			this.is_array = 0;
 			this.array_size = null;
 			this.initializer = null;
 		}
 
-		//Class Inheritance
-		Constructor.prototype = ast_declaration;
-		ast_declaration.__proto__ = ast_node.prototype;
+		var ast_declaration = jClass('ast_declaration', Initializer, ast_node);
 
 		//public:
 
@@ -562,30 +499,22 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			}
 		}
 
-		return Constructor;		
+		return ast_declaration.Constructor;		
 	
 	})();
 
 
 	var ast_declarator_list = (function() {
-	
-		//External Constructor
-		function Constructor(type) {
-			ast_declarator_list.apply(this);
-			this.ast_declarator_list(type);
-		}
 
 		//Internal Constructor
-		function ast_declarator_list() {
-			ast_node.prototype.apply(this);
+		function Initializer() {
+			ast_node.Initializer.apply(this);
 			this.type = null;
 			this.declarations = [];
 			this.invariant = 0;
 		}
 
-		//Class Inheritance
-		Constructor.prototype = ast_declarator_list;
-		ast_declarator_list.__proto__ = ast_node.prototype;
+		var ast_declarator_list = jClass('ast_declarator_list', Initializer, ast_node);
 
 		//public:
 
@@ -611,21 +540,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			printf("; ");
 		}
 
-		return Constructor;		
+		return ast_declarator_list.Constructor;		
 
 	})();
 
 
 	var ast_parameter_declarator = (function() {
 
-		//External Constructor
-		function Constructor() {
-			ast_parameter_declarator.apply(this);
-		}
-
 		//Internal Constructor
-		function ast_parameter_declarator() {
-			ast_node.apply(this);
+		function Initializer() {
+			ast_node.Initializer.apply(this);
 			this.type = null;
 			this.identifier = null;
 			this.is_array = 0;
@@ -634,9 +558,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			this.is_void = null;
 		}
 
-		//Class Inheritance
-		Constructor.prototype = ast_parameter_declarator;
-		ast_parameter_declarator.__proto__ = ast_node.prototype;
+		var ast_parameter_declarator = jClass('ast_parameter_declarator', Initializer, ast_node);
 
 		//public:
 
@@ -647,31 +569,22 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 
 		ast_parameter_declarator.print = function() {
-			
 		}
 
-		return Constructor;
-	
+		return ast_parameter_declarator.Constructor;
+
 	})();
 
 
 	var ast_expression_statement = (function() {
 
-		//External Constructor
-		function Constructor(ex) {
-			ast_expression_statement.apply(this);
-			this.ast_expression_statement(ex);
-		}
-
 		//Internal Constructor
-		function ast_expression_statement() {
-			ast_node.prototype.apply(this);
+		function Initializer() {
+			ast_expression.Initializer.apply(this);
 			this.expression = null;
 		}
 
-		//Class Inheritance
-		Constructor.prototype = ast_expression_statement;
-		ast_expression_statement.__proto__ = ast_node.prototype;
+		var ast_expression_statement = jClass('ast_expression_statement', Initializer, ast_expression);
 
 		//public:
 
@@ -682,29 +595,21 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		ast_expression_statement.print = function() {			
 		}
 
-		return Constructor;
+		return ast_expression_statement.Constructor;
 	
 	})();
 
 
 	var ast_compound_statement = (function() {
 
-		//External Constructor
-		function Constructor(new_scope, statements) {
-			ast_compound_statement.apply(this);
-			this.ast_compound_statement(new_scope, statements);
-		}
-
 		//Internal Constructor
-		function ast_compound_statement() {
-			ast_node.prototype.apply(this);
+		function Initializer() {
+			ast_node.Initializer.apply(this);
 			this.new_scope = null;
 			this.statements = [];
 		}
 
-		//Class Inheritance
-		Constructor.prototype = ast_compound_statement;
-		ast_compound_statement.__proto__ = ast_node.prototype;
+		var ast_compound_statement = jClass('ast_compound_statement', Initializer, ast_node);
 
 		//public:
 
@@ -718,29 +623,21 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		ast_compound_statement.print = function() {			
 		}
 
-		return Constructor;
-	
+		return ast_compound_statement.Constructor;
+
 	})();
 
 
 	var ast_function_definition = (function() {
 
-		//External Constructor
-		function Constructor() {
-			ast_function_definition.apply(this);
-			this.ast_function_definition();
-		}
-
 		//Internal Constructor
-		function ast_function_definition() {
-			ast_node.prototype.apply(this);
+		function Initializer() {
+			ast_node.Initializer.apply(this);
 			this.proto_type = null;
 			this.body = null;
 		}
 
-		//Class Inheritance
-		Constructor.prototype = ast_function_definition;
-		ast_function_definition.__proto__ = ast_node.prototype;
+		var ast_function_definition = jClass('ast_function_definition', Initializer, ast_node);
 
 		//public:
 
@@ -750,27 +647,19 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		ast_function_definition.print = function() {			
 		}
 
-		return Constructor;
+		return ast_function_definition.Constructor;
 	
 	})();
 
-	
+
 	var ast_expression_bin = (function() {
 
-		//External Constructor
-		function Constructor(oper, ex0, ex1) {
-			ast_expression_bin.apply(this);
-			this.ast_expression_bin(oper, ex0, ex1);
-		}
-
 		//Internal Constructor
-		function ast_expression_bin() {
-			ast_expression.prototype.apply(this);
+		function Initializer() {
+			ast_expression.Initializer.apply(this);
 		}
 
-		//Class Inheritance
-		Constructor.prototype = ast_expression_bin;
-		ast_expression_bin.__proto__ = ast_expression.prototype;
+		var ast_expression_bin = jClass('ast_expression_bin', Initializer, ast_expression);
 
 		//public:
 		ast_expression_bin.ast_expression_bin = function(oper, ex0, ex1) {
@@ -781,33 +670,25 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		ast_expression_bin.print = function() {	
 		}
 
-		return Constructor;
+		return ast_expression_bin.Constructor;
 	
 	})();
 
 
 	var ast_function_expression = (function() {
 
-		//External Constructor
-		function Constructor() {
-			ast_function_expression.apply(this);
-			this.ast_function_expression.apply(this, arguments);
-		}
-
 		//Internal Constructor
-		function ast_function_expression() {
-			ast_expression.prototype.apply(this);
+		function Initializer() {
+			ast_expression.Initializer.apply(this);
 			this.cons = false;
 		}
 
-		//Class Inheritance
-		Constructor.prototype = ast_function_expression;
-		ast_function_expression.__proto__ = ast_expression.prototype;
+		var ast_function_expression = jClass('ast_function_expression', Initializer, ast_expression);
 
 		//public:
 		ast_function_expression.ast_function_expression = function() {
 			
-			if (arguments[0].typeof('ast_expression')) {
+			if (arguments[0].typeOf('ast_expression')) {
 				ast_function_expression.ast_function_expression.ast_expression.apply(this, arguments);
 			} else {
 				ast_function_expression.ast_function_expression.ast_type_specifier.apply(this, arguments);				
@@ -832,7 +713,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			return this.cons;
 		}
 
-		return Constructor;
+		return ast_function_expression.Constructor;
 	
 	})();
 
