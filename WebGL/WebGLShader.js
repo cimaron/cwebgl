@@ -20,51 +20,39 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-//----------------------------------------------------------------------------------------
-//	class WebGLShader
-//----------------------------------------------------------------------------------------
-
-function cWebGLShader(context, /*GLenum*/ type) {	
-
-	//members
-	this._type = null;
-	this._source = null;
+cWebGLShader = (function() {
 	
-	//Call constructor
-	this.construct(context, type);
-}
+	function Initializer() {
+		cWebGLObject.Initializer.apply(this);
+		//public:
+		this._type = null;
+		this._source = null;
+	}
 
-//----------------------------------------------------------------------------------------
-//	Class Magic
-//----------------------------------------------------------------------------------------
+	var cWebGLShader = jClass('cWebGLShader', Initializer, cWebGLObject);
 
-__WebGLShader =  new cWebGLObject().extend('cWebGLShader');
-cWebGLShader.prototype = __WebGLShader;
+	//public:
 
-//----------------------------------------------------------------------------------------
-//	Methods
-//----------------------------------------------------------------------------------------
+	cWebGLShader.cWebGLShader = function(context, type) {
+		this.cWebGLObject(context);
+		this._type = type;
+		this._source = '';
+		this.setObject(this.context().graphicsContext3D().createShader(type));
+	};
 
-__WebGLShader.cWebGLShader = function(context, type) {
-	this.cWebGLObject(context);
-	this._type = type;
-	this._source = '';
-	this.setObject(this.context().graphicsContext3D().createShader(type));
-}
+	cWebGLShader.getType = function() {
+		return this._type;
+	};
 
-//public:
+	cWebGLShader.getSource = function() {
+		return this._source;	
+	};
 
-__WebGLShader.getType = function() {
-	return this._type;
-}
+	cWebGLShader.setSource = function(/*DOMString*/ source) {
+		this._source = source;
+	};
 
-__WebGLShader.getSource = function() {
-	return this._source;	
-}
+	return cWebGLShader.Constructor;
 
-__WebGLShader.setSource = function(/*DOMString*/ source) {
-	this._source = source;
-}
-
-//private:
+}());
 

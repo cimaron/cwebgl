@@ -20,34 +20,22 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-//----------------------------------------------------------------------------------------
-//	class WebGLUniformLocation
-//----------------------------------------------------------------------------------------
+cWebGLUniformLocation = (function() {
+	
+	function Initializer() {
+		cWebGLObject.Initializer.apply(this);
+		//public	
+	}
 
-function cWebGLUniformLocation(context) {	
+	var cWebGLUniformLocation = jClass('cWebGLUniformLocation', Initializer, cWebGLObject);
 
-	//members
+	//public:
 
-	//Call constructor
-	this.construct(context);
-}
+	cWebGLUniformLocation.cWebGLUniformLocation = function(context) {
+		this.cWebGLObject(context);
+	};
+	
+	return cWebGLUniformLocation.Constructor;
 
-//----------------------------------------------------------------------------------------
-//	Class Magic
-//----------------------------------------------------------------------------------------
-
-__WebGLUniformLocation = new cWebGLObject().extend('cWebGLUniformLocation');;
-cWebGLUniformLocation.prototype = __WebGLUniformLocation;
-
-//----------------------------------------------------------------------------------------
-//	Methods
-//----------------------------------------------------------------------------------------
-
-__WebGLUniformLocation.cWebGLUniformLocation = function(context) {
-	this.cWebGLObject(context);
-}
-
-//public:
-
-//private:
+}());
 

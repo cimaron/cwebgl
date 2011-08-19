@@ -37,7 +37,7 @@ function cWebGLIncludeFile($file) {
 	}
 
 	$output = file_get_contents($file);
-	$output = preg_replace('#//.*\n#', '', $output);	
+	$output = preg_replace('#//.*\n#', "\n", $output);	
 	$output = preg_replace('#/\*(.|[\r\n])*?\*/#', '', $output);
 
 	$output = preg_replace_callback('#include\(\'([^\']+)\'\);#', 'cWebGLIncludeCallback', $output);
@@ -65,11 +65,11 @@ function include(file) {
 	$include .= 'Debug';
 }
 
+$include('cWebGL.js');
 $include('library/pClass/pClass.js');
 $include('library/jClass/jClass.js');
 $include('library/glMatrix/glMatrix.js');
 $include('library/glMatrix/constructors.js');
-$include('cWebGL.js');
 
 $cnvGL = true;
 if ($cnvGL) {

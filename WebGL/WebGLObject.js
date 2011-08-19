@@ -20,49 +20,35 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-//----------------------------------------------------------------------------------------
-//	class WebGLObject
-//----------------------------------------------------------------------------------------
+cWebGLObject = (function() {
 
-function cWebGLObject(context) {
+	function Initializer() {
+		//public:
+		this._context = null;
+		this._object = null;	
+	}
+
+	var cWebGLObject = jClass('cWebGLObject', Initializer);
+
+	//public:
+
+	cWebGLObject.cWebGLObject = function(context) {
+		this._context = context;
+	};
+
+	cWebGLObject.context = function() {
+		return this._context;	
+	};
+
+	cWebGLObject.object = function() {
+		return this._object;	
+	};
+
+	cWebGLObject.setObject = function(object) {
+		this._object = object;
+	};
+
+	return cWebGLObject.Constructor;
+
+}());
 	
-	//members
-	this._context = null;
-	this._object = null;
-
-	//Call constructor
-	this.construct(context);
-}
-
-//----------------------------------------------------------------------------------------
-//	Class Magic
-//----------------------------------------------------------------------------------------
-
-__WebGLObject = new pClass('cWebGLObject');
-cWebGLObject.prototype = __WebGLObject;
-
-//----------------------------------------------------------------------------------------
-//	Methods
-//----------------------------------------------------------------------------------------
-
-__WebGLObject.cWebGLObject = function(context) {
-	this._context = context;
-}
-
-//public:
-
-__WebGLObject.context = function() {
-	return this._context;	
-}
-
-__WebGLObject.object = function() {
-	return this._object;	
-}
-
-__WebGLObject.setObject = function(object) {
-	this._object = object;
-}
-
-//private:
-
-

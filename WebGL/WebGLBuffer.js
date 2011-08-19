@@ -20,28 +20,23 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-//----------------------------------------------------------------------------------------
-//	class WebGLBuffer
-//----------------------------------------------------------------------------------------
-function cWebGLBuffer(context) {
+cWebGLBuffer = (function() {
+ 
+	function Initializer() {
+		cWebGLObject.Initializer.apply(this);
+		//public:
+	}
+	
+	var cWebGLBuffer = jClass('cWebGLBuffer', Initializer, cWebGLObject);
 
-	//Call constructor
-	this.construct(context);
-}
+	//public:
 
-//----------------------------------------------------------------------------------------
-//	Class Magic
-//----------------------------------------------------------------------------------------
-
-__WebGLBuffer = new cWebGLObject().extend('cWebGLBuffer');
-cWebGLBuffer.prototype = __WebGLBuffer;
-
-//----------------------------------------------------------------------------------------
-//	Methods
-//----------------------------------------------------------------------------------------
-
-__WebGLBuffer.cWebGLBuffer = function(context) {
-	this.cWebGLObject(context);
-	this.setObject(this.context().graphicsContext3D().createBuffer());
-}
+	cWebGLBuffer.cWebGLBuffer = function(context) {
+		this.cWebGLObject(context);
+		this.setObject(this.context().graphicsContext3D().createBuffer());
+	};
+	
+	return cWebGLBuffer.Constructor;
+	
+}());
 

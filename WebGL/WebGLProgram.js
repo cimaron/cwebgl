@@ -20,35 +20,23 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-//----------------------------------------------------------------------------------------
-//	class WebGLProgram
-//----------------------------------------------------------------------------------------
+cWebGLProgram = (function() {
+						  
+	function Initializer() {
+		cWebGLObject.Initializer.apply(this);
+		//public:
+	}
 
-function cWebGLProgram(context) {	
+	var cWebGLProgram = jClass('cWebGLProgram', Initializer, cWebGLObject);
+	
+	//public:
+	
+	cWebGLProgram.cWebGLProgram = function(context) {
+		this.cWebGLObject(context);
+		this.setObject(this.context().graphicsContext3D().createProgram());
+	};
+	
+	return cWebGLProgram.Constructor;
 
-	//members
-
-	//Call constructor
-	this.construct(context);
-}
-
-//----------------------------------------------------------------------------------------
-//	Class Magic
-//----------------------------------------------------------------------------------------
-
-__WebGLProgram = new cWebGLObject().extend('cWebGLProgram');
-cWebGLProgram.prototype = __WebGLProgram;
-
-//----------------------------------------------------------------------------------------
-//	Methods
-//----------------------------------------------------------------------------------------
-
-__WebGLProgram.cWebGLProgram = function(context) {
-	this.cWebGLObject(context);
-	this.setObject(this.context().graphicsContext3D().createProgram());
-}
-
-//public:
-
-//private:
+}());
 

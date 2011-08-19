@@ -20,28 +20,23 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-//----------------------------------------------------------------------------------------
-//	class WebGLRenderbuffer
-//----------------------------------------------------------------------------------------
-function cWebGLRenderbuffer(context) {
+cWebGLRenderbuffer = (function() {
 
-	//Call constructor
-	this.construct(context);
-}
+	function Initializer() {
+		cWebGLObject.Initializer.apply(this);
+		//public:
+	}
 
-//----------------------------------------------------------------------------------------
-//	Class Magic
-//----------------------------------------------------------------------------------------
+	var cWebGLRenderbuffer = jClass('cWebGLRenderbuffer', Initializer, cWebGLObject);
 
-__WebGLRenderbuffer = new cWebGLObject().extend('cWebGLRenderbuffer');
-cWebGLRenderbuffer.prototype = __WebGLRenderbuffer;
+	//public:
 
-//----------------------------------------------------------------------------------------
-//	Methods
-//----------------------------------------------------------------------------------------
+	cWebGLRenderbuffer.cWebGLRenderbuffer = function(context) {
+		this.cWebGLObject(context);
+		this.setObject(this.context().graphicsContext3D().createRenderbuffer());
+	};
+	
+	return cWebGLRenderbuffer.Cosntructor;
 
-__WebGLRenderbuffer.cWebGLRenderbuffer = function(context) {
-	this.cWebGLObject(context);
-	this.setObject(this.context().graphicsContext3D().createRenderbuffer());
-}
+}());
 

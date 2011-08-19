@@ -20,35 +20,23 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-//----------------------------------------------------------------------------------------
-//	class WebGLTexture
-//----------------------------------------------------------------------------------------
+cWebGLTexture = (function() {
 
-function cWebGLTexture(context) {	
+	function Initializer() {
+		cWebGLObject.Initializer.apply(this);
+		//public:
+	}
 
-	//members
-	
-	//Call constructor
-	this.construct(context);
-}
+	var cWebGLTexture = jClass('cWebGLTexture', Initializer, cWebGLObject);
 
-//----------------------------------------------------------------------------------------
-//	Class Magic
-//----------------------------------------------------------------------------------------
+	//public:
 
-__WebGLTexture = new new cWebGLObject().extend('cWebGLTexture');
-cWebGLTexture.prototype = __WebGLTexture;
+	cWebGLTexture.cWebGLTexture = function(context) {
+		this.cWebGLObject(context);
+		this.setObject(this.context().graphicsContext3D().createTexture());
+	};
 
-//----------------------------------------------------------------------------------------
-//	Methods
-//----------------------------------------------------------------------------------------
+	return cWebGLTexture.Constructor;
 
-__WebGLTexture.cWebGLTexture = function(context) {
-	this.cWebGLObject(context);
-	this.setObject(this.context().graphicsContext3D().createTexture());
-}
-
-//public:
-
-//private:
+}());
 

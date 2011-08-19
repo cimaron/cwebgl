@@ -20,23 +20,53 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-cWebGLFramebuffer = (function() {
+function jClass(name, Initializer, Extends) {
 
-	function Initializer() {
-		cWebGLObject.Initializer.apply(this);
-		//public:
+	function ExtCons(){}
+	function ProtoCons(){}
+	function Constructor() {
+		if (this.Initializer) {
+			this.Initializer.apply(this);
+		}
+		if (this[this.TypeOf]) {
+			this[this.TypeOf].apply(this, arguments);
+		}
 	}
 
-	var cWebGLFramebuffer = jClass('cWebGLFramebuffer', Initializer, cWebGLObject);
+	if (Extends) {
+		ExtCons.prototype = Extends.prototype;
+	}
 
-	//public:
+	var my_proto = new ExtCons();
+	ProtoCons.prototype = my_proto;
+	Constructor.prototype = new ProtoCons();
 
-	cWebGLFramebuffer.cWebGLFramebuffer = function(context) {
-		this.cWebGLObject(context);
-		this.setObject(this.context().graphicsContext3D().createFramebuffer());
-	};
+	if (Initializer) {
+		//for extending class
+		Constructor.Initializer = Initializer;
+		//for Constructor
+		my_proto.Initializer = Initializer;
+	}
 
-	return cWebGLFramebuffer.Constructor;
+	my_proto.Constructor = Constructor;
+	my_proto.TypeOf = name;
+	my_proto.typeOf = jClass.typeOf;
+	my_proto.Enumerate = jClass.Enumerate;
 
-}());
+	return my_proto;
+}
+
+jClass.typeOf = function(name) {
+	if (name) {
+		return this.TypeOf == name;
+	}
+	return this.TypeOf;
+};
+
+jClass.Enumerate = function(obj) {
+	var i;
+	for (i in obj) {
+		this[i] = obj[i];	
+	}
+};
 
