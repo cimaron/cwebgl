@@ -22,6 +22,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 function glGenTextures(n, buffers) {
 
+	var list = [], buffer, ref, i;
+
 	if (n < 0) {
 		cnvgl_throw_error(GL_INVALID_VALUE);
 		return;
@@ -32,9 +34,7 @@ function glGenTextures(n, buffers) {
 		return 0;
 	} */
 
-	var list = [], buffer, ref;
-
-	for (var i = 0; i < n; i++) {
+	for (i = 0; i < n; i++) {
 		texture = new cnvgl_texture();
 		cnvgl_objects.push(texture);
 		ref = cnvgl_objects.length - 1;

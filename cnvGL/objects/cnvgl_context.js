@@ -19,58 +19,68 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-
-function cnvgl_context() {
-
-	this.current_error_code = 0;
-
-	this.enabled = {};
-
-	//Frame Buffers
-	this.clear_color = [0,0,0,0];
-	this.clear_depth = 0,	
-	this.color_buffer = null;
-	this.depth_buffer = null;
-
-	//Viewport
-	this.viewport_x = 0;
-	this.viewport_y = 0;
-	this.viewport_w = 0;
-	this.viewport_h = 0;
-
-	//Buffers
-	this.bound_buffers = {};
-
-	this.current_program = null;
-
-	this.vertex_attrib_arrays = [];
-
-	//Shaders	
-}
-
-cnvgl_context.getCurrentContext = function() {
-	if (!window.cnvgl_state) {
-		cnvgl_state = new cnvgl_context();	
-		cnvgl_context.initialize(cnvgl_state);
+var cnvgl_context = (function() {
+							  
+	function Initializer() {
+		this.current_error_code = 0;
+	
+		this.enabled = {};
+	
+		//Frame Buffers
+		this.clear_color = [0,0,0,0];
+		this.clear_depth = 0;	
+		this.color_buffer = null;
+		this.depth_buffer = null;
+	
+		//Viewport
+		this.viewport_x = 0;
+		this.viewport_y = 0;
+		this.viewport_w = 0;
+		this.viewport_h = 0;
+	
+		//Buffers
+		this.bound_buffers = {};
+	
+		this.current_program = null;
+	
+		this.vertex_attrib_arrays = [];
+	
+		//Shaders		
 	}
-	return cnvgl_state;
-}
 
-cnvgl_context.initialize = function(ctx) {
+	var cnvgl_context = jClass('cnvgl_context', Initializer);
 
-	ctx.enabled[GL_DEPTH_TEST] = GL_TRUE;
+	//public:
 
-	ctx.bound_buffers[GL_ARRAY_BUFFER] = 0;
-	ctx.bound_buffers[GL_ELEMENT_ARRAY_BUFFER] = 0;		
+	cnvgl_context.cnvgl_context = function() {
+		var i;
+	
+		this.enabled[GL_DEPTH_TEST] = GL_TRUE;
+	
+		this.bound_buffers[GL_ARRAY_BUFFER] = 0;
+		this.bound_buffers[GL_ELEMENT_ARRAY_BUFFER] = 0;		
 
-	//Vertex attribute arrays
-	for (var i = 0; i < cnvgl_const.GL_MAX_VERTEX_ATTRIBS; i++) {
-		ctx.vertex_attrib_arrays[i] = new cnvgl_attrib_array_object();
-	}	
+		//Vertex attribute arrays
+		for (i = 0; i < cnvgl_const.GL_MAX_VERTEX_ATTRIBS; i++) {
+			this.vertex_attrib_arrays[i] = new cnvgl_attrib_array_object();
+		}
+		
+		this.renderer = new cnvgl_renderer();
+		this.renderer.state = this;
+	};
 
-	ctx.vertex_processor = new cnvgl_vertex_processor();	
-	ctx.fragment_processor = new cnvgl_fragment_processor();	
-}
+	//static:
 
+	var context;
 
+	cnvgl_context.Constructor.getCurrentContext = function() {
+		if (!context) {
+			context = new cnvgl_context.Constructor();
+		}
+		return context;
+	};
+
+	return cnvgl_context.Constructor;
+
+}());
 

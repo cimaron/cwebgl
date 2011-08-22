@@ -25,14 +25,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	var output = [null, '', ''];
 	var log = [null, '', ''];
 
-	var sprintf = function(str) {
+	function sprintf(str) {
 		var i = 1, m, rest = str; str = '';
 		while (m = rest.match('%([l]?)([dus%])')) {
 			var d = m[0];
 			switch (m[2]) {
 				case 'u':
 				case 'd':
-					d = parseInt(arguments[i]);
+					d = parseInt(arguments[i], 10);
 					break;
 				case 's':
 					d = arguments[i];
@@ -48,22 +48,22 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 		str += rest;
 		return str;
-	};
+	}
 
-	var printf = function() {
+	function printf() {
 		var args = [].splice.call(arguments, 0);
 		args.unshift(1);
 		fprintf.apply(null, args);
 	}
 
-	var fprintf = function(file, str) {
+	function fprintf(file, str) {
 		var args = [].splice.call(arguments, 1);	
 		str = sprintf.apply(null, args);
-		output[file ? file : 1] = str;
+		output[file || 1] = str;
 		ob_stream(file, str);
-	};
+	}
 
-	var ob_stream = function(file, str) {
+	function ob_stream(file, str) {
 		var i;
 		str = log[file] + str;
 		while ((i = str.indexOf("\n")) != -1) {
@@ -75,7 +75,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			str = str.slice(i + 1);
 		}
 		log[file] = str;
-	};
+	}
 
 	//-----------------------------------------------------------
 	//External interface
@@ -84,4 +84,5 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	glsl.printf = printf;
 	glsl.fprintf = fprintf;
 
-})();
+}());
+

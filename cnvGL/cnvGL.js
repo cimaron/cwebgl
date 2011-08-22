@@ -6,6 +6,8 @@ include('cnvGL/objects/cnvgl_attrib_array.js');
 include('cnvGL/objects/cnvgl_attribute.js');
 include('cnvGL/objects/cnvgl_buffer.js');
 include('cnvGL/objects/cnvgl_context.js');
+include('cnvGL/objects/cnvgl_fragment.js');
+include('cnvGL/objects/cnvgl_primitive.js');
 include('cnvGL/objects/cnvgl_program.js');
 include('cnvGL/objects/cnvgl_shader.js');
 include('cnvGL/objects/cnvgl_texture.js');
@@ -28,8 +30,12 @@ include('cnvGL/includes/glsl/generator.js');
 include('cnvGL/includes/linker/linker.js');
 include('cnvGL/includes/linker/symbol.js');
 
-include('cnvGL/includes/vertex_processor.js');
-include('cnvGL/includes/fragment_processor.js');
+//Rendering Pipeline
+include('cnvGL/includes/rendering/renderer.js');
+include('cnvGL/includes/rendering/fragment.js');
+include('cnvGL/includes/rendering/vertex.js');
+include('cnvGL/includes/rendering/data.js');
+include('cnvGL/includes/rendering/clipping.js');
 
 include('cnvGL/functions/glAttachShader.js');
 include('cnvGL/functions/glBindBuffer.js');

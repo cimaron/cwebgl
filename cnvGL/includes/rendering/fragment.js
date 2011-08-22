@@ -19,14 +19,42 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+cnvgl_rendering_fragment = (function() {
 
-function glEnable(cap) {
-	switch (cap) {
-		case GL_DEPTH_TEST:
-			cnvgl_context.getCurrentContext()[cap] = GL_TRUE;
-			return;
-		default:
-			throw new Error('');
+	//Internal Constructor
+	function Initializer() {
+		//public:
+		this.renderer = null;
+		this.program = null;
+		this.data = null;
 	}
-}
+
+	var cnvgl_rendering_fragment = jClass('cnvgl_rendering_fragment', Initializer);
+
+	//public:
+
+	cnvgl_rendering_fragment.cnvgl_rendering_fragment = function(renderer) {
+		this.renderer = renderer;
+		//build data heap for fragment executable
+		this.data = new cnvgl_rendering_data();
+	};
+
+	cnvgl_rendering_fragment.setProgram = function(program) {
+		this.program = program;
+	};
+
+	cnvgl_rendering_fragment.process = function(fragment) {
+
+		this.data.fragment = fragment;
+		this.program.apply(this.data);
+
+		fragment.r = Math.round(fragment.gl_FragColor[0] * 255);
+		fragment.g = Math.round(fragment.gl_FragColor[1] * 255);
+		fragment.b = Math.round(fragment.gl_FragColor[2] * 255);
+		fragment.a = Math.round(fragment.gl_FragColor[3] * 255);		
+	};
+
+	return cnvgl_rendering_fragment.Constructor;
+
+}());
 

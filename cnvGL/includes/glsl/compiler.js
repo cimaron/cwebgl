@@ -19,6 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+
 var glsl = (function() {
 
 	var initialized;
@@ -105,17 +106,18 @@ var glsl = (function() {
 
 	var token;
 
-	var copy = function(target, source) {
-		for (var i in target) {
+	function copy(target, source) {
+		var i;
+		for (i in target) {
 			delete target[i];
 		}
-		for (var i in source) {
+		for (i in source) {
 			target[i] = source[i];	
 		}
 		return target;
-	};
+	}
 
-	var next_token = function(p_yylval, yylloc, scanner) {
+	function next_token(p_yylval, yylloc, scanner) {
 		lexer.yylval = p_yylval;
 		var result = lexer.lex();
 		if (result == 1) {
@@ -124,33 +126,29 @@ var glsl = (function() {
 		//references reset in lexer, copy properties into our object
 		copy(yylloc, lexer.yylloc);
 		return result;
-	};
+	}
 
 	//#IF DEBUG
-	var print_token_value = function(yyoutput, yytoknum, yyvaluep) {
+	function print_token_value(yyoutput, yytoknum, yyvaluep) {
 		glsl.fprintf(2, JSON.stringify(yyvaluep).replace(/"/g, ''));
 	}
 
-	var print_error = function(yylloc, state, error) {
+	function print_error(yylloc, state, error) {
 		glsl.errors.push(error + " at line " + yylloc.first_line + " column " + yylloc.first_column);
-	};
+	}
 	//#ENDIF
 
-	var initialize_types = function(state) {
+	function initialize_types(state) {
 
 		//later, check compiler mode (shader vs fragment) when initializing types
 
 		//gl_Position
 		var entry = state.symbols.add_variable('gl_Position');
 		entry.type = 'vec4';
-		entry.qualifier = glsl.ast.type_qualifier.flags.out;
-		entry.qualifier_name = 'out';
 
 		//gl_FragColor
-		var entry = state.symbols.add_variable('gl_FragColor');
+		entry = state.symbols.add_variable('gl_FragColor');
 		entry.type = 'vec4';
-		entry.qualifier = glsl.ast.type_qualifier.flags.out;
-		entry.qualifier_name = 'out';
 	}
 
 	var state = null;
@@ -160,7 +158,7 @@ var glsl = (function() {
 		output : null,
 		status : false,
 		errors : [],
-		
+
 		mode : 0,
 
 		//expose to lexer/parser
@@ -238,5 +236,5 @@ var glsl = (function() {
 	};
 	
 	return glsl;
-})();
+}());
 

@@ -40,6 +40,6 @@ function glBindBuffer(target, buffer) {
 	}
 	*/
 
-	cnvgl_state.bound_buffers[target] = buffer;
+	cnvgl_context.getCurrentContext().bound_buffers[target] = buffer;
 }
 

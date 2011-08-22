@@ -30,6 +30,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	g_type_qualifiers[glsl.ast.type_qualifier.flags.attribute] = 'attribute';
 	g_type_qualifiers[glsl.ast.type_qualifier.flags.uniform] = 'uniform';
 	g_type_qualifiers[glsl.ast.type_qualifier.flags.out] = 'out';
+	g_type_qualifiers[glsl.ast.type_qualifier.flags.varying] = 'varying';
 
 	function g_type_default_value(type) {
 		switch (type.type_specifier) {
@@ -56,10 +57,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				vec4 : { type : 'vec4', func : 'mat4.multiplyVec4(%s,%s,[])' }
 			}
 		}
-	}
+	};
 
 	function g_get_operation(op, type1, type2) {
-		var op = g_operations_types[op];
+		op = g_operations_types[op];
 		if (op[type1] && !type2) {
 			return op[type1];
 		}
@@ -86,7 +87,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	function g_ast_declarator_list(dl) {
 
-		var code = '', d_code;
+		var code = '', d_code, i;
 
 		//get default initialization values
 		var type = dl.type;
@@ -98,7 +99,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 
 		var list = dl.declarations;
-		for (var i = 0; i < list.length; i++) {
+		for (i = 0; i < list.length; i++) {
 			var decl = list[i];
 			var name = decl.identifier;
 
@@ -117,7 +118,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	}
 
 	function g_ast_function(f) {
-		var code = '', p_code = '';
+		var code = '', p_code = '', i;
 
 		var name = f.identifier;
 		var entry = glsl.state.symbols.get_function(name);
@@ -125,7 +126,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		var parameters = f.parameters;
 
 		var params = [];
-		for (var i = 0; i < parameters.length; i++) {
+		for (i = 0; i < parameters.length; i++) {
 			var param = parameters[i];
 			if (param.is_void) {
 				return '';
@@ -188,19 +189,20 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				return exp;
 
 			case glsl.ast.operators.function_call:
-				var es = [];
+				var es = [], i;
 
-				for (var i = 0; i < e.expressions.length; i++) {
+				for (i = 0; i < e.expressions.length; i++) {
 					es.push(g_ast_expression(e.expressions[i]).code);
 				}
 
 				//cast
 				if (left) {
-					var op = g_get_operation('cast', left.type);
+					op = g_get_operation('cast', left.type);
 					exp.type = op.type;
 					exp.code = glsl.sprintf(op.func, es.join(','));
 					return exp;
 				}
+				throw new Error(g_error("Could not translate function call", e));
 
 			default:
 				throw new Error(g_error("Could not translate unknown expression " + e.typeOf() + '(' + e.oper + ')', e));
@@ -270,15 +272,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	}
 
 	function g_ast_compound_statement(cs) {
-		var code = '';
+		var code = '', i;
 		var stmts = cs.statements;
 		glsl.generator.depth++;
 
-		for (var i = 0; i < stmts.length; i++) {
+		for (i = 0; i < stmts.length; i++) {
 			var stmt = stmts[i];
 			switch (stmt.typeOf()) {
 				case 'ast_expression_statement':
-					var es = g_ast_expression_statement(stmt)
+					var es = g_ast_expression_statement(stmt);
 					if (!es) {
 						return false;
 					}
@@ -288,7 +290,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					throw new Error(g_error("Could not translate statement type (" + stmt.typeOf() + ")", stmt));
 			}
 		}
-		
+
 		glsl.generator.depth--;
 		code = g_indent() + "{\n" + code + g_indent() + "}\n";
 		return code;
@@ -345,21 +347,21 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		errors : [],
 
 		createObjectCode : function(state) {
-
+			var i;
 			//initialize
 			this.output = '';
 			this.status = false;
 			this.errors = [];
 
 			try {
-				for (var i = 0; i < state.translation_unit.length; i++) {
+				for (i = 0; i < state.translation_unit.length; i++) {
 					var tu = state.translation_unit[i];
 					this.output += g_translation_unit(tu);					
 				}
 			} catch (e) {
 				this.errors.push(e);
 				throw e;
-				return false;
+				//return false;
 			}
 
 			this.status = true;
@@ -367,5 +369,5 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}		
 	};
 
-})(glsl);
+}(glsl));
 

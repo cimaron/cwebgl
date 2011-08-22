@@ -27,6 +27,6 @@ function glClearDepth(depth) {
 		return 0;
 	} */
 
-	cnvgl_state.clear_depth = depth > 1 ? 1 : (depth < 0 ? 0 : depth);
+	cnvgl_context.getCurrentContext().clear_depth = depth > 1 ? 1 : (depth < 0 ? 0 : depth);
 }
 

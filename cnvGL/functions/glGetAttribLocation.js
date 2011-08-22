@@ -22,6 +22,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 function glGetAttribLocation(program, name) {
 
+	var i;
+
 	/*if (between glBegin and glEnd) {
 		cnvgl_throw_error(GL_INVALID_OPERATION);
 		return 0;
@@ -48,7 +50,7 @@ function glGetAttribLocation(program, name) {
 	}
 
 	var t = program_obj.active_attributes;
-	for (var i = 0; i < program_obj.active_attributes_count; i++) {
+	for (i = 0; i < program_obj.active_attributes_count; i++) {
 		if (t[i].name == name) {
 			return t[i].location;
 		}

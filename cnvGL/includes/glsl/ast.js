@@ -45,7 +45,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			this.location.source = 0;
 			this.location.line = 0;
 			this.location.column = 0;	
-		}
+		};
 
 		ast_node.get_location = function() {
 			locp = {};
@@ -55,21 +55,21 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			locp.last_line = locp.first_line;
 			locp.last_column = locp.first_column;
 			return locp;			
-		}
+		};
 
 		ast_node.set_location = function(locp) {
 			this.location.source = locp.source;
 			this.location.line = locp.first_line;
 			this.location.column = locp.first_column;
-		}
+		};
 
 		ast_node.print = function() {
 			printf("unhandled node");
-		}
+		};
 
 		return ast_node.Constructor;
 
-	})();
+	}());
 
 	/**
 	 * Operators for AST expression nodes.
@@ -130,24 +130,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		
 		sequence : 47
 	};
-
-	var ast_declaration = (function() {
-
-		//Internal Constructor
-		function Initializer() {
-			ast_node.Initializer.apply(this);
-			this.identifier = null;
-			this.is_array = 0;
-			this.array_size = null;
-			this.initializer = null;
-		}
-		
-		var ast_declaration = jClass('ast_declaration', Initializer, ast_node);
-
-		return ast_declaration.Constructor;
-
-	})();
-
 
 	var ast_precision = {
 		none : 0,
@@ -234,7 +216,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			if (this.ast_type_specifier[typeof specifier]) {
 				this.ast_type_specifier[typeof specifier].call(this, specifier);
 			}
-		}
+		};
 
 		//overloaded constructors
 		ast_type_specifier.ast_type_specifier.number = function(specifier) {
@@ -299,7 +281,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			];
 
 			this.type_name = names[specifier];
-		}
+		};
 
 		ast_type_specifier.ast_type_specifier.string = function(name) {
 			this.type_specifier = ast_types.type_name;
@@ -307,7 +289,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			this.is_array = false;
 			this.precision = ast_precision.none;
 			this.is_precision_statement = false;
-		}
+		};
 		
 		ast_type_specifier.ast_type_specifier.object = function(specifier) {
 			this.type_specifier = ast_types.struct;
@@ -316,7 +298,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			this.is_array = false;
 			this.precision = ast_precision.none;
 			this.is_precision_statement = false;			
-		}
+		};
 
 		ast_type_specifier.print = function() {
 			if (this.type_specifier == ast_types.struct) {
@@ -331,11 +313,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				}
 				printf(" ]");
 			}
-		}
+		};
 
 		return ast_type_specifier.Constructor;
 
-	})();
+	}());
 
 
 	var ast_function = (function() {
@@ -355,22 +337,24 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		//public:
 		ast_function.ast_function = function() {
 			this.is_definition = false;
-		}
+		};
 		
 		ast_function.print = function() {
-			
+			var i;
 			this.return_type.print();
 			printf(" %s (", this.identifier);
-			for (var i = 0; i < this.parameters.length; i++) {
-				//var ast = exec_node_data(ast_node, n, link);
-				//ast.print();
+			/*
+			for (i = 0; i < this.parameters.length; i++) {
+				var ast = exec_node_data(ast_node, n, link);
+				ast.print();
 			}
+			*/
 			printf(")");
-		}
+		};
 
 		return ast_function.Constructor;
 
-	})();
+	}());
 
 
 	/**
@@ -396,26 +380,26 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			} else {
 				this.ast_expression.four.apply(this, arguments);
 			}
-		}
+		};
 
 		ast_expression.ast_expression.one = function(identifier) {
 			//this.oper = ast_identifier
 			this.primary_expression.identifier = identifier;
-		}
+		};
 
 		ast_expression.ast_expression.four = function(oper, ex0, ex1, ex2) {
 			this.oper = oper;
 			this.subexpressions[0] = ex0;
 			this.subexpressions[1] = ex1;
 			this.subexpressions[2] = ex2;
-		}
+		};
 		
 		ast_expression.print = function() {			
-		}
+		};
 
 		return ast_expression.Constructor;
 
-	})();
+	}());
 
 
 
@@ -456,16 +440,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		ast_fully_specified_type.has_qualifiers = function() {
 			return this.qualifier.flags.i != 0;
-		}
+		};
 
 		ast_fully_specified_type.print = function() {
 			//ast_Type_qualifier_print(qualifier);
 			this.specifier.print();	
-		}
+		};
 
 		return ast_fully_specified_type.Constructor;
 
-	})();
+	}());
 
 
 	var ast_declaration = (function() {
@@ -488,7 +472,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			this.is_array = is_array;
 			this.array_size = array_size;
 			this.initializer = initializer;
-		}
+		};
 		
 		ast_declaration.print = function() {
 			printf("%s ", identifier);
@@ -497,11 +481,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				printf("= ");
 				initializer.print();
 			}
-		}
+		};
 
 		return ast_declaration.Constructor;		
 	
-	})();
+	}());
 
 
 	var ast_declarator_list = (function() {
@@ -521,16 +505,18 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		ast_declarator_list.ast_declarator_list = function(type) {
 			this.type = type;
 			this.invariant = 0;
-		}
+		};
 
 		ast_declarator_list.print = function() {
+			var i;
+
 			if (type) {
 				type.print();
 			} else {
 				printf("invariant ");	
 			}
 			
-			for (var i = 0; i < this.declarations.length; i++) {
+			for (i = 0; i < this.declarations.length; i++) {
 				if (i != 0) {
 					printf(", ");
 				}
@@ -538,11 +524,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				ast.print();
 			}
 			printf("; ");
-		}
+		};
 
 		return ast_declarator_list.Constructor;		
 
-	})();
+	}());
 
 
 	var ast_parameter_declarator = (function() {
@@ -566,14 +552,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			this.identifier = null;
 			this.is_array = false;
 			this.array_size = 0;
-		}
+		};
 
 		ast_parameter_declarator.print = function() {
-		}
+		};
 
 		return ast_parameter_declarator.Constructor;
 
-	})();
+	}());
 
 
 	var ast_expression_statement = (function() {
@@ -590,14 +576,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		ast_expression_statement.ast_expression_statement = function(ex) {
 			this.expression = ex;
-		}
+		};
 
 		ast_expression_statement.print = function() {			
-		}
+		};
 
 		return ast_expression_statement.Constructor;
 	
-	})();
+	}());
 
 
 	var ast_compound_statement = (function() {
@@ -618,14 +604,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			if (statements) {
 				this.statements.unshift(statements);	
 			}
-		}
+		};
 
 		ast_compound_statement.print = function() {			
-		}
+		};
 
 		return ast_compound_statement.Constructor;
 
-	})();
+	}());
 
 
 	var ast_function_definition = (function() {
@@ -642,14 +628,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		//public:
 
 		ast_function_definition.ast_function_definition = function() {
-		}
+		};
 
 		ast_function_definition.print = function() {			
-		}
+		};
 
 		return ast_function_definition.Constructor;
 	
-	})();
+	}());
 
 
 	var ast_expression_bin = (function() {
@@ -665,14 +651,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		ast_expression_bin.ast_expression_bin = function(oper, ex0, ex1) {
 			this.ast_expression(oper, ex0, ex1, null);
 			//assert(oper >= ast.operators.plus && oper <= ast.operators.logic_not);
-		}
+		};
 
 		ast_expression_bin.print = function() {	
-		}
+		};
 
 		return ast_expression_bin.Constructor;
 	
-	})();
+	}());
 
 
 	var ast_function_expression = (function() {
@@ -686,36 +672,35 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		var ast_function_expression = jClass('ast_function_expression', Initializer, ast_expression);
 
 		//public:
-		ast_function_expression.ast_function_expression = function() {
-			
-			if (arguments[0].typeOf('ast_expression')) {
+		ast_function_expression.ast_function_expression = function(a) {
+			if (a.typeOf('ast_expression')) {
 				ast_function_expression.ast_function_expression.ast_expression.apply(this, arguments);
 			} else {
 				ast_function_expression.ast_function_expression.ast_type_specifier.apply(this, arguments);				
 			}
-		}
+		};
 
 		ast_function_expression.ast_function_expression.ast_expression = function(callee) {
 			this.ast_expression(ast_operators.function_call, callee, null, null);
 			cons = false;
-		}
+		};
 
 		ast_function_expression.ast_function_expression.ast_type_specifier = function(type) {
 			this.ast_expression(ast_operators.function_call, type, null, null);
 			cons = true;			
-		}
+		};
 
 
 		ast_function_expression.print = function() {
-		}
+		};
 
 		ast_function_expression.is_constructor = function() {
 			return this.cons;
-		}
+		};
 
 		return ast_function_expression.Constructor;
 	
-	})();
+	}());
 
 	//-----------------------------------------------------------
 	//	External interface
@@ -739,5 +724,5 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		function_expression : ast_function_expression
 	};
 
-})(glsl);
+}(glsl));
 

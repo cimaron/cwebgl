@@ -22,6 +22,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 function glLinkProgram(program) {
 
+	var i;
+
 	//if (not supported) then
 	//	cnvgl_throw_error(GL_INVALID_OPERATION);
 	//endif
@@ -60,7 +62,7 @@ function glLinkProgram(program) {
 	var linker = new GlslLinker();
 
 	//may want to move this into the linker itself
-	for (var i = 0; i < program_obj.attached_shaders_count; i++) {
+	for (i = 0; i < program_obj.attached_shaders_count; i++) {
 		var location = program_obj.attached_shaders[i];
 		var shader_obj = cnvgl_objects[location];
 		linker.addObjectCode(shader_obj.object_code);

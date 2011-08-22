@@ -22,6 +22,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 function glGetProgramiv(program, pname, params) {
 
+	var i;
+
 	//get program
 	var program_obj = cnvgl_objects[program];
 
@@ -67,7 +69,7 @@ function glGetProgramiv(program, pname, params) {
 		case GL_ACTIVE_ATTRIBUTE_MAX_LENGTH:
 			params[0] = 0;
 			var t = program_obj.active_attributes;
-			for (var i = 0; i < program_obj.active_attributes_count; i++) {
+			for (i = 0; i < program_obj.active_attributes_count; i++) {
 				if (params[0] < t[i].name.length) {
 					params[0] = t[i].name.length;	
 				}
@@ -80,8 +82,8 @@ function glGetProgramiv(program, pname, params) {
 
 		case GL_ACTIVE_UNIFORM_MAX_LENGTH:
 			params[0] = 0;
-			var t = program_obj.active_uniforms;
-			for (var i = 0; i < program_obj.active_uniforms_count; i++) {
+			t = program_obj.active_uniforms;
+			for (i = 0; i < program_obj.active_uniforms_count; i++) {
 				if (params[0] < t[i].name.length) {
 					params[0] = t[i].name.length;	
 				}

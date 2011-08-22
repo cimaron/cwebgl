@@ -51,7 +51,7 @@ var lexer = (function () {
             this.match += ch;
             this.matched += ch;
             var lines = ch.match(/\n/);
-            if (lines) this.yylineno++;
+            if (lines) {this.yylineno++;}
             this._input = this._input.slice(1);
             return ch;
         },
@@ -80,10 +80,11 @@ var lexer = (function () {
             return pre + this.upcomingInput() + "\n" + c + "^";
         },
         next: function () {
+			var i;
             if (this.done) {
                 return this.EOF;
             }
-            if (!this._input) this.done = true;
+            if (!this._input) {this.done = true;}
 
             var token, match, col, lines;
             if (!this._more) {
@@ -91,17 +92,17 @@ var lexer = (function () {
                 this.match = '';
             }
             var rules = this._currentRules();
-            for (var i = 0; i < rules.length; i++) {
+            for (i = 0; i < rules.length; i++) {
                 match = this._input.match(this.rules[rules[i]]);
                 if (match) {
                     lines = match[0].match(/\n.*/g);
-                    if (lines) this.yylineno += lines.length;
+                    if (lines) {this.yylineno += lines.length;}
                     this.yylloc = {
                         first_line: this.yylloc.last_line,
                         last_line: this.yylineno + 1,
                         first_column: this.yylloc.last_column,
                         last_column: lines ? lines[lines.length - 1].length - 1 : this.yylloc.last_column + match[0].length
-                    }
+                    };
                     this.yytext += match[0];
                     this.match += match[0];
                     this.matches = match;
@@ -110,8 +111,8 @@ var lexer = (function () {
                     this._input = this._input.slice(match[0].length);
                     this.matched += match[0];
                     token = this.performAction.call(this, this.yy, this, rules[i], this.conditionStack[this.conditionStack.length - 1]);
-                    if (token) return token;
-                    else return;
+                    if (token) {return token;}
+                    else {return;}
                 }
             }
             if (this._input === "") {
@@ -144,7 +145,7 @@ var lexer = (function () {
     });
     lexer.performAction = function anonymous(yy, yy_, $avoiding_name_collisions, YY_START) {
 
-        var YYSTATE = YY_START
+        var YYSTATE = YY_START;
         switch ($avoiding_name_collisions) {
         case 0:
             /* Preprocessor tokens. */

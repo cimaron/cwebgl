@@ -20,14 +20,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-function glUniformMatrix4fv(/*GLint*/ location, /*GLsizei*/ count, /*GLboolean*/ transpose, /*const GLfloat* */ value) {
+function glUniformMatrix4fv(location, count, transpose, value) {
 	__glUniform(location, count, transpose, value, 4, false, true, [4, 4]);
 }
 
 function __glUniform(location, count, transpose, value, _size, _integer, _vector, _matrix) {
 
-	var current_program = cnvgl_state.current_program
-	
+	var current_program = cnvgl_context.getCurrentContext().current_program;
+
 	if (!current_program) {
 		cnvgl_throw_error(GL_INVALID_OPERATION);
 		return;

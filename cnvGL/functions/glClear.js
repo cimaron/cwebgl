@@ -22,25 +22,27 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 function glClear(mask) {
 
+	var buffer, clear, state, i;
+
 	//mask = mask & (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ACCUM_BUFFER_BIT | and GL_STENCIL_BUFFER_BIT);
 
 	if (mask & ~(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ACCUM_BUFFER_BIT | GL_STENCIL_BUFFER_BIT)) {
 		cnvgl_throw_error(GL_INVALID_VALUE);
 		return;
 	}
-	
+
 	/*if (between glBegin and glEnd) {
 		cnvgl_throw_error(GL_INVALID_OPERATION);
 		return 0;
 	} */
 
-	var buffer, clear;
+	state = cnvgl_context.getCurrentContext();
 
 	//GL_COLOR_BUFFER_BIT
 	if (mask & GL_COLOR_BUFFER_BIT) {
-		buffer = cnvgl_state.color_buffer;
-		clear = cnvgl_state.clear_color;
-		for (var i = 0, l = buffer.length; i < l; i += 4) {
+		buffer = state.color_buffer;
+		clear = state.clear_color;
+		for (i = 0, l = buffer.length; i < l; i += 4) {
 			buffer[i] = clear[0];
 			buffer[i + 1] = clear[1];
 			buffer[i + 2] = clear[2];
@@ -50,9 +52,9 @@ function glClear(mask) {
 
 	//GL_DEPTH_BUFFER_BIT
 	if (mask & GL_DEPTH_BUFFER_BIT) {
-		buffer = cnvgl_state.depth_buffer;
-		clear = cnvgl_state.clear_depth;
-		for (var i = 0, l = buffer.length; i < l; i ++) {
+		buffer = state.depth_buffer;
+		clear = state.clear_depth;
+		for (i = 0, l = buffer.length; i < l; i ++) {
 			buffer[i] = clear[0];
 		}
 	}

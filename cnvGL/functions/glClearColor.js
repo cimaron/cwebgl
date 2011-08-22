@@ -27,7 +27,7 @@ function glClearColor(r, g, b, a) {
 		return 0;
 	} */
 
-	var c = cnvgl_state.clear_color;
+	var c = cnvgl_context.getCurrentContext().clear_color;
 	
 	c[0] = Math.round(255 * (r > 1 ? 1 : (r < 0 ? 0 : r)), 0);
 	c[1] = Math.round(255 * (g > 1 ? 1 : (g < 0 ? 0 : g)), 0);

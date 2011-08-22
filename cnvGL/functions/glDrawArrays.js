@@ -20,62 +20,76 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-function glDrawArrays(/*GLenum*/ mode, /*GLint*/ first, /*GLsizei*/ count) {
+function glDrawArrays(mode, first, count) {
 
-	var buffer = cnvgl_state.bound_buffers[GL_ARRAY_BUFFER];
-	var buffer_object = cnvgl_objects[buffer];
-	var data = buffer_object.data;
+	var state, renderer, program;
+	var a, i, j, k;
 
-	var processor = cnvgl_state.vertex_processor;
+	state = cnvgl_context.getCurrentContext();
+	renderer = state.renderer;
+	program = state.current_program;
+
+	//var buffer = state.bound_buffers[GL_ARRAY_BUFFER];
+	//var buffer_object = cnvgl_objects[buffer];
+	//var data = buffer_object.data;
 
 	//gather vertex attributes
 
-	var program = cnvgl_state.current_program;
-	var vtas = cnvgl_state.vertex_attrib_arrays;
-	var attr_buffers = [];
+	var vtas = state.vertex_attrib_arrays;
 
-	var attrs = [];
-	for (var a = 0; a < program.active_attributes_count; a++) {
-		var attr = program.active_attributes[a];
-		attrs[attr.location] = vtas[a];
+	var active_attrs = [], attr_buffers = [];
+	var prgm_attr, prgm_attr_loc;
+
+	for (a = 0; a < program.active_attributes_count; a++) {
+		
+		prgm_attr = program.active_attributes[a];
+		prgm_attr_loc = prgm_attr.location;
+		
+		active_attrs[prgm_attr_loc] = vtas[a];
 		if (vtas[a].buffer_obj) {
-			attr_buffers[attr.location] = vtas[a].buffer_obj;	
+			attr_buffers[prgm_attr_loc] = vtas[a].buffer_obj.data;
 		}
 	}
 
-	processor.setMode(mode);
+
+	//generate primitive/vertices
+	var prim = new cnvgl_primitive();
+	prim.mode = mode;
+
+	var vertex, attr_data, vtx_attr_data, attr;
+
+	var start, stride, size;
 
 	//each vertex
-	for (var i = first; i < count; i++) {
+	for (i = first; i < count; i++) {
+
+		vertex = new cnvgl_vertex();
+		prim.vertices.push(vertex);
 
 		//build attribute set and initialize
-		var vertex_attr = [];
-		for (var j in attrs) {
+		for (j = 0; j < active_attrs.length; j++) {
 
-			var attr = attrs[j];
-			var buffer_obj = attr_buffers[j];
+			//no buffer data was specified for this attribute
+			if (!(attr_data = attr_buffers[j])) {
+				continue;
+			}
 
-			if (buffer_obj) {
-				var buffer = buffer_obj.data;
-				var stride = attr.stride;
-				var size = attr.size;
+			attr = active_attrs[j];
 
-				var start = attr.pointer + (i * size + stride);
+			vtx_attr_data = [];
+			vertex.attributes[j] = vtx_attr_data;
 
-				//allocation space for data in attributes
-				var new_buffer = [];				
-				vertex_attr[j] = new_buffer;
+			stride = attr.stride;
+			size = attr.size;
+			start = attr.pointer + (i * size + stride);
 
-				//copy data
-				for (var k = 0; k < size; k++) {
-					new_buffer[k] = buffer[k + start];
-				}
+			//can replace the following with TypedArray view
+			for (k = 0; k < size; k++) {
+				vtx_attr_data[k] = attr_data[k + start];
 			}
 		}
-
-		//get info on how to interpret attribute data
-		processor.access.gl_PerVertex = vertex_attr;
-		processor.sendVertex();
 	}
+
+	renderer.send(prim);
 }
 

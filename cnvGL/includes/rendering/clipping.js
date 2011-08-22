@@ -19,14 +19,20 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+cnvgl_rendering_clipping = (function() {
 
-function glEnable(cap) {
-	switch (cap) {
-		case GL_DEPTH_TEST:
-			cnvgl_context.getCurrentContext()[cap] = GL_TRUE;
-			return;
-		default:
-			throw new Error('');
+	function Initializer() {
 	}
-}
+
+	var cnvgl_rendering_clipping = jClass('cnvgl_rendering_clipping', Initializer);	
+
+	cnvgl_rendering_clipping.cnvgl_rendering_clipping = function() {
+	};
+
+	cnvgl_rendering_clipping.clip = function(vertex) {
+	}
+
+	return cnvgl_rendering_clipping.Constructor;
+
+}());
 

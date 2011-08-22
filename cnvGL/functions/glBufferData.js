@@ -22,6 +22,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 function glBufferData(target, size, data, usage) {
 
+	var state, i;
+	state = cnvgl_context.getCurrentContext();
+
 	if (target != GL_ARRAY_BUFFER &&
 			target != GL_ELEMENT_ARRAY_BUFFER && 
 			target != GL_PIXEL_PACK_BUFFER &&
@@ -50,7 +53,7 @@ function glBufferData(target, size, data, usage) {
 		return;		
 	}
 
-	if (cnvgl_state.bound_buffers[target] == 0) {
+	if (state.bound_buffers[target] == 0) {
 		cnvgl_throw_error(GL_INVALID_OPERATION);
 		return;					
 	}
@@ -63,7 +66,7 @@ function glBufferData(target, size, data, usage) {
 		return 0;
 	} */
 
-	var buffer = cnvgl_state.bound_buffers[target];	
+	var buffer = state.bound_buffers[target];	
 	var buffer_obj = cnvgl_objects[buffer];
 
 	buffer_obj.target = target;
@@ -74,7 +77,7 @@ function glBufferData(target, size, data, usage) {
 		buffer_obj.data = new Float32Array(temp, 0, size);
 	} else {
 		buffer_obj.data	= new Array(size);
-		for (var i = 0; i < size; i++) {
+		for (i = 0; i < size; i++) {
 			buffer_obj.data[i] = data[i];
 		}
 	}

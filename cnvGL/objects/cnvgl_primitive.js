@@ -20,13 +20,34 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-function glEnable(cap) {
-	switch (cap) {
-		case GL_DEPTH_TEST:
-			cnvgl_context.getCurrentContext()[cap] = GL_TRUE;
-			return;
-		default:
-			throw new Error('');
+cnvgl_primitive = (function() {
+							
+	function Initializer() {
+		//public:
+		this.mode = null;
+		this.vertices = [];
+		this.sorted = false;
+		this.direction = null;
 	}
-}
+
+	var cnvgl_primitive = jClass('cnvgl_primitive', Initializer);
+
+	//public:
+
+	cnvgl_primitive.cnvgl_primitive = function() {
+	};
+
+	cnvgl_primitive.perspective = function() {
+		var i, v;
+		for (i = 0; i < this.vertices.length; i++) {
+			v = this.vertices[i];
+			v.x /= v.w;
+			v.y /= v.w;
+			v.z /= v.w;
+		}
+	};
+
+	return cnvgl_primitive.Constructor;
+
+}());
 

@@ -20,14 +20,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-function glVertexAttribPointer(/*GLuint*/ index, /*GLint*/ size, /*GLenum*/ type, /*GLboolean*/ normalized,
-							   /*GLsizei*/ stride, /*GLvoid*/ pointer) {
+function glVertexAttribPointer(index, size, type, normalized, stride, pointer) {
+
+	var state;
+	state = cnvgl_context.getCurrentContext();
 
 	if (index > GL_MAX_VERTEX_ATTRIBS) {
 		cnvgl_throw_error(GL_INVALID_VALUE);
 		return;			
 	}
-	
+
 	if (size < 1 || size > 4) {
 		cnvgl_throw_error(GL_INVALID_VALUE);
 		return;
@@ -47,11 +49,11 @@ function glVertexAttribPointer(/*GLuint*/ index, /*GLint*/ size, /*GLenum*/ type
 
 	var buffer, buffer_obj;
 	//check for buffer
-	if (buffer = cnvgl_state.bound_buffers[GL_ARRAY_BUFFER]) {
+	if (buffer = state.bound_buffers[GL_ARRAY_BUFFER]) {
 		buffer_obj = cnvgl_objects[buffer];
 	}
 
-	var vertex_attribute = cnvgl_state.vertex_attrib_arrays[index];
+	var vertex_attribute = state.vertex_attrib_arrays[index];
 	vertex_attribute.size = size;
 	vertex_attribute.type = type;
 	vertex_attribute.normalized = normalized;

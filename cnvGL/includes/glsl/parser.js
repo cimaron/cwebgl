@@ -1320,7 +1320,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	   If N is 0, then set CURRENT to the empty location which ends
 	   the previous symbol: RHS[0] (always defined).  */
 
-	var YYLLOC_DEFAULT = function(Current, Rhs, i, N) {
+	function YYLLOC_DEFAULT(Current, Rhs, i, N) {
 		if (N) {
 			(Current).first_line   = Rhs[1 + i].first_line;
 			(Current).first_column = Rhs[1 + i].first_column;
@@ -1328,17 +1328,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			(Current).last_column  = Rhs[N + i].last_column;
 		} else {
 			(Current).first_line   = (Current).last_line   =
-				Rhs[i + 0].last_line;
+				Rhs[i].last_line;
 			(Current).first_column = (Current).last_column =
-			Rhs[i + 0].last_column;
+			Rhs[i].last_column;
 		}
-	};
+	}
 
 	/* YY_LOCATION_PRINT -- Print the location on the stream.
 	   This macro was not mandated originally: define only if we know
 	   we won't break user code: when these are the locations we know.  */
 
-	var YY_LOCATION_PRINT = function(File, Loc) {
+	function YY_LOCATION_PRINT(File, Loc) {
 		glsl.fprintf(File, "%d.%d-%d.%d", Loc.first_line, Loc.first_column, Loc.last_line, Loc.last_column);
 	}
 
@@ -1374,9 +1374,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	copied.  As a special case, return 0 if an ordinary "syntax error"
 	message will do.  Return YYSIZE_MAXIMUM if overflow occurs during
 	size calculation.  */
-	var yysyntax_error = function(yystate, yychar) {
+	function yysyntax_error(yystate, yychar) {
+		var yyx, yyn;
 
-		var yyn = yypact[yystate];
+		yyn = yypact[yystate];
 		if (!(YYPACT_NINF < yyn && yyn <= YYLAST)) {
 			return '';
 		} else {
@@ -1401,7 +1402,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			var yyresult = glsl.sprintf(yyunexpected, yytname[yytype]);
 
 			var yycount = 1;
-			for (var yyx = yyxbegin; yyx < yyxend; ++yyx) {
+			for (yyx = yyxbegin; yyx < yyxend; ++yyx) {
 				if (yycheck[yyx + yyn] == yyx && yyx != YYTERROR) {
 					if (yycount == YYERROR_VERBOSE_ARGS_MAXIMUM) {
 						break;
@@ -1427,7 +1428,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	};
 
 
-	var yyparse = function(state) {
+	function yyparse(state) {
+		var i;
 		
 		/* The lookahead symbol.  */
 		var yychar = 0;
@@ -1444,22 +1446,22 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		var yyerrstatus = 0;
 
 		/* The state stack.  */
-		var yyssa = new Array(YYINITDEPTH); for (var i = 0; i < yyssa.length; i++) { yyssa[i] = 0; }
+		var yyssa = new Array(YYINITDEPTH); for (i = 0; i < yyssa.length; i++) { yyssa[i] = 0; }
 		var yyss = 0;
 		var yyssp = 0;
 		
 		/* The semantic value stack.  */
-		var yyvsa = new Array(YYINITDEPTH); for (var i = 0; i < yyvsa.length; i++) { yyvsa[i] = {}; }
+		var yyvsa = new Array(YYINITDEPTH); for (i = 0; i < yyvsa.length; i++) { yyvsa[i] = {}; }
 		var yyvs = {};
 		var yyvsp = {};
 		
 		/* The location stack.  */
-		var yylsa = new Array(YYINITDEPTH); for (var i = 0; i < yylsa.length; i++) { yylsa[i] = YYLTYPE(); }
+		var yylsa = new Array(YYINITDEPTH); for (i = 0; i < yylsa.length; i++) { yylsa[i] = YYLTYPE(); }
 		var yyls = 0;
 		var yylsp = 0;
 
 		/* The locations where the error started and ended.  */
-		var yyerror_range = new Array(3); for (var i = 0; i < yyerror_range.length; i++) { yyerror_range[i] = YYLTYPE(); }
+		var yyerror_range = new Array(3); for (i = 0; i < yyerror_range.length; i++) { yyerror_range[i] = YYLTYPE(); }
 
 		var yystacksize = 0;
 
@@ -1477,7 +1479,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			var yymsg;
 		//#ENDIF
 		
-		var YYPOPSTACK = function(N) { (yyvsp -= (N), yyssp -= (N), yylsp -= (N)); };
+		var YYPOPSTACK = function(N) { yyvsp -= (N); yyssp -= (N); yylsp -= (N); };
 
 		  /* The number of symbols on the RHS of the reduced rule.
 			 Keep to zero when no symbol should be popped.  */
@@ -1510,16 +1512,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			yylloc.first_column = yylloc.last_column = 1;
 		}
 
-
 		/* User initialization code.  */
-		{
-			yylloc.first_line = 1;
-			yylloc.first_column = 1;
-			yylloc.last_line = 1;
-			yylloc.last_column = 1;
-			yylloc.source = 0;
-		}
-		
+		yylloc.first_line = 1;
+		yylloc.first_column = 1;
+		yylloc.last_line = 1;
+		yylloc.last_column = 1;
+		yylloc.source = 0;
+
 		yylsa[0] = yylloc;
 
 		var _goto = '';
@@ -1652,20 +1651,18 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				YYLLOC_DEFAULT(yyloc, yylsa, (yylsp - yylen), yylen);
 
 				if (yydebug) {
-					{
-						var yynrhs = yyr2[yyn];
-						var yyi;
-						var yylno = yyrline[yyn];
+					var yynrhs = yyr2[yyn];
+					var yyi;
+					var yylno = yyrline[yyn];
 
-						glsl.fprintf(2, "Reducing stack by rule %d (line %lu):\n", yyn - 1, yylno);
-						/* The symbols being reduced.  */
-						for (yyi = 0; yyi < yynrhs; yyi++) {
-							glsl.fprintf(2, "   $%d = ", yyi + 1);
-							yy_symbol_print(2, yyrhs[yyprhs[yyn] + yyi],
-								yyvsa[yyvsp + (yyi + 1) - (yynrhs)],
-								yylsa[yylsp + (yyi + 1) - (yynrhs)]);
-							glsl.fprintf(2, "\n");
-						}
+					glsl.fprintf(2, "Reducing stack by rule %d (line %lu):\n", yyn - 1, yylno);
+					/* The symbols being reduced.  */
+					for (yyi = 0; yyi < yynrhs; yyi++) {
+						glsl.fprintf(2, "   $%d = ", yyi + 1);
+						yy_symbol_print(2, yyrhs[yyprhs[yyn] + yyi],
+							yyvsa[yyvsp + (yyi + 1) - (yynrhs)],
+							yylsa[yylsp + (yyi + 1) - (yynrhs)]);
+						glsl.fprintf(2, "\n");
 					}
 				}
 
@@ -1908,6 +1905,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						yyval.node =	 yyvsa[yyvsp].node;
 						break;
 
+					case 263:
+						if (yyvsa[yyvsp].node == null) {
+							throw new Error("<nil> statement\n");
+						}
+						yyval = {};
+						yyval.node = (yyvsa[yyvsp - 1].node);
+						//yyval.node.link.insert_before(yyvsa[yyvsp].node.link);
+						break;
+
 					case 265:
 						yyval = {};
 						yyval.node = new glsl.ast.expression_statement(yyvsa[yyvsp - 1].expression);
@@ -2103,7 +2109,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					case 257:
 					case 258:
 					case 260:
-					case 263:
 					case 264:
 					case 266:
 					case 267:
@@ -2122,7 +2127,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					case 286:
 					case 287:
 					case 290:
-  						throw new Error('Missing state: ' + yyn);
+						throw new Error('Missing state: ' + yyn);
 					default:
 						break;
 				}
@@ -2272,7 +2277,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 										
 			}
 		} //end while(true)
-
 	}
 
 	//-----------------------------------------------------------
@@ -2293,5 +2297,5 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		yyparse : yyparse
 	};
 
-})(glsl);
+}(glsl));
 

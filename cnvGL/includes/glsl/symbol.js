@@ -57,27 +57,27 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				parent : this.table,
 				data : {}
 			};
-		}
+		};
 
 		symbol_table.pop_scope = function() {
 			this.table = this.table.parent;
-		}
+		};
 	
 		symbol_table.name_declared_this_scope = function(name) {
 			return (this.table.data[name] ? true : false);
-		}
+		};
 
 		symbol_table.add_variable = function(name) {
 			var entry = new SymbolTableEntry(name, SymbolTableEntry.typedef.variable);
 			entry.object_name = '@' + name + '@';
 			return this.add_entry(entry);
-		}
+		};
 	
 		symbol_table.add_type = function(name, t) {
 			var entry = new SymbolTableEntry(name, SymbolTableEntry.typedef.type);
 			entry.definition = t;
 			return this.add_entry(entry);
-		}
+		};
 	
 		symbol_table.add_function = function(name) {
 			var entry = new SymbolTableEntry(name, SymbolTableEntry.typedef.func);
@@ -87,7 +87,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				entry.object_name = (glsl.mode == 1) ? '@fragment.main@' : '@vertex.main@';
 			}
 			return this.add_entry(entry);
-		}
+		};
 
 		/*
 		symbol_table.add_global_function = function(f) {
@@ -97,24 +97,24 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		symbol_table.get_variable = function(name) {
 			var entry = this.get_entry(name, SymbolTableEntry.typedef.variable);
 			return entry;
-		}
+		};
 	
 		symbol_table.get_type = function(name) {
 			var entry = this.get_entry(name, SymbolTableEntry.typedef.type);
 			return entry;
-		}
-	
+		};
+
 		symbol_table.get_function = function(name) {
 			var entry = this.get_entry(name, SymbolTableEntry.typedef.func);
 			return entry;
-		}
+		};
 	
 		//private:
 		
 		symbol_table.add_entry = function(entry) {
 			this.table.data[entry.name] = entry;
 			return entry;
-		}
+		};
 		
 		symbol_table.get_entry = function(name, typedef) {
 			var table = this.table;
@@ -125,11 +125,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				table = table.parent;
 			}
 			return null;
-		}
+		};
 	
 		return symbol_table.Constructor;	
 	
-	})();
+	}());
 
 	//-----------------------------------------------------------
 	//External interface
@@ -137,4 +137,4 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	glsl.symbol_table = SymbolTable;
 	glsl.symbol_table_entry = SymbolTableEntry;
 
-})(glsl);
+}(glsl));

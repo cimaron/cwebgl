@@ -22,6 +22,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 function glGetUniformLocation(program, name) {
 
+	var t, i;
+
 	/*if (between glBegin and glEnd) {
 		cnvgl_throw_error(GL_INVALID_OPERATION);
 		return 0;
@@ -47,8 +49,8 @@ function glGetUniformLocation(program, name) {
 		return;
 	}
 
-	var t = program_obj.active_uniforms;
-	for (var i = 0; i < program_obj.active_uniforms_count; i++) {
+	t = program_obj.active_uniforms;
+	for (i = 0; i < program_obj.active_uniforms_count; i++) {
 		if (t[i].name == name) {
 			return t[i].location;
 		}

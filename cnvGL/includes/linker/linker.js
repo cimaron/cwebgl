@@ -39,10 +39,10 @@ GlslLinker = (function() {
 	//public:
 
 	linker.linker = function() {
-	}
+	};
 
 	linker.link = function(program) {
-
+		var i;
 		this.program = program;
 		this.fragment = '';
 		this.vertex = '';
@@ -50,7 +50,7 @@ GlslLinker = (function() {
 		this.status = false;
 		this.errors = [];
 
-		for (var i = 0; i < this.input.length; i++) {
+		for (i = 0; i < this.input.length; i++) {
 			this.merge(this.input[i]);
 		}
 
@@ -58,11 +58,11 @@ GlslLinker = (function() {
 		this.buildExecutable(this.vertex, 2);
 
 		this.status = 1;
-	}
+	};
 
 	linker.addObjectCode = function(object) {
 		this.input.push(object);
-	}
+	};
 
 	linker.merge = function(shader) {
 		var code = this.processSymbols(shader);
@@ -73,15 +73,15 @@ GlslLinker = (function() {
 			code = code.replace(/@vertex.main@/g, '__vertex_main');
 			this.vertex += code;
 		}
-	}
+	};
 
 	linker.processSymbols = function(shader) {
-
+		var name;
 		var symbol_table = shader.symbol_table.table.data;
 		var code = shader.object_code;
 		var location = 0;
 
-		for (var name in symbol_table) {
+		for (name in symbol_table) {
 
 			var entry = symbol_table[name];
 
@@ -102,14 +102,26 @@ GlslLinker = (function() {
 					attribute_obj.location = this.program.active_attributes_count;
 					this.program.active_attributes.push(attribute_obj);
 					this.program.active_attributes_count++;
-					code = this.replaceSymbol(code, entry.object_name, 'this.gl_PerVertex['+attribute_obj.location+']');
+					code = this.replaceSymbol(code, entry.object_name, 'this.vertex.attributes['+attribute_obj.location+']');
 					break;
 
 				case 'out':
 					code = this.replaceSymbol(code, entry.object_name, "this._out['"+entry.name+"']");
 					break;
 
+				case 'varying':
+					code = this.replaceSymbol(code, entry.object_name, "this._varying['"+entry.name+"']");
+					break;
+
 				default:
+					if (['@gl_Position@'].indexOf(entry.object_name) != -1) {
+						code = this.replaceSymbol(code, entry.object_name, "this.vertex['"+entry.name+"']");
+						continue;	
+					}				
+					if (['@gl_FragColor@'].indexOf(entry.object_name) != -1) {
+						code = this.replaceSymbol(code, entry.object_name, "this.fragment['"+entry.name+"']");
+						continue;	
+					}				
 					if (entry.typedef == 0) {
 						code = this.replaceSymbol(code, entry.object_name, entry.name);
 					}
@@ -117,11 +129,11 @@ GlslLinker = (function() {
 		}
 
 		return code;
-	}
+	};
 
 	linker.replaceSymbol = function(code, object_name, repl) {
 		return code.replace(new RegExp(object_name, 'g'), repl);
-	}
+	};
 
 	linker.buildExecutable = function(__code, __mode) {
 
@@ -134,9 +146,9 @@ GlslLinker = (function() {
 		} else {
 			this.program.vertex_program = __vertex_main;
 		}
-	}
+	};
 
 	return linker.Constructor;
 
-})();
+}());
 

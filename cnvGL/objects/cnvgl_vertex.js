@@ -20,10 +20,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-function cnvgl_vertex(x, y, z, w) {
-	this.x = x;
-	this.y = y;
-	this.z = z;
-	this.w = w;
+function cnvgl_vertex() {
+	this.gl_Position = [0,0,0,1];
+	this.attributes = [];
+
+	this.x = 0;
+	this.y = 0;
+	this.z = 0;
+	this.w = 0;
+
+	this.sx = 0;
+	this.sy = 0;
 }
 

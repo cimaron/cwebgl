@@ -22,9 +22,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 function glGenBuffers(n, buffers) {
 
-	var list = [], buffer, ref;
+	var list = [], buffer, ref, i;
 	
-	for (var i = 0; i < n; i++) {
+	for (i = 0; i < n; i++) {
 		buffer = new cnvgl_buffer();
 		cnvgl_objects.push(buffer);
 		ref = cnvgl_objects.length - 1;
