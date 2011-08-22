@@ -22,6 +22,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 function jClass(name, Initializer, Extends) {
 
+	var ExtCons;
+	eval('ExtCons = function '+name+'(){}');
 	function ExtCons(){}
 	function ProtoCons(){}
 	function Constructor() {
@@ -57,10 +59,7 @@ function jClass(name, Initializer, Extends) {
 }
 
 jClass.typeOf = function(name) {
-	if (name) {
-		return this.TypeOf == name;
-	}
-	return this.TypeOf;
+	return name ? this.TypeOf == name : this.TypeOf;
 };
 
 jClass.Enumerate = function(obj) {
