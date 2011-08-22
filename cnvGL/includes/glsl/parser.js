@@ -1899,19 +1899,20 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 					case 262:
 						if (yyvsa[yyvsp].node == null) {
-							_mesa_glsl_error(yylsa[yylsp], state, "<nil> statement\n");
+							//_mesa_glsl_error(yylsa[yylsp], state, "<nil> statement\n");
 						}
 						yyval = {};
-						yyval.node =	 yyvsa[yyvsp].node;
+						yyval.node = yyvsa[yyvsp].node;
+						yyval.node.link.self_link();
 						break;
 
 					case 263:
 						if (yyvsa[yyvsp].node == null) {
-							throw new Error("<nil> statement\n");
+							//throw new Error("<nil> statement\n");
 						}
 						yyval = {};
 						yyval.node = (yyvsa[yyvsp - 1].node);
-						//yyval.node.link.insert_before(yyvsa[yyvsp].node.link);
+						yyval.node.link.insert_before(yyvsa[yyvsp].node.link);
 						break;
 
 					case 265:

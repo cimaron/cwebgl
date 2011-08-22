@@ -21,6 +21,65 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 (function(glsl) {
 
+
+	var exec_node = (function() {
+		
+		function Initializer() {
+			this.prev = null;
+			this.next = null;
+			this.data = null;
+		}
+		
+		var exec_node = jClass('exec_node', Initializer);
+		
+		exec_node.exec_node = function(data) {
+			this.data = data;
+		};
+		
+		exec_node.self_link = function(el) {
+			this.prev = this;
+			this.next = this;
+		};
+		
+		exec_node.insert_before = function(before) {
+			before.next = this;
+			before.prev = this.prev;
+			this.prev.next = before;
+			this.prev = before;
+		};
+
+		return exec_node.Constructor;
+
+	}());
+
+	var exec_list = (function() {
+		
+		function Initializer() {
+			this.head = null;
+			this.tail = null;
+			this.tail_pred = null;
+		}
+		
+		var exec_list = jClass('exec_list', Initializer);
+		
+		exec_list.exec_list = function() {
+		};
+
+		exec_list.push_degenerate_list_at_head = function(n) {
+			//assert(n.prev.next == n);
+			//n.prev.next = this.head;
+			//this.head.prev = n.prev;
+			//n.prev = this.head;
+			//this.head = n;
+			//n.prev = (exec_node *) &this.head;
+			//this.head = n;
+			this.head = n;
+		}
+
+		return exec_list.Constructor;
+
+	}());
+
 	/**
 	 * Base class of all abstract syntax tree nodes
 	 */
@@ -34,7 +93,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				line : 0,
 				column : 0
 			};
-			this.link = null;
+			this.link = new exec_node(this);
 		}
 
 		var ast_node = jClass('ast_node', Initializer);
@@ -592,7 +651,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		function Initializer() {
 			ast_node.Initializer.apply(this);
 			this.new_scope = null;
-			this.statements = [];
+			this.statements = new exec_list();
 		}
 
 		var ast_compound_statement = jClass('ast_compound_statement', Initializer, ast_node);
@@ -602,7 +661,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		ast_compound_statement.ast_compound_statement = function(new_scope, statements) {
 			this.new_scope = new_scope;
 			if (statements) {
-				this.statements.unshift(statements);	
+				this.statements.push_degenerate_list_at_head(statements.link);
 			}
 		};
 

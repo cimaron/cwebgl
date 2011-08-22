@@ -274,10 +274,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	function g_ast_compound_statement(cs) {
 		var code = '', i;
 		var stmts = cs.statements;
+		var start = stmts.head, node, stmt;
+
 		glsl.generator.depth++;
 
-		for (i = 0; i < stmts.length; i++) {
-			var stmt = stmts[i];
+		while (node != start) {
+			if (!node) {
+				node = start;
+			}
+			stmt = node.data;
 			switch (stmt.typeOf()) {
 				case 'ast_expression_statement':
 					var es = g_ast_expression_statement(stmt);
@@ -289,6 +294,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				default:
 					throw new Error(g_error("Could not translate statement type (" + stmt.typeOf() + ")", stmt));
 			}
+			
+			node = node.next;
 		}
 
 		glsl.generator.depth--;
