@@ -26,6 +26,8 @@
  *    distribution.
  */
 
+var glMatrixArrayType;
+
 // Fallback for systems that don't support WebGL
 if(typeof Float32Array != 'undefined') {
         glMatrixArrayType = Float32Array;
@@ -326,7 +328,7 @@ vec3.lerp = function(vec, vec2, lerp, dest){
     dest[2] = vec[2] + lerp * (vec2[2] - vec[2]);
     
     return dest;
-}
+};
 
 /*
  * vec3.str
@@ -496,7 +498,7 @@ mat3.toMat4 = function(mat, dest) {
         dest[15] = 1;
         
         return dest;
-}
+};
 
 /*
  * mat3.str
@@ -864,7 +866,7 @@ mat4.toInverseMat3 = function(mat, dest) {
  * dest if specified, mat otherwise
  */
 mat4.multiply = function(mat, mat2, dest) {
-        if(!dest) { dest = mat }
+        if(!dest) { dest = mat; }
         
         // Cache the matrix values (makes for huge speed increases!)
         var a00 = mat[0], a01 = mat[1], a02 = mat[2], a03 = mat[3];
@@ -911,7 +913,7 @@ mat4.multiply = function(mat, mat2, dest) {
  * dest if specified, vec otherwise
  */
 mat4.multiplyVec3 = function(mat, vec, dest) {
-        if(!dest) { dest = vec }
+        if(!dest) { dest = vec; }
         
         var x = vec[0], y = vec[1], z = vec[2];
         
@@ -935,7 +937,7 @@ mat4.multiplyVec3 = function(mat, vec, dest) {
  * dest if specified, vec otherwise
  */
 mat4.multiplyVec4 = function(mat, vec, dest) {
-        if(!dest) { dest = vec }
+        if(!dest) { dest = vec; }
         
         var x = vec[0], y = vec[1], z = vec[2], w = vec[3];
         
@@ -1084,7 +1086,7 @@ mat4.rotate = function(mat, angle, axis, dest) {
         var b20 = x*z*t + y*s, b21 = y*z*t - x*s, b22 = z*z*t + c;
         
         if(!dest) { 
-                dest = mat 
+                dest = mat;
         } else if(mat != dest) { // If the source and destination differ, copy the unchanged last row
                 dest[12] = mat[12];
                 dest[13] = mat[13];
@@ -1131,7 +1133,7 @@ mat4.rotateX = function(mat, angle, dest) {
         var a20 = mat[8], a21 = mat[9], a22 = mat[10], a23 = mat[11];
 
         if(!dest) { 
-                dest = mat 
+                dest = mat;
         } else if(mat != dest) { // If the source and destination differ, copy the unchanged rows
                 dest[0] = mat[0];
                 dest[1] = mat[1];
@@ -1178,7 +1180,7 @@ mat4.rotateY = function(mat, angle, dest) {
         var a20 = mat[8], a21 = mat[9], a22 = mat[10], a23 = mat[11];
         
         if(!dest) { 
-                dest = mat 
+                dest = mat;
         } else if(mat != dest) { // If the source and destination differ, copy the unchanged rows
                 dest[4] = mat[4];
                 dest[5] = mat[5];
@@ -1225,7 +1227,7 @@ mat4.rotateZ = function(mat, angle, dest) {
         var a10 = mat[4], a11 = mat[5], a12 = mat[6], a13 = mat[7];
         
         if(!dest) { 
-                dest = mat 
+                dest = mat;
         } else if(mat != dest) { // If the source and destination differ, copy the unchanged last row
                 dest[8] = mat[8];
                 dest[9] = mat[9];
@@ -1402,7 +1404,7 @@ mat4.lookAt = function(eye, center, up, dest) {
                 x0 *= len;
                 x1 *= len;
                 x2 *= len;
-        };
+        }
         
         //vec3.normalize(vec3.cross(z, x, y));
         y0 = z1*x2 - z2*x1;
@@ -1532,7 +1534,7 @@ quat4.calculateW = function(quat, dest) {
         dest[2] = z;
         dest[3] = -Math.sqrt(Math.abs(1.0 - x*x - y*y - z*z));
         return dest;
-}
+};
 
 /*
  * quat4.inverse
@@ -1557,7 +1559,7 @@ quat4.inverse = function(quat, dest) {
         dest[2] = -quat[2];
         dest[3] = quat[3];
         return dest;
-}
+};
 
 /*
  * quat4.length
@@ -1572,7 +1574,7 @@ quat4.inverse = function(quat, dest) {
 quat4.length = function(quat) {
         var x = quat[0], y = quat[1], z = quat[2], w = quat[3];
         return Math.sqrt(x*x + y*y + z*z + w*w);
-}
+};
 
 /*
  * quat4.normalize
@@ -1605,7 +1607,7 @@ quat4.normalize = function(quat, dest) {
         dest[3] = w * len;
         
         return dest;
-}
+};
 
 /*
  * quat4.multiply
@@ -1631,7 +1633,7 @@ quat4.multiply = function(quat, quat2, dest) {
         dest[3] = qaw*qbw - qax*qbx - qay*qby - qaz*qbz;
         
         return dest;
-}
+};
 
 /*
  * quat4.multiplyVec3
@@ -1663,7 +1665,7 @@ quat4.multiplyVec3 = function(quat, vec, dest) {
         dest[2] = iz*qw + iw*-qz + ix*-qy - iy*-qx;
         
         return dest;
-}
+};
 
 /*
  * quat4.toMat3
@@ -1710,7 +1712,7 @@ quat4.toMat3 = function(quat, dest) {
         dest[8] = 1 - (xx + yy);
         
         return dest;
-}
+};
 
 /*
  * quat4.toMat4
@@ -1766,7 +1768,7 @@ quat4.toMat4 = function(quat, dest) {
         dest[15] = 1;
         
         return dest;
-}
+};
 
 /*
  * quat4.slerp
@@ -1816,7 +1818,7 @@ quat4.slerp = function(quat, quat2, slerp, dest) {
         dest[3] = (quat[3]*ratioA + quat2[3]*ratioB);
         
         return dest;
-}
+};
 
 
 /*
@@ -1831,4 +1833,4 @@ quat4.slerp = function(quat, quat2, slerp, dest) {
  */
 quat4.str = function(quat) {
         return '[' + quat[0] + ', ' + quat[1] + ', ' + quat[2] + ', ' + quat[3] + ']'; 
-}
+};

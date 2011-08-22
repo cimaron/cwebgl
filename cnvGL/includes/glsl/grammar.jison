@@ -36,8 +36,8 @@ HASH		^{SPC}#{SPC}
 				    * yylineno is zero-based instead of
 				    * one-based.
 				    */
-				   yylineno = parseInt(yytext.slice(0, 1)) - 1;
-				   yylloc.source = parseInt(yytext.slice(0));
+				   yylineno = parseInt(yytext.slice(0, 1), 10) - 1;
+				   yylloc.source = parseInt(yytext.slice(0), 10);
 				}
 {HASH}"line"{SPCP}{INT}{SPC}$	{
 				   /* Eat characters until the first digit is
@@ -51,7 +51,7 @@ HASH		^{SPC}#{SPC}
 				    * yylineno is zero-based instead of
 				    * one-based.
 				    */
-				   yylineno = parseInt(yytext.slice(0, 1)) - 1;
+				   yylineno = parseInt(yytext.slice(0, 1), 10) - 1;
 				}
 {SPC}\#{SPC}"pragma"{SPCP}"debug"{SPC}\({SPC}"on"{SPC}\) {
 				  this.begin('PP');
@@ -228,7 +228,7 @@ HASH		^{SPC}#{SPC}
 			    return IS_UINT ? UINTCONSTANT : INTCONSTANT;
 			}
 [1-9][0-9]*[uU]?	{
-				this.yylval.n = parseInt(yytext);
+				this.yylval.n = parseInt(yytext, 10);
 				return this.IS_UINT(yytext) ? yy.token.UINTCONSTANT : yy.token.INTCONSTANT;
 			}
 "true"			{

@@ -66,7 +66,6 @@ function include(file) {
 }
 
 $include('cWebGL.js');
-$include('library/pClass/pClass.js');
 $include('library/jClass/jClass.js');
 $include('library/glMatrix/glMatrix.js');
 $include('library/glMatrix/constructors.js');

@@ -20,6 +20,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
+var cWebGLRenderingContext;
+
 (function() {
 
 	//@todo: implement per spec (2.1)
@@ -42,5 +44,5 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	document._getElementById = document.getElementById;
 	document.getElementById = getElementById;
 
-})();
+}());
 

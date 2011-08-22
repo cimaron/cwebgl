@@ -172,8 +172,8 @@ var lexer = (function () {
              * yy_.yylineno is zero-based instead of
              * one-based.
              */
-            yy_.yylineno = parseInt(yy_.yytext.slice(0, 1)) - 1;
-            yylloc.source = parseInt(yy_.yytext.slice(0));
+            yy_.yylineno = parseInt(yy_.yytext.slice(0, 1), 10) - 1;
+            yylloc.source = parseInt(yy_.yytext.slice(0), 10);
 
             break;
         case 5:
@@ -188,7 +188,7 @@ var lexer = (function () {
              * yy_.yylineno is zero-based instead of
              * one-based.
              */
-            yy_.yylineno = parseInt(yy_.yytext.slice(0, 1)) - 1;
+            yy_.yylineno = parseInt(yy_.yytext.slice(0, 1), 10) - 1;
 
             break;
         case 6:
