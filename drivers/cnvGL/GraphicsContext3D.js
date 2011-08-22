@@ -20,174 +20,167 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-//----------------------------------------------------------------------------------------
-//	class GraphicsContext3D
-//----------------------------------------------------------------------------------------
+GraphicsContext3D = (function() {
 
-function GraphicsContext3D(canvas) {
+	function Initializer() {
+		//public:	
+	}
 	
-	//members
+	var GraphicsContext3D = new jClass('GraphicsContext3D', Initializer);
+	
+	//public:
+	
+	GraphicsContext3D.GraphicsContext3D = function(canvas) {
+		this.context = canvas.getContext('2d');
+	
+		//create our cnvGL context here;
+		this.width = canvas.width;
+		this.height = canvas.height;
+	
+		var cnvgl_ctx = cnvgl_context.getCurrentContext();
+	
+		//initialize frame buffers
+		//cnvgl_state.color_buffer = new Uint8Array(this.width * this.height * 4);
+		this.buffer = this.context.createImageData(this.width, this.height);
+	
+		cnvgl_ctx.color_buffer = this.buffer.data;
+	
+		if (Float32Array.native) {
+			cnvgl_ctx.depth_buffer = new Float32Array(this.width * this.height);
+		} else {
+			cnvgl_ctx.depth_buffer = new Array(this.width * this.height);
+		}
+	
+		//initialize state
+		glClearColor(0, 0, 0, 255);
+		glClearDepth(1.0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	};
+	
+	//public:
+	
+	GraphicsContext3D.attachShader = function(program, shader) {
+		glAttachShader(program, shader);
+	};
+	
+	GraphicsContext3D.bindBuffer = function(target, buffer) {
+		glBindBuffer(target, buffer);
+	};
+	
+	GraphicsContext3D.bufferData = function(target, data, usage) {
+		/*
+		if (typeof data == 'number') {
+		}
+		*/
+		glBufferData(target, data.length, data, usage);			 
+	};
+	
+	GraphicsContext3D.clear = function(mask) {
+		glClear(mask);
+		this.setRedraw();
+	};
+	
+	GraphicsContext3D.clearColor = function(red, green, blue, alpha) {
+		glClearColor(red, green, blue, alpha);
+	};
+	
+	GraphicsContext3D.compileShader = function(shader) {
+		glCompileShader(shader);
+	};
+	
+	GraphicsContext3D.createBuffer = function() {
+		var buffers = [];
+		glGenBuffers(1, buffers);	
+		return buffers[0][0];
+	};
+	
+	GraphicsContext3D.createProgram = function() {
+		return glCreateProgram();
+	};
+	
+	GraphicsContext3D.createShader = function(type) {
+		return glCreateShader(type);
+	};
+	
+	GraphicsContext3D.drawArrays = function(mode, first, count) {
+		glDrawArrays(mode, first, count);
+		this.setRedraw();
+	};
+	
+	GraphicsContext3D.enable = function(cap) {
+		glEnable(cap);
+	};
+	
+	GraphicsContext3D.enableVertexAttribArray = function(index) {
+		glEnableVertexAttribArray(index);
+	};
+	
+	GraphicsContext3D.getAttribLocation = function(program, name) {
+		return glGetAttribLocation(program, name);
+	};
+	
+	GraphicsContext3D.getProgramParameter = function(program, pname) {
+		var params = [];
+		glGetProgramiv(program, pname, params);
+		return params[0];
+	};
+	
+	GraphicsContext3D.getShaderInfoLog = function(shader) {
+		var length = [], infoLog = [];
+		glGetShaderInfoLog(shader, null, length, infoLog);
+		return infoLog[0];
+	};
+	
+	GraphicsContext3D.getShaderParameter = function(shader, pname) {
+		var params = [];
+		glGetShaderiv(shader, pname, params);
+		return params[0];
+	};
+	
+	GraphicsContext3D.getUniformLocation = function(program, name) {
+		return glGetUniformLocation(program, name);
+	};
+	
+	GraphicsContext3D.linkProgram = function(program) {
+		glLinkProgram(program);
+	};
+	
+	GraphicsContext3D.shaderSource = function(shader, string) {
+		glShaderSource(shader, 1, [string], [string.length]);
+	};
+	
+	GraphicsContext3D.uniformMatrix4fv = function(location, transpose, value) {
+		return glUniformMatrix4fv(location, value.length / 16, transpose, value);
+	};
+	
+	GraphicsContext3D.useProgram = function(program) {
+		glUseProgram(program);
+	};
+	
+	GraphicsContext3D.vertexAttribPointer = function(idx, size, type, normalized, stride, offset) {
+		var pointer = [];
+		glVertexAttribPointer(idx, size, type, normalized, stride, offset);
+	};
+	
+	GraphicsContext3D.viewport = function(x, y, width, height) {
+		glViewport(x, y, width, height);
+	};
+	
+	//private:
+	GraphicsContext3D.setRedraw = function() {
+		this.redrawing = true;
+		var This = this;
+		setTimeout(function() { This.redraw(); }, 0);
+	};
+	
+	GraphicsContext3D.redraw = function() {
+		if (this.redrawing) {
+			this.context.putImageData(this.buffer, 0, 0);
+			this.redrawing = false;
+		}
+	};
+	
+	return GraphicsContext3D.Constructor;
 
-	//Call constructor
-	this.construct(canvas);
-}
+}());
 
-//----------------------------------------------------------------------------------------
-//	Class Magic
-//----------------------------------------------------------------------------------------
-
-__GraphicsContext3D = new pClass('GraphicsContext3D');
-GraphicsContext3D.prototype = __GraphicsContext3D;
-
-//----------------------------------------------------------------------------------------
-//	Methods
-//----------------------------------------------------------------------------------------
-
-__GraphicsContext3D.GraphicsContext3D = function(canvas) {
-	this.context = canvas.getContext('2d');
-
-	//create our cnvGL context here;
-	this.width = canvas.width;
-	this.height = canvas.height;
-
-	var cnvgl_ctx = cnvgl_context.getCurrentContext();
-
-	//initialize frame buffers
-	//cnvgl_state.color_buffer = new Uint8Array(this.width * this.height * 4);
-	this.buffer = this.context.createImageData(this.width, this.height);
-
-	cnvgl_ctx.color_buffer = this.buffer.data;
-
-	if (Float32Array.native) {
-		cnvgl_ctx.depth_buffer = new Float32Array(this.width * this.height);
-	} else {
-		cnvgl_ctx.depth_buffer = new Array(this.width * this.height);
-	}
-
-	//initialize state
-	glClearColor(0, 0, 0, 255);
-	glClearDepth(1.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
-//public:
-
-__GraphicsContext3D.attachShader = function(program, shader) {
-	glAttachShader(program, shader);
-}
-
-__GraphicsContext3D.bindBuffer = function(target, buffer) {
-	glBindBuffer(target, buffer);
-}
-
-__GraphicsContext3D.bufferData = function(target, data, usage) {
-	if (typeof data == 'number') {
-		//@todo
-	}
-	glBufferData(target, data.length, data, usage);			 
-}
-
-__GraphicsContext3D.clear = function(mask) {
-	glClear(mask);
-	this.setRedraw();
-}
-
-__GraphicsContext3D.clearColor = function(red, green, blue, alpha) {
-	glClearColor(red, green, blue, alpha);
-}
-
-__GraphicsContext3D.compileShader = function(shader) {
-	glCompileShader(shader);
-}
-
-__GraphicsContext3D.createBuffer = function() {
-	var buffers = [];
-	glGenBuffers(1, buffers);	
-	return buffers[0][0];
-}
-
-__GraphicsContext3D.createProgram = function() {
-	return glCreateProgram();
-}
-
-__GraphicsContext3D.createShader = function(type) {
-	return glCreateShader(type);
-}
-
-__GraphicsContext3D.drawArrays = function(mode, first, count) {
-	glDrawArrays(mode, first, count);
-	this.setRedraw();
-}
-
-__GraphicsContext3D.enable = function(cap) {
-	glEnable(cap);
-}
-
-__GraphicsContext3D.enableVertexAttribArray = function(index) {
-	glEnableVertexAttribArray(index);
-}
-
-__GraphicsContext3D.getAttribLocation = function(program, name) {
-	return glGetAttribLocation(program, name);
-}
-
-__GraphicsContext3D.getProgramParameter = function(program, pname) {
-	var params = [];
-	glGetProgramiv(program, pname, params);
-	return params[0];
-}
-
-__GraphicsContext3D.getShaderInfoLog = function(shader) {
-	var length = [], infoLog = [];
-	glGetShaderInfoLog(shader, null, length, infoLog);
-	return infoLog[0];
-}
-
-__GraphicsContext3D.getShaderParameter = function(shader, pname) {
-	var params = [];
-	glGetShaderiv(shader, pname, params);
-	return params[0];
-}
-
-__GraphicsContext3D.getUniformLocation = function(program, name) {
-	return glGetUniformLocation(program, name);
-}
-
-__GraphicsContext3D.linkProgram = function(program) {
-	glLinkProgram(program);
-}
-
-__GraphicsContext3D.shaderSource = function(shader, string) {
-	glShaderSource(shader, 1, [string], [string.length]);
-}
-
-__GraphicsContext3D.uniformMatrix4fv = function(location, transpose, value) {
-	return glUniformMatrix4fv(location, value.length / 16, transpose, value);
-}
-
-__GraphicsContext3D.useProgram = function(program) {
-	glUseProgram(program);
-}
-
-__GraphicsContext3D.vertexAttribPointer = function(idx, size, type, normalized, stride, offset) {
-	var pointer = [];
-	glVertexAttribPointer(idx, size, type, normalized, stride, offset);
-}
-
-__GraphicsContext3D.viewport = function(x, y, width, height) {
-	glViewport(x, y, width, height);
-}
-
-//private:
-__GraphicsContext3D.setRedraw = function() {
-	this.redrawing = true;
-	var This = this;
-	setTimeout(function() { This.redraw(); }, 0);
-}
-
-__GraphicsContext3D.redraw = function() {
-	if (this.redrawing) {
-		this.context.putImageData(this.buffer, 0, 0);
-		this.redrawing = false;
-	}
-}
