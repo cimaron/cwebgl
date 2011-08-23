@@ -48,6 +48,7 @@ cnvgl_rendering_vertex = (function() {
 	};
 
 	cnvgl_rendering_vertex.process = function(vertex) {
+		
 		this.data.vertex = vertex;
 		this.program.apply(this.data);
 		
@@ -158,30 +159,18 @@ cnvgl_rendering_vertex = (function() {
 		return dir;
 	};
 
-	cnvgl_rendering_vertex.prepareInterpolate = function(v1, v2) {
-		
-		var i, int = {};
-		var dx, dy;
+	cnvgl_rendering_vertex.slope = function(x1, y1, x2, y2) {
+		var i, slope = {};
+		var x, y;
+		x = x1 - x2;
+		y = y1 - y2;
 
-		dx = v1.sx - v2.sx;
-		dy = v1.sy - v2.sy;
-
-		//need to do check for zero
-		if (dy != 0) {
-			int.dx = dx / dy;
-		} else {
-			int.dx = 0;
-		}
-		if (dx != 0) {
-			int.dy = dy / dx;
-		} else {
-			int.dy = 0;	
-		}
-
-		//prepare varying here:
-
-		return int;
+		//need to do check for zero?
+		slope.x = y != 0 ? x / y : 0;
+		slope.y = x != 0 ? y / x : 0;
+		return slope;
 	};
+
 
 	return cnvgl_rendering_vertex.Constructor;
 

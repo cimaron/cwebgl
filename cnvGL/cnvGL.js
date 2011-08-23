@@ -23,6 +23,7 @@ include('cnvGL/includes/glsl/preprocessor.js');
 include('cnvGL/includes/glsl/lexer.js');
 include('cnvGL/includes/glsl/lexer_extern.js');
 include('cnvGL/includes/glsl/parser.js');
+//include('cnvGL/includes/glsl/parser_debug.js');
 include('cnvGL/includes/glsl/ast.js');
 include('cnvGL/includes/glsl/generator.js');
 
@@ -36,6 +37,7 @@ include('cnvGL/includes/rendering/fragment.js');
 include('cnvGL/includes/rendering/vertex.js');
 include('cnvGL/includes/rendering/data.js');
 include('cnvGL/includes/rendering/clipping.js');
+include('cnvGL/includes/rendering/varying.js');
 
 include('cnvGL/functions/glAttachShader.js');
 include('cnvGL/functions/glBindBuffer.js');

@@ -110,7 +110,11 @@ GlslLinker = (function() {
 					break;
 
 				case 'varying':
-					code = this.replaceSymbol(code, entry.object_name, "this._varying['"+entry.name+"']");
+					if (shader.mode == 1) {
+						code = this.replaceSymbol(code, entry.object_name, "this.fragment.varying['"+entry.name+"']");
+					} else {
+						code = this.replaceSymbol(code, entry.object_name, "this.vertex.varying['"+entry.name+"']");
+					}
 					break;
 
 				default:

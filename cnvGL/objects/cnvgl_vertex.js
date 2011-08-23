@@ -21,9 +21,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 function cnvgl_vertex() {
-	this.gl_Position = [0,0,0,1];
-	this.attributes = [];
 
+	//used by renderer
 	this.x = 0;
 	this.y = 0;
 	this.z = 0;
@@ -31,5 +30,11 @@ function cnvgl_vertex() {
 
 	this.sx = 0;
 	this.sy = 0;
+
+	//communication with program
+	this.gl_Position = [0,0,0,1];
+
+	this.attributes = [];
+	this.varying = {};
 }
 

@@ -21,11 +21,21 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 function cnvgl_fragment() {
-	this.gl_FragColor = [0,0,0,1];
 
+	//used by renderer
 	this.r = 0;
 	this.g = 0;
 	this.b = 0;
 	this.a = 1;
+
+	this.x = 0;
+	this.y = 0;
+	this.z = 0;
+	this.w = 1;
+
+	//communication with program
+	this.gl_FragColor = [0,0,0,1];
+
+	this.varying = {};
 }
 

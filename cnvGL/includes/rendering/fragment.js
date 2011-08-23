@@ -54,6 +54,7 @@ cnvgl_rendering_fragment = (function() {
 		fragment.a = Math.round(fragment.gl_FragColor[3] * 255);		
 	};
 
+
 	return cnvgl_rendering_fragment.Constructor;
 
 }());

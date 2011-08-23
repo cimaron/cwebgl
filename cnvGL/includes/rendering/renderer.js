@@ -74,10 +74,11 @@ cnvgl_renderer = (function() {
 
 	cnvgl_renderer.renderTriangle = function(prim) {
 
-		var vw, vh, buffer, v1, v2, v3, dir;
-		var lint, rint;
-		var frag;
+		var v1, v2, v3, dir;
+		var lsteps, rsteps, ysteps;
+		var frag, varying;
 
+		//prepare (sort) vertices
 		this.vertex.sortVertices(prim);
 		if (!prim.direction) {
 			prim.direction = this.vertex.getDirection(prim.vertices);
@@ -93,26 +94,23 @@ cnvgl_renderer = (function() {
 			v3 = prim.vertices[1];				
 		}
 
-		vw = this.state.viewport_w;
-		vh = this.state.viewport_h;	
-		buffer = this.state.color_buffer;
 		frag = new cnvgl_fragment();
+		varying = new cnvgl_rendering_varying(v1, v2, v3);
 
-		lint = this.vertex.prepareInterpolate(v1, v3);
-		rint = this.vertex.prepareInterpolate(v1, v2);
+		lsteps = this.vertex.slope(v1.sx, v1.sy, v3.sx, v3.sy);
+		rsteps = this.vertex.slope(v1.sx, v1.sy, v2.sx, v2.sy);
 
-		var yi_start, yi_end, yi, yp = false;
-		var x_start, x_end, xi, i;
+		var yi_start, yi_end, yi, yp = false, x_start, x_end;
 
+		//top and bottom
 		yi_start = Math.ceil(v1.sy - 0.5) + 1;
 		yi_end = Math.ceil((v2.sy > v3.sy ? v2.sy : v3.sy) + 0.5) - 1;
-
-		//yi_end will be increased later if necessary
-
 		x_start = v1.sx;
 		x_end = v1.sx;
+
+		//top line is horizontal, "fix" x_end
 		if (v1.sy == v2.sy) {
-			x_end = v2.sx;	
+			x_end = v2.sx;
 		}
 
 		//for each horizontal scanline
@@ -120,32 +118,45 @@ cnvgl_renderer = (function() {
 
 			//next vertex (v1, v2) -> (v2, v3)
 			if (!yp && yi > v2.sy) {
-				lint = this.vertex.prepareInterpolate(v2, v3);
+				lsteps = this.vertex.slope(v2.sx, v2.sy, v3.sx, v3.sy);
 				yp = true;
 			}
 
 			//next vertex (v1, v3) -> (v2, v3)
 			if (!yp && yi > v3.sy) {
-				rint = this.vertex.prepareInterpolate(v2, v3);
+				rsteps = this.vertex.slope(v2.sx, v2.sy, v3.sx, v3.sy);
 				yp = true;
 			}
 
-			x_start += lint.dx;
-			x_end += rint.dx;
+			x_start += lsteps.x;
+			x_end += rsteps.x;
 
-			for (xi = Math.floor(x_start); xi < x_end; xi++) {
-				i = (vw * yi + xi) * 4;
-
-				this.fragment.process(frag);
-
-				buffer[i] = frag.r;
-				buffer[i + 1] = frag.g;
-				buffer[i + 2] = frag.b;
-				//if (alpha, do calculation next)
-			}
+			this.processScanline(yi, x_start, x_end, frag, varying);
 		}
-
 	};
+
+	cnvgl_renderer.processScanline = function(yi, x_start, x_end, frag, varying) {
+		var buffer, vw, xi, i, p;
+		
+		buffer = this.state.color_buffer;
+		vw = this.state.viewport_w;
+
+		for (xi = Math.floor(x_start); xi < x_end; xi++) {
+
+			p = [xi, yi, 0, 1];
+			varying.prepare(frag, p);
+			frag.varying = varying.varying;
+
+			this.fragment.process(frag);
+
+			i = (vw * yi + xi) * 4;
+			buffer[i] = frag.r;
+			buffer[i + 1] = frag.g;
+			buffer[i + 2] = frag.b;
+			//if (alpha, do calculation next)
+		}		
+	};
+
 
 	return cnvgl_renderer.Constructor;
 
