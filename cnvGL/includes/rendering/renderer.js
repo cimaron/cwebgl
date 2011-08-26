@@ -67,6 +67,8 @@ cnvgl_renderer = (function() {
 			prim.vertices[0] = vertices[i];
 			prim.vertices[1] = vertices[i + 1];
 			prim.vertices[2] = vertices[i + 2];
+			
+			this.clipping.clip(prim);
 
 			this.renderTriangle(prim);
 		}
@@ -119,12 +121,18 @@ cnvgl_renderer = (function() {
 			//next vertex (v1, v2) -> (v2, v3)
 			if (!yp && yi > v2.sy) {
 				lsteps = this.vertex.slope(v2.sx, v2.sy, v3.sx, v3.sy);
+				if (v1.sy != v2.sy) {
+					lsteps.x = -lsteps.x;
+				}
 				yp = true;
 			}
 
 			//next vertex (v1, v3) -> (v2, v3)
 			if (!yp && yi > v3.sy) {
 				rsteps = this.vertex.slope(v2.sx, v2.sy, v3.sx, v3.sy);
+				if (v1.sy != v2.sy) {
+					rsteps.x = -rsteps.x;
+				}
 				yp = true;
 			}
 
@@ -140,12 +148,11 @@ cnvgl_renderer = (function() {
 		
 		buffer = this.state.color_buffer;
 		vw = this.state.viewport_w;
-
+ 
 		for (xi = Math.floor(x_start); xi < x_end; xi++) {
 
 			p = [xi, yi, 0, 1];
 			varying.prepare(frag, p);
-			frag.varying = varying.varying;
 
 			this.fragment.process(frag);
 
