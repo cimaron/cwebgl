@@ -717,6 +717,14 @@ cWebGLRenderingContext = (function() {
 		this._context.viewport(x, y, width, height);
 	};
 	
+	cWebGLRenderingContext.redraw = function() {
+		if (this._context.redraw) {
+			this._context.redraw();	
+		}
+	}
+	
+	
+	
 	return cWebGLRenderingContext.Constructor;
 
 }());
