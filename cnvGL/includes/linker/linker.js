@@ -122,10 +122,11 @@ GlslLinker = (function() {
 						code = this.replaceSymbol(code, entry.object_name, "this.vertex['"+entry.name+"']");
 						continue;	
 					}				
-					if (['@gl_FragColor@'].indexOf(entry.object_name) != -1) {
+					if (['@gl_FragDepth', '@gl_FragColor@'].indexOf(entry.object_name) != -1) {
 						code = this.replaceSymbol(code, entry.object_name, "this.fragment['"+entry.name+"']");
-						continue;	
-					}				
+						continue;
+					}
+					
 					if (entry.typedef == 0) {
 						code = this.replaceSymbol(code, entry.object_name, entry.name);
 					}

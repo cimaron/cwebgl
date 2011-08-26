@@ -149,6 +149,10 @@ var glsl = (function() {
 		//gl_FragColor
 		entry = state.symbols.add_variable('gl_FragColor');
 		entry.type = 'vec4';
+
+		//gl_FragDepth
+		entry = state.symbols.add_variable('gl_FragDepth');
+		entry.type = 'float';
 	}
 
 	var state = null;

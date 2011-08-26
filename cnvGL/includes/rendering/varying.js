@@ -55,6 +55,7 @@ cnvgl_rendering_varying = (function() {
 	};
 
 	cnvgl_rendering_varying.precompute = function() {
+
 		var x0, x1, x2, y0, y1, y2;
 		x0 = this.v1[0];
 		x1 = this.v2[0];
@@ -73,12 +74,6 @@ cnvgl_rendering_varying = (function() {
 	};
 
 	cnvgl_rendering_varying.prepare = function(fragment, p) {
-		for (i in this.varying) {
-			fragment.varying[i] = this.interpolate(p, this.f1[i], this.f2[i], this.f3[i]);
-		}
-	};
-
-	cnvgl_rendering_varying.interpolate = function(p, f1, f2, f3) {
 
 		var xp, yp;
 		var x0 = this.v1[0];
@@ -86,14 +81,23 @@ cnvgl_rendering_varying = (function() {
 		xp = p[0];
 		yp = p[1];
 
-		var u = (this.t.a * (yp - y0) - this.t.c * (xp - x0)) * this.t.g;
-		var t = (this.t.b * (y0 - yp) + this.t.d * (xp - x0)) * this.t.g;
+		this.t.u = (this.t.a * (yp - y0) - this.t.c * (xp - x0)) * this.t.g;
+		this.t.t = (this.t.b * (y0 - yp) + this.t.d * (xp - x0)) * this.t.g;
+	};
 
-		var v = [];
-		for (var i in f1) {
-			v[i] = f1[i] + t * (f2[i] - f1[i]) + u * (f3[i] - f1[i]);
+	cnvgl_rendering_varying.interpolate = function(f1, f2, f3) {
+		
+		//todo: do a check that we need to interpolate at all
+
+		var v;
+		if (typeof f1 == 'object') {
+			v = [];
+			for (var i in f1) {
+				v[i] = f1[i] + this.t.t * (f2[i] - f1[i]) + this.t.u * (f3[i] - f1[i]);
+			}
+		} else {
+			v = f1 + this.t.t * (f2 - f1) + this.t.u * (f3 - f1);
 		}
-
 		return v;
 	};
 

@@ -139,24 +139,41 @@ cnvgl_renderer = (function() {
 			x_start += lsteps.x;
 			x_end += rsteps.x;
 
-			this.processScanline(yi, x_start, x_end, frag, varying);
+			this.processScanline(yi, x_start, x_end, frag, varying, [v1, v2, v3]);
 		}
 	};
 
-	cnvgl_renderer.processScanline = function(yi, x_start, x_end, frag, varying) {
-		var buffer, vw, xi, i, p;
-		
+	cnvgl_renderer.processScanline = function(yi, x_start, x_end, frag, varying, verts) {
+		var buffer, vw, xi, i, v, p;
+
 		buffer = this.state.color_buffer;
+		depth = this.state.depth_buffer;
+
 		vw = this.state.viewport_w;
- 
+
 		for (xi = Math.floor(x_start); xi < x_end; xi++) {
+
+			i = (vw * yi + xi);
 
 			p = [xi, yi, 0, 1];
 			varying.prepare(frag, p);
 
+			frag.gl_FragDepth = varying.interpolate(verts[0].z, verts[1].z, verts[2].z);
+
+			if (frag.gl_FragDepth < depth[i]) {
+				continue;
+			}
+
+			//interpolate varying
+			for (v in varying.varying) {
+				frag.varying[v] = varying.interpolate(varying.f1[v], varying.f2[v], varying.f3[v]);
+			}
+
 			this.fragment.process(frag);
 
-			i = (vw * yi + xi) * 4;
+			depth[i] = frag.gl_FragDepth;
+
+			i *= 4;
 			buffer[i] = frag.r;
 			buffer[i + 1] = frag.g;
 			buffer[i + 2] = frag.b;

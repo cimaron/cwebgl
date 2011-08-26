@@ -35,6 +35,7 @@ function cnvgl_fragment() {
 
 	//communication with program
 	this.gl_FragColor = [0,0,0,1];
+	this.gl_FragDepth = 0.0;
 
 	this.varying = {};
 }
