@@ -59,6 +59,29 @@ cnvgl_renderer = (function() {
 		this.renderTriangles(prim.vertices);
 	};
 
+	cnvgl_renderer.faceDir = function(vertices) {
+		var a, E, i, th, n, dir;
+		n = vertices.length;
+		E = 0;
+
+		//FrontFace state setting
+		dir = 0;
+
+		for (i = 0; i < n; i++) {
+			th = (i + 1) % n;
+			E += (vertices[i].sx * vertices[th].sy - vertices[th].sx * vertices[i].sy);
+		}
+
+		E = E > 0 ? 1 : -1;
+		dir = dir ? E : -E;
+
+		if (this.state.polygon.frontFace) {
+			dir = -dir;	
+		}
+
+		return dir;
+	};
+
 	cnvgl_renderer.renderTriangles = function(vertices) {
 		var i, prim;
 		for (i = 0; i < vertices.length - 2; i++) {
@@ -79,6 +102,15 @@ cnvgl_renderer = (function() {
 		var v1, v2, v3, dir;
 		var lsteps, rsteps, ysteps;
 		var frag, varying;
+
+		if (this.state.polygon.cullFlag) {
+			dir = this.isFrontFacing(prim.vertices);
+			if (!(
+				(dir > 0 && (this.state.polygon.cullFlag == GL_FALSE || this.state.polygon.cullFace == GL_FRONT)) ||
+				(dir < 0 && (this.state.polygon.cullFlag == GL_FALSE || this.state.polygon.cullFace == GL_BACK)))) {
+				return;	
+			}
+		}
 
 		//prepare (sort) vertices
 		this.vertex.sortVertices(prim);
@@ -158,10 +190,11 @@ cnvgl_renderer = (function() {
 			p = [xi, yi, 0, 1];
 			varying.prepare(frag, p);
 
-			frag.gl_FragDepth = varying.interpolate(verts[0].z, verts[1].z, verts[2].z);
-
-			if (frag.gl_FragDepth < depth[i]) {
-				continue;
+			if (this.state.depth.test) {
+				frag.gl_FragDepth = varying.interpolate(verts[0].z, verts[1].z, verts[2].z);
+				if (frag.gl_FragDepth < depth[i]) {
+					continue;
+				}
 			}
 
 			//interpolate varying

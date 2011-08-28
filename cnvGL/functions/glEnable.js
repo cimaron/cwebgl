@@ -21,12 +21,21 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 function glEnable(cap) {
+	var ctx;
+	
+	ctx = cnvgl_context.getCurrentContext();
+
 	switch (cap) {
+		case GL_CULL_FACE:
+			ctx.polygon.cullFlag = GL_TRUE;
+			break;
 		case GL_DEPTH_TEST:
-			cnvgl_context.getCurrentContext()[cap] = GL_TRUE;
-			return;
+			ctx.depth.test = GL_TRUE;
+			break;
+
 		default:
-			throw new Error('');
+			throw new Error('Bad Enable: ' + cap);
 	}
+
 }
 

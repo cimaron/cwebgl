@@ -22,13 +22,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 var cnvgl_context = (function() {
 							  
 	function Initializer() {
+
 		this.current_error_code = 0;
 	
-		this.enabled = {};
-	
+		//modes
+		this.depth = {};
+		this.polygon = {};
+
 		//Frame Buffers
 		this.clear_color = [0,0,0,0];
-		this.clear_depth = 0;	
+		this.clear_depth = 0;
 		this.color_buffer = null;
 		this.depth_buffer = null;
 	
@@ -37,7 +40,7 @@ var cnvgl_context = (function() {
 		this.viewport_y = 0;
 		this.viewport_w = 0;
 		this.viewport_h = 0;
-	
+
 		//Buffers
 		this.bound_buffers = {};
 	
@@ -54,9 +57,15 @@ var cnvgl_context = (function() {
 
 	cnvgl_context.cnvgl_context = function() {
 		var i;
-	
-		this.enabled[GL_DEPTH_TEST] = GL_TRUE;
-	
+
+		//depth modes
+		this.depth.test = GL_TRUE;
+
+		//polygon modes
+		this.polygon.cullFaceMode = GL_BACK;
+		this.polygon.cullFlag = GL_FALSE;
+		this.polygon.frontFace = GL_CCW;
+
 		this.bound_buffers[GL_ARRAY_BUFFER] = 0;
 		this.bound_buffers[GL_ELEMENT_ARRAY_BUFFER] = 0;		
 
