@@ -29,12 +29,9 @@ function glDrawArrays(mode, first, count) {
 	renderer = state.renderer;
 	program = state.current_program;
 
-	//var buffer = state.bound_buffers[GL_ARRAY_BUFFER];
-	//var buffer_object = cnvgl_objects[buffer];
-	//var data = buffer_object.data;
+	renderer.setMode(mode);
 
 	//gather vertex attributes
-
 	var vtas = state.vertex_attrib_arrays;
 
 	var active_attrs = [], attr_buffers = [];

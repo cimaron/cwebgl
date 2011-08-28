@@ -33,6 +33,8 @@ include('cnvGL/includes/linker/symbol.js');
 
 //Rendering Pipeline
 include('cnvGL/includes/rendering/renderer.js');
+include('cnvGL/includes/rendering/point.js');
+include('cnvGL/includes/rendering/triangle.js');
 include('cnvGL/includes/rendering/fragment.js');
 include('cnvGL/includes/rendering/vertex.js');
 include('cnvGL/includes/rendering/data.js');
@@ -50,6 +52,7 @@ include('cnvGL/functions/glCompileShader.js');
 include('cnvGL/functions/glCreateProgram.js');
 include('cnvGL/functions/glCreateShader.js');
 include('cnvGL/functions/glDrawArrays.js');
+include('cnvGL/functions/glDrawElements.js');
 include('cnvGL/functions/glEnable.js');
 include('cnvGL/functions/glEnableVertexAttribArray.js');
 include('cnvGL/functions/glGenBuffers.js');

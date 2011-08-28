@@ -29,6 +29,13 @@ cnvgl_renderer = (function() {
 		this.vertex = null;
 		this.fragment = null;
 		this.clipping = null;
+
+		//renderers
+		this.Point = null;
+		this.Triangle = null;
+		
+		this.mode = null;
+		
 	}
 
 	var cnvgl_renderer = jClass('cnvgl_renderer', Initializer);
@@ -39,12 +46,19 @@ cnvgl_renderer = (function() {
 		this.vertex = new cnvgl_rendering_vertex(this);
 		this.fragment = new cnvgl_rendering_fragment(this);
 		this.clipping = new cnvgl_rendering_clipping(this);
+
+		this.Point = new cnvgl_renderer_point();
+		this.Triangle = new cnvgl_renderer_triangle();
 	};
 
 	cnvgl_renderer.setProgram = function(program) {
 		this.program = program;	
 		this.vertex.setProgram(program.vertex_program);
 		this.fragment.setProgram(program.fragment_program);
+	};
+	
+	cnvgl_renderer.setMode = function(mode) {
+		this.mode = mode;
 	};
 
 	cnvgl_renderer.send = function(prim) {
@@ -56,10 +70,23 @@ cnvgl_renderer = (function() {
 	};
 
 	cnvgl_renderer.render = function(prim) {
-		this.renderTriangles(prim.vertices);
+		switch (this.mode) {
+			case GL_POINTS:
+				this.Point.points.call(this, prim.vertices);
+				break;
+			case GL_LINE_LOOP:
+				this.renderLineLoop(prim.vertices);
+				break;
+			case GL_TRIANGLES:
+				this.Triangle.triangles.call(this, prim.vertices);
+				break;
+			case GL_TRIANGLE_STRIP:
+				this.Triangle.triangleStrip.call(this, prim.vertices);
+				break;
+		}
 	};
 
-	cnvgl_renderer.faceDir = function(vertices) {
+	cnvgl_renderer.getPolygonFaceDir = function(vertices) {
 		var a, E, i, th, n, dir;
 		n = vertices.length;
 		E = 0;
@@ -81,139 +108,6 @@ cnvgl_renderer = (function() {
 
 		return dir;
 	};
-
-	cnvgl_renderer.renderTriangles = function(vertices) {
-		var i, prim;
-		for (i = 0; i < vertices.length - 2; i++) {
-
-			prim = new cnvgl_primitive();
-			prim.vertices[0] = vertices[i];
-			prim.vertices[1] = vertices[i + 1];
-			prim.vertices[2] = vertices[i + 2];
-			
-			this.clipping.clip(prim);
-
-			this.renderTriangle(prim);
-		}
-	};
-
-	cnvgl_renderer.renderTriangle = function(prim) {
-
-		var v1, v2, v3, dir;
-		var lsteps, rsteps, ysteps;
-		var frag, varying;
-
-		if (this.state.polygon.cullFlag) {
-			dir = this.isFrontFacing(prim.vertices);
-			if (!(
-				(dir > 0 && (this.state.polygon.cullFlag == GL_FALSE || this.state.polygon.cullFace == GL_FRONT)) ||
-				(dir < 0 && (this.state.polygon.cullFlag == GL_FALSE || this.state.polygon.cullFace == GL_BACK)))) {
-				return;	
-			}
-		}
-
-		//prepare (sort) vertices
-		this.vertex.sortVertices(prim);
-		if (!prim.direction) {
-			prim.direction = this.vertex.getDirection(prim.vertices);
-		}
-
-		dir = prim.direction;
-		v1 = prim.vertices[0];
-		if (dir > 0) {
-			v2 = prim.vertices[1];
-			v3 = prim.vertices[2];
-		} else {
-			v2 = prim.vertices[2];
-			v3 = prim.vertices[1];				
-		}
-
-		frag = new cnvgl_fragment();
-		varying = new cnvgl_rendering_varying(v1, v2, v3);
-
-		lsteps = this.vertex.slope(v1.sx, v1.sy, v3.sx, v3.sy);
-		rsteps = this.vertex.slope(v1.sx, v1.sy, v2.sx, v2.sy);
-
-		var yi_start, yi_end, yi, yp = false, x_start, x_end;
-
-		//top and bottom
-		yi_start = Math.ceil(v1.sy - 0.5) + 1;
-		yi_end = Math.ceil((v2.sy > v3.sy ? v2.sy : v3.sy) + 0.5) - 1;
-		x_start = v1.sx;
-		x_end = v1.sx;
-
-		//top line is horizontal, "fix" x_end
-		if (v1.sy == v2.sy) {
-			x_end = v2.sx;
-		}
-
-		//for each horizontal scanline
-		for (yi = yi_start; yi < yi_end; yi++) {
-
-			//next vertex (v1, v2) -> (v2, v3)
-			if (!yp && yi > v2.sy) {
-				lsteps = this.vertex.slope(v2.sx, v2.sy, v3.sx, v3.sy);
-				if (v1.sy != v2.sy) {
-					lsteps.x = -lsteps.x;
-				}
-				yp = true;
-			}
-
-			//next vertex (v1, v3) -> (v2, v3)
-			if (!yp && yi > v3.sy) {
-				rsteps = this.vertex.slope(v2.sx, v2.sy, v3.sx, v3.sy);
-				if (v1.sy != v2.sy) {
-					rsteps.x = -rsteps.x;
-				}
-				yp = true;
-			}
-
-			x_start += lsteps.x;
-			x_end += rsteps.x;
-
-			this.processScanline(yi, x_start, x_end, frag, varying, [v1, v2, v3]);
-		}
-	};
-
-	cnvgl_renderer.processScanline = function(yi, x_start, x_end, frag, varying, verts) {
-		var buffer, vw, xi, i, v, p;
-
-		buffer = this.state.color_buffer;
-		depth = this.state.depth_buffer;
-
-		vw = this.state.viewport_w;
-
-		for (xi = Math.floor(x_start); xi < x_end; xi++) {
-
-			i = (vw * yi + xi);
-
-			p = [xi, yi, 0, 1];
-			varying.prepare(frag, p);
-
-			if (this.state.depth.test) {
-				frag.gl_FragDepth = varying.interpolate(verts[0].z, verts[1].z, verts[2].z);
-				if (frag.gl_FragDepth < depth[i]) {
-					continue;
-				}
-			}
-
-			//interpolate varying
-			for (v in varying.varying) {
-				frag.varying[v] = varying.interpolate(varying.f1[v], varying.f2[v], varying.f3[v]);
-			}
-
-			this.fragment.process(frag);
-
-			depth[i] = frag.gl_FragDepth;
-
-			i *= 4;
-			buffer[i] = frag.r;
-			buffer[i + 1] = frag.g;
-			buffer[i + 2] = frag.b;
-			//if (alpha, do calculation next)
-		}		
-	};
-
 
 	return cnvgl_renderer.Constructor;
 
