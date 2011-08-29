@@ -24,15 +24,22 @@ var cWebGLRenderingContext;
 
 (function() {
 
-	var getNativeContext = HTMLCanvasElement.prototype.getContext;;
+	var getNativeContext, hasCanvas;
+	
+	hasCanvas = (typeof HTMLCanvasElement != 'undefined');
+	if (hasCanvas) {
+		getNativeContext = HTMLCanvasElement.prototype.getContext;
+	}
 
 	function hook() {
-		HTMLCanvasElement.prototype.getContext = function(contextId, native) {
-			if (contextId == 'experimental-webgl' && !native) {
-				return cWebGLRenderingContext.create(this);
-			}
-			return getNativeContext.call(this, contextId);
-		};
+		if (hasCanvas) {
+			HTMLCanvasElement.prototype.getContext = function(contextId, native) {
+				if (contextId == 'experimental-webgl' && !native) {
+					return cWebGLRenderingContext.create(this);
+				}
+				return getNativeContext.call(this, contextId);
+			};
+		}
 	}
 
 	try {
