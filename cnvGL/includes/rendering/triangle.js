@@ -162,13 +162,12 @@ cnvgl_renderer_triangle = function() {
 			point = [xi, yi, 0, 1];
 			varying.prepare(frag, point);
 
-			if (this.state.depth.test) {
+			if (this.state.depth.test == GL_TRUE) {
 				frag.gl_FragDepth = varying.interpolate(this.t.vertex_z[0], this.t.vertex_z[1], this.t.vertex_z[2]);
-				if (frag.gl_FragDepth < depth_buffer[id]) {
-					continue;
+				if (!this.checkDepth(id, frag.gl_FragDepth)) {
+					continue;	
 				}
 				depth_buffer[id] = frag.gl_FragDepth;
-				id++;
 			}
 
 			//interpolate varying
@@ -181,6 +180,8 @@ cnvgl_renderer_triangle = function() {
 			color_buffer[ib] = frag.r;
 			color_buffer[ib + 1] = frag.g;
 			color_buffer[ib + 2] = frag.b;
+
+			id++;
 			ib += 4;
 		}		
 	};

@@ -119,6 +119,41 @@ cnvgl_renderer = (function() {
 		return false;
 	};
 
+	cnvgl_renderer.checkDepth = function(i, z) {
+		var mode, depth_buffer, pass;
+		mode = this.state.depth.func;
+		depth_buffer = this.state.depth_buffer;
+		switch (mode) {
+			case GL_NEVER:
+				pass = false;
+				break;
+			case GL_ALWAYS:
+				pass = true;
+				break;
+			case GL_LESS:
+				pass = z < depth_buffer[i];
+				break;
+			case GL_LEQUAL:
+				pass = z < depth_buffer[i];
+				break;
+			case GL_EQUAL:
+				pass = z == depth_buffer[i];
+				break;
+			case GL_GREATER:
+				pass = z > depth_buffer[i];
+				break;
+			case GL_GEQUAL:
+				pass = z >= depth_buffer[i];
+				break;
+			case GL_NOTEQUAL:
+				pass = z != depth_buffer[i];
+				break;
+			default:
+				pass = true;
+		}		
+		return pass;
+	};
+
 	return cnvgl_renderer.Constructor;
 
 }());

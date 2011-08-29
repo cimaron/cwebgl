@@ -31,7 +31,6 @@ var cnvgl_context = (function() {
 
 		//Frame Buffers
 		this.clear_color = [0,0,0,0];
-		this.clear_depth = 0;
 		this.color_buffer = null;
 		this.depth_buffer = null;
 	
@@ -59,7 +58,9 @@ var cnvgl_context = (function() {
 		var i;
 
 		//depth modes
-		this.depth.test = GL_TRUE;
+		this.depth.clear = 1.0;
+		this.depth.func = GL_LESS;
+		this.depth.test = GL_FALSE;
 
 		//polygon modes
 		this.polygon.cullFaceMode = GL_BACK;

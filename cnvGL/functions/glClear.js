@@ -53,9 +53,9 @@ function glClear(mask) {
 	//GL_DEPTH_BUFFER_BIT
 	if (mask & GL_DEPTH_BUFFER_BIT) {
 		buffer = state.depth_buffer;
-		clear = state.clear_depth;
+		clear = state.depth.clear;
 		for (i = 0, l = buffer.length; i < l; i ++) {
-			buffer[i] = clear[0];
+			buffer[i] = clear;
 		}
 	}
 
