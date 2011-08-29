@@ -35,6 +35,7 @@ include('cnvGL/includes/linker/symbol.js');
 include('cnvGL/includes/rendering/renderer.js');
 include('cnvGL/includes/rendering/point.js');
 include('cnvGL/includes/rendering/triangle.js');
+include('cnvGL/includes/rendering/line.js');
 include('cnvGL/includes/rendering/fragment.js');
 include('cnvGL/includes/rendering/vertex.js');
 include('cnvGL/includes/rendering/data.js');

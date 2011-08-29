@@ -116,7 +116,7 @@ cnvgl_rendering_vertex = (function() {
 		prim.sorted = true;
 	};
 	
-	cnvgl_rendering_vertex.slopeX = function(x1, y1, x2, y2) {
+	cnvgl_rendering_vertex.slope = function(x1, y1, x2, y2) {
 		x1 = x2 - x1;
 		y1 = y2 - y1;
 		//divide by zero should return Nan

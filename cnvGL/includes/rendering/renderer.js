@@ -33,7 +33,8 @@ cnvgl_renderer = (function() {
 		//renderers
 		this.Point = null;
 		this.Triangle = null;
-		
+		this.Line = null;
+
 		//current rendering state		
 		this.t = {};
 		
@@ -52,6 +53,7 @@ cnvgl_renderer = (function() {
 
 		this.Point = new cnvgl_renderer_point();
 		this.Triangle = new cnvgl_renderer_triangle();
+		this.Line = new cnvgl_renderer_line();
 	};
 
 	cnvgl_renderer.setProgram = function(program) {
@@ -77,8 +79,14 @@ cnvgl_renderer = (function() {
 			case GL_POINTS:
 				this.Point.points.call(this, prim.vertices);
 				break;
+			case GL_LINES:
+				this.Line.lines.call(this, prim.vertices);
+				break;
+			case GL_LINE_STRIP:
+				this.Line.lineStrip.call(this, prim.vertices);
+				break;
 			case GL_LINE_LOOP:
-				this.renderLineLoop(prim.vertices);
+				this.Line.lineLoop.call(this, prim.vertices);
 				break;
 			case GL_TRIANGLES:
 				this.Triangle.triangles.call(this, prim.vertices);

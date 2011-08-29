@@ -88,9 +88,9 @@ cnvgl_renderer_triangle = function() {
 		this.t.varying = new cnvgl_rendering_varying(v1, v2, v3);
 		this.t.vertex_z = [v1.z, v2.z, v3.z];
 
-		dx1 = this.vertex.slopeX(v1.sx, v1.sy, v2.sx, v2.sy);
-		dx2 = this.vertex.slopeX(v1.sx, v1.sy, v3.sx, v3.sy);
-		dx3 = this.vertex.slopeX(v2.sx, v2.sy, v3.sx, v3.sy);
+		dx1 = this.vertex.slope(v1.sx, v1.sy, v2.sx, v2.sy);
+		dx2 = this.vertex.slope(v1.sx, v1.sy, v3.sx, v3.sy);
+		dx3 = this.vertex.slope(v2.sx, v2.sy, v3.sx, v3.sy);
 
 		//top and bottom bounds
 		yi_start = Math.floor(v1.sy) + .5;
