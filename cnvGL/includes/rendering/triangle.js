@@ -62,112 +62,112 @@ cnvgl_renderer_triangle = function() {
 
 	cnvgl_renderer_triangle.Constructor.triangle = function(prim) {
 
-		var v1, v2, v3, dir;
-		var lsteps, rsteps, ysteps;
 		var frag, varying;
+		var v1, v2, v3, dir;
+		var yi_start, yi_end, yi, x_start, x_end, vpass = false;
+		var dx1, dx2, dx3;
 
-		if (this.state.polygon.cullFlag) {
-			dir = this.getPolygonFaceDir(prim.vertices);
-			if (!(
-				(dir > 0 && (this.state.polygon.cullFlag == GL_FALSE || this.state.polygon.cullFace == GL_FRONT)) ||
-				(dir < 0 && (this.state.polygon.cullFlag == GL_FALSE || this.state.polygon.cullFace == GL_BACK)))) {
-				return;	
-			}
+		if (this.checkCull(prim)) {
+			return;
 		}
 
 		//prepare (sort) vertices
 		this.vertex.sortVertices(prim);
-		if (!prim.direction) {
-			prim.direction = this.vertex.getDirection(prim.vertices);
-		}
+		dir = prim.getDirection();
 
-		dir = prim.direction;
 		v1 = prim.vertices[0];
-		if (dir > 0) {
+		if (dir < 0) {
 			v2 = prim.vertices[1];
 			v3 = prim.vertices[2];
 		} else {
 			v2 = prim.vertices[2];
-			v3 = prim.vertices[1];				
+			v3 = prim.vertices[1];		
 		}
 
-		/*
-		console.log(Math.round(v1.sx), Math.round(v1.sy));
-		console.log(Math.round(v2.sx), Math.round(v2.sy));
-		console.log(Math.round(v3.sx), Math.round(v3.sy));
-		console.log('----');
-		*/
+		this.t.frag = new cnvgl_fragment();
+		this.t.varying = new cnvgl_rendering_varying(v1, v2, v3);
+		this.t.vertex_z = [v1.z, v2.z, v3.z];
 
-		frag = new cnvgl_fragment();
-		varying = new cnvgl_rendering_varying(v1, v2, v3);
+		dx1 = this.vertex.slopeX(v1.sx, v1.sy, v2.sx, v2.sy);
+		dx2 = this.vertex.slopeX(v1.sx, v1.sy, v3.sx, v3.sy);
+		dx3 = this.vertex.slopeX(v2.sx, v2.sy, v3.sx, v3.sy);
 
-		lsteps = this.vertex.slope(v1.sx, v1.sy, v3.sx, v3.sy);
-		rsteps = this.vertex.slope(v1.sx, v1.sy, v2.sx, v2.sy);
-
-		var yi_start, yi_end, yi, yp = false, x_start, x_end;
-
-		//top and bottom
-		yi_start = Math.ceil(v1.sy - 0.5) + 1;
-		yi_end = Math.ceil((v2.sy > v3.sy ? v2.sy : v3.sy) + 0.5) - 1;
-		x_start = v1.sx;
-		x_end = v1.sx;
-
-		//top line is horizontal, "fix" x_end
-		if (v1.sy == v2.sy) {
-			x_end = v2.sx;
+		//top and bottom bounds
+		yi_start = Math.floor(v1.sy) + .5;
+		if (yi_start < v1.sy) {
+			yi_start++;
 		}
+		if (v3.sy > v2.sy) {
+			yi = v3.sy;
+		} else {
+			yi = v2.sy;
+		}
+		yi_end = Math.ceil(yi) - .5;
+		if (yi_end >= yi) {
+			yi_end--;
+		}
+
+		x_start = v1.sx + (yi_start - v1.sy) * dx1;
+		x_end = v1.sx + (yi_start - v1.sy) * dx2;
 
 		//for each horizontal scanline
 		for (yi = yi_start; yi < yi_end; yi++) {
 
 			//next vertex (v1, v2) -> (v2, v3)
-			if (!yp && yi > v2.sy) {
-				lsteps = this.vertex.slope(v2.sx, v2.sy, v3.sx, v3.sy);
-				if (v1.sy != v2.sy) {
-					lsteps.x = -lsteps.x;
-				}
-				yp = true;
+			if (!vpass && yi > v2.sy) {
+				x_start = v3.sx + (yi - v3.sy) * dx3;
+				dx1 = dx3;
+				vpass = true;
 			}
 
 			//next vertex (v1, v3) -> (v2, v3)
-			if (!yp && yi > v3.sy) {
-				rsteps = this.vertex.slope(v2.sx, v2.sy, v3.sx, v3.sy);
-				if (v1.sy != v2.sy) {
-					rsteps.x = -rsteps.x;
-				}
-				yp = true;
+			if (!vpass && yi > v3.sy) {
+				x_end = v3.sx + (yi - v3.sy) * dx3;
+				dx2 = dx3;
+				vpass = true;
 			}
 
-			x_start += lsteps.x;
-			x_end += rsteps.x;
+			this.Triangle.scanline.call(this, yi, x_start, x_end);
 
-			this.Triangle.scanline.call(this, yi, x_start, x_end, frag, varying, [v1, v2, v3]);
+			x_start += dx1;
+			x_end += dx2;
 		}
 	};
 
-	cnvgl_renderer_triangle.Constructor.scanline = function(yi, x_start, x_end, frag, varying, verts) {
-		var buffer, vw, xi, id, ib, v, p;
+	cnvgl_renderer_triangle.Constructor.scanline = function(yi, x_start, x_end) {
+		var color_buffer, depth_buffer, varying, frag;
+		var id, ib, point;
+		var xi_start, xi_end, xi;
+		
+		color_buffer = this.state.color_buffer;
+		depth_buffer = this.state.depth_buffer;
+		frag = this.t.frag;
+		varying = this.t.varying;
 
-		buffer = this.state.color_buffer;
-		depth = this.state.depth_buffer;
+		//left and right bounds
+		xi_start = Math.floor(x_start) + .5;
+		if (xi_start < x_start) {
+			xi_start++;	
+		}
+		xi_end = Math.ceil(x_end) - .5;
+		if (xi_end >= x_end) {
+			xi_end--;	
+		}
 
-		vw = this.state.viewport_w;
-
-		x_start = Math.floor(x_start);
-		id = (vw * yi + x_start);
+		id = this.state.viewport_w * (yi - .5) + (xi_start - .5);
 		ib = id * 4;
 
-		for (xi = x_start; xi < x_end; xi++) {
+		for (xi = xi_start; xi <= xi_end; xi++) {
 
-			p = [xi, yi, 0, 1];
-			varying.prepare(frag, p);
+			point = [xi, yi, 0, 1];
+			varying.prepare(frag, point);
 
 			if (this.state.depth.test) {
-				frag.gl_FragDepth = varying.interpolate(verts[0].z, verts[1].z, verts[2].z);
-				if (frag.gl_FragDepth < depth[id]) {
+				frag.gl_FragDepth = varying.interpolate(this.t.vertex_z[0], this.t.vertex_z[1], this.t.vertex_z[2]);
+				if (frag.gl_FragDepth < depth_buffer[id]) {
 					continue;
 				}
-				depth[id] = frag.gl_FragDepth;
+				depth_buffer[id] = frag.gl_FragDepth;
 				id++;
 			}
 
@@ -178,12 +178,10 @@ cnvgl_renderer_triangle = function() {
 
 			this.fragment.process(frag);
 
-			buffer[ib] = frag.r;
-			buffer[ib + 1] = frag.g;
-			buffer[ib + 2] = frag.b;
-			ib+=4;
-
-			//if (alpha, do calculation next)
+			color_buffer[ib] = frag.r;
+			color_buffer[ib + 1] = frag.g;
+			color_buffer[ib + 2] = frag.b;
+			ib += 4;
 		}		
 	};
 

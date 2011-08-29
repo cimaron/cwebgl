@@ -34,8 +34,11 @@ cnvgl_renderer = (function() {
 		this.Point = null;
 		this.Triangle = null;
 		
-		this.mode = null;
+		//current rendering state		
+		this.t = {};
 		
+		//simple
+		this.mode = null;
 	}
 
 	var cnvgl_renderer = jClass('cnvgl_renderer', Initializer);
@@ -86,27 +89,26 @@ cnvgl_renderer = (function() {
 		}
 	};
 
-	cnvgl_renderer.getPolygonFaceDir = function(vertices) {
-		var a, E, i, th, n, dir;
-		n = vertices.length;
-		E = 0;
-
-		//FrontFace state setting
-		dir = 0;
-
-		for (i = 0; i < n; i++) {
-			th = (i + 1) % n;
-			E += (vertices[i].sx * vertices[th].sy - vertices[th].sx * vertices[i].sy);
-		}
-
-		E = E > 0 ? 1 : -1;
-		dir = dir ? E : -E;
-
+	cnvgl_renderer.getPolygonFaceDir = function(prim) {
+		var dir;
+		dir = prim.getDirection();
 		if (this.state.polygon.frontFace) {
 			dir = -dir;	
 		}
-
 		return dir;
+	};
+
+	cnvgl_renderer.checkCull = function(prim) {
+		var dir;
+		if (this.state.polygon.cullFlag) {
+			dir = this.getPolygonFaceDir(prim);
+			if (!(
+				(dir > 0 && (this.state.polygon.cullFlag == GL_FALSE || this.state.polygon.cullFace == GL_FRONT)) ||
+				(dir < 0 && (this.state.polygon.cullFlag == GL_FALSE || this.state.polygon.cullFace == GL_BACK)))) {
+				return true;
+			}
+		}
+		return false;
 	};
 
 	return cnvgl_renderer.Constructor;

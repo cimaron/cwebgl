@@ -115,62 +115,13 @@ cnvgl_rendering_vertex = (function() {
 		prim.vertices = vertices;
 		prim.sorted = true;
 	};
-
-	cnvgl_rendering_vertex.getDirection = function(vs) {
-
-		var v1, v2, v3, dir;
-		if (vs.length < 3) {
-			return;
-		}
-
-		v1 = vs[0];
-		v2 = vs[1];
-		v3 = vs[vs.length - 1];
-
-		//determine direction (cw vs ccw)
-
-		//(v1, v2) is horizontal, can get direction directly from x values
-		if (v1.sy == v2.sy) {
-			dir = (v1.sx < v2.sx) ? 1 : -1;
-			return dir;
-		}
-
-		//(v1, vlast) is horizontal, can get direction directly from x values
-		if (v1.sy == v3.sy) {
-			dir = (v1.sx < v3.sx) ? -1 : 1;
-			return dir;
-		}
-
-		//pick a y value (v1 is top, so v2.sy > v1.sy and vlast.sy > v1.sy)
-		var v2ya, v3ya, yi, dxl, dxr, xl, xr;
-
-		v2ya = (v1.sy + v2.sy / 2) - v1.sy;
-		v3ya = (v1.sy + v3.sy / 2) - v1.sy;
-
-		//lower one should fall on both edges 
-		yi = Math.min(v2ya, v3ya);
-
-		//compute x value on both edges
-		dxl = (v2.sx - v1.sx) / (v2.sy - v1.sy);
-		dxr = (v3.sx - v1.sx) / (v3.sy - v1.sy);
-
-		dir = (dxl < dxr) ? -1 : 1;
-
-		return dir;
+	
+	cnvgl_rendering_vertex.slopeX = function(x1, y1, x2, y2) {
+		x1 = x2 - x1;
+		y1 = y2 - y1;
+		//divide by zero should return Nan
+		return (x1 / y1);
 	};
-
-	cnvgl_rendering_vertex.slope = function(x1, y1, x2, y2) {
-		var i, slope = {};
-		var x, y;
-		x = x1 - x2;
-		y = y1 - y2;
-
-		//need to do check for zero?
-		slope.x = y != 0 ? x / y : 0;
-		slope.y = x != 0 ? y / x : 0;
-		return slope;
-	};
-
 
 	return cnvgl_rendering_vertex.Constructor;
 

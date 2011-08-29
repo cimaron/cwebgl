@@ -37,14 +37,25 @@ cnvgl_primitive = (function() {
 	cnvgl_primitive.cnvgl_primitive = function() {
 	};
 
-	cnvgl_primitive.perspective = function() {
-		var i, v;
-		for (i = 0; i < this.vertices.length; i++) {
-			v = this.vertices[i];
-			v.x /= v.w;
-			v.y /= v.w;
-			v.z /= v.w;
+
+	cnvgl_primitive.getDirection = function() {
+		var a, E, i, th, n;
+
+		if (this.direction) {
+			return direction;	
 		}
+
+		n = this.vertices.length;
+		E = 0;
+		for (i = 0; i < n; i++) {
+			th = (i + 1) % n;
+			E += (this.vertices[i].sx * this.vertices[th].sy - this.vertices[th].sx * this.vertices[i].sy);
+		}
+		E = E > 0 ? 1 : -1;
+		
+		this.direction = E;
+
+		return this.direction;
 	};
 
 	return cnvgl_primitive.Constructor;
