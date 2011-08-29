@@ -39,6 +39,7 @@ function cWebGLIncludeFile($file) {
 	$output = file_get_contents($file);
 	$output = preg_replace('#//.*\n#', "\n", $output);	
 	$output = preg_replace('#/\*(.|[\r\n])*?\*/#', '', $output);
+	$output = preg_replace('#\n\n+#', "\n", $output);
 
 	$output = preg_replace_callback('#include\(\'([^\']+)\'\);#', 'cWebGLIncludeCallback', $output);
 	return $output;

@@ -24,25 +24,24 @@ var cWebGLRenderingContext;
 
 (function() {
 
-	//@todo: implement per spec (2.1)
-	function getContext(ctx, skip) {
-		if (ctx == 'experimental-webgl' && !skip) {
-			return cWebGLRenderingContext.create(this);
-		}
-		return this._getContext(ctx);
+	var getNativeContext = HTMLCanvasElement.prototype.getContext;;
+
+	function hook() {
+		HTMLCanvasElement.prototype.getContext = function(contextId, native) {
+			if (contextId == 'experimental-webgl' && !native) {
+				return cWebGLRenderingContext.create(this);
+			}
+			return getNativeContext.call(this, contextId);
+		};
 	}
 
-	function getElementById(id) {
-		var el = document._getElementById(id);
-		if (el && el.getContext) {
-			el._getContext = el.getContext;
-			el.getContext = getContext;
+	try {
+		if (!document.createElement('canvas').getContext('experimental-webgl')) {
+			hook();
 		}
-		return el;		
+	} catch (e) {
+		hook();
 	}
-
-	document._getElementById = document.getElementById;
-	document.getElementById = getElementById;
 
 }());
 
