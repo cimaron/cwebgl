@@ -29,15 +29,13 @@ cnvgl_renderer = (function() {
 		this.vertex = null;
 		this.fragment = null;
 		this.clipping = null;
+		this.interpolate = null;
 
 		//renderers
 		this.Point = null;
 		this.Triangle = null;
 		this.Line = null;
 
-		//current rendering state		
-		this.t = {};
-		
 		//simple
 		this.mode = null;
 	}
@@ -50,6 +48,7 @@ cnvgl_renderer = (function() {
 		this.vertex = new cnvgl_rendering_vertex(this);
 		this.fragment = new cnvgl_rendering_fragment(this);
 		this.clipping = new cnvgl_rendering_clipping(this);
+		this.interpolate = new cnvgl_rendering_interpolate(this);
 
 		this.Point = new cnvgl_renderer_point();
 		this.Triangle = new cnvgl_renderer_triangle();

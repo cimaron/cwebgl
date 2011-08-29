@@ -81,12 +81,14 @@ cnvgl_renderer_triangle = function() {
 			v3 = prim.vertices[2];
 		} else {
 			v2 = prim.vertices[2];
-			v3 = prim.vertices[1];		
+			v3 = prim.vertices[1];
 		}
 
-		this.t.frag = new cnvgl_fragment();
-		this.t.varying = new cnvgl_rendering_varying(v1, v2, v3);
-		this.t.vertex_z = [v1.z, v2.z, v3.z];
+		this.Triangle.fragment = new cnvgl_fragment();
+		this.Triangle.v1 = v1;
+		this.Triangle.v2 = v2;
+		this.Triangle.v3 = v3;
+		this.interpolate.setVertices(v1, v2, v3);
 
 		dx1 = this.vertex.slope(v1.sx, v1.sy, v2.sx, v2.sy);
 		dx2 = this.vertex.slope(v1.sx, v1.sy, v3.sx, v3.sy);
@@ -135,14 +137,13 @@ cnvgl_renderer_triangle = function() {
 	};
 
 	cnvgl_renderer_triangle.Constructor.scanline = function(yi, x_start, x_end) {
-		var color_buffer, depth_buffer, varying, frag;
+		var color_buffer, depth_buffer, frag;
 		var id, ib, point;
 		var xi_start, xi_end, xi;
-		
+
 		color_buffer = this.state.color_buffer;
 		depth_buffer = this.state.depth_buffer;
-		frag = this.t.frag;
-		varying = this.t.varying;
+		frag = this.Triangle.fragment;
 
 		//left and right bounds
 		xi_start = Math.floor(x_start) + .5;
@@ -160,19 +161,19 @@ cnvgl_renderer_triangle = function() {
 		for (xi = xi_start; xi <= xi_end; xi++) {
 
 			point = [xi, yi, 0, 1];
-			varying.prepare(frag, point);
+			this.interpolate.setPoint(point);
 
 			if (this.state.depth.test == GL_TRUE) {
-				frag.gl_FragDepth = varying.interpolate(this.t.vertex_z[0], this.t.vertex_z[1], this.t.vertex_z[2]);
+				frag.gl_FragDepth = this.interpolate.interpolate(this.Triangle.v1.z, this.Triangle.v2.z, this.Triangle.v3.z);
 				if (!this.checkDepth(id, frag.gl_FragDepth)) {
-					continue;	
+					continue;
 				}
 				depth_buffer[id] = frag.gl_FragDepth;
 			}
 
 			//interpolate varying
-			for (v in varying.varying) {
-				frag.varying[v] = varying.interpolate(varying.f1[v], varying.f2[v], varying.f3[v]);
+			for (v in this.Triangle.v1.varying) {
+				frag.varying[v] = this.interpolate.interpolate(this.Triangle.v1.varying[v], this.Triangle.v2.varying[v], this.Triangle.v3.varying[v]);
 			}
 
 			this.fragment.process(frag);

@@ -40,7 +40,7 @@ include('cnvGL/includes/rendering/fragment.js');
 include('cnvGL/includes/rendering/vertex.js');
 include('cnvGL/includes/rendering/data.js');
 include('cnvGL/includes/rendering/clipping.js');
-include('cnvGL/includes/rendering/varying.js');
+include('cnvGL/includes/rendering/interpolate.js');
 
 include('cnvGL/functions/glAttachShader.js');
 include('cnvGL/functions/glBindBuffer.js');
