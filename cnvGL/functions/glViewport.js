@@ -29,9 +29,9 @@ function glViewport(x, y, width, height) {
 		return;
 	}
 
-	state.viewport_x = x;
-	state.viewport_y = y;
-	state.viewport_w = width;
-	state.viewport_h = height;
+	state.viewport.x = x;
+	state.viewport.y = y;
+	state.viewport.w = width;
+	state.viewport.h = height;
 }
 

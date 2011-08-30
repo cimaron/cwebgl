@@ -25,20 +25,15 @@ var cnvgl_context = (function() {
 
 		this.current_error_code = 0;
 	
-		//modes
+		//states
 		this.depth = {};
 		this.polygon = {};
+		this.viewport = {};
 
 		//Frame Buffers
 		this.clear_color = [0,0,0,0];
 		this.color_buffer = null;
 		this.depth_buffer = null;
-	
-		//Viewport
-		this.viewport_x = 0;
-		this.viewport_y = 0;
-		this.viewport_w = 0;
-		this.viewport_h = 0;
 
 		//Buffers
 		this.bound_buffers = {};
@@ -57,15 +52,23 @@ var cnvgl_context = (function() {
 	cnvgl_context.cnvgl_context = function() {
 		var i;
 
-		//depth modes
+		//depth state
 		this.depth.clear = 1.0;
 		this.depth.func = GL_LESS;
 		this.depth.test = GL_FALSE;
 
-		//polygon modes
+		//polygon state
 		this.polygon.cullFaceMode = GL_BACK;
 		this.polygon.cullFlag = GL_FALSE;
 		this.polygon.frontFace = GL_CCW;
+
+		//viewport state
+		this.viewport.near = 0;
+		this.viewport.far = 1;
+		this.viewport.x = 0;
+		this.viewport.y = 0;
+		this.viewport.w = 0;
+		this.viewport.h = 0;
 
 		this.bound_buffers[GL_ARRAY_BUFFER] = 0;
 		this.bound_buffers[GL_ELEMENT_ARRAY_BUFFER] = 0;		

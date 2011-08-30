@@ -53,8 +53,8 @@ cnvgl_renderer_line = function() {
 
 	cnvgl_renderer_line.Constructor.line = function(v1, v2) {
 		var dx, dy, dir;
-		dx = this.vertex.slope(v1.sx, v1.sy, v2.sx, v2.sy);
-		dy = this.vertex.slope(v1.sy, v1.sx, v2.sy, v2.sx);
+		dx = this.vertex.slope(v1.xw, v1.yw, v2.xw, v2.yw);
+		dy = this.vertex.slope(v1.yw, v1.xw, v2.yw, v2.xw);
 		dir = Math.abs(dx) > Math.abs(dy) ? 1 : -1; //x-major = 1 : y-major = -1
 
 		if (dir > 0) {
@@ -71,20 +71,20 @@ cnvgl_renderer_line = function() {
 		var ib, v;
 
 		//make v1 left vertex
-		if (v2.sx < v1.sx) {
+		if (v2.xw < v1.xw) {
 			v = v2; v2 = v1; v1 = v;
 			//dy = -dy;
 		}
 
-		x_start = v1.sx;
-		x_end = v2.sx;
+		x_start = v1.xw;
+		x_end = v2.xw;
 		xi_start = Math.ceil(x_start);
 		xi_end = Math.floor(x_end);
 
-		y = v1.sy + (xi_start - v1.sx) * dy;
+		y = v1.yw + (xi_start - v1.xw) * dy;
 
 		color_buffer = this.state.color_buffer;
-		view_width = this.state.viewport_w;
+		view_width = this.state.viewport.w;
 		frag = new cnvgl_fragment();
 		for (v in v1.varying) {
 			frag.varying[v] = v1.varying[v];
@@ -112,20 +112,20 @@ cnvgl_renderer_line = function() {
 		var ib, v;
 
 		//make v1 top vertex
-		if (v2.sy < v1.sy) {
+		if (v2.yw < v1.yw) {
 			v = v2; v2 = v1; v1 = v;
 			//dy = -dy;
 		}
 
-		y_start = v1.sy;
-		y_end = v2.sy;
+		y_start = v1.yw;
+		y_end = v2.yw;
 		yi_start = Math.ceil(y_start);
 		yi_end = Math.floor(y_end);
 
-		x = v1.sx + (yi_start - v1.sy) * dx;
+		x = v1.xw + (yi_start - v1.yw) * dx;
 
 		color_buffer = this.state.color_buffer;
-		view_width = this.state.viewport_w;
+		view_width = this.state.viewport.w;
 		frag = new cnvgl_fragment();
 		for (v in v1.varying) {
 			frag.varying[v] = v1.varying[v];

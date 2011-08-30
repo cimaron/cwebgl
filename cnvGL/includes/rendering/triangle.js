@@ -90,41 +90,41 @@ cnvgl_renderer_triangle = function() {
 		this.Triangle.v3 = v3;
 		this.interpolate.setVertices(v1, v2, v3);
 
-		dx1 = this.vertex.slope(v1.sx, v1.sy, v2.sx, v2.sy);
-		dx2 = this.vertex.slope(v1.sx, v1.sy, v3.sx, v3.sy);
-		dx3 = this.vertex.slope(v2.sx, v2.sy, v3.sx, v3.sy);
+		dx1 = this.vertex.slope(v1.xw, v1.yw, v2.xw, v2.yw);
+		dx2 = this.vertex.slope(v1.xw, v1.yw, v3.xw, v3.yw);
+		dx3 = this.vertex.slope(v2.xw, v2.yw, v3.xw, v3.yw);
 
 		//top and bottom bounds
-		yi_start = Math.floor(v1.sy) + .5;
-		if (yi_start < v1.sy) {
+		yi_start = Math.floor(v1.yw) + .5;
+		if (yi_start < v1.yw) {
 			yi_start++;
 		}
-		if (v3.sy > v2.sy) {
-			yi = v3.sy;
+		if (v3.yw > v2.yw) {
+			yi = v3.yw;
 		} else {
-			yi = v2.sy;
+			yi = v2.yw;
 		}
 		yi_end = Math.ceil(yi) - .5;
 		if (yi_end >= yi) {
 			yi_end--;
 		}
 
-		x_start = v1.sx + (yi_start - v1.sy) * dx1;
-		x_end = v1.sx + (yi_start - v1.sy) * dx2;
+		x_start = v1.xw + (yi_start - v1.yw) * dx1;
+		x_end = v1.xw + (yi_start - v1.yw) * dx2;
 
 		//for each horizontal scanline
 		for (yi = yi_start; yi < yi_end; yi++) {
 
 			//next vertex (v1, v2) -> (v2, v3)
-			if (!vpass && yi > v2.sy) {
-				x_start = v3.sx + (yi - v3.sy) * dx3;
+			if (!vpass && yi > v2.yw) {
+				x_start = v3.xw + (yi - v3.yw) * dx3;
 				dx1 = dx3;
 				vpass = true;
 			}
 
 			//next vertex (v1, v3) -> (v2, v3)
-			if (!vpass && yi > v3.sy) {
-				x_end = v3.sx + (yi - v3.sy) * dx3;
+			if (!vpass && yi > v3.yw) {
+				x_end = v3.xw + (yi - v3.yw) * dx3;
 				dx2 = dx3;
 				vpass = true;
 			}
@@ -155,16 +155,15 @@ cnvgl_renderer_triangle = function() {
 			xi_end--;	
 		}
 
-		id = this.state.viewport_w * (yi - .5) + (xi_start - .5);
+		id = this.state.viewport.w * (yi - .5) + (xi_start - .5);
 		ib = id * 4;
 
 		for (xi = xi_start; xi <= xi_end; xi++) {
 
 			point = [xi, yi, 0, 1];
 			this.interpolate.setPoint(point);
-
 			if (this.state.depth.test == GL_TRUE) {
-				frag.gl_FragDepth = this.interpolate.interpolate(this.Triangle.v1.z, this.Triangle.v2.z, this.Triangle.v3.z);
+				frag.gl_FragDepth = this.interpolate.interpolate(this.Triangle.v1.zw, this.Triangle.v2.zw, this.Triangle.v3.zw);
 				if (!this.checkDepth(id, frag.gl_FragDepth)) {
 					continue;
 				}

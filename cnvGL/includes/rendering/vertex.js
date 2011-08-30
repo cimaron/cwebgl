@@ -73,11 +73,13 @@ cnvgl_rendering_vertex = (function() {
 		}
 	};
 
-	cnvgl_rendering_vertex.transformScreen = function(vertex) {		
-		var w = this.renderer.state.viewport_w;
-		var h = this.renderer.state.viewport_h;
-		vertex.sx = (vertex.x + 1) * (w / 2);
-		vertex.sy = (1 - vertex.y) * (h / 2);
+	cnvgl_rendering_vertex.transformScreen = function(v) {		
+		var vp;
+		vp = this.renderer.state.viewport;
+		v.xw = (v.x + 1) * (vp.w / 2);
+		//v.yw = (v.y + 1) * (vp.h / 2);
+		v.yw = (1 - v.y) * (vp.h / 2);
+		v.zw = ((vp.far - vp.near) / 2) * v.z + ((vp.near + vp.far) / 2);
 	};
 
 	cnvgl_rendering_vertex.sortVertices = function(prim) {
@@ -96,9 +98,9 @@ cnvgl_rendering_vertex = (function() {
 
 		//find top vertex
 		for (i = 0; i < vs.length; i++) {
-			if (vs[i].sy < ymin || (vs[i].sy == ymin && vs[i].sx < yminx)) {
-				ymin = vs[i].sy;
-				yminx = vs[i].sx;
+			if (vs[i].yw < ymin || (vs[i].yw == ymin && vs[i].xw < yminx)) {
+				ymin = vs[i].yw;
+				yminx = vs[i].xw;
 				yi = i;
 			}
 		}

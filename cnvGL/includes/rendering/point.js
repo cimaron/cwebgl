@@ -41,9 +41,9 @@ cnvgl_renderer_point = function() {
 		var buffer, i, x, y, vw, ib, p, varying, frag;
 
 		buffer = this.state.color_buffer;
-		vw = this.state.viewport_w;
-		x = Math.round(v.sx);
-		y = Math.round(v.sy);
+		vw = this.state.viewport.w;
+		x = Math.round(v.xw);
+		y = Math.round(v.yw);
 
 		p = [x, y, 0, 1];
 

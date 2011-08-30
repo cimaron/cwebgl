@@ -28,8 +28,9 @@ function cnvgl_vertex() {
 	this.z = 0;
 	this.w = 0;
 
-	this.sx = 0;
-	this.sy = 0;
+	this.xw = 0;
+	this.yw = 0;
+	this.zw = 0;
 
 	//communication with program
 	this.gl_Position = [0,0,0,1];

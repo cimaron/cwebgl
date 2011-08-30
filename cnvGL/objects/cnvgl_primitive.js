@@ -49,7 +49,7 @@ cnvgl_primitive = (function() {
 		E = 0;
 		for (i = 0; i < n; i++) {
 			th = (i + 1) % n;
-			E += (this.vertices[i].sx * this.vertices[th].sy - this.vertices[th].sx * this.vertices[i].sy);
+			E += (this.vertices[i].xw * this.vertices[th].yw - this.vertices[th].xw * this.vertices[i].yw);
 		}
 		E = E > 0 ? 1 : -1;
 		
