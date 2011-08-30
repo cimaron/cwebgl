@@ -22,11 +22,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 function cnvgl_vertex() {
 
-	//used by renderer
 	this.x = 0;
 	this.y = 0;
 	this.z = 0;
 	this.w = 0;
+	
+	this.xd = 0;
+	this.yd = 0;
+	this.zd = 0;
 
 	this.xw = 0;
 	this.yw = 0;

@@ -57,29 +57,25 @@ cnvgl_rendering_vertex = (function() {
 		vertex.z = vertex.gl_Position[2];
 		vertex.w = vertex.gl_Position[3];
 
-		this.normalize(vertex);
-		this.transformScreen(vertex);
+		this.setNormalizedCoordinates(vertex);
+		this.setWindowCoordinates(vertex);
 	};
 
-	cnvgl_rendering_vertex.normalize = function(vertex) {
-		if (vertex.w) {
-			vertex.x /= vertex.w;
-			vertex.y /= vertex.w;
-			vertex.z /= vertex.w;
-		} else {
-			if (typeof vertex.z == 'undefined') {
-				vertex.z = 0;
-			}
+	cnvgl_rendering_vertex.setNormalizedCoordinates = function(v) {
+		if (v.w) {
+			v.xd = v.x / v.w;
+			v.yd = v.y / v.w;
+			v.zd = v.z / v.w;
 		}
 	};
 
-	cnvgl_rendering_vertex.transformScreen = function(v) {		
+	cnvgl_rendering_vertex.setWindowCoordinates = function(v) {		
 		var vp;
 		vp = this.renderer.state.viewport;
-		v.xw = (v.x + 1) * (vp.w / 2);
+		v.xw = (v.xd + 1) * (vp.w / 2);
 		//v.yw = (v.y + 1) * (vp.h / 2);
-		v.yw = (1 - v.y) * (vp.h / 2);
-		v.zw = ((vp.far - vp.near) / 2) * v.z + ((vp.near + vp.far) / 2);
+		v.yw = (1 - v.yd) * (vp.h / 2);
+		v.zw = ((vp.far - vp.near) / 2) * v.zd + ((vp.near + vp.far) / 2);
 	};
 
 	cnvgl_rendering_vertex.sortVertices = function(prim) {

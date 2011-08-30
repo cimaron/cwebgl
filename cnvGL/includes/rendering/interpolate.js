@@ -41,9 +41,9 @@ cnvgl_rendering_interpolate = (function() {
 	
 	cnvgl_rendering_interpolate.setVertices = function(v1, v2, v3) {
 
-		this.v1 = [v1.xw, v1.yw, 0];
-		this.v2 = [v2.xw, v2.yw, 0];
-		this.v3 = [v3.xw, v3.yw, 0];
+		this.v1 = [v1.xw, v1.yw, v1.zw];
+		this.v2 = [v2.xw, v2.yw, v2.zw];
+		this.v3 = [v3.xw, v3.yw, v3.zw];
 
 		this.precompute();
 	};
