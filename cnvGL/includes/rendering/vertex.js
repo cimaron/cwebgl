@@ -47,18 +47,18 @@ cnvgl_rendering_vertex = (function() {
 		this.mode = mode;
 	};
 
-	cnvgl_rendering_vertex.process = function(vertex) {
-		
-		this.data.vertex = vertex;
+	cnvgl_rendering_vertex.process = function(v) {
+		debugger;
+		this.data.vertex = v;
 		this.program.apply(this.data);
-		
-		vertex.x = vertex.gl_Position[0];
-		vertex.y = vertex.gl_Position[1];
-		vertex.z = vertex.gl_Position[2];
-		vertex.w = vertex.gl_Position[3];
 
-		this.setNormalizedCoordinates(vertex);
-		this.setWindowCoordinates(vertex);
+		v.x = v.gl_Position[0];
+		v.y = v.gl_Position[1];
+		v.z = v.gl_Position[2];
+		v.w = v.gl_Position[3];
+
+		this.setNormalizedCoordinates(v);
+		this.setWindowCoordinates(v);
 	};
 
 	cnvgl_rendering_vertex.setNormalizedCoordinates = function(v) {
@@ -72,9 +72,8 @@ cnvgl_rendering_vertex = (function() {
 	cnvgl_rendering_vertex.setWindowCoordinates = function(v) {		
 		var vp;
 		vp = this.renderer.state.viewport;
-		v.xw = (v.xd + 1) * (vp.w / 2);
-		//v.yw = (v.y + 1) * (vp.h / 2);
-		v.yw = (1 - v.yd) * (vp.h / 2);
+		v.xw = (vp.x + vp.w / 2) + (vp.w / 2 * v.xd);
+		v.yw = (vp.y + vp.h / 2) - (vp.h / 2 * v.yd);
 		v.zw = ((vp.far - vp.near) / 2) * v.zd + ((vp.near + vp.far) / 2);
 	};
 
