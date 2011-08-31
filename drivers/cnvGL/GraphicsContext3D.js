@@ -77,7 +77,7 @@ GraphicsContext3D = (function() {
 			this._tempCanvas.height = this._tempHeight;
 			this._tempCanvasCtx = this._tempCanvas.getContext('2d');
 			this._tempCanvasCtx.mozImageSmoothingEnabled = false;
-			
+
 			width = this._tempWidth;
 			height = this._tempHeight;
 			
@@ -85,7 +85,7 @@ GraphicsContext3D = (function() {
 			width = this.width;
 			height = this.height;
 		}
-		
+
 		//initialize frame buffers
 		//cnvgl_state.color_buffer = new Uint8Array(this.width * this.height * 4);
 		this.buffer = this.context.createImageData(width, height);
@@ -118,8 +118,8 @@ GraphicsContext3D = (function() {
 	};
 	
 	GraphicsContext3D.clear = function(mask) {
-		glClear(mask);
 		this._dirty = true;
+		glClear(mask);
 	};
 
 	GraphicsContext3D.clearColor = function(red, green, blue, alpha) {
@@ -145,8 +145,13 @@ GraphicsContext3D = (function() {
 	};
 	
 	GraphicsContext3D.drawArrays = function(mode, first, count) {
-		glDrawArrays(mode, first, count);
 		this._dirty = true;
+		glDrawArrays(mode, first, count);
+	};
+
+	GraphicsContext3D.drawElements = function(mode, count, type, offset) {
+		this._dirty = true;
+		glDrawElements(mode, count, type, offset);
 	};
 
 	GraphicsContext3D.enable = function(cap) {
@@ -229,25 +234,26 @@ GraphicsContext3D = (function() {
 			}
 			this._time = time;
 
-			if (dur > 500 && this._scale < 8) {
+			if (dur > 300 && this._scale < 8) {
 				this._checkResChange--;
 			} else {
-				if (dur < 50 && this._scale > 1) {
+				if (dur < 100 && this._scale > 1) {
 					this._checkResChange++;
 				} else {
 					this._checkResChange = 0;
 				}
 			}
 
-			if (this._checkResChange < -2) {
-				this._scale *= 2;
-				this._createBuffer();				
+			if (this._checkResChange < -4) {
+				//this._scale *= 2;
+				//this._createBuffer();				
+				//this._checkResChange = 0;
 			}
 
 			if (this._checkResChange > 10) {
-				this._scale /= 2;
-				this._createBuffer();
-				this._checkResChange = 0;
+				//this._scale /= 2;
+				//this._createBuffer();
+				//this._checkResChange = 0;
 			}
 		}
 	};
