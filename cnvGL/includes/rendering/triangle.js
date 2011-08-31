@@ -165,6 +165,8 @@ cnvgl_renderer_triangle = function() {
 			if (this.state.depth.test == GL_TRUE) {
 				frag.gl_FragDepth = this.interpolate.interpolate(this.Triangle.v1.zw, this.Triangle.v2.zw, this.Triangle.v3.zw);
 				if (!this.checkDepth(id, frag.gl_FragDepth)) {
+					id++;
+					ib += 4;
 					continue;
 				}
 				depth_buffer[id] = frag.gl_FragDepth;
