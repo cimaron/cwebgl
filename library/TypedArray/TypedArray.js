@@ -19,37 +19,38 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+function TypedArray(buffer, byteOffset, length) {
+	var i;
+	if (typeof byteOffset == 'undefined') {
+		byteOffset = 0;	
+	}
+	if (typeof length == 'undefined') {
+		if (typeof buffer == 'object') {
+			length = buffer.length;	
+		} else {
+			length = buffer;
+			buffer = null;
+		}
+	}
+	if (buffer) {
+		for (i = byteOffset; i < length; i++) {
+			this[i] = buffer[i];	
+		}
+	}
+	this.length = length;
+};
+TypedArray.prototype = Array;
+
+
 if (typeof Float32Array == 'undefined') {
-	
 	Float32Array = function(buffer, byteOffset, length) {
-	
-		var i;
-	
-		if (typeof byteOffset == 'undefined') {
-			byteOffset = 0;	
-		}
-		
-		if (typeof length == 'undefined') {
-			if (typeof buffer == 'object') {
-				length = buffer.length;	
-			} else {
-				length = buffer;
-				buffer = null;
-			}
-		}
-	
-		if (buffer) {
-			for (i = byteOffset; i < length; i++) {
-				this[i] = buffer[i];	
-			}
-		}
-		this.length = length;
+		TypedArray.apply(this, [buffer, byteOffset, length]);
 	};
-
-	Float32Array.native = false;
-
-	//Float32Array.prototype = Array;
-	
-} else {
-	Float32Array.native = true;	
 }
+
+if (typeof Uint16Array == 'undefined') {
+	Uint16Array = function(buffer, byteOffset, length) {
+		TypedArray.apply(this, [buffer, byteOffset, length]);
+	};
+}
+
