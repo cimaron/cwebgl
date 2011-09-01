@@ -62,7 +62,7 @@ cnvgl_renderer_line = function() {
 		} else {
 			this.Line.lineY.call(this, v1, v2, dx);
 		}
-	}
+	};
 
 	cnvgl_renderer_line.Constructor.lineX = function(v1, v2, dy) {
 		var color_buffer, view_width, frag;

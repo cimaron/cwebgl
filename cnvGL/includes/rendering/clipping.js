@@ -30,7 +30,7 @@ cnvgl_rendering_clipping = (function() {
 	};
 
 	cnvgl_rendering_clipping.clip = function(vertex) {
-	}
+	};
 
 	return cnvgl_rendering_clipping.Constructor;
 

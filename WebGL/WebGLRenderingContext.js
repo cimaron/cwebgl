@@ -721,9 +721,7 @@ cWebGLRenderingContext = (function() {
 		if (this._context.redraw) {
 			this._context.redraw();	
 		}
-	}
-	
-	
+	};
 	
 	return cWebGLRenderingContext.Constructor;
 
