@@ -101,6 +101,10 @@ GraphicsContext3D = (function() {
 	
 	//public:
 	
+	GraphicsContext3D.activeTexture = function(texture) {
+		glActiveTexture(texture);
+	};
+
 	GraphicsContext3D.attachShader = function(program, shader) {
 		glAttachShader(program, shader);
 	};
@@ -108,7 +112,11 @@ GraphicsContext3D = (function() {
 	GraphicsContext3D.bindBuffer = function(target, buffer) {
 		glBindBuffer(target, buffer);
 	};
-	
+
+	GraphicsContext3D.bindTexture = function(target, texture) {
+		glBindTexture(target, texture);
+	};
+
 	GraphicsContext3D.bufferData = function(target, data, usage) {
 		/*
 		if (typeof data == 'number') {
@@ -143,6 +151,12 @@ GraphicsContext3D = (function() {
 	GraphicsContext3D.createShader = function(type) {
 		return glCreateShader(type);
 	};
+	
+	GraphicsContext3D.createTexture = function() {
+		var textures = [];
+		glGenTextures(1, textures);
+		return textures[0][0];
+	};	
 	
 	GraphicsContext3D.drawArrays = function(mode, first, count) {
 		this._dirty = true;
@@ -196,6 +210,10 @@ GraphicsContext3D = (function() {
 		glShaderSource(shader, 1, [string], [string.length]);
 	};
 	
+	GraphicsContext3D.uniform1i = function(location, x) {
+		return glUniform1i(location, x);
+	};
+
 	GraphicsContext3D.uniformMatrix4fv = function(location, transpose, value) {
 		return glUniformMatrix4fv(location, value.length / 16, transpose, value);
 	};

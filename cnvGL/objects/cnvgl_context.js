@@ -29,6 +29,7 @@ var cnvgl_context = (function() {
 		this.depth = {};
 		this.polygon = {};
 		this.viewport = {};
+		this.texture = {};
 
 		//Frame Buffers
 		this.clear_color = [0,0,0,0];
@@ -69,6 +70,9 @@ var cnvgl_context = (function() {
 		this.viewport.y = 0;
 		this.viewport.w = 0;
 		this.viewport.h = 0;
+
+		//texture state
+		this.texture.active = GL_TEXTURE0;
 
 		this.bound_buffers[GL_ARRAY_BUFFER] = 0;
 		this.bound_buffers[GL_ELEMENT_ARRAY_BUFFER] = 0;		

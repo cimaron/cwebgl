@@ -42,6 +42,7 @@ include('cnvGL/includes/rendering/data.js');
 include('cnvGL/includes/rendering/clipping.js');
 include('cnvGL/includes/rendering/interpolate.js');
 
+include('cnvGL/functions/glActiveTexture.js');
 include('cnvGL/functions/glAttachShader.js');
 include('cnvGL/functions/glBindBuffer.js');
 include('cnvGL/functions/glBindTexture.js');
@@ -75,8 +76,8 @@ include('cnvGL/functions/glViewport.js');
 
 //internal functions
 function cnvgl_throw_error(error_code) {
-	if (!cnvgl_state.current_error_code) {
-		cnvgl_state.current_error_code = error_code;
+	if (!cnvgl_context.getCurrentContext().current_error_code) {
+		cnvgl_context.getCurrentContext().current_error_code = error_code;
 	}
 }
 

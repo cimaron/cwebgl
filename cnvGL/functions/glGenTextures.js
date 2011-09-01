@@ -20,9 +20,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-function glGenTextures(n, buffers) {
+function glGenTextures(n, textures) {
 
-	var list = [], buffer, ref, i;
+	var list = [], texture, ref, i;
 
 	if (n < 0) {
 		cnvgl_throw_error(GL_INVALID_VALUE);
@@ -41,6 +41,6 @@ function glGenTextures(n, buffers) {
 		list.push(ref);
 	}
 
-	buffers[0] = list;
+	textures[0] = list;
 }
 
