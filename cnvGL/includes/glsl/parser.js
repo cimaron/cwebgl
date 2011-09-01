@@ -1718,6 +1718,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						yyval.expression = yyvsa[yyvsp].expression;
 						break;
 				
+					case 30:
+						yyval = {};
+						yyval.expression = new glsl.ast.expression(glsl.ast.operators.field_selection, yyvsa[yyvsp - 2].expression, null, null);
+						yyval.expression.set_location(yylloc);
+						yyval.expression.primary_expression.identifier = yyvsa[yyvsp].identifier;
+						break;
+
 					case 41:
 						yyval = {};
 						yyval.expression = yyvsa[yyvsp - 1].expression;
@@ -1737,9 +1744,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						yyval.expression = new glsl.ast.function_expression(yyvsa[yyvsp].type_specifier);
 						yyval.expression.set_location(yylloc);
 						break;
+					
+					case 45:
+						yyval = {};
+						var callee = new glsl.ast.expression(yyvsa[yyvsp].identifier);
+						yyval.expression = new glsl.ast.function_expression(callee);
+						yyval.expression.set_location(yylloc);
+						break;
 
 					case 63:
-						var ctx = state;
 						yyval = {};
 						yyval.expression = new glsl.ast.expression_bin(glsl.ast.operators.mul, yyvsa[yyvsp - 2].expression, yyvsa[yyvsp].expression);
 						yyval.expression.set_location(yylloc);
@@ -1868,6 +1881,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						yyval.n = glsl.ast.types.float;
 					    break;
 
+					case 186:
+						yyval = {};
+						yyval.n = glsl.ast.types.vec2;
+						break;
+
 					case 187:
 						yyval = {};
 						yyval.n = glsl.ast.types.vec3;
@@ -1882,6 +1900,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						yyval = {};
 						yyval.n = glsl.ast.types.mat4;
 						break;						
+
+					case 208:
+						yyval = {};
+						yyval.n = glsl.ast.types.sampler2d;
+						break;
 
 					case 232:
 						if (!state.es_shader && state.language_version < 130) {
@@ -1952,11 +1975,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					case 25:
 					case 26:
 					case 28:
-					case 30:
 					case 31:
 					case 32:
 					case 36:
-					case 45:
 					case 46:
 					case 51:
 					case 52:
@@ -2048,7 +2069,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					case 183:
 					case 184:
 					case 185:
-					case 186:
 					case 187:
 					case 189:
 					case 190:
@@ -2068,7 +2088,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					case 204:
 					case 205:
 					case 207:
-					case 208:
 					case 209:
 					case 210:
 					case 211:

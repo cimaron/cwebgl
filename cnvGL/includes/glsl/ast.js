@@ -74,7 +74,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			//n.prev = (exec_node *) &this.head;
 			//this.head = n;
 			this.head = n;
-		}
+		};
 
 		return exec_list.Constructor;
 
@@ -741,12 +741,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		ast_function_expression.ast_function_expression.ast_expression = function(callee) {
 			this.ast_expression(ast_operators.function_call, callee, null, null);
-			cons = false;
+			this.cons = false;
 		};
 
 		ast_function_expression.ast_function_expression.ast_type_specifier = function(type) {
 			this.ast_expression(ast_operators.function_call, type, null, null);
-			cons = true;			
+			this.cons = true;			
 		};
 
 

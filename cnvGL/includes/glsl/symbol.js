@@ -82,7 +82,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		symbol_table.add_function = function(name) {
 			var entry = new SymbolTableEntry(name, SymbolTableEntry.typedef.func);
 			if (name != 'main') {
-				entry.object_name = name;
+				entry.object_name = '@' + name + '@';
 			} else {
 				entry.object_name = (glsl.mode == 1) ? '@fragment.main@' : '@vertex.main@';
 			}

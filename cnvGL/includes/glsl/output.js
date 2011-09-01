@@ -26,6 +26,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	var log = [null, '', ''];
 
 	function sprintf(str) {
+		if (!str) {
+			return "";
+		}
 		var i = 1, m, rest = str; str = '';
 		while (m = rest.match('%([l]?)([dus%])')) {
 			var d = m[0];

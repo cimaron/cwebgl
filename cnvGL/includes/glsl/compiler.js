@@ -139,20 +139,30 @@ var glsl = (function() {
 	//#ENDIF
 
 	function initialize_types(state) {
+		var i, symbols, entry;
+		
+		symbols = {
+			variables : {
+				'gl_Position' : { type : 'vec4' },
+				'gl_FragColor' : { type : 'vec4' },
+				'gl_FragDepth' : { type : 'float' },
+			},
+			functions : {
+				'texture2D' : { type : 'vec4' }
+			}
+		}
 
 		//later, check compiler mode (shader vs fragment) when initializing types
 
-		//gl_Position
-		var entry = state.symbols.add_variable('gl_Position');
-		entry.type = 'vec4';
+		for (i in symbols.variables) {
+			entry = state.symbols.add_variable(i);
+			entry.type = symbols.variables[i].type;
+		}
 
-		//gl_FragColor
-		entry = state.symbols.add_variable('gl_FragColor');
-		entry.type = 'vec4';
-
-		//gl_FragDepth
-		entry = state.symbols.add_variable('gl_FragDepth');
-		entry.type = 'float';
+		for (i in symbols.functions) {
+			entry = state.symbols.add_function(i);
+			entry.type = symbols.functions[i].type;
+		}
 	}
 
 	var state = null;

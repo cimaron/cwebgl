@@ -32,6 +32,7 @@ GlslLinker = (function() {
 
 		this.fragment = null;
 		this.vertex = null;
+		this.external = {};
 	}
 
 	var linker = jClass('linker', Initializer);
@@ -39,6 +40,17 @@ GlslLinker = (function() {
 	//public:
 
 	linker.linker = function() {
+		this.addExternalReference('@gl_Position@', 'this.vertex[\'%s\']');
+		this.addExternalReference('@gl_FragDepth@', 'this.fragment[\'%s\']');
+		this.addExternalReference('@gl_FragColor@', 'this.fragment[\'%s\']');
+		this.addExternalReference('@texture2D@', 'this.external.%s');
+	};
+
+	linker.addExternalReference = function(object_name, output) {
+		if (!this.external[output]) {
+			this.external[output] = [];
+		}
+		this.external[output].push(object_name);
 	};
 
 	linker.link = function(program) {
@@ -80,6 +92,7 @@ GlslLinker = (function() {
 		var symbol_table = shader.symbol_table.table.data;
 		var code = shader.object_code;
 		var location = 0;
+		var i, e;
 
 		for (name in symbol_table) {
 
@@ -118,15 +131,16 @@ GlslLinker = (function() {
 					break;
 
 				default:
-					if (['@gl_Position@'].indexOf(entry.object_name) != -1) {
-						code = this.replaceSymbol(code, entry.object_name, "this.vertex['"+entry.name+"']");
-						continue;	
-					}				
-					if (['@gl_FragDepth', '@gl_FragColor@'].indexOf(entry.object_name) != -1) {
-						code = this.replaceSymbol(code, entry.object_name, "this.fragment['"+entry.name+"']");
-						continue;
+					//search for external object references
+					for (i in this.external) {
+						if (this.external[i].indexOf(entry.object_name) != -1) {
+							e = i.replace('%s', entry.name);
+							code = this.replaceSymbol(code, entry.object_name, e);
+							continue;
+						}
 					}
-					
+
+					//nothing found, just replace symbol
 					if (entry.typedef == 0) {
 						code = this.replaceSymbol(code, entry.object_name, entry.name);
 					}

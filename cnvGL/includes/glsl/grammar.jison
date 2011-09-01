@@ -21,8 +21,8 @@ HASH		^{SPC}#{SPC}
 [ \r\t]+
     /* Preprocessor tokens. */ 
 [ \t]*\#[ \t]*$	{}		
-[ \t]*\#[ \t]*"version"		{ this.begin('PP'); return 'VERSION'; }
-[ \t]*\#[ \t]*"extension"		{ this.begin('PP'); return 'EXTENSION'; }
+[ \t]*\#[ \t]*"version"		{ this.begin('PP'); return yy.token.VERSION; }
+[ \t]*\#[ \t]*"extension"		{ this.begin('PP'); return yy.token.EXTENSION; }
 
 {HASH}"line"{SPCP}{INT}{SPCP}{INT}{SPC}$ {
 				   /* Eat characters until the first digit is
@@ -55,23 +55,23 @@ HASH		^{SPC}#{SPC}
 				}
 {SPC}\#{SPC}"pragma"{SPCP}"debug"{SPC}\({SPC}"on"{SPC}\) {
 				  this.begin('PP');
-				  return 'PRAGMA_DEBUG_ON';
+				  return yy.token.PRAGMA_DEBUG_ON;
 				}
 {SPC}\#{SPC}"pragma"{SPCP}"debug"{SPC}\({SPC}"off"{SPC}\) {
 				  this.begin('PP');
-				  return 'PRAGMA_DEBUG_OFF';
+				  return yy.token.PRAGMA_DEBUG_OFF;
 				}
 {SPC}\#{SPC}"pragma"{SPCP}"optimize"{SPC}\({SPC}"on"{SPC}\) {
 				  this.begin('PP');
-				  return 'PRAGMA_OPTIMIZE_ON';
+				  return yy.token.PRAGMA_OPTIMIZE_ON;
 				}
 {SPC}\#{SPC}"pragma"{SPCP}"optimize"{SPC}\({SPC}"off"{SPC}\) {
 				  this.begin('PP');
-				  return 'PRAGMA_OPTIMIZE_OFF';
+				  return yy.token.PRAGMA_OPTIMIZE_OFF;
 				}
 {SPC}\#{SPC}"pragma"{SPCP}"STDGL"{SPCP}"invariant"{SPC}\({SPC}"all"{SPC}\) {
 				  this.begin('PP');
-				  return 'PRAGMA_INVARIANT_ALL';
+				  return yy.token.PRAGMA_INVARIANT_ALL;
 				}
 {SPC}\#{SPC}"pragma"{SPCP}	{ this.begin('PRAGMA'); }
 
@@ -80,50 +80,50 @@ HASH		^{SPC}#{SPC}
 
 <PP>\/\/[^\n]*			{ }
 <PP>[ \t\r]*			{ }
-<PP>":"				return 'COLON';
+<PP>":"				return yy.token.COLON;
 <PP>[_a-zA-Z][_a-zA-Z0-9]*	{
 				   yylval.identifier = strdup(yytext);
-				   return 'IDENTIFIER';
+				   return yy.token.IDENTIFIER;
 				}
 <PP>[1-9][0-9]*			{
 				    yylval.n = strtol(yytext, NULL, 10);
-				    return 'INTCONSTANT';
+				    return yy.token.INTCONSTANT;
 				}
-<PP>[\n]				{ this.begin('INITIAL'); yylineno++; yycolumn = 0; return 'EOL'; }
+<PP>[\n]				{ this.begin('INITIAL'); yylineno++; yycolumn = 0; return yy.token.EOL; }
 
 [\n]		{ /*yylineno++; yycolumn = 0;*/ }
 
 "attribute"	return yy.token.ATTRIBUTE;
-"const"		return 'CONST_TOK';
-"bool"		return 'BOOL_TOK';
+"const"		return yy.token.CONST_TOK;
+"bool"		return yy.token.BOOL_TOK;
 "float"		return yy.token.FLOAT_TOK;
-"int"		return 'INT_TOK';
+"int"		return yy.token.INT_TOK;
 "uint"		return this.KEYWORD(130, 130, UINT_TOK);
 
-"break"		return 'BREAK';
-"continue"	return 'CONTINUE';
-"do"		return 'DO';
-"while"		return 'WHILE';
-"else"		return 'ELSE';
-"for"		return 'FOR';
-"if"		return 'IF';
-"discard"		return 'DISCARD';
-"return"		return 'RETURN';
+"break"		return yy.token.BREAK;
+"continue"	return yy.token.CONTINUE;
+"do"		return yy.token.DO;
+"while"		return yy.token.WHILE;
+"else"		return yy.token.ELSE;
+"for"		return yy.token.FOR;
+"if"		return yy.token.IF;
+"discard"		return yy.token.DISCARD;
+"return"		return yy.token.RETURN;
 
-"bvec2"		return 'BVEC2';
-"bvec3"		return 'BVEC3';
-"bvec4"		return 'BVEC4';
-"ivec2"		return 'IVEC2';
-"ivec3"		return 'IVEC3';
-"ivec4"		return 'IVEC4';
+"bvec2"		return yy.token.BVEC2;
+"bvec3"		return yy.token.BVEC3;
+"bvec4"		return yy.token.BVEC4;
+"ivec2"		return yy.token.IVEC2;
+"ivec3"		return yy.token.IVEC3;
+"ivec4"		return yy.token.IVEC4;
 "uvec2"		return this.KEYWORD(130, 130, UVEC2);
 "uvec3"		return this.KEYWORD(130, 130, UVEC3);
 "uvec4"		return this.KEYWORD(130, 130, UVEC4);
-"vec2"		return 'VEC2';
+"vec2"		return yy.token.VEC2;
 "vec3"		return yy.token.VEC3;
 "vec4"		return yy.token.VEC4;
-"mat2"		return 'MAT2X2';
-"mat3"		return 'MAT3X3';
+"mat2"		return yy.token.MAT2X2;
+"mat3"		return yy.token.MAT3X3;
 "mat4"		return yy.token.MAT4X4;
 "mat2x2"		return this.KEYWORD(120, 120, MAT2X2);
 "mat2x3"		return this.KEYWORD(120, 120, MAT2X3);
@@ -135,9 +135,9 @@ HASH		^{SPC}#{SPC}
 "mat4x3"		return this.KEYWORD(120, 120, MAT4X3);
 "mat4x4"		return this.KEYWORD(120, 120, MAT4X4);
 
-"in"		return 'IN_TOK';
-"out"		return 'OUT_TOK';
-"inout"		return 'INOUT_TOK';
+"in"		return yy.token.IN_TOK;
+"out"		return yy.token.OUT_TOK;
+"inout"		return yy.token.INOUT_TOK;
 "uniform"		return yy.token.UNIFORM;
 "varying"		return yy.token.VARYING;
 "centroid"	return this.KEYWORD(120, 120, CENTROID);
@@ -146,14 +146,14 @@ HASH		^{SPC}#{SPC}
 "smooth"		return this.KEYWORD(130, 130, SMOOTH);
 "noperspective"	return this.KEYWORD(130, 130, NOPERSPECTIVE);
 
-"sampler1D"	return 'SAMPLER1D';
-"sampler2D"	return 'SAMPLER2D';
-"sampler3D"	return 'SAMPLER3D';
-"samplerCube"	return 'SAMPLERCUBE';
+"sampler1D"	return yy.token.SAMPLER1D;
+"sampler2D"	return yy.token.SAMPLER2D;
+"sampler3D"	return yy.token.SAMPLER3D;
+"samplerCube"	return yy.token.SAMPLERCUBE;
 "sampler1DArray"	return this.KEYWORD(130, 130, SAMPLER1DARRAY);
 "sampler2DArray"	return this.KEYWORD(130, 130, SAMPLER2DARRAY);
-"sampler1DShadow"	return 'SAMPLER1DSHADOW';
-"sampler2DShadow"	return 'SAMPLER2DSHADOW';
+"sampler1DShadow"	return yy.token.SAMPLER1DSHADOW;
+"sampler2DShadow"	return yy.token.SAMPLER2DSHADOW;
 "samplerCubeShadow"	return this.KEYWORD(130, 130, SAMPLERCUBESHADOW);
 "sampler1DArrayShadow"	return this.KEYWORD(130, 130, SAMPLER1DARRAYSHADOW);
 "sampler2DArrayShadow"	return this.KEYWORD(130, 130, SAMPLER2DARRAYSHADOW);
@@ -176,28 +176,28 @@ HASH		^{SPC}#{SPC}
 
 "layout"		{/*copy manually*/}
 
-"++"		return 'INC_OP';
-"--"		return 'DEC_OP';
-"<="		return 'LE_OP';
-">="		return 'GE_OP';
-"=="		return 'EQ_OP';
-"!="		return 'NE_OP';
-"&&"		return 'AND_OP';
-"||"		return 'OR_OP';
-"^^"		return 'XOR_OP';
-"<<"		return 'LEFT_OP';
-">>"		return 'RIGHT_OP';
+"++"		return yy.token.INC_OP;
+"--"		return yy.token.DEC_OP;
+"<="		return yy.token.LE_OP;
+">="		return yy.token.GE_OP;
+"=="		return yy.token.EQ_OP;
+"!="		return yy.token.NE_OP;
+"&&"		return yy.token.AND_OP;
+"||"		return yy.token.OR_OP;
+"^^"		return yy.token.XOR_OP;
+"<<"		return yy.token.LEFT_OP;
+">>"		return yy.token.RIGHT_OP;
 
-"*="		return 'MUL_ASSIGN';
-"/="		return 'DIV_ASSIGN';
-"+="		return 'ADD_ASSIGN';
-"%="		return 'MOD_ASSIGN';
-"<<="		return 'LEFT_ASSIGN';
-">>="		return 'RIGHT_ASSIGN';
-"&="		return 'AND_ASSIGN';
-"^="		return 'XOR_ASSIGN';
-"|="		return 'OR_ASSIGN';
-"-="		return 'SUB_ASSIGN';
+"*="		return yy.token.MUL_ASSIGN;
+"/="		return yy.token.DIV_ASSIGN;
+"+="		return yy.token.ADD_ASSIGN;
+"%="		return yy.token.MOD_ASSIGN;
+"<<="		return yy.token.LEFT_ASSIGN;
+">>="		return yy.token.RIGHT_ASSIGN;
+"&="		return yy.token.AND_ASSIGN;
+"^="		return yy.token.XOR_ASSIGN;
+"|="		return yy.token.OR_ASSIGN;
+"-="		return yy.token.SUB_ASSIGN;
 
 [0-9]+\.[0-9]+([eE][+-]?[0-9]+)?[fF]?	{
 			    this.yylval.real = parseFloat(yytext);
@@ -233,11 +233,11 @@ HASH		^{SPC}#{SPC}
 			}
 "true"			{
 			    yylval.n = 1;
-			    return 'BOOLCONSTANT';
+			    return yy.token.BOOLCONSTANT;
 			}
 "false"			{
 			    yylval.n = 0;
-			    return 'BOOLCONSTANT';
+			    return yy.token.BOOLCONSTANT;
 			}
 
 
@@ -277,9 +277,9 @@ HASH		^{SPC}#{SPC}
 "fvec2"		return this.KEYWORD([110, 1], 999, FVEC2);
 "fvec3"		return this.KEYWORD([110, 1], 999, FVEC3);
 "fvec4"		return this.KEYWORD([110, 1], 999, FVEC4);
-"sampler2DRect"		return 'SAMPLER2DRECT';
+"sampler2DRect"		return yy.token.SAMPLER2DRECT;
 "sampler3DRect"		return this.KEYWORD([110, 1], 999, SAMPLER3DRECT);
-"sampler2DRectShadow"	return 'SAMPLER2DRECTSHADOW';
+"sampler2DRectShadow"	return yy.token.SAMPLER2DRECTSHADOW;
 "sizeof"		return this.KEYWORD([110, 1], 999, SIZEOF);
 "cast"		return this.KEYWORD([110, 1], 999, CAST);
 "namespace"	return this.KEYWORD([110, 1], 999, NAMESPACE);

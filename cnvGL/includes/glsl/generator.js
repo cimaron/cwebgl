@@ -31,15 +31,18 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	g_type_qualifiers[glsl.ast.type_qualifier.flags.uniform] = 'uniform';
 	g_type_qualifiers[glsl.ast.type_qualifier.flags.out] = 'out';
 	g_type_qualifiers[glsl.ast.type_qualifier.flags.varying] = 'varying';
-
 	function g_type_default_value(type) {
 		switch (type.type_specifier) {
+			case glsl.ast.types.vec2:
+				return '[0,0]';
 			case glsl.ast.types.vec3:
 				return '[0,0,0]';
 			case glsl.ast.types.vec4:
 				return '[0,0,0,0]';
 			case glsl.ast.types.mat4:
 				return '[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]';
+			case glsl.ast.types.sampler2d:
+				return 'null';
 			default:
 				throw new Error(g_error('Cannot generate default value for type ' + type.type_name, type));
 		}
@@ -48,7 +51,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	//table for valid type operations
 	var g_valid_type_operations = {};
 	var g_operations_types = {
-		'cast' : {
+		'cons' : {
+			vec2 : { type : 'vec2', func : 'vec2.construct(%s)' },
+			vec3 : { type : 'vec3', func : 'vec3.construct(%s)' },
 			vec4 : { type : 'vec4', func : 'vec4.construct(%s)' }
 		},
 		5 : { //glsl.ast.operators.mul
@@ -56,7 +61,22 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				mat4 : { type : 'mat4', func : 'mat4.multiply(%s,%s,[])' },
 				vec4 : { type : 'vec4', func : 'mat4.multiplyVec4(%s,%s,[])' }
 			}
+		},
+		39 : { //glsl.ast.operators.field_selection
+			vec2 : { type : 'float', func : '%s[%s]' },
+			vec3 : { type : 'float', func : '%s[%s]' }
+		},
+		41 : { //glsl.ast.operators.function_call
+			'*' : { type : 'null', func : '%s(%s)' }
 		}
+	};
+	var g_operations_field_selection_names = {
+		vec2 : { x : '0', y : '1',
+				 r : '0', g : '1',
+				 s : '0', t : '1'},
+		vec3 : { x : '0', y : '1', z : '2',
+				 r : '0', g : '1', b : '2',
+				 s : '0', t : '1', p : '2'}
 	};
 
 	function g_get_operation(op, type1, type2) {
@@ -66,6 +86,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 		if (op[type1] && op[type1][type2]) {
 			return op[type1][type2];
+		}
+		if (op['*'] && !type2) {
+			return op['*'];
+		}		
+		if (op['*'] && op['*'][type2]) {
+			return op['*'][type2];
+		}
+		if (op['*'] && op['*']['*']) {
+			return op['*']['*'];
 		}
 		return false;
 	}
@@ -195,14 +224,36 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					es.push(g_ast_expression(e.expressions[i]).code);
 				}
 
-				//cast
-				if (left) {
-					op = g_get_operation('cast', left.type);
+				//todo: check types of parameters
+
+				if (e.cons) {
+					op = g_get_operation('cons', left.type);
 					exp.type = op.type;
 					exp.code = glsl.sprintf(op.func, es.join(','));
 					return exp;
+				} else {
+					op = g_get_operation(e.oper, left.type);
+					var entry = glsl.state.symbols.get_variable(se1.primary_expression.identifier);
+					exp.type = entry.type;
+					exp.code = glsl.sprintf(op.func, left.code, es.join(','));
+					return exp;					
 				}
+				
 				throw new Error(g_error("Could not translate function call", e));
+
+			case glsl.ast.operators.field_selection:
+				op = g_get_operation(e.oper, left.type);
+				exp.type = op.type;
+
+				if (op) {
+					var field = g_operations_field_selection_names[left.type][e.primary_expression.identifier];
+					if (field) {
+						exp.code = glsl.sprintf(op.func, left.code, field);
+						return exp;
+					}
+				}
+
+				throw new Error(g_error("Invalid operation on type " + left.type, e));
 
 			default:
 				throw new Error(g_error("Could not translate unknown expression " + e.typeOf() + '(' + e.oper + ')', e));
@@ -211,7 +262,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		
 	function g_ast_expression_simple(e) {
 		var exp = {};
-		
+
 		//identifier
 		if (e.primary_expression.identifier) {
 
