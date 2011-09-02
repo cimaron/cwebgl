@@ -29,6 +29,9 @@ cnvgl_rendering_interpolate = (function() {
 		this.a = null;
 		this.b = null;
 		this.c = null;
+		this.wa = null;
+		this.wb = null;
+		this.wc = null;
 		this.t = {};
 	}
 
@@ -41,9 +44,9 @@ cnvgl_rendering_interpolate = (function() {
 	
 	cnvgl_rendering_interpolate.setVertices = function(v1, v2, v3) {
 
-		this.v1 = [v1.xw, v1.yw, v1.zw];
-		this.v2 = [v2.xw, v2.yw, v2.zw];
-		this.v3 = [v3.xw, v3.yw, v3.zw];
+		this.v1 = [v1.xw, v1.yw, v1.zw, v1.w];
+		this.v2 = [v2.xw, v2.yw, v2.zw, v2.w];
+		this.v3 = [v3.xw, v3.yw, v3.zw, v3.w];
 
 		this.precompute();
 	};
@@ -66,16 +69,11 @@ cnvgl_rendering_interpolate = (function() {
 		t.d = (y3 - y1);
 		t.e = (this.t.c / this.t.a);
 		t.f = (this.t.d + this.t.e * this.t.b);
-		t.g = 1 / (this.t.a * this.t.d - this.t.b * this.t.c);   
-
-		/*
-		t.y2_y3 = (y2 - y3);
-		t.x3_x2 = (x3 - x2);
-		t.x1_x3 = (x1 - x3);
-		t.y1_y3 = (y1 - y3);
-		t.y3_y1 = (y3 - y1);
-		t.det = (t.y2_y3 * t.x1_x3) + (t.x3_x2 * t.y1_y3);
-		*/
+		t.g = 1 / (this.t.a * this.t.d - this.t.b * this.t.c);  
+		
+		this.wa = 1 / this.v1[3];
+		this.wb = 1 / this.v2[3];
+		this.wc = 1 / this.v3[3];
 	};
 
 	cnvgl_rendering_interpolate.setPoint = function(p) {
@@ -93,20 +91,12 @@ cnvgl_rendering_interpolate = (function() {
 		this.b = (this.t.b * (y1 - y) + this.t.d * (x - x1)) * this.t.g;
 		this.c = (this.t.a * (y - y1) - this.t.c * (x - x1)) * this.t.g;
 		this.a = 1 - this.b - this.c;
-
-
-		/*
-		x3 = this.v3[0];
-		y3 = this.v3[1];
 		
-		x_x3 = x - x3;
-		y_y3 = y - y3;
-
-		this.a = (t.y2_y3 * x_x3) + (t.x3_x2 * y_y3) / t.det;
-		this.b = (t.y3_y1 * x_x3) + (t.x1_x3 * y_y3) / t.det;
-		this.c = 1 - this.a - this.b;
-		*/
+		this.a *= this.wa;
+		this.b *= this.wb;
+		this.c *= this.wc;
 		
+		this.t.p = 1 / (this.a + this.b + this.c);
 		
 	};
 
@@ -117,10 +107,10 @@ cnvgl_rendering_interpolate = (function() {
 		if (typeof f1 == 'object') {
 			v = [];
 			for (i = 0; i < f1.length; i++) {
-				v[i] = (this.a * f1[i]) + (this.b * f2[i]) + (this.c * f3[i]);
+				v[i] = ((this.a * f1[i]) + (this.b * f2[i]) + (this.c * f3[i])) * this.t.p;
 			}
 		} else {
-			v = (this.a * f1) + (this.b * f2) + (this.c * f3);
+			v = ((this.a * f1) + (this.b * f2) + (this.c * f3)) * this.t.p;
 		}
 		return v;
 	};
