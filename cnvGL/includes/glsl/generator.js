@@ -52,9 +52,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	var g_valid_type_operations = {};
 	var g_operations_types = {
 		'cons' : {
-			vec2 : { type : 'vec2', func : 'vec2.construct(%s)' },
-			vec3 : { type : 'vec3', func : 'vec3.construct(%s)' },
-			vec4 : { type : 'vec4', func : 'vec4.construct(%s)' }
+			vec2 : { type : 'vec2', func : 'vec.construct(2,%s)' },
+			vec3 : { type : 'vec3', func : 'vec.construct(3,%s)' },
+			vec4 : { type : 'vec4', func : 'vec.construct(4,%s)' }
 		},
 		5 : { //glsl.ast.operators.mul
 			mat4 : {

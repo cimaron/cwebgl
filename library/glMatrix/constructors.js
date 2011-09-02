@@ -19,12 +19,11 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-var vec4 = {};
+var vec = {};
 
-
-vec4.construct = function() {
-	var i = 0, j = 0, k = 0, v = [];
-	while (i < 4) {
+vec.construct = function(l) {
+	var i = 0, j = 1, k = 0, v = [];
+	while (i < l) {
 		if (typeof arguments[j] == 'number') {
 			v[i] = arguments[j]; i++; j++;
 		} else {
@@ -37,6 +36,4 @@ vec4.construct = function() {
 		}
 	}
 	return v;
-};
-
-
+}
