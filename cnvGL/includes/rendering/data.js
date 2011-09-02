@@ -22,6 +22,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 cnvgl_rendering_data = (function() {
 
 	function Initializer() {
+		this._renderer = null;
 		this._out = null;
 		this._varying = null;
 		this.vertex = null;
@@ -30,8 +31,33 @@ cnvgl_rendering_data = (function() {
 
 	var cnvgl_rendering_data = jClass('cnvgl_rendering_data', Initializer);	
 
-	cnvgl_rendering_data.cnvgl_rendering_data = function() {
+	cnvgl_rendering_data.cnvgl_rendering_data = function(renderer) {
+		this._renderer = renderer;
+		this._texture_unit = renderer.ctx.texture.unit;
+		this.texture2D = texture2D;
 	};
+
+	function texture2D(sampler, coord, bias) {
+		var texture_unit, texture_obj, img, i, j, c;
+
+		texture_unit = this._texture_unit[sampler];
+		texture_obj = texture_unit.current_texture[GL_TEXTURE_2D];
+		img = texture_obj.images[0];
+
+		i = Math.round((coord[0] * (img.width - 1)) % img.width);
+		j = Math.round((coord[1] * (img.height - 1)) % img.height);
+
+		i = (j * img.width + i) * 4;
+
+		c = [];
+		c[0] = img.data[i] / 255;
+		c[1] = img.data[i + 1] / 255;
+		c[2] = img.data[i + 2] / 255;
+		c[3] = img.data[i + 3] / 255;
+
+		return c;
+	}
+
 
 	return cnvgl_rendering_data.Constructor;
 

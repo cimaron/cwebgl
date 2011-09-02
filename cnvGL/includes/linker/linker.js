@@ -43,7 +43,7 @@ GlslLinker = (function() {
 		this.addExternalReference('@gl_Position@', 'this.vertex[\'%s\']');
 		this.addExternalReference('@gl_FragDepth@', 'this.fragment[\'%s\']');
 		this.addExternalReference('@gl_FragColor@', 'this.fragment[\'%s\']');
-		this.addExternalReference('@texture2D@', 'this.external.%s');
+		this.addExternalReference('@texture2D@', 'this.%s');
 	};
 
 	linker.addExternalReference = function(object_name, output) {

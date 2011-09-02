@@ -36,7 +36,7 @@ cnvgl_rendering_fragment = (function() {
 	cnvgl_rendering_fragment.cnvgl_rendering_fragment = function(renderer) {
 		this.renderer = renderer;
 		//build data heap for fragment executable
-		this.data = new cnvgl_rendering_data();
+		this.data = new cnvgl_rendering_data(renderer);
 	};
 
 	cnvgl_rendering_fragment.setProgram = function(program) {
@@ -53,7 +53,6 @@ cnvgl_rendering_fragment = (function() {
 		fragment.b = Math.round(fragment.gl_FragColor[2] * 255);
 		fragment.a = Math.round(fragment.gl_FragColor[3] * 255);		
 	};
-
 
 	return cnvgl_rendering_fragment.Constructor;
 

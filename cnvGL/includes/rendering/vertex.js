@@ -26,7 +26,7 @@ cnvgl_rendering_vertex = (function() {
 		//public:
 		this.renderer = null;
 		this.program = null;
-		this.state = null;
+		this.ctx = null;
 		this.data = null;
 	}
 
@@ -36,7 +36,7 @@ cnvgl_rendering_vertex = (function() {
 	cnvgl_rendering_vertex.cnvgl_rendering_vertex = function(renderer) {
 		this.renderer = renderer;
 		//build data heap for vertex executable
-		this.data = new cnvgl_rendering_data();
+		this.data = new cnvgl_rendering_data(renderer);
 	};
 
 	cnvgl_rendering_vertex.setProgram = function(vertex_program) {
@@ -70,7 +70,7 @@ cnvgl_rendering_vertex = (function() {
 
 	cnvgl_rendering_vertex.setWindowCoordinates = function(v) {		
 		var vp;
-		vp = this.renderer.state.viewport;
+		vp = this.renderer.ctx.viewport;
 		v.xw = (vp.x + vp.w / 2) + (vp.w / 2 * v.xd);
 		v.yw = (vp.y + vp.h / 2) - (vp.h / 2 * v.yd);
 		v.zw = ((vp.far - vp.near) / 2) * v.zd + ((vp.near + vp.far) / 2);

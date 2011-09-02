@@ -24,7 +24,7 @@ cnvgl_renderer = (function() {
 	//Internal Constructor
 	function Initializer() {
 		//public:
-		this.state = null;
+		this.ctx = null;
 		this.program = null;
 		this.vertex = null;
 		this.fragment = null;
@@ -44,7 +44,8 @@ cnvgl_renderer = (function() {
 
 	//public:
 
-	cnvgl_renderer.cnvgl_renderer = function() {
+	cnvgl_renderer.cnvgl_renderer = function(ctx) {
+		this.ctx = ctx;
 		this.vertex = new cnvgl_rendering_vertex(this);
 		this.fragment = new cnvgl_rendering_fragment(this);
 		this.clipping = new cnvgl_rendering_clipping(this);
@@ -99,7 +100,7 @@ cnvgl_renderer = (function() {
 	cnvgl_renderer.getPolygonFaceDir = function(prim) {
 		var dir;
 		dir = prim.getDirection();
-		if (this.state.polygon.frontFace) {
+		if (this.ctx.polygon.frontFace) {
 			dir = -dir;	
 		}
 		return dir;
@@ -107,11 +108,11 @@ cnvgl_renderer = (function() {
 
 	cnvgl_renderer.checkCull = function(prim) {
 		var dir;
-		if (this.state.polygon.cullFlag) {
+		if (this.ctx.polygon.cullFlag) {
 			dir = this.getPolygonFaceDir(prim);
 			if (!(
-				(dir > 0 && (this.state.polygon.cullFlag == GL_FALSE || this.state.polygon.cullFace == GL_FRONT)) ||
-				(dir < 0 && (this.state.polygon.cullFlag == GL_FALSE || this.state.polygon.cullFace == GL_BACK)))) {
+				(dir > 0 && (this.ctx.polygon.cullFlag == GL_FALSE || this.ctx.polygon.cullFace == GL_FRONT)) ||
+				(dir < 0 && (this.ctx.polygon.cullFlag == GL_FALSE || this.ctx.polygon.cullFace == GL_BACK)))) {
 				return true;
 			}
 		}
@@ -120,8 +121,8 @@ cnvgl_renderer = (function() {
 
 	cnvgl_renderer.checkDepth = function(i, z) {
 		var mode, depth_buffer, pass;
-		mode = this.state.depth.func;
-		depth_buffer = this.state.depth_buffer;
+		mode = this.ctx.depth.func;
+		depth_buffer = this.ctx.depth_buffer;
 		switch (mode) {
 			case GL_NEVER:
 				pass = false;

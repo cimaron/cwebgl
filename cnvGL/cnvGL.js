@@ -10,7 +10,9 @@ include('cnvGL/objects/cnvgl_fragment.js');
 include('cnvGL/objects/cnvgl_primitive.js');
 include('cnvGL/objects/cnvgl_program.js');
 include('cnvGL/objects/cnvgl_shader.js');
-include('cnvGL/objects/cnvgl_texture.js');
+include('cnvGL/objects/texture_image.js');
+include('cnvGL/objects/texture_object.js');
+include('cnvGL/objects/texture_unit.js');
 include('cnvGL/objects/cnvgl_uniform.js');
 include('cnvGL/objects/cnvgl_vertex.js');
 
@@ -66,8 +68,10 @@ include('cnvGL/functions/glGetShaderInfoLog.js');
 include('cnvGL/functions/glGetShaderiv.js');
 include('cnvGL/functions/glGetUniformLocation.js');
 include('cnvGL/functions/glLinkProgram.js');
+include('cnvGL/functions/glPixelStore.js');
 include('cnvGL/functions/glShaderSource.js');
 include('cnvGL/functions/glTexImage2D.js');
+include('cnvGL/functions/glTexParameter.js');
 include('cnvGL/functions/glUniform.js');
 include('cnvGL/functions/glUseProgram.js');
 include('cnvGL/functions/glVertexAttribPointer.js');
@@ -82,5 +86,5 @@ function cnvgl_throw_error(error_code) {
 }
 
 cnvgl_objects = [0];
-
+cnvgl_textures = [0];
 

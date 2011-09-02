@@ -141,8 +141,8 @@ cnvgl_renderer_triangle = function() {
 		var id, ib, point;
 		var xi_start, xi_end, xi;
 
-		color_buffer = this.state.color_buffer;
-		depth_buffer = this.state.depth_buffer;
+		color_buffer = this.ctx.color_buffer;
+		depth_buffer = this.ctx.depth_buffer;
 		frag = this.Triangle.fragment;
 
 		//left and right bounds
@@ -155,14 +155,14 @@ cnvgl_renderer_triangle = function() {
 			xi_end--;	
 		}
 
-		id = this.state.viewport.w * (yi - .5) + (xi_start - .5);
+		id = this.ctx.viewport.w * (yi - .5) + (xi_start - .5);
 		ib = id * 4;
 
 		for (xi = xi_start; xi <= xi_end; xi++) {
 
 			point = [xi, yi, 0, 1];
 			this.interpolate.setPoint(point);
-			if (this.state.depth.test == GL_TRUE) {
+			if (this.ctx.depth.test == GL_TRUE) {
 				frag.gl_FragDepth = this.interpolate.interpolate(this.Triangle.v1.zw, this.Triangle.v2.zw, this.Triangle.v3.zw);
 				if (!this.checkDepth(id, frag.gl_FragDepth)) {
 					id++;

@@ -83,8 +83,8 @@ cnvgl_renderer_line = function() {
 
 		y = v1.yw + (xi_start - v1.xw) * dy;
 
-		color_buffer = this.state.color_buffer;
-		view_width = this.state.viewport.w;
+		color_buffer = this.ctx.color_buffer;
+		view_width = this.ctx.viewport.w;
 		frag = new cnvgl_fragment();
 		for (v in v1.varying) {
 			frag.varying[v] = v1.varying[v];
@@ -124,8 +124,8 @@ cnvgl_renderer_line = function() {
 
 		x = v1.xw + (yi_start - v1.yw) * dx;
 
-		color_buffer = this.state.color_buffer;
-		view_width = this.state.viewport.w;
+		color_buffer = this.ctx.color_buffer;
+		view_width = this.ctx.viewport.w;
 		frag = new cnvgl_fragment();
 		for (v in v1.varying) {
 			frag.varying[v] = v1.varying[v];
