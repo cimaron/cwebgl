@@ -53,4 +53,22 @@ if (typeof Uint16Array == 'undefined') {
 		TypedArray.apply(this, [buffer, byteOffset, length]);
 	};
 }
+if (typeof Uint8Array == 'undefined') {
+	//we have a special shortcut for Uint8Arrays (Canvas ImageData!)
+	Uint8Array = function(buffer, byteOffset, length) {
+		if (typeof length == 'undefined') {
+			if (typeof buffer == 'object') {
+				length = buffer.length;	
+			} else {
+				length = buffer;
+				buffer = null;
+			}
+		}
+		var data = Uint8Array.ctx.createImageData(length, 1).data;
+		TypedArray.apply(data, [buffer, byteOffset, length]);
+		return data;
+	};
+	Uint8Array.ctx = document.createElement('canvas').getContext('2d');
+}
+
 
