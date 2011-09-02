@@ -20,17 +20,20 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-function glActiveTexture(texture) {
-
-	var i;
+function glActiveTexture(unit) {
+	var ctx, i;
 	
-	i = texture - GL_TEXTURE0;
+	ctx = cnvgl_context.getCurrentContext();
+	i = unit - GL_TEXTURE0;
 
 	if (i < 0 || i > Math.max(cnvgl_const.GL_MAX_TEXTURE_COORDS, cnvgl_const.GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS) - 1) {
 		cnvgl_throw_error(GL_INVALID_ENUM);
 		return;
 	}
 
-	cnvgl_context.getCurrentContext().texture.active = texture;	
+	ctx.texture.currentUnit = unit;
+	if (!ctx.texture.unit[i]) {
+		ctx.texture.unit[i] = new cnvgl_texture_unit(ctx, unit);	
+	}
 }
 

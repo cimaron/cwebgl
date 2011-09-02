@@ -27,9 +27,11 @@ var cnvgl_context = (function() {
 	
 		//states
 		this.depth = {};
+		this.pack = {};
 		this.polygon = {};
-		this.viewport = {};
 		this.texture = {};
+		this.unpack = {};
+		this.viewport = {};
 
 		//Frame Buffers
 		this.clear_color = [0,0,0,0];
@@ -38,12 +40,15 @@ var cnvgl_context = (function() {
 
 		//Buffers
 		this.bound_buffers = {};
-	
+		this.bound_textures = {};
+
 		this.current_program = null;
-	
+
 		this.vertex_attrib_arrays = [];
-	
-		//Shaders		
+
+		this.shared = null;
+
+		//Shaders
 	}
 
 	var cnvgl_context = jClass('cnvgl_context', Initializer);
@@ -63,6 +68,11 @@ var cnvgl_context = (function() {
 		this.polygon.cullFlag = GL_FALSE;
 		this.polygon.frontFace = GL_CCW;
 
+		//texture state
+		this.texture.currentUnit = GL_TEXTURE0;
+		this.texture.unit = [];
+		this.texture.unit[0] = new cnvgl_texture_unit(this, GL_TEXTURE0);
+
 		//viewport state
 		this.viewport.near = 0;
 		this.viewport.far = 1;
@@ -71,19 +81,17 @@ var cnvgl_context = (function() {
 		this.viewport.w = 0;
 		this.viewport.h = 0;
 
-		//texture state
-		this.texture.active = GL_TEXTURE0;
-
 		this.bound_buffers[GL_ARRAY_BUFFER] = 0;
-		this.bound_buffers[GL_ELEMENT_ARRAY_BUFFER] = 0;		
+		this.bound_buffers[GL_ELEMENT_ARRAY_BUFFER] = 0;
 
 		//Vertex attribute arrays
 		for (i = 0; i < cnvgl_const.GL_MAX_VERTEX_ATTRIBS; i++) {
 			this.vertex_attrib_arrays[i] = new cnvgl_attrib_array_object();
 		}
-		
-		this.renderer = new cnvgl_renderer();
-		this.renderer.state = this;
+
+		this.shared = this.getSharedObjects();
+
+		this.renderer = new cnvgl_renderer(this);
 	};
 
 	//static:
@@ -95,6 +103,17 @@ var cnvgl_context = (function() {
 			context = new cnvgl_context.Constructor();
 		}
 		return context;
+	};
+
+	var shared;
+
+	cnvgl_context.getSharedObjects = function() {
+		if (shared) {
+			return shared;	
+		}
+		shared = {};
+		shared.texture_objects = [0];
+		return shared;
 	};
 
 	return cnvgl_context.Constructor;

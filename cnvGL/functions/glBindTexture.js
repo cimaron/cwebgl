@@ -21,27 +21,37 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 function glBindTexture(target, texture) {
+	var ctx, unit, texture_unit, texture_obj;
 
-	if (target != GL_TEXTURE_1D && target != GL_TEXTURE_2D
-			&& target != GL_TEXTURE_3D && target != GL_TEXTURE_CUBE_MAP) {
+	if (target != GL_TEXTURE_1D &&
+		target != GL_TEXTURE_2D &&
+		target != GL_TEXTURE_3D &&
+		target != GL_TEXTURE_CUBE_MAP
+		) {
 		cnvgl_throw_error(GL_INVALID_ENUM);
 		return;
 	}
 
-	var texture_obj = cnvgl_objects[texture];
+	ctx = cnvgl_context.getCurrentContext();
+	unit = ctx.texture.currentUnit;
+	texture_unit = ctx.texture.unit[unit - GL_TEXTURE0];
 
-	if (!texture_obj || !texture_obj instanceof cnvgl_texture
-		|| (texture_obj.target && texture_obj.target != target)) {
-
-		cnvgl_throw_error(GL_INVALID_OPERATION);
-		return;
+	if (texture == 0) {
+		texture_obj = ctx.shared.default_texture_objects[target];
+	} else {
+		texture_obj = ctx.shared.texture_objects[texture];
+		if (texture_obj) {
+			if (texture_obj.target != 0 && texture_obj.target != target) {
+				cnvgl_throw_error(GL_INVALID_OPERATION);	
+				return;
+			}
+		} else {
+			texture_obj = new cnvgl_texture_object(ctx, texture, target);
+			ctx.shared.texture_objects[texture] = texture_obj;
+		}
+		texture_obj.target = target;
 	}
 
-	/*if (between glBegin and glEnd) {
-		cnvgl_throw_error(GL_INVALID_OPERATION);
-		return 0;
-	} */
-
-	texture_obj.target = target;
+	texture_unit.current_texture[target] = texture_obj;
 }
 

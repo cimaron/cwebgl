@@ -20,9 +20,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-function glTexImage2D(target, level, internalFormat, width, height, border, format, type, data) {
-	var ctx, unit, texture_unit, texture_obj, texture_img, size, temp;
-
+function glTexParameteri(target, pname, param) {
+	var ctx, unit, texture_unit, texture_obj;
+	
 	if (target != GL_TEXTURE_1D
 		&& target != GL_TEXTURE_2D
 		&& target != GL_TEXTURE_3D
@@ -36,24 +36,13 @@ function glTexImage2D(target, level, internalFormat, width, height, border, form
 	texture_unit = ctx.texture.unit[unit - GL_TEXTURE0];
 	texture_obj = texture_unit.current_texture[target];
 
-	texture_img = new cnvgl_texture_image(texture_obj);
-
-	texture_img.width = width;
-	texture_img.height = height;
-	texture_img.internalFormat = internalFormat;
-	
-	texture_obj.images.push(texture_img);
-
-	size = width * height * 4;
-
-	if (Uint8Array.native) {
-		temp = new Uint8Array(data);
-		texture_img.data = new Uint8Array(temp, 0, size);
-	} else {
-		texture_img.data = new Array(size);
-		for (i = 0; i < size; i++) {
-			texture_img.data[i] = data[i];
-		}
+	switch (pname) {
+		case GL_TEXTURE_MIN_FILTER:
+			texture_obj.min_filter = param;
+			break;
+		case GL_TEXTURE_MAG_FILTER:
+			texture_obj.min_filter = param;
+			break;
 	}
 }
 

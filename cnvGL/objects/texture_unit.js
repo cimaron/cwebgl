@@ -20,40 +20,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-function glTexImage2D(target, level, internalFormat, width, height, border, format, type, data) {
-	var ctx, unit, texture_unit, texture_obj, texture_img, size, temp;
+function cnvgl_texture_unit(ctx, unit) {
 
-	if (target != GL_TEXTURE_1D
-		&& target != GL_TEXTURE_2D
-		&& target != GL_TEXTURE_3D
-		&& target != GL_TEXTURE_CUBE_MAP) {
-		cnvgl_throw_error(GL_INVALID_ENUM);
-		return;
-	}
+	this.ctx = ctx;
+	this.unit = unit;
 
-	ctx = cnvgl_context.getCurrentContext();
-	unit = ctx.texture.currentUnit;
-	texture_unit = ctx.texture.unit[unit - GL_TEXTURE0];
-	texture_obj = texture_unit.current_texture[target];
-
-	texture_img = new cnvgl_texture_image(texture_obj);
-
-	texture_img.width = width;
-	texture_img.height = height;
-	texture_img.internalFormat = internalFormat;
-	
-	texture_obj.images.push(texture_img);
-
-	size = width * height * 4;
-
-	if (Uint8Array.native) {
-		temp = new Uint8Array(data);
-		texture_img.data = new Uint8Array(temp, 0, size);
-	} else {
-		texture_img.data = new Array(size);
-		for (i = 0; i < size; i++) {
-			texture_img.data[i] = data[i];
-		}
-	}
+	this.current_texture = [];
 }
 

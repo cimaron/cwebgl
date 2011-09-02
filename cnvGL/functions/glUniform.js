@@ -20,6 +20,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
+function glUniform1i(location, v0) {
+	__glUniform(location, 1, false, Math.floor(v0), 1, true, false, false);
+}
+
 function glUniformMatrix4fv(location, count, transpose, value) {
 	__glUniform(location, count, transpose, value, 4, false, true, [4, 4]);
 }
@@ -45,7 +49,7 @@ function __glUniform(location, count, transpose, value, _size, _integer, _vector
 
 	var uniform_obj = current_program.active_uniforms[location];
 
-	var itypes = ['int', 'ivec2', 'ivec3', 'ivec4'];
+	var itypes = ['int', 'ivec2', 'ivec3', 'ivec4', 'sampler2D'];
 	var ftypes = ['float', 'vec2', 'vec3', 'vec4', 'mat4'];
 
 	if (location == -1) {

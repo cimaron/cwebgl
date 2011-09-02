@@ -22,23 +22,24 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 function glGenTextures(n, textures) {
 
-	var list = [], texture, ref, i;
+	var current, list, i, t, texture_obj;
 
 	if (n < 0) {
 		cnvgl_throw_error(GL_INVALID_VALUE);
 		return;
 	}
 
-	/*if (between glBegin and glEnd) {
-		cnvgl_throw_error(GL_INVALID_OPERATION);
-		return 0;
-	} */
+	current = cnvgl_context.getCurrentContext().shared.texture_objects;
 
+	list = [];
 	for (i = 0; i < n; i++) {
-		texture = new cnvgl_texture();
-		cnvgl_objects.push(texture);
-		ref = cnvgl_objects.length - 1;
-		list.push(ref);
+		t = current.indexOf(null);
+		if (t == -1) {
+			t = current.length;
+		}
+		texture_obj = new cnvgl_texture_object(t, 0);
+		current[t] = texture_obj;
+		list[i] = t;
 	}
 
 	textures[0] = list;
