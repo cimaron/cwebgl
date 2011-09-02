@@ -31,6 +31,7 @@ GraphicsContext3D = (function() {
 		this.context = null;
 		
 		//private:
+		this._state = {};
 		this._scale = null;
 		this._timer = null;
 		this._dirty = false;
@@ -137,7 +138,7 @@ GraphicsContext3D = (function() {
 	GraphicsContext3D.compileShader = function(shader) {
 		glCompileShader(shader);
 	};
-	
+
 	GraphicsContext3D.createBuffer = function() {
 		var buffers = [];
 		glGenBuffers(1, buffers);	
@@ -206,6 +207,16 @@ GraphicsContext3D = (function() {
 		glLinkProgram(program);
 	};
 	
+	GraphicsContext3D.pixelStorei = function(pname, param) {
+		switch (pname) {
+			case 0x9240:
+				this._state.UNPACK_FLIP_Y_WEBGL = pname;
+				break;
+			default:
+				glPixelStorei(pname, param);
+		}
+	};
+
 	GraphicsContext3D.shaderSource = function(shader, string) {
 		glShaderSource(shader, 1, [string], [string.length]);
 	};
@@ -221,7 +232,68 @@ GraphicsContext3D = (function() {
 	GraphicsContext3D.useProgram = function(program) {
 		glUseProgram(program);
 	};
-	
+
+	GraphicsContext3D.texImage2D = function(target, level, internalformat, format, type, source) {
+		var width, height, border, cnv, ctx, cnv, i, j, id, is, t;
+
+		//todo: check origin-clean flag
+
+		if (source instanceof HTMLImageElement) {
+			cnv = document.createElement('canvas');
+			cnv.width = source.width;
+			cnv.height = source.height;
+			ctx = cnv.getContext('2d');
+			ctx.drawImage(source, 0, 0, source.width, source.height);
+			source = cnv;
+		}
+
+		if (source instanceof HTMLCanvasElement) {
+			if (!ctx) {
+				ctx = source.getContext('2d'); 	
+			}
+			source = ctx.getImageData(0, 0, source.width, source.height);
+		}
+
+		if (source.data) {
+			width = source.width;
+			height = source.height;
+			border = 0;
+			source = source.data;
+		} else {
+			width = format;
+			height = type;
+			border = source;
+			format = arguments[6];
+			type = arguments[7];
+			source = arguments[8];
+			if (!source) {
+				source = new Uint8Array(width * height * 4);	
+			}
+		}
+
+		//need to invert data rows
+		if (this._state.UNPACK_FLIP_Y_WEBGL) {
+			t = new Uint8Array(width * height * 4);
+			for (i = 0; i < height; i++) {
+				for (j = 0; j < width; j++) {
+					is = ((width * i) + j) * 4;
+					id = ((width * (height - i)) + j) * 4;
+					t[id] = source[is];
+					t[id + 1] = source[is + 1];
+					t[id + 2] = source[is + 2];
+					t[id + 3] = source[is + 3];
+				}
+			}
+			source = t;
+		}
+		
+		glTexImage2D(target, level, internalformat, width, height, border, format, type, source);
+	};
+
+	GraphicsContext3D.texParameteri = function(target, pname, param) {
+		glTexParameteri(target, pname, param);
+	};
+
 	GraphicsContext3D.vertexAttribPointer = function(idx, size, type, normalized, stride, offset) {
 		var pointer = [];
 		glVertexAttribPointer(idx, size, type, normalized, stride, offset);
