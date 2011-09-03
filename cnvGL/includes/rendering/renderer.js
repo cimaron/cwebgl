@@ -75,6 +75,10 @@ cnvgl_renderer = (function() {
 	};
 
 	cnvgl_renderer.render = function(prim) {
+		
+		this.vertex.prepareContext();
+		this.fragment.prepareContext();		
+		
 		switch (this.mode) {
 			case GL_POINTS:
 				this.Point.points.call(this, prim.vertices);

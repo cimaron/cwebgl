@@ -47,6 +47,10 @@ cnvgl_rendering_vertex = (function() {
 		this.mode = mode;
 	};
 
+	cnvgl_rendering_vertex.prepareContext = function() {
+		this.data.prepareContext();
+	};
+
 	cnvgl_rendering_vertex.process = function(v) {
 		this.data.vertex = v;
 		this.program.apply(this.data);

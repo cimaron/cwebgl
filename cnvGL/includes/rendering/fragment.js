@@ -43,6 +43,10 @@ cnvgl_rendering_fragment = (function() {
 		this.program = program;
 	};
 
+	cnvgl_rendering_fragment.prepareContext = function() {
+		this.data.prepareContext();
+	};
+	
 	cnvgl_rendering_fragment.process = function(fragment) {
 
 		this.data.fragment = fragment;

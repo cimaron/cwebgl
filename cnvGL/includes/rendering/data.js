@@ -27,33 +27,61 @@ cnvgl_rendering_data = (function() {
 		this._varying = null;
 		this.vertex = null;
 		this.fragment = null;
+		this._textures = null;
 	}
 
 	var cnvgl_rendering_data = jClass('cnvgl_rendering_data', Initializer);	
 
 	cnvgl_rendering_data.cnvgl_rendering_data = function(renderer) {
 		this._renderer = renderer;
-		this._texture_unit = renderer.ctx.texture.unit;
+		this._textures = renderer.ctx.texture.unit;
 		this.texture2D = texture2D;
 	};
 
-	function texture2D(sampler, coord, bias) {
-		var texture_unit, texture_obj, img, i, j, c;
+	cnvgl_rendering_data.prepareContext = function(renderer) {
+		var unit, i;
+		unit = this._renderer.ctx.texture.unit;
+		this._textures = [];
+		for (i in unit) {
+			this._textures[i] = unit[i].current_texture;
+		}
+	};
 
-		texture_unit = this._texture_unit[sampler];
-		texture_obj = texture_unit.current_texture[GL_TEXTURE_2D];
+	function texture2D(sampler, coord, bias) {
+
+		var texture_obj, img, u, v, s, t, c, i;
+
+		texture_obj = this._textures[sampler][GL_TEXTURE_2D];
 		img = texture_obj.images[0];
 
-		i = Math.round((coord[0] * (img.width - 1)) % img.width);
-		j = Math.round((coord[1] * (img.height - 1)) % img.height);
-
-		i = (j * img.width + i) * 4;
-
+		s = coord[0];
+		t = coord[1];
 		c = [];
-		c[0] = img.data[i] / 255;
-		c[1] = img.data[i + 1] / 255;
-		c[2] = img.data[i + 2] / 255;
-		c[3] = img.data[i + 3] / 255;
+
+		//how to determine if using mag or min?
+
+		switch (texture_obj.min_filter) {
+			case GL_NEAREST:
+			default:
+				u = Math.floor(s * img.width);
+				v = Math.floor(t * img.height);
+				if (u == img.width) {
+					u--;
+				}
+				if (v == img.height) {
+					v--;	
+				}
+				i = (v * img.width + u) * 4;
+				c[0] = img.data[i];
+				c[1] = img.data[i + 1];
+				c[2] = img.data[i + 2];
+				c[3] = img.data[i + 3];
+		}
+
+		c[0] /= 255;
+		c[1] /= 255;
+		c[2] /= 255;
+		c[3] /= 255;
 
 		return c;
 	}
