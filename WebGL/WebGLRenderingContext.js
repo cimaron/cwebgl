@@ -24,14 +24,16 @@ cWebGLRenderingContext = (function() {
 
 	function Initializer() {
 		//public:
-		this._canvas = null;
+		this.canvas = null;
+		this.drawingBufferWidth = null;
+		this.drawingBufferWidth = null;
 		this._context = null;
 	}
 
 	var cWebGLRenderingContext = jClass('cWebGLRenderingContext', Initializer);
 
 	cWebGLRenderingContext.Enumerate({
-	
+
 	 /* ClearBufferMask */
 		DEPTH_BUFFER_BIT               : 0x00000100,
 		STENCIL_BUFFER_BIT             : 0x00000400,
@@ -45,7 +47,7 @@ cWebGLRenderingContext = (function() {
 		TRIANGLES                      : 0x0004,
 		TRIANGLE_STRIP                 : 0x0005,
 		TRIANGLE_FAN                   : 0x0006,
-	
+
 		/* AlphaFunction (not supported in ES20) */
 		/*      NEVER */
 		/*      LESS */
@@ -464,8 +466,8 @@ cWebGLRenderingContext = (function() {
 	//public
 	
 	cWebGLRenderingContext.cWebGLRenderingContext = function(canvas) {
-		this._canvas = canvas;
-		this._context = new GraphicsContext3D(canvas);
+		this.canvas = canvas;
+		this._context = new GraphicsContext3D(this);
 	};
 	
 	//public:
@@ -722,7 +724,11 @@ cWebGLRenderingContext = (function() {
 			this._context.redraw();	
 		}
 	};
-	
+
+	cWebGLRenderingContext.setTargetFps = function(low, high) {
+		this._context.setTargetFps(low, high);
+	};
+
 	return cWebGLRenderingContext.Constructor;
 
 }());

@@ -33,8 +33,8 @@ var cWebGLRenderingContext;
 
 	function hook() {
 		if (hasCanvas) {
-			HTMLCanvasElement.prototype.getContext = function(contextId, native) {
-				if (contextId == 'experimental-webgl' && !native) {
+			HTMLCanvasElement.prototype.getContext = function(contextId, nativeCtx) {
+				if (contextId == 'experimental-webgl' && !nativeCtx) {
 					return cWebGLRenderingContext.create(this);
 				}
 				return getNativeContext.call(this, contextId);
@@ -49,6 +49,10 @@ var cWebGLRenderingContext;
 	} catch (e) {
 		hook();
 	}
+
+	if (WebGLRenderingContext) {
+		WebGLRenderingContext.prototype.setTargetFps = function() {};
+	};
 
 }());
 

@@ -25,34 +25,30 @@ GraphicsContext3D = (function() {
 	function Initializer() {
 		
 		//public:
+		this.webglCtx = null;
+		this.canvas = null;
+
 		this.buffer = null;
-		this.width = null;
-		this.height = null;
 		this.context = null;
-		
+
 		//private:
 		this._state = {};
-		this._scale = null;
-		this._timer = null;
 		this._dirty = false;
-		this._tempWidth = null;
-		this._tempHeight = null;
-		this._tempCanvas = null;
-		this._tempCanvasCtx = null;
-		this._frameCount = null;
-		this._checkResChange = 0;
+		
+		this._frame = {};
+		this._quality = {};
 	}
 
 	var GraphicsContext3D = new jClass('GraphicsContext3D', Initializer);
 	
 	//public:
-	
-	GraphicsContext3D.GraphicsContext3D = function(canvas) {
-		this.context = canvas.getContext('2d');
+
+	GraphicsContext3D.GraphicsContext3D = function(webglCtx) {
+		this.webglCtx = webglCtx;
+		this.canvas = webglCtx.canvas;
+		this.context = this.canvas.getContext('2d');
 
 		//create our cnvGL context here;
-		this.width = canvas.width;
-		this.height = canvas.height;
 		this._scale = 1;
 
 		this._createBuffer();
@@ -61,47 +57,16 @@ GraphicsContext3D = (function() {
 		glClearColor(0, 0, 0, 255);
 		glClearDepth(1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
+
+		this._quality.factor = 1;
+		this.setTargetFps(2);
+
 		var This = this;
 		setInterval(function() { This._redraw(); }, 0);
 	};
-	
-	GraphicsContext3D._createBuffer = function() {
-		var cnvgl_ctx = cnvgl_context.getCurrentContext();
-		var width, height;
 
-		if (this._scale > 1) {
-			this._tempCanvas = document.createElement('canvas');
-			this._tempWidth = Math.round(this.width / this._scale);
-			this._tempHeight = Math.round(this.height / this._scale);
-			this._tempCanvas.width = this._tempWidth;
-			this._tempCanvas.height = this._tempHeight;
-			this._tempCanvasCtx = this._tempCanvas.getContext('2d');
-			this._tempCanvasCtx.mozImageSmoothingEnabled = false;
-
-			width = this._tempWidth;
-			height = this._tempHeight;
-			
-		} else {
-			width = this.width;
-			height = this.height;
-		}
-
-		//initialize frame buffers
-		//cnvgl_state.color_buffer = new Uint8Array(this.width * this.height * 4);
-		this.buffer = this.context.createImageData(width, height);
-
-		cnvgl_ctx.color_buffer = this.buffer.data;
-
-		if (Float32Array.native) {
-			cnvgl_ctx.depth_buffer = new Float32Array(width * height);
-		} else {
-			cnvgl_ctx.depth_buffer = new Array(width * height);
-		}		
-	};
-	
 	//public:
-	
+
 	GraphicsContext3D.activeTexture = function(texture) {
 		glActiveTexture(texture);
 	};
@@ -249,7 +214,7 @@ GraphicsContext3D = (function() {
 
 		if (source instanceof HTMLCanvasElement) {
 			if (!ctx) {
-				ctx = source.getContext('2d'); 	
+				ctx = source.getContext('2d');
 			}
 			source = ctx.getImageData(0, 0, source.width, source.height);
 		}
@@ -267,7 +232,7 @@ GraphicsContext3D = (function() {
 			type = arguments[7];
 			source = arguments[8];
 			if (!source) {
-				source = new Uint8Array(width * height * 4);	
+				source = new Uint8Array(width * height * 4);
 			}
 		}
 
@@ -300,52 +265,113 @@ GraphicsContext3D = (function() {
 	};
 
 	GraphicsContext3D.viewport = function(x, y, width, height) {
-		glViewport(x / this._scale, y / this._scale, width / this._scale, height / this._scale);
+		x = Math.round(x / this._quality.factor);
+		y = Math.round(y / this._quality.factor);
+		width = Math.round(width / this._quality.factor);
+		height = Math.round(height / this._quality.factor);
+
+		glViewport(x, y, width, height);
+	};
+
+	GraphicsContext3D.setTargetFps = function(low, high) {
+		this._frame.fps = 0;
+		this._frame.last = [];
+		this._quality.fpsLow = low;
+		this._quality.fpsHigh = high ? high : 4 * low;
+		this._quality.fpsLowThreshold = 0;
+		this._quality.fpsHighThreshold = 0;
 	};
 
 	//private:
+
+	GraphicsContext3D._createBuffer = function() {
+		var ctx, width, height;
+
+		ctx = cnvgl_context.getCurrentContext();
+
+		if (this._quality.factor > 1) {
+			if (!this._quality.cnv) {
+				this._quality.cnv = document.createElement('canvas');
+			}
+			width = Math.round(this.canvas.width / this._quality.factor);
+			height = Math.round(this.canvas.height / this._quality.factor);
+			this.webglCtx.drawingBufferWidth = width;
+			this.webglCtx.drawingBufferHeight = height;
+			this._quality.cnv.width = width;
+			this._quality.cnv.height = height;
+			this._quality.ctx = this._quality.cnv.getContext('2d');
+			this.context.mozImageSmoothingEnabled = false;
+		} else {
+			width = this.canvas.width;
+			height = this.canvas.height;
+		}
+
+		//initialize buffers
+		this.buffer = this.context.createImageData(width, height);
+		ctx.color_buffer = this.buffer.data;
+		ctx.depth_buffer = new Float32Array(width * height);
+	};
+
+	GraphicsContext3D._updateFrame = function() {
+		var time, dur;
+		//update frame counts, fps, etc.
+		this._frame.count++;
+		time = new Date().getTime();
+		this._frame.last.push(time);
+
+		//average over one second period
+		dur = time - this._frame.last[0];
+		this._frame.fps = 1000 * this._frame.last.length / dur;
+		if (dur > 1000) {
+			this._frame.last.shift();
+		}
+	};
+
+	GraphicsContext3D._checkFps = function() {
+		var change;
+
+		if (this._frame.fps < this._quality.fpsLow) {
+			this._quality.fpsLowThreshold++;
+		}
+
+		//must maintain low fps over period of one second
+		if (this._quality.fpsLowThreshold > this._frame.fps) {
+			this._quality.fpsLowThreshold = 0;
+			change = 1 + this._quality.fpsLow / Math.max(this._frame.fps, 1) / 4;
+			this._quality.factor *= change;
+			this._createBuffer();
+		}
+
+		if (this._frame.fps > this._quality.fpsHigh) {
+			this._quality.fpsHighThreshold++;
+		}
+
+		//must maintain high fps over period of one second
+		if (this._quality.fpsHighThreshold > this._frame.fps && this._quality.factor > 1) {
+			this._quality.fpsHighThreshold = 0;
+			//and even then, only slowly increase the resolution
+			this._quality.factor = Math.max(1, this._quality.factor / 1.1);
+			this._createBuffer();
+		}
+	};
+
 	GraphicsContext3D._redraw = function() {
+
+		this._updateFrame();
+
 		if (this._dirty) {
-			this._frameCount++;
 			this._dirty = false;
 
-			if (this._scale == 1) {
+			if (this._quality.factor <= 1) {
 				this.context.putImageData(this.buffer, 0, 0);
 			} else {
-				this._tempCanvasCtx.putImageData(this.buffer, 0, 0);
-				this.context.drawImage(this._tempCanvas, 0, 0, this.width, this.height);
-			}
-
-			//automatically adjust resolution for next frame
-			var time, dur;
-			time = new Date().getTime();
-			if (this._time) {
-				dur = time - this._time;
-			}
-			this._time = time;
-
-			if (dur > 300 && this._scale < 8) {
-				this._checkResChange--;
-			} else {
-				if (dur < 100 && this._scale > 1) {
-					this._checkResChange++;
-				} else {
-					this._checkResChange = 0;
-				}
-			}
-
-			if (this._checkResChange < -4) {
-				//this._scale *= 2;
-				//this._createBuffer();				
-				//this._checkResChange = 0;
-			}
-
-			if (this._checkResChange > 10) {
-				//this._scale /= 2;
-				//this._createBuffer();
-				//this._checkResChange = 0;
+				this._quality.ctx.putImageData(this.buffer, 0, 0);
+				this.context.drawImage(this._quality.cnv, 0, 0, this.canvas.width, this.canvas.height);
 			}
 		}
+
+		this._checkFps();
+
 	};
 	
 	return GraphicsContext3D.Constructor;
