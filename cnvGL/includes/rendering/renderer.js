@@ -23,18 +23,16 @@ cnvgl_renderer = (function() {
 
 	//Internal Constructor
 	function Initializer() {
+
 		//public:
 		this.ctx = null;
-		this.program = null;
-		this.vertex = null;
-		this.fragment = null;
-		this.clipping = null;
-		this.interpolate = null;
 
-		//renderers
-		this.Point = null;
-		this.Triangle = null;
-		this.Line = null;
+		this.culling = null;
+		this.fragment = null;
+		this.interpolate = null;
+		this.primitive = null;
+		this.texture = null;
+		this.vertex = null;
 
 		//simple
 		this.mode = null;
@@ -46,81 +44,35 @@ cnvgl_renderer = (function() {
 
 	cnvgl_renderer.cnvgl_renderer = function(ctx) {
 		this.ctx = ctx;
-		this.vertex = new cnvgl_rendering_vertex(this);
-		this.fragment = new cnvgl_rendering_fragment(this);
-		this.clipping = new cnvgl_rendering_clipping(this);
-		this.interpolate = new cnvgl_rendering_interpolate(this);
 
-		this.Point = new cnvgl_renderer_point();
-		this.Triangle = new cnvgl_renderer_triangle();
-		this.Line = new cnvgl_renderer_line();
+		this.culling = new cnvgl_rendering_culling(ctx, this);
+		this.interpolate = new cnvgl_rendering_interpolate(ctx, this);
+		this.primitive = new cnvgl_rendering_primitive(ctx, this);
+		this.texture = new cnvgl_rendering_texture(ctx, this);
+
+		this.fragment = new cnvgl_rendering_fragment(ctx, this);
+		this.vertex = new cnvgl_rendering_vertex(ctx, this);
 	};
 
 	cnvgl_renderer.setProgram = function(program) {
-		this.program = program;	
 		this.vertex.setProgram(program.vertex_program);
 		this.fragment.setProgram(program.fragment_program);
 	};
-	
+
 	cnvgl_renderer.setMode = function(mode) {
 		this.mode = mode;
-	};
-
-	cnvgl_renderer.send = function(prim) {
-		var i;
-		for (i = 0; i < prim.vertices.length; i++) {
-			this.vertex.process(prim.vertices[i]);
-		}
-		this.render(prim);
-	};
-
-	cnvgl_renderer.render = function(prim) {
-		
+		this.primitive.setMode(mode);
 		this.vertex.prepareContext();
-		this.fragment.prepareContext();		
-		
-		switch (this.mode) {
-			case GL_POINTS:
-				this.Point.points.call(this, prim.vertices);
-				break;
-			case GL_LINES:
-				this.Line.lines.call(this, prim.vertices);
-				break;
-			case GL_LINE_STRIP:
-				this.Line.lineStrip.call(this, prim.vertices);
-				break;
-			case GL_LINE_LOOP:
-				this.Line.lineLoop.call(this, prim.vertices);
-				break;
-			case GL_TRIANGLES:
-				this.Triangle.triangles.call(this, prim.vertices);
-				break;
-			case GL_TRIANGLE_STRIP:
-				this.Triangle.triangleStrip.call(this, prim.vertices);
-				break;
-		}
+		this.fragment.prepareContext();
 	};
 
-	cnvgl_renderer.getPolygonFaceDir = function(prim) {
-		var dir;
-		dir = prim.getDirection();
-		if (this.ctx.polygon.frontFace) {
-			dir = -dir;	
-		}
-		return dir;
+	cnvgl_renderer.send = function(vertex) {
+		this.vertex.process(vertex);
+		this.primitive.send(vertex);
 	};
-
-	cnvgl_renderer.checkCull = function(prim) {
-		var dir;
-		if (this.ctx.polygon.cullFlag) {
-			dir = this.getPolygonFaceDir(prim);
-			if (!(
-				(dir > 0 && (this.ctx.polygon.cullFlag == GL_FALSE || this.ctx.polygon.cullFace == GL_FRONT)) ||
-				(dir < 0 && (this.ctx.polygon.cullFlag == GL_FALSE || this.ctx.polygon.cullFace == GL_BACK)))) {
-				return true;
-			}
-		}
-		return false;
+	
+	cnvgl_renderer.end = function() {
+		this.primitive.end();	
 	};
 
 	cnvgl_renderer.checkDepth = function(i, z) {

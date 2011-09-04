@@ -19,40 +19,34 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-cnvgl_rendering_data = (function() {
+cnvgl_rendering_texture = (function() {
 
+	//Internal Constructor
 	function Initializer() {
-		this._renderer = null;
-		this._out = null;
-		this._varying = null;
-		this.vertex = null;
-		this.fragment = null;
-		this._textures = null;
+
+		//public:
+		this.ctx = null;
+		this.renderer = null;
 	}
 
-	var cnvgl_rendering_data = jClass('cnvgl_rendering_data', Initializer);	
+	var cnvgl_rendering_texture = jClass('cnvgl_rendering_texture', Initializer);
 
-	cnvgl_rendering_data.cnvgl_rendering_data = function(renderer) {
-		this._renderer = renderer;
-		this._textures = renderer.ctx.texture.unit;
-		this.texture2D = texture2D;
+	//public:
+	cnvgl_rendering_texture.cnvgl_rendering_texture = function(ctx, renderer) {
+		this.ctx = ctx;
+		this.renderer = renderer;
 	};
 
-	cnvgl_rendering_data.prepareContext = function(renderer) {
-		var unit, i;
-		unit = this._renderer.ctx.texture.unit;
-		this._textures = [];
-		for (i in unit) {
-			this._textures[i] = unit[i].current_texture;
-		}
-	};
+	//Note: all the following functions will be executed in the 'this' context of cnvgl_rendering_data
 
-	function texture2D(sampler, coord, bias) {
+	cnvgl_rendering_texture.texture2D = function(sampler, coord, bias) {
+		var texture_obj, mipmap_level, img, u, v, s, t, c, i;
 
-		var texture_obj, img, u, v, s, t, c, i;
+		texture_obj = this._ctx.texture.unit[sampler].current_texture[GL_TEXTURE_2D];
 
-		texture_obj = this._textures[sampler][GL_TEXTURE_2D];
-		img = texture_obj.images[0];
+		//todo: mipmap 
+		mipmap_level = 0;
+		img = texture_obj.images[mipmap_level];
 
 		s = coord[0];
 		t = coord[1];
@@ -84,10 +78,9 @@ cnvgl_rendering_data = (function() {
 		c[3] /= 255;
 
 		return c;
-	}
+	};
 
-
-	return cnvgl_rendering_data.Constructor;
+	return cnvgl_rendering_texture.Constructor;
 
 }());
 

@@ -19,50 +19,44 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-cnvgl_rendering_fragment = (function() {
+cnvgl_rendering_culling = (function() {
 
-	//Internal Constructor
 	function Initializer() {
 		//public:
 		this.ctx = null;
 		this.renderer = null;
-
-		this.program = null;
-		this.data = null;
 	}
 
-	var cnvgl_rendering_fragment = jClass('cnvgl_rendering_fragment', Initializer);
+	var cnvgl_rendering_culling = jClass('cnvgl_rendering_culling', Initializer);	
 
-	//public:
-
-	cnvgl_rendering_fragment.cnvgl_rendering_fragment = function(ctx, renderer) {
+	cnvgl_rendering_culling.cnvgl_rendering_culling = function(ctx, renderer) {
 		this.ctx = ctx;
 		this.renderer = renderer;
-		
-		//build environment for fragment executable
-		this.data = new cnvgl_rendering_program(ctx, renderer);
 	};
 
-	cnvgl_rendering_fragment.setProgram = function(program) {
-		this.program = program;
+	cnvgl_rendering_culling.checkCull = function(prim) {
+		var dir;
+		if (this.ctx.polygon.cullFlag) {
+			dir = this.getPolygonFaceDir(prim);
+			if (!(
+				(dir > 0 && (this.ctx.polygon.cullFlag == GL_FALSE || this.ctx.polygon.cullFace == GL_FRONT)) ||
+				(dir < 0 && (this.ctx.polygon.cullFlag == GL_FALSE || this.ctx.polygon.cullFace == GL_BACK)))) {
+				return true;
+			}
+		}
+		return false;
 	};
 
-	cnvgl_rendering_fragment.prepareContext = function() {
-		//this.data.prepareContext();
-	};
-	
-	cnvgl_rendering_fragment.process = function(fragment) {
-
-		this.data.fragment = fragment;
-		this.program.apply(this.data);
-
-		fragment.r = Math.round(fragment.gl_FragColor[0] * 255);
-		fragment.g = Math.round(fragment.gl_FragColor[1] * 255);
-		fragment.b = Math.round(fragment.gl_FragColor[2] * 255);
-		fragment.a = Math.round(fragment.gl_FragColor[3] * 255);		
+	cnvgl_rendering_culling.getPolygonFaceDir = function(prim) {
+		var dir;
+		dir = prim.getDirection();
+		if (this.ctx.polygon.frontFace) {
+			dir = -dir;	
+		}
+		return dir;
 	};
 
-	return cnvgl_rendering_fragment.Constructor;
+	return cnvgl_rendering_culling.Constructor;
 
 }());
 

@@ -19,50 +19,52 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-cnvgl_rendering_fragment = (function() {
+cnvgl_rendering_primitive_point = (function() {
 
 	//Internal Constructor
 	function Initializer() {
+
 		//public:
 		this.ctx = null;
 		this.renderer = null;
 
-		this.program = null;
-		this.data = null;
+		this.prim = null;
 	}
 
-	var cnvgl_rendering_fragment = jClass('cnvgl_rendering_fragment', Initializer);
+	var cnvgl_rendering_primitive_point = jClass('cnvgl_rendering_point', Initializer);
 
 	//public:
 
-	cnvgl_rendering_fragment.cnvgl_rendering_fragment = function(ctx, renderer) {
+	cnvgl_rendering_primitive_point.cnvgl_rendering_primitive_point = function(ctx, renderer) {
 		this.ctx = ctx;
 		this.renderer = renderer;
+	};
+
+	cnvgl_rendering_primitive_point.render = function(prim) {
+		var c_buffer, vw, v, x, y, p, frag, i;
+
+		this.prim = prim;
+		c_buffer = this.ctx.color_buffer;
+		vw = this.ctx.viewport.w;
+		frag = new cnvgl_fragment();
 		
-		//build environment for fragment executable
-		this.data = new cnvgl_rendering_program(ctx, renderer);
+		v = prim.vertices[0];
+		x = Math.round(v.xw);
+		y = Math.round(v.yw);
+		p = [x, y, 0, v.w];
+
+		for (i in v.varying) {
+			frag.varying[i] = v.varying[i];	
+		}
+
+		this.renderer.fragment.process(frag);
+
+		ic = (vw * y + x) * 4;
+		c_buffer[ic] = frag.r;
+		c_buffer[ic + 1] = frag.g;
+		c_buffer[ic + 2] = frag.b;
 	};
 
-	cnvgl_rendering_fragment.setProgram = function(program) {
-		this.program = program;
-	};
-
-	cnvgl_rendering_fragment.prepareContext = function() {
-		//this.data.prepareContext();
-	};
-	
-	cnvgl_rendering_fragment.process = function(fragment) {
-
-		this.data.fragment = fragment;
-		this.program.apply(this.data);
-
-		fragment.r = Math.round(fragment.gl_FragColor[0] * 255);
-		fragment.g = Math.round(fragment.gl_FragColor[1] * 255);
-		fragment.b = Math.round(fragment.gl_FragColor[2] * 255);
-		fragment.a = Math.round(fragment.gl_FragColor[3] * 255);		
-	};
-
-	return cnvgl_rendering_fragment.Constructor;
-
+	return cnvgl_rendering_primitive_point.Constructor;
 }());
 

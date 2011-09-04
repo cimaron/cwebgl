@@ -101,7 +101,7 @@ var lexer = (function () {
 						last_line: this.yylineno + 1,
 						first_column: this.yylloc.last_column,
 						last_column: lines ? lines[lines.length - 1].length - 1 : this.yylloc.last_column + match[0].length
-					}
+					};
 					this.yytext += match[0];
 					this.match += match[0];
 					this.matches = match;
@@ -144,7 +144,7 @@ var lexer = (function () {
 	});
 	lexer.performAction = function anonymous(yy, yy_, $avoiding_name_collisions, YY_START) {
 
-		var YYSTATE = YY_START
+		var YYSTATE = YY_START;
 		switch ($avoiding_name_collisions) {
 		case 0:
 			/* Preprocessor tokens. */

@@ -34,15 +34,18 @@ include('cnvGL/includes/linker/linker.js');
 include('cnvGL/includes/linker/symbol.js');
 
 //Rendering Pipeline
-include('cnvGL/includes/rendering/renderer.js');
-include('cnvGL/includes/rendering/point.js');
-include('cnvGL/includes/rendering/triangle.js');
-include('cnvGL/includes/rendering/line.js');
-include('cnvGL/includes/rendering/fragment.js');
-include('cnvGL/includes/rendering/vertex.js');
-include('cnvGL/includes/rendering/data.js');
+include('cnvGL/includes/rendering/primitive/line.js');
+include('cnvGL/includes/rendering/primitive/point.js');
+include('cnvGL/includes/rendering/primitive/triangle.js');
 include('cnvGL/includes/rendering/clipping.js');
+include('cnvGL/includes/rendering/culling.js');
+include('cnvGL/includes/rendering/fragment.js');
 include('cnvGL/includes/rendering/interpolate.js');
+include('cnvGL/includes/rendering/primitive.js');
+include('cnvGL/includes/rendering/program.js');
+include('cnvGL/includes/rendering/renderer.js');
+include('cnvGL/includes/rendering/texture.js');
+include('cnvGL/includes/rendering/vertex.js');
 
 include('cnvGL/functions/glActiveTexture.js');
 include('cnvGL/functions/glAttachShader.js');
@@ -60,6 +63,7 @@ include('cnvGL/functions/glDrawElements.js');
 include('cnvGL/functions/glEnable.js');
 include('cnvGL/functions/glEnableVertexAttribArray.js');
 include('cnvGL/functions/glGenBuffers.js');
+include('cnvGL/functions/glGenerateMipmap.js');
 include('cnvGL/functions/glGenTextures.js');
 include('cnvGL/functions/glGet.js');
 include('cnvGL/functions/glGetAttribLocation.js');

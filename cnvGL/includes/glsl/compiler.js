@@ -150,7 +150,7 @@ var glsl = (function() {
 			functions : {
 				'texture2D' : { type : 'vec4' }
 			}
-		}
+		};
 
 		//later, check compiler mode (shader vs fragment) when initializing types
 

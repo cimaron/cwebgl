@@ -24,19 +24,22 @@ cnvgl_rendering_vertex = (function() {
 	//Internal Constructor
 	function Initializer() {
 		//public:
-		this.renderer = null;
-		this.program = null;
 		this.ctx = null;
+		this.renderer = null;
+
+		this.program = null;
 		this.data = null;
 	}
 
 	var cnvgl_rendering_vertex = jClass('cnvgl_rendering_vertex', Initializer);
 
 	//public:
-	cnvgl_rendering_vertex.cnvgl_rendering_vertex = function(renderer) {
+	cnvgl_rendering_vertex.cnvgl_rendering_vertex = function(ctx, renderer) {
+		this.ctx = ctx;
 		this.renderer = renderer;
-		//build data heap for vertex executable
-		this.data = new cnvgl_rendering_data(renderer);
+
+		//build environment for vertex executable
+		this.data = new cnvgl_rendering_program(ctx, renderer);
 	};
 
 	cnvgl_rendering_vertex.setProgram = function(vertex_program) {
@@ -48,7 +51,7 @@ cnvgl_rendering_vertex = (function() {
 	};
 
 	cnvgl_rendering_vertex.prepareContext = function() {
-		this.data.prepareContext();
+		//this.data.prepareContext();
 	};
 
 	cnvgl_rendering_vertex.process = function(v) {
@@ -74,7 +77,7 @@ cnvgl_rendering_vertex = (function() {
 
 	cnvgl_rendering_vertex.setWindowCoordinates = function(v) {		
 		var vp;
-		vp = this.renderer.ctx.viewport;
+		vp = this.ctx.viewport;
 		v.xw = (vp.x + vp.w / 2) + (vp.w / 2 * v.xd);
 		v.yw = (vp.y + vp.h / 2) - (vp.h / 2 * v.yd);
 		v.zw = ((vp.far - vp.near) / 2) * v.zd + ((vp.near + vp.far) / 2);

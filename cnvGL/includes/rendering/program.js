@@ -19,51 +19,33 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-cnvgl_renderer_point = function() {
+cnvgl_rendering_program = (function() {
 
-	//Internal Constructor
 	function Initializer() {
+
+		//public:
+		this._ctx = null;
+		this._renderer = null;
+
+		//vertex/fragment objects
+		this.vertex = null;
+		this.fragment = null;
+
+		//data sharing
+		this._out = null;
+		this._varying = null;
 	}
 
-	var cnvgl_renderer_point = jClass('cnvgl_renderer_point', Initializer);
+	var cnvgl_rendering_data = jClass('cnvgl_rendering_data', Initializer);	
 
-	//static:
+	cnvgl_rendering_data.cnvgl_rendering_data = function(ctx, renderer) {
+		this._ctx = ctx;
+		this._renderer = renderer;
 
-	cnvgl_renderer_point.Constructor.points = function(vertices) {
-		var i;
-		for (i = 0; i < vertices.length; i++) {
-			this.Point.point.call(this, vertices[i]);
-		}
+		this._texture2D = renderer.texture.texture2D;
 	};
 
-	cnvgl_renderer_point.Constructor.point = function(v) {
+	return cnvgl_rendering_data.Constructor;
 
-		var buffer, i, x, y, vw, ib, p, varying, frag;
-
-		buffer = this.ctx.color_buffer;
-		vw = this.ctx.viewport.w;
-		x = Math.round(v.xw);
-		y = Math.round(v.yw);
-
-		p = [x, y, 0, 1];
-
-		frag = new cnvgl_fragment();
-		for (i in v.varying) {
-			frag.varying[i] = v.varying[i];	
-		}
-
-		this.fragment.process(frag);
-
-		ib = (vw * y + x) * 4;
-		buffer[ib] = frag.r;
-		buffer[ib + 1] = frag.g;
-		buffer[ib + 2] = frag.b;
-	};
-
-	//public:
-	cnvgl_renderer_point.cnvgl_renderer_point = function() {
-	};
-
-	return cnvgl_renderer_point.Constructor;
-};
+}());
 

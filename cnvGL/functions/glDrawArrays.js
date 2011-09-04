@@ -21,47 +21,36 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 function glDrawArrays(mode, first, count) {
+	var ctx, renderer, program, vtas, active_attrs, attr_buffers, prgm_attr_loc, i;
 
-	var state, renderer, program;
-	var a, i, j, k;
-
-	state = cnvgl_context.getCurrentContext();
-	renderer = state.renderer;
-	program = state.current_program;
+	ctx = cnvgl_context.getCurrentContext();
+	renderer = ctx.renderer;
+	program = ctx.current_program;
 
 	renderer.setMode(mode);
 
 	//gather vertex attributes
-	var vtas = state.vertex_attrib_arrays;
+	vtas = ctx.vertex_attrib_arrays;
 
-	var active_attrs = [], attr_buffers = [];
-	var prgm_attr, prgm_attr_loc;
+	active_attrs = [];
+	attr_buffers = [];
+	for (i = 0; i < program.active_attributes_count; i++) {
+		
+		prgm_attr_loc = program.active_attributes[i].location;
 
-	for (a = 0; a < program.active_attributes_count; a++) {
-		
-		prgm_attr = program.active_attributes[a];
-		prgm_attr_loc = prgm_attr.location;
-		
-		active_attrs[prgm_attr_loc] = vtas[a];
-		if (vtas[a].buffer_obj) {
-			attr_buffers[prgm_attr_loc] = vtas[a].buffer_obj.data;
+		active_attrs[prgm_attr_loc] = vtas[i];
+		if (vtas[i].buffer_obj) {
+			attr_buffers[prgm_attr_loc] = vtas[i].buffer_obj.data;
 		}
 	}
 
-
-	//generate primitive/vertices
-	var prim = new cnvgl_primitive();
-	prim.mode = mode;
-
-	var vertex, attr_data, vtx_attr_data, attr;
-
-	var start, stride, size;
+	//generate vertices
+	var vertex, attr_data, vtx_attr_data, attr, start, stride, size, j, k;
 
 	//each vertex
 	for (i = first; i < count; i++) {
 
 		vertex = new cnvgl_vertex();
-		prim.vertices.push(vertex);
 
 		//build attribute set and initialize
 		for (j = 0; j < active_attrs.length; j++) {
@@ -85,8 +74,10 @@ function glDrawArrays(mode, first, count) {
 				vtx_attr_data[k] = attr_data[k + start];
 			}
 		}
+
+		renderer.send(vertex);
 	}
 
-	renderer.send(prim);
+	renderer.end();
 }
 

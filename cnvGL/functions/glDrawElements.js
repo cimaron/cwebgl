@@ -21,51 +21,41 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 function glDrawElements(mode, count, type, indices) {
+	var ctx, renderer, program, elements, vtas, active_attrs, attr_buffers, prgm_attr_loc, i;
 
-	var state, renderer, program;
-	var a, i, j, k;
-
-	state = cnvgl_context.getCurrentContext();
-	renderer = state.renderer;
-	program = state.current_program;
+	ctx = cnvgl_context.getCurrentContext();
+	renderer = ctx.renderer;
+	program = ctx.current_program;
 
 	renderer.setMode(mode);
 
-	var element_array_buffer = cnvgl_objects[state.bound_buffers[GL_ELEMENT_ARRAY_BUFFER]];
-	
+	elements = cnvgl_objects[ctx.bound_buffers[GL_ELEMENT_ARRAY_BUFFER]];
+
 	//gather vertex attributes
 
-	var vtas = state.vertex_attrib_arrays;
+	vtas = ctx.vertex_attrib_arrays;
 
-	var active_attrs = [], attr_buffers = [];
-	var prgm_attr, prgm_attr_loc;
-
-	for (a = 0; a < program.active_attributes_count; a++) {
+	active_attrs = [];
+	attr_buffers = [];
+	for (i = 0; i < program.active_attributes_count; i++) {
 		
-		prgm_attr = program.active_attributes[a];
-		prgm_attr_loc = prgm_attr.location;
+		prgm_attr_loc = program.active_attributes[i].location;
 
-		active_attrs[prgm_attr_loc] = vtas[a];
-		if (vtas[a].buffer_obj) {
-			attr_buffers[prgm_attr_loc] = vtas[a].buffer_obj.data;
+		active_attrs[prgm_attr_loc] = vtas[i];
+		if (vtas[i].buffer_obj) {
+			attr_buffers[prgm_attr_loc] = vtas[i].buffer_obj.data;
 		}
 	}
 
 	//generate primitive/vertices
-	var prim = new cnvgl_primitive();
-	prim.mode = mode;
-
-	var vertex, attr_data, vtx_attr_data, attr;
-
-	var start, stride, size, index;
-
+	var vertex, attr_data, vtx_attr_data, attr, start, stride, size, index, j, k;
+	
 	//each vertex
 	for (i = 0; i < count; i++) {
 
 		vertex = new cnvgl_vertex();
-		prim.vertices.push(vertex);
 
-		index = element_array_buffer.data[i];
+		index = elements.data[i];
 
 		//build attribute set and initialize
 		for (j = 0; j < active_attrs.length; j++) {
@@ -89,8 +79,10 @@ function glDrawElements(mode, count, type, indices) {
 				vtx_attr_data[k] = attr_data[k + start];
 			}
 		}
+
+		renderer.send(vertex);
 	}
 
-	renderer.send(prim);
+	renderer.end();
 }
 
