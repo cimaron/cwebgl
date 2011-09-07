@@ -46,64 +46,98 @@ cnvgl_rendering_interpolate = (function() {
 
 		this.v1 = [v1.xw, v1.yw, v1.zw, v1.w];
 		this.v2 = [v2.xw, v2.yw, v2.zw, v2.w];
-		this.v3 = [v3.xw, v3.yw, v3.zw, v3.w];
-
+		if (v3) {
+			this.v3 = [v3.xw, v3.yw, v3.zw, v3.w];
+		} else {
+			this.v3 = null;	
+		}
 		this.precompute();
 	};
 
 	cnvgl_rendering_interpolate.precompute = function() {
-
 		var x1, x2, x3, y1, y2, y3, t;
+
 		x1 = this.v1[0];
 		x2 = this.v2[0];
-		x3 = this.v3[0];		
 		y1 = this.v1[1];
 		y2 = this.v2[1];
-		y3 = this.v3[1];
 
-		t = this.t;
+		t = {};
 
-		t.a = (x2 - x1);
-		t.b = (x3 - x1);
-		t.c = (y2 - y1);
-		t.d = (y3 - y1);
-		t.e = (this.t.c / this.t.a);
-		t.f = (this.t.d + this.t.e * this.t.b);
-		t.g = 1 / (this.t.a * this.t.d - this.t.b * this.t.c);  
+		if (this.v3) {
+			x3 = this.v3[0];		
+			y3 = this.v3[1];
+
+			t.a = (x2 - x1);
+			t.b = (x3 - x1);
+			t.c = (y2 - y1);
+			t.d = (y3 - y1);
+			t.e = (t.c / t.a);
+			t.f = (t.d + t.e * t.b);
+			t.g = 1 / (t.a * t.d - t.b * t.c);  
+
+			this.wa = 1 / this.v1[3];
+			this.wb = 1 / this.v2[3];
+			this.wc = 1 / this.v3[3];
 		
-		this.wa = 1 / this.v1[3];
-		this.wb = 1 / this.v2[3];
-		this.wc = 1 / this.v3[3];
+		} else {
+			t.a = (x2 - x1);
+			t.b = (y2 - y1);
+			t.c = Math.sqrt(t.a * t.a + t.b * t.b);
+		}
+
+		this.t = t;
 	};
 
 	cnvgl_rendering_interpolate.setPoint = function(p) {
-
-		var  t, x1, y1, x, y;
-
-		t = this.t;
+		var  x1, y1, x, y;
 
 		x = p[0];
 		y = p[1];
 		x1 = this.v1[0];
 		y1 = this.v1[1];
 
+		if (this.v3) {
 
-		this.b = (this.t.b * (y1 - y) + this.t.d * (x - x1)) * this.t.g;
-		this.c = (this.t.a * (y - y1) - this.t.c * (x - x1)) * this.t.g;
-		this.a = 1 - this.b - this.c;
+			this.b = (this.t.b * (y1 - y) + this.t.d * (x - x1)) * this.t.g;
+			this.c = (this.t.a * (y - y1) - this.t.c * (x - x1)) * this.t.g;
+			this.a = 1 - this.b - this.c;
+
+			this.a *= this.wa;
+			this.b *= this.wb;
+			this.c *= this.wc;
+
+			this.t.p = 1 / (this.a + this.b + this.c);
 		
-		this.a *= this.wa;
-		this.b *= this.wb;
-		this.c *= this.wc;
-		
-		this.t.p = 1 / (this.a + this.b + this.c);
-		
+		} else {
+
+			x = (x - x1);
+			y = (y - y1);
+			this.a = Math.sqrt(x * x + y * y);
+			this.a = this.a / this.t.c;
+			this.b = 1 - this.a;
+		}
 	};
 
-	cnvgl_rendering_interpolate.interpolate = function(f1, f2, f3) {
+	cnvgl_rendering_interpolate.interpolateLine = function(f1, f2) {
+		var i, v;
 
 		//todo: do a check that we need to interpolate at all
+		if (typeof f1 == 'object') {
+			v = [];
+			for (i = 0; i < f1.length; i++) {
+				v[i] = ((this.a * f1[i]) + (this.b * f2[i])) /* * this.t.p*/;
+			}
+		} else {
+			v = ((this.a * f1) + (this.b * f2)) /* * this.t.p*/;
+		}
+		return v;				
+	};
+
+	cnvgl_rendering_interpolate.interpolateTriangle = function(f1, f2, f3) {
 		var i, v;
+
+		//todo: do a check that we need to interpolate at all
 		if (typeof f1 == 'object') {
 			v = [];
 			for (i = 0; i < f1.length; i++) {

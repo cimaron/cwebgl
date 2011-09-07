@@ -27,6 +27,7 @@ cnvgl_renderer = (function() {
 		//public:
 		this.ctx = null;
 
+		this.clipping = null;
 		this.culling = null;
 		this.fragment = null;
 		this.interpolate = null;
@@ -34,7 +35,6 @@ cnvgl_renderer = (function() {
 		this.texture = null;
 		this.vertex = null;
 
-		//simple
 		this.mode = null;
 	}
 
@@ -45,6 +45,7 @@ cnvgl_renderer = (function() {
 	cnvgl_renderer.cnvgl_renderer = function(ctx) {
 		this.ctx = ctx;
 
+		this.clipping = new cnvgl_rendering_clipping(ctx, this);
 		this.culling = new cnvgl_rendering_culling(ctx, this);
 		this.interpolate = new cnvgl_rendering_interpolate(ctx, this);
 		this.primitive = new cnvgl_rendering_primitive(ctx, this);

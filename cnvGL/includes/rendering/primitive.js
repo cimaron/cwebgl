@@ -79,6 +79,8 @@ cnvgl_rendering_primitive = (function() {
 	cnvgl_rendering_primitive.end = function() {
 		switch (this.mode) {
 			case GL_LINE_LOOP:
+				//swap vertices
+				this.vertices.push(this.vertices.shift());
 				this.lines();
 				break;
 		}
@@ -90,7 +92,7 @@ cnvgl_rendering_primitive = (function() {
 		prim = new cnvgl_primitive();
 		prim.mode = this.mode;
 		prim.vertices.push(this.vertices.shift());
-		this.point.render(prim);		
+		this.point.render(prim);	
 	};
 
 	cnvgl_rendering_primitive.lines = function() {
@@ -115,20 +117,21 @@ cnvgl_rendering_primitive = (function() {
 		}
 	};
 
-	cnvgl_rendering_primitive_line.lineLoop = function() {
+	cnvgl_rendering_primitive.lineLoop = function() {
 		var prim, v0;
 		if (this.vertices.length < 2) {
-			return;	
+			return;
 		}
 		prim = new cnvgl_primitive();
-		prim.mode = this.mode;			
-		if (vertices.length > 2) {
+		prim.mode = this.mode;
+		if (this.vertices.length > 2) {
 			v0 = this.vertices.shift();
-		}
-		prim.vertices.push(this.vertices.shift());
-		prim.vertices.push(this.vertices[0]);
-		if (v0) {
-			prim.vertices.unshift(v0);
+			prim.vertices.push(this.vertices.shift());
+			prim.vertices.push(this.vertices[0]);
+			this.vertices.unshift(v0);
+		} else {
+			prim.vertices.push(this.vertices[0]);
+			prim.vertices.push(this.vertices[1]);
 		}
 		this.line.render(prim);
 	};
@@ -140,7 +143,7 @@ cnvgl_rendering_primitive = (function() {
 			prim.mode = this.mode;
 			prim.vertices.push(this.vertices.shift());	
 			prim.vertices.push(this.vertices.shift());	
-			prim.vertices.push(this.vertices.shift());	
+			prim.vertices.push(this.vertices.shift());
 			this.triangle.render(prim);
 		}
 	};

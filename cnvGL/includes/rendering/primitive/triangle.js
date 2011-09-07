@@ -74,7 +74,7 @@ cnvgl_rendering_primitive_triangle = (function() {
 		v3 = this.v3 = prim.vertices[2];
 
 		this.renderer.interpolate.setVertices(this.v1, this.v2, this.v3);
-		
+
 		dx1 = this.renderer.vertex.slope(v1.xw, v1.yw, v2.xw, v2.yw);
 		dx2 = this.renderer.vertex.slope(v1.xw, v1.yw, v3.xw, v3.yw);
 		dx3 = this.renderer.vertex.slope(v2.xw, v2.yw, v3.xw, v3.yw);
@@ -149,7 +149,7 @@ cnvgl_rendering_primitive_triangle = (function() {
 			p[0] = xi;
 			int.setPoint(p);
 			if (this.ctx.depth.test == GL_TRUE) {
-				this.frag.gl_FragDepth = int.interpolate(this.v1.zw, this.v2.zw, this.v3.zw);
+				this.frag.gl_FragDepth = int.interpolateTriangle(this.v1.zw, this.v2.zw, this.v3.zw);
 				if (!this.renderer.checkDepth(id, this.frag.gl_FragDepth)) {
 					id++;
 					ic += 4;
@@ -160,7 +160,7 @@ cnvgl_rendering_primitive_triangle = (function() {
 
 			//interpolate varying
 			for (v in this.v1.varying) {
-				this.frag.varying[v] = int.interpolate(this.v1.varying[v], this.v2.varying[v], this.v3.varying[v]);
+				this.frag.varying[v] = int.interpolateTriangle(this.v1.varying[v], this.v2.varying[v], this.v3.varying[v]);
 			}
 
 			this.renderer.fragment.process(this.frag);

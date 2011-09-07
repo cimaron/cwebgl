@@ -31,7 +31,7 @@ cnvgl_rendering_primitive_point = (function() {
 		this.prim = null;
 	}
 
-	var cnvgl_rendering_primitive_point = jClass('cnvgl_rendering_point', Initializer);
+	var cnvgl_rendering_primitive_point = jClass('cnvgl_rendering_primitive_point', Initializer);
 
 	//public:
 
