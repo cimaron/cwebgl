@@ -36,4 +36,4 @@ vec.construct = function(l) {
 		}
 	}
 	return v;
-}
+};

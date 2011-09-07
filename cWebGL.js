@@ -50,7 +50,7 @@ var cWebGLRenderingContext;
 		hook();
 	}
 
-	if (WebGLRenderingContext) {
+	if (typeof WebGLRenderingContext != 'undefined') {
 		WebGLRenderingContext.prototype.setTargetFps = function() {};
 	};
 
