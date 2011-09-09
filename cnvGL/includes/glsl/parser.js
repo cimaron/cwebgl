@@ -2177,8 +2177,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						yyval.declarator_list = new glsl.ast.declarator_list(yyvsa[yyvsp - 1].fully_specified_type);
 						yyval.declarator_list.set_location(yylloc);
 						yyval.declarator_list.declarations.push(decl);
-						var symbol = state.symbols.add_variable(yyvsa[yyvsp].identifier);
-						symbol.definition = yyvsa[yyvsp - 1];
+						//var symbol = state.symbols.add_variable(yyvsa[yyvsp].identifier);
+						//symbol.definition = yyvsa[yyvsp - 1];
 						break;
 
 					case 143:
@@ -2274,6 +2274,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						}
 						yyval = {};
 						yyval.n = glsl.ast.precision.high;
+						break;
+
+					case 233:
+						if (!state.es_shader && state.language_version < 130) {
+							yyerror(yylsa[yylsp], state, "precision qualifier forbidden in %s (1.30 or later required)\n", state.version_string);
+						}
+						yyval = {};
+						yyval.n = glsl.ast.precision.medium;
 						break;
 
 					case 261:
@@ -2471,7 +2479,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					case 229:
 					case 230:
 					case 231:
-					case 233:
 					case 234:
 					case 235:
 					case 236:

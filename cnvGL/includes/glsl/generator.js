@@ -33,6 +33,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	g_type_qualifiers[glsl.ast.type_qualifier.flags.varying] = 'varying';
 	function g_type_default_value(type) {
 		switch (type.type_specifier) {
+			case glsl.ast.types.float:
+				return '0.0';
 			case glsl.ast.types.vec2:
 				return '[0,0]';
 			case glsl.ast.types.vec3:
@@ -60,23 +62,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			mat4 : {
 				mat4 : { type : 'mat4', func : 'mat4.multiply(%s,%s,[])' },
 				vec4 : { type : 'vec4', func : 'mat4.multiplyVec4(%s,%s,[])' }
+			},
+			vec3 : {
+				float : { type : 'vec3', func : 'vec3.multipleScalar(%s,%s,[])' }
 			}
-		},
-		39 : { //glsl.ast.operators.field_selection
-			vec2 : { type : 'float', func : '%s[%s]' },
-			vec3 : { type : 'float', func : '%s[%s]' }
 		},
 		41 : { //glsl.ast.operators.function_call
 			'*' : { type : 'null', func : '%s(%s)' }
 		}
-	};
-	var g_operations_field_selection_names = {
-		vec2 : { x : '0', y : '1',
-				 r : '0', g : '1',
-				 s : '0', t : '1'},
-		vec3 : { x : '0', y : '1', z : '2',
-				 r : '0', g : '1', b : '2',
-				 s : '0', t : '1', p : '2'}
 	};
 
 	function g_get_operation(op, type1, type2) {
@@ -99,6 +92,54 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		return false;
 	}
 
+	var g_operations_field_selection_names = {
+		vec2 : [ 'xy', 'rg', 'st' ],
+		vec3 : [ 'xyz', 'rgb', 'stp' ],
+		vec4 : [ 'xyzw', 'rgba', 'stpq' ]
+	};
+
+	function g_get_field_selection_r_type(identifier, fields, type) {
+		var i, sets, set, exp, j, keys;
+		fields = fields.split('');
+
+		//invalid number of field selections
+		if (fields.length < 1 || fields.length > 4) {
+			return false;
+		}
+
+		//find a field set based on the first field
+		sets = g_operations_field_selection_names[type];
+		for (i in sets) {
+			if (sets[i].indexOf(fields[0]) != -1) {
+				set = sets[i];
+				break;
+			}
+		}
+		if (!set) {
+			return false;
+		}
+
+		keys = [];
+		for (i = 0; i < fields.length; i++) {
+			j = set.indexOf(fields[i]);
+			if (j == -1) {
+				return false;	
+			}
+			keys[i] = glsl.sprintf('%s[%s]', identifier, j);
+		}
+
+		exp = {};
+		if (keys.length == 1) {
+			exp.type = 'float';
+			exp.code = keys[0];
+		} else {
+			exp.type = 'vec' + keys.length;
+			exp.code = glsl.sprintf("[%s]", keys.join(","));
+		}
+
+		return exp;
+	}
+
 	function g_indent() {
 		return new Array(glsl.generator.depth + 1).join("\t");
 	}
@@ -106,7 +147,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	//-------------------------------------------------
 	//	Code Generation
 	//-------------------------------------------------
-	
+
 	function g_ast_type_specifier(ts) {
 		if (ts.is_precision_statement) {
 			return "\n";	
@@ -115,32 +156,42 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	}
 
 	function g_ast_declarator_list(dl) {
+		var code, type, specifier, list, d_code, i, decl, name, entry, exp, i_code;
 
-		var code = '', d_code, i;
+		code = '';
 
 		//get default initialization values
-		var type = dl.type;
-		var specifier = type.specifier;
-
+		type = dl.type;
+		specifier = type.specifier;
 		d_code = g_type_default_value(specifier);
 		if (!d_code) {
 			return false;
 		}
 
-		var list = dl.declarations;
+		list = dl.declarations;
 		for (i = 0; i < list.length; i++) {
-			var decl = list[i];
-			var name = decl.identifier;
+			decl = list[i];
+			name = decl.identifier;
 
-			//update symbol table entry type
-			var entry = glsl.state.symbols.get_variable(name);
+			//add symbol table entry
+			entry = glsl.state.symbols.add_variable(name);
 			entry.type = specifier.type_name;
-			if (type.qualifier) {
+
+			if (dl.type.qualifier) {
 				entry.qualifier_name = g_type_qualifiers[type.qualifier.flags.q];
 				//code += entry.object_name + " = " + d_code + ";\n";
 				code += "\n";
 			} else {
-				code += entry.name + " = " + d_code + ";\n";
+				if (decl.initializer) {
+					exp = g_ast_expression(decl.initializer);
+					if (exp.type != entry.type) {
+						throw new Error(g_error("Could not assign value of type " + exp.type + " to " + entry.type, dl));
+					}
+					i_code = exp.code;
+				} else {
+					i_code = d_code;
+				}
+				code += "var " + entry.name + " = " + i_code + ";\n";
 			}
 		}
 		return code;
@@ -194,6 +245,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		switch (e.oper) {
 
+			case glsl.ast.operators.int_constant:
 			case glsl.ast.operators.identifier:
 				exp = g_ast_expression_simple(e);
 				return exp;
@@ -246,24 +298,18 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				throw new Error(g_error("Could not translate function call", e));
 
 			case glsl.ast.operators.field_selection:
-				op = g_get_operation(e.oper, left.type);
-				exp.type = op.type;
-
-				if (op) {
-					var field = g_operations_field_selection_names[left.type][e.primary_expression.identifier];
-					if (field) {
-						exp.code = glsl.sprintf(op.func, left.code, field);
-						return exp;
-					}
+				exp = g_get_field_selection_r_type(left.code, e.primary_expression.identifier, left.type);
+				if (exp) {
+					return exp;
+				} else {
+					throw new Error(g_error("Invalid field selection " + left.code + "." + e.primary_expression.identifier, e));					
 				}
-
-				throw new Error(g_error("Invalid operation on type " + left.type, e));
 
 			default:
 				throw new Error(g_error("Could not translate unknown expression " + e.typeOf() + '(' + e.oper + ')', e));
 		}
 	}
-		
+
 	function g_ast_expression_simple(e) {
 		var exp = {};
 
@@ -283,13 +329,19 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 			return exp;
 		}
-
+		
 		if (typeof e.primary_expression.float_constant != 'undefined') {
 			exp.code = e.primary_expression.float_constant;
 			exp.type = 'float';
 			return exp;
 		}
-		
+
+		if (typeof e.primary_expression.int_constant != 'undefined') {
+			exp.code = e.primary_expression.int_constant;
+			exp.type = 'int';
+			return exp;
+		}
+
 		throw new Error(g_error("Cannot translate unkown simple expression type", e));
 	}
 
@@ -315,7 +367,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			return exp;
 		}
 
-		throw new Error(g_error("Could not translate unkown expression type", e));
+		throw new Error(g_error("Could not translate unknown expression type", e));
 	}
 
 	function g_ast_expression_statement(es) {
@@ -327,6 +379,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	}
 
 	function g_ast_compound_statement(cs) {
+		
+		glsl.state.symbols.push_scope();
+		
 		var code = '', i;
 		var stmts = cs.statements;
 		var start = stmts.head, node, stmt;
@@ -346,12 +401,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					}
 					code += g_indent() + es;
 					break;
+				case 'ast_declarator_list':
+					var es = g_ast_declarator_list(stmt);
+					break;
 				default:
 					throw new Error(g_error("Could not translate statement type (" + stmt.typeOf() + ")", stmt));
 			}
-			
+
 			node = node.next;
 		}
+
+		glsl.state.symbols.pop_scope();
 
 		glsl.generator.depth--;
 		code = g_indent() + "{\n" + code + g_indent() + "}\n";
@@ -418,7 +478,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			try {
 				for (i = 0; i < state.translation_unit.length; i++) {
 					var tu = state.translation_unit[i];
-					this.output += g_translation_unit(tu);					
+					this.output += g_translation_unit(tu);
 				}
 			} catch (e) {
 				this.errors.push(e);
