@@ -197,7 +197,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		low : 3
 	};
 
-	ast_types = {
+	var ast_types = {
 		'void' : 0,
 		float : 1,
 		int : 2,

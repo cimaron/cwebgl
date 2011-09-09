@@ -102,41 +102,27 @@ var glsl = (function() {
 		this.num_builtines_to_link = 0;
 	};
 
-
-
 	var token;
-
-	function copy(target, source) {
-		var i;
-		for (i in target) {
-			delete target[i];
-		}
-		for (i in source) {
-			target[i] = source[i];	
-		}
-		return target;
-	}
-
-	function next_token(p_yylval, yylloc, scanner) {
-		lexer.yylval = p_yylval;
+	function next_token(yylval, yylloc, scanner) {
+		lexer.yylval = {};
 		var result = lexer.lex();
 		if (result == 1) {
 			result = 0; //YYEOF	
 		}
-		//references reset in lexer, copy properties into our object
-		copy(yylloc, lexer.yylloc);
+		yylval[0] = lexer.yylval;
+		yylloc[0] = lexer.yylloc;
 		return result;
 	}
 
-	//#IF DEBUG
+	/*IF DEBUG
 	function print_token_value(yyoutput, yytoknum, yyvaluep) {
 		glsl.fprintf(2, JSON.stringify(yyvaluep).replace(/"/g, ''));
 	}
+	*/
 
 	function print_error(yylloc, state, error) {
 		glsl.errors.push(error + " at line " + yylloc.first_line + " column " + yylloc.first_column);
 	}
-	//#ENDIF
 
 	function initialize_types(state) {
 		var i, symbols, entry;
@@ -196,10 +182,12 @@ var glsl = (function() {
 			//parser
 			this.parser.yy = this;
 
-			this.parser.extern('yylex', next_token);
-			this.parser.extern('yyerror', print_error);
-			this.parser.extern('YYPRINT', print_token_value);
-			this.parser.extern('initialize_types', initialize_types);
+			this.parser.yylex = next_token;
+			this.parser.yyerror = print_error;
+			/*IF DEBUG
+			this.parser.YYPRINT = print_token_value;
+			*/
+			this.parser.initialize_types = initialize_types;
 
 			this.token = this.parser.yytokentype;
 		},

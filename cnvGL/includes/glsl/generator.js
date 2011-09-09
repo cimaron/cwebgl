@@ -194,6 +194,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		switch (e.oper) {
 
+			case glsl.ast.operators.identifier:
+				exp = g_ast_expression_simple(e);
+				return exp;
+
 			case glsl.ast.operators.assign:
 
 				if (left.type != right.type) {
