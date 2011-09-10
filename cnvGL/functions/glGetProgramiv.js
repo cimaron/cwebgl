@@ -21,11 +21,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 function glGetProgramiv(program, pname, params) {
-
-	var i;
+	var ctx, program_obj, t, i;
 
 	//get program
-	var program_obj = cnvgl_objects[program];
+	ctx = cnvgl_context.getCurrentContext();
+	program_obj = ctx.shared.program_objects[program];
 
 	//no shader exists
 	if (!program_obj) {
@@ -68,7 +68,7 @@ function glGetProgramiv(program, pname, params) {
 
 		case GL_ACTIVE_ATTRIBUTE_MAX_LENGTH:
 			params[0] = 0;
-			var t = program_obj.active_attributes;
+			t = program_obj.active_attributes;
 			for (i = 0; i < program_obj.active_attributes_count; i++) {
 				if (params[0] < t[i].name.length) {
 					params[0] = t[i].name.length;	
@@ -89,7 +89,7 @@ function glGetProgramiv(program, pname, params) {
 				}
 			}
 			break;
-		
+
 		default:
 			cnvgl_throw_error(GL_INVALID_ENUM);
 			return;

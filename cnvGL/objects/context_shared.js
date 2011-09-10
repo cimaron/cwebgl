@@ -19,18 +19,36 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+var cnvgl_context_shared = (function() {
+							  
+	function Initializer() {
+		//public:
+		this.linker = null;
+		
+		this.program_objects = [];
+		this.texture_objects = [];
+	}
 
-function glCreateProgram() {
-	var ctx, program_obj, name;
+	var cnvgl_context_shared = jClass('cnvgl_context_shared', Initializer);
+	
+	//static:
+	var instance = null;
+	cnvgl_context_shared.Constructor.getInstance = function() {
+		if (instance) {
+			return instance;	
+		}
+		return new cnvgl_context_shared.Constructor();
+	};
 
-	ctx = cnvgl_context.getCurrentContext();
-	name = ctx.shared.program_objects.length;
+	//public:
 
-	program_obj = new cnvgl_program();
-	program_obj.name = name;
+	cnvgl_context_shared.cnvgl_context_shared = function() {
+		this.linker = new GlslLinker();
+		this.texture_objects = [0];
+		this.program_objects = [0];
+	};
 
-	ctx.shared.program_objects.push(program_obj);
+	return cnvgl_context_shared.Constructor;
 
-	return name;
-}
+}());
 

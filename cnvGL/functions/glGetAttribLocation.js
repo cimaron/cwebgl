@@ -22,15 +22,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 function glGetAttribLocation(program, name) {
 
-	var i;
+	var ctx, program_obj, i;
 
-	/*if (between glBegin and glEnd) {
-		cnvgl_throw_error(GL_INVALID_OPERATION);
-		return 0;
-	} */
+	ctx = cnvgl_context.getCurrentContext();
 
 	//get program
-	var program_obj = cnvgl_objects[program];
+	program_obj = ctx.shared.program_objects[program];
 
 	//no program exists
 	if (!program_obj) {
@@ -38,15 +35,9 @@ function glGetAttribLocation(program, name) {
 		return;
 	}
 
-	//object is not a program (BAD!)
-	if (!program_obj instanceof cnvgl_program) {
-		cnvgl_throw_error(GL_INVALID_OPERATION);
-		return;
-	}	
-
 	if (!program_obj.link_status) {
 		cnvgl_throw_error(GL_INVALID_OPERATION);
-		return;		
+		return;
 	}
 
 	var t = program_obj.active_attributes;

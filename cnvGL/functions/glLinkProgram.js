@@ -21,15 +21,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 function glLinkProgram(program) {
-
-	var i;
-
-	//if (not supported) then
-	//	cnvgl_throw_error(GL_INVALID_OPERATION);
-	//endif
+	var ctx, program_obj, linker, i;
 
 	//get program
-	var program_obj = cnvgl_objects[program];
+	ctx = cnvgl_context.getCurrentContext();
+	program_obj = ctx.shared.program_objects[program];
 
 	//no program exists
 	if (!program_obj) {
@@ -59,7 +55,7 @@ function glLinkProgram(program) {
 	program_obj.active_attributes = [];
 	program_obj.active_attributes_values = [];	
 
-	var linker = new GlslLinker();
+	linker = ctx.shared.linker;
 
 	//may want to move this into the linker itself
 	for (i = 0; i < program_obj.attached_shaders_count; i++) {

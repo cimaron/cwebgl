@@ -29,15 +29,20 @@ function glUniformMatrix4fv(location, count, transpose, value) {
 }
 
 function __glUniform(location, count, transpose, value, _size, _integer, _vector, _matrix) {
+	var ctx, program_obj, uniform_obj, itypes, ftypes;
 
-	var current_program = cnvgl_context.getCurrentContext().current_program;
+	itypes = ['int', 'ivec2', 'ivec3', 'ivec4', 'sampler2D'];
+	ftypes = ['float', 'vec2', 'vec3', 'vec4', 'mat4'];
 
-	if (!current_program) {
+	ctx = cnvgl_context.getCurrentContext();
+	program_obj = ctx.current_program;
+
+	if (!program_obj) {
 		cnvgl_throw_error(GL_INVALID_OPERATION);
 		return;
 	}
 
-	if (location != -1 && location < 0 && location >= current_program.active_uniforms_count) {
+	if (location != -1 && location < 0 && location >= program_obj.active_uniforms_count) {
 		cnvgl_throw_error(GL_INVALID_OPERATION);
 		return;
 	}
@@ -47,10 +52,7 @@ function __glUniform(location, count, transpose, value, _size, _integer, _vector
 		return;
 	}
 
-	var uniform_obj = current_program.active_uniforms[location];
-
-	var itypes = ['int', 'ivec2', 'ivec3', 'ivec4', 'sampler2D'];
-	var ftypes = ['float', 'vec2', 'vec3', 'vec4', 'mat4'];
+	uniform_obj = program_obj.active_uniforms[location];
 
 	if (location == -1) {
 		return;
@@ -69,12 +71,7 @@ function __glUniform(location, count, transpose, value, _size, _integer, _vector
 	}
 
 	//GL_INVALID_OPERATION is generated if a sampler is loaded using a command other than glUniform1i and glUniform1iv.
-	
-	/*if (between glBegin and glEnd) {
-		cnvgl_throw_error(GL_INVALID_OPERATION);
-		return 0;
-	} */
 
-	current_program.active_uniforms_values[location] = value;
+	program_obj.active_uniforms_values[location] = value;
 }
 

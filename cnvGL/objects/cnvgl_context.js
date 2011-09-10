@@ -89,7 +89,7 @@ var cnvgl_context = (function() {
 			this.vertex_attrib_arrays[i] = new cnvgl_attrib_array_object();
 		}
 
-		this.shared = this.getSharedObjects();
+		this.shared = cnvgl_context_shared.getInstance();
 
 		this.renderer = new cnvgl_renderer(this);
 	};
@@ -103,17 +103,6 @@ var cnvgl_context = (function() {
 			context = new cnvgl_context.Constructor();
 		}
 		return context;
-	};
-
-	var shared;
-
-	cnvgl_context.getSharedObjects = function() {
-		if (shared) {
-			return shared;	
-		}
-		shared = {};
-		shared.texture_objects = [0];
-		return shared;
 	};
 
 	return cnvgl_context.Constructor;

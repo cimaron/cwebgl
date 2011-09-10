@@ -22,18 +22,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 function glAttachShader(program, shader) {
 
-	/*if (shader compiler not supported) {
-		cnvgl_throw_error(GL_INVALID_OPERATION);
-	} */
+	var ctx, program_obj, shader_obj;
 
-	/*if (between glBegin and glEnd) {
-		cnvgl_throw_error(GL_INVALID_OPERATION);
-		return 0;
-	} */
+	ctx = cnvgl_context.getCurrentContext();
 
-	//get objects
-	var shader_obj = cnvgl_objects[shader];
-	var program_obj = cnvgl_objects[program];
+	program_obj = ctx.shared.program_objects[program];
+	shader_obj = cnvgl_objects[shader];
 
 	//program or shader does not exist
 	if (!program_obj || !shader_obj) {

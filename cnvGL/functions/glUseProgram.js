@@ -21,24 +21,18 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 function glUseProgram(program) {
+	var ctx, program_obj;
 
-	var state;
-
-	/*if (between glBegin and glEnd) {
-		cnvgl_throw_error(GL_INVALID_OPERATION);
-		return 0;
-	} */
-
-	state = cnvgl_context.getCurrentContext();
+	ctx = cnvgl_context.getCurrentContext();
 
 	if (program == 0) {
-		state.vertex_executable = null;
-		state.fragment_executable = null;
+		ctx.vertex_executable = null;
+		ctx.fragment_executable = null;
 		return;
 	}
 
 	//get program
-	var program_obj = cnvgl_objects[program];
+	program_obj = ctx.shared.program_objects[program];
 
 	//no program exists
 	if (!program_obj) {
@@ -57,8 +51,8 @@ function glUseProgram(program) {
 		return;
 	}
 
-	state.current_program = program_obj;
+	ctx.current_program = program_obj;
 
-	state.renderer.setProgram(program_obj);
+	ctx.renderer.setProgram(program_obj);
 }
 

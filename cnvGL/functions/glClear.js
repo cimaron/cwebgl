@@ -22,7 +22,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 function glClear(mask) {
 
-	var buffer, clear, state, i;
+	var ctx, buffer, clear, i;
 
 	//mask = mask & (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ACCUM_BUFFER_BIT | and GL_STENCIL_BUFFER_BIT);
 
@@ -36,13 +36,13 @@ function glClear(mask) {
 		return 0;
 	} */
 
-	state = cnvgl_context.getCurrentContext();
+	ctx = cnvgl_context.getCurrentContext();
 
 	//GL_COLOR_BUFFER_BIT
 	if (mask & GL_COLOR_BUFFER_BIT) {
-		buffer = state.color_buffer;
-		clear = state.clear_color;
-		for (i = 0, l = buffer.length; i < l; i += 4) {
+		buffer = ctx.color_buffer;
+		clear = ctx.clear_color;
+		for (i = 0; i < buffer.length; i += 4) {
 			buffer[i] = clear[0];
 			buffer[i + 1] = clear[1];
 			buffer[i + 2] = clear[2];
@@ -52,9 +52,9 @@ function glClear(mask) {
 
 	//GL_DEPTH_BUFFER_BIT
 	if (mask & GL_DEPTH_BUFFER_BIT) {
-		buffer = state.depth_buffer;
-		clear = state.depth.clear;
-		for (i = 0, l = buffer.length; i < l; i ++) {
+		buffer = ctx.depth_buffer;
+		clear = ctx.depth.clear;
+		for (i = 0; i < buffer.length; i ++) {
 			buffer[i] = clear;
 		}
 	}

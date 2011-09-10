@@ -21,16 +21,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 function glGetUniformLocation(program, name) {
-
-	var t, i;
-
-	/*if (between glBegin and glEnd) {
-		cnvgl_throw_error(GL_INVALID_OPERATION);
-		return 0;
-	} */
+	var ctx, program_obj, t, i;
 
 	//get program
-	var program_obj = cnvgl_objects[program];
+	ctx = cnvgl_context.getCurrentContext();
+	program_obj = ctx.shared.program_objects[program];
 
 	//no program exists
 	if (!program_obj) {

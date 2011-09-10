@@ -6,6 +6,7 @@ include('cnvGL/objects/cnvgl_attrib_array.js');
 include('cnvGL/objects/cnvgl_attribute.js');
 include('cnvGL/objects/cnvgl_buffer.js');
 include('cnvGL/objects/cnvgl_context.js');
+include('cnvGL/objects/context_shared.js');
 include('cnvGL/objects/cnvgl_fragment.js');
 include('cnvGL/objects/cnvgl_primitive.js');
 include('cnvGL/objects/cnvgl_program.js');
