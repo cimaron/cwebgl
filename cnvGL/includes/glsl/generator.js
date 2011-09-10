@@ -324,7 +324,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				throw new Error(g_error(e.primary_expression.identifier + " is undefined", e));
 			}
 
-			exp.code = entry.object_name;
+			if (entry.depth == 0) {
+				exp.code = entry.object_name;
+			} else {
+				exp.code = identifier;	
+			}
 			exp.type = entry.type;
 
 			return exp;
@@ -379,12 +383,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	}
 
 	function g_ast_compound_statement(cs) {
-		
+		var code, i, stmts, start, node, stmt, exp, es;
+
 		glsl.state.symbols.push_scope();
-		
-		var code = '', i;
-		var stmts = cs.statements;
-		var start = stmts.head, node, stmt;
+
+		code = '';
+		stmts = cs.statements;
+		start = stmts.head;
 
 		glsl.generator.depth++;
 
@@ -395,14 +400,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			stmt = node.data;
 			switch (stmt.typeOf()) {
 				case 'ast_expression_statement':
-					var es = g_ast_expression_statement(stmt);
+					es = g_ast_expression_statement(stmt);
 					if (!es) {
 						return false;
 					}
 					code += g_indent() + es;
 					break;
 				case 'ast_declarator_list':
-					var es = g_ast_declarator_list(stmt);
+					exp = g_ast_declarator_list(stmt);
+					if (exp) {
+						code += exp;
+					}
 					break;
 				default:
 					throw new Error(g_error("Could not translate statement type (" + stmt.typeOf() + ")", stmt));

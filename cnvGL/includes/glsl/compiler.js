@@ -138,7 +138,7 @@ var glsl = (function() {
 			functions : {
 				'dot' : { type : 'float' },
 				'max' : { type : 'float' },
-				'texture2D' : { type : 'vec4' },
+				'texture2D' : { type : 'vec4' }
 			}
 		};
 

@@ -26,6 +26,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		this.typedef = typedef;
 		this.type = null;
 		this.definition = null;
+		this.depth = null;
 
 		this.object_name = null;
 		this.qualifier = null;
@@ -113,9 +114,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		
 		symbol_table.add_entry = function(entry) {
 			this.table.data[entry.name] = entry;
+			entry.depth = this.table.depth;
 			return entry;
 		};
-		
+
 		symbol_table.get_entry = function(name, typedef) {
 			var table = this.table;
 			while (table != null) {
