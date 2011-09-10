@@ -23,7 +23,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 GraphicsContext3D = (function() {
 
 	function Initializer() {
-		
+
 		//public:
 		this.webglCtx = null;
 		this.canvas = null;
@@ -99,7 +99,7 @@ GraphicsContext3D = (function() {
 	GraphicsContext3D.clearColor = function(red, green, blue, alpha) {
 		glClearColor(red, green, blue, alpha);
 	};
-	
+
 	GraphicsContext3D.compileShader = function(shader) {
 		glCompileShader(shader);
 	};
@@ -141,7 +141,7 @@ GraphicsContext3D = (function() {
 	GraphicsContext3D.enableVertexAttribArray = function(index) {
 		glEnableVertexAttribArray(index);
 	};
-	
+
 	GraphicsContext3D.getAttribLocation = function(program, name) {
 		return glGetAttribLocation(program, name);
 	};
@@ -186,8 +186,12 @@ GraphicsContext3D = (function() {
 		glShaderSource(shader, 1, [string], [string.length]);
 	};
 	
-	GraphicsContext3D.uniform1i = function(location, x) {
-		return glUniform1i(location, x);
+	GraphicsContext3D.uniform1i = function(location, v0) {
+		return glUniform1i(location, v0);
+	};
+
+	GraphicsContext3D.uniform3f = function(location, v0, v1, v2) {
+		return glUniform3f(location, v0, v1, v2);
 	};
 
 	GraphicsContext3D.uniformMatrix4fv = function(location, transpose, value) {
@@ -358,7 +362,7 @@ GraphicsContext3D = (function() {
 	GraphicsContext3D._redraw = function() {
 
 		this._updateFrame();
-
+		
 		if (this._dirty) {
 			this._dirty = false;
 

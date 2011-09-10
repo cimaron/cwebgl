@@ -44,7 +44,8 @@ cnvgl_rendering_fragment = (function() {
 	};
 
 	cnvgl_rendering_fragment.setProgram = function(program) {
-		this.program = program;
+		this.program = program.fragment_program;
+		this.data._uniforms = program.active_uniforms_values;
 	};
 
 	cnvgl_rendering_fragment.prepareContext = function() {

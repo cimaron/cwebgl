@@ -107,7 +107,7 @@ GlslLinker = (function() {
 					uniform_obj.location = this.program.active_uniforms_count;
 					this.program.active_uniforms.push(uniform_obj);
 					this.program.active_uniforms_count++;
-					code = this.replaceSymbol(code, entry.object_name, '__uniform['+uniform_obj.location+']');						
+					code = this.replaceSymbol(code, entry.object_name, 'this._uniforms['+uniform_obj.location+']');						
 					break;
 
 				case 'attribute':
@@ -155,8 +155,6 @@ GlslLinker = (function() {
 	};
 
 	linker.buildExecutable = function(__code, __mode) {
-
-		var __uniform = this.program.active_uniforms_values;
 
 		eval(__code);
 

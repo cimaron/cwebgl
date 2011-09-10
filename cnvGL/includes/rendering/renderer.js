@@ -56,8 +56,8 @@ cnvgl_renderer = (function() {
 	};
 
 	cnvgl_renderer.setProgram = function(program) {
-		this.vertex.setProgram(program.vertex_program);
-		this.fragment.setProgram(program.fragment_program);
+		this.vertex.setProgram(program);
+		this.fragment.setProgram(program);
 	};
 
 	cnvgl_renderer.setMode = function(mode) {

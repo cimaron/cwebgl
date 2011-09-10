@@ -34,18 +34,19 @@ cnvgl_rendering_program = (function() {
 		//data sharing
 		this._out = null;
 		this._varying = null;
+		this._uniforms = null;
 	}
 
-	var cnvgl_rendering_data = jClass('cnvgl_rendering_data', Initializer);	
+	var cnvgl_rendering_program = jClass('cnvgl_rendering_program', Initializer);	
 
-	cnvgl_rendering_data.cnvgl_rendering_data = function(ctx, renderer) {
+	cnvgl_rendering_program.cnvgl_rendering_program = function(ctx, renderer) {
 		this._ctx = ctx;
 		this._renderer = renderer;
-
+		
 		this._texture2D = renderer.texture.texture2D;
 	};
 
-	return cnvgl_rendering_data.Constructor;
+	return cnvgl_rendering_program.Constructor;
 
 }());
 

@@ -42,8 +42,9 @@ cnvgl_rendering_vertex = (function() {
 		this.data = new cnvgl_rendering_program(ctx, renderer);
 	};
 
-	cnvgl_rendering_vertex.setProgram = function(vertex_program) {
-		this.program = vertex_program;
+	cnvgl_rendering_vertex.setProgram = function(program) {
+		this.program = program.vertex_program;
+		this.data._uniforms = program.active_uniforms_values;
 	};
 
 	cnvgl_rendering_vertex.setMode = function(mode) {

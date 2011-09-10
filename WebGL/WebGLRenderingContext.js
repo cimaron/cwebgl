@@ -482,9 +482,14 @@ cWebGLRenderingContext = (function() {
 		this._context.attachShader(program.object(), shader.object());
 	};
 	
+	cWebGLRenderingContext.bindAttribLocation = function(program, index, name) {
+		//@validation
+		this._context.bindAttribLocation(program.object(), index, name);
+	};
+
 	cWebGLRenderingContext.bindBuffer = function(target, buffer) {
 		//@validation
-		this._context.bindBuffer(target, buffer.object());
+		this._context.bindBuffer(target, buffer ? buffer.object() : null);
 	};
 	
 	cWebGLRenderingContext.bindFramebuffer = function(target, framebuffer) {
@@ -528,7 +533,12 @@ cWebGLRenderingContext = (function() {
 		//@validation
 		this._context.clearColor(red, green, blue, alpha);
 	};
-	
+
+	cWebGLRenderingContext.clearDepth = function(depth) {
+		//@validation
+		this._context.clearDepth(depth);
+	};
+
 	cWebGLRenderingContext.compileShader = function(shader) {
 		//@validation
 		this._context.compileShader(shader.object());
