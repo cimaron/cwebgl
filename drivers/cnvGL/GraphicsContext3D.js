@@ -23,15 +23,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 GraphicsContext3D = (function() {
 
 	function Initializer() {
-
-		//public:
+		//private:
 		this.webglCtx = null;
 		this.canvas = null;
 
 		this.buffer = null;
 		this.context = null;
+		this.errors = [];
 
-		//private:
 		this._state = {};
 		this._dirty = false;
 		
@@ -145,7 +144,14 @@ GraphicsContext3D = (function() {
 	GraphicsContext3D.getAttribLocation = function(program, name) {
 		return glGetAttribLocation(program, name);
 	};
-	
+
+	GraphicsContext3D.getError = function() {
+		if (this.errors.length > 0) {
+			return this.errors.shift();     
+		}
+		return glGetError();
+	};
+
 	GraphicsContext3D.getProgramParameter = function(program, pname) {
 		var params = [];
 		glGetProgramiv(program, pname, params);

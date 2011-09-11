@@ -628,6 +628,10 @@ cWebGLRenderingContext = (function() {
 		//@validation
 		return this._context.getAttribLocation(program.object(), name);
 	};
+
+	cWebGLRenderingContext.getError = function() {
+		return this._context.getError();
+	};
 	
 	cWebGLRenderingContext.getProgramParameter = function(program, pname) {
 		//@validation

@@ -23,8 +23,6 @@ var cnvgl_context = (function() {
 							  
 	function Initializer() {
 
-		this.current_error_code = 0;
-	
 		//states
 		this.color = {};
 		this.depth = {};
@@ -34,6 +32,9 @@ var cnvgl_context = (function() {
 		this.unpack = {};
 		this.viewport = {};
 
+		//direct
+		this.errorValue = 0;
+	
 		//Frame Buffers
 		this.color_buffer = null;
 		this.depth_buffer = null;
@@ -84,6 +85,9 @@ var cnvgl_context = (function() {
 		this.viewport.y = 0;
 		this.viewport.w = 0;
 		this.viewport.h = 0;
+
+		//direct
+		this.errorValue = GL_NO_ERROR;
 
 		this.bound_buffers[GL_ARRAY_BUFFER] = 0;
 		this.bound_buffers[GL_ELEMENT_ARRAY_BUFFER] = 0;
