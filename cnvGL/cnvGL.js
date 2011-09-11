@@ -50,6 +50,7 @@ include('cnvGL/includes/rendering/vertex.js');
 
 include('cnvGL/functions/glActiveTexture.js');
 include('cnvGL/functions/glAttachShader.js');
+include('cnvGL/functions/glBlendFunc.js');
 include('cnvGL/functions/glBindAttribLocation.js');
 include('cnvGL/functions/glBindBuffer.js');
 include('cnvGL/functions/glBindTexture.js');

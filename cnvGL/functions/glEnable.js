@@ -32,6 +32,31 @@ function glEnable(cap) {
 		case GL_DEPTH_TEST:
 			ctx.depth.test = GL_TRUE;
 			break;
+		case GL_BLEND:
+			ctx.color.blendEnabled = GL_TRUE;
+			break;
+
+		default:
+			throw new Error('Bad Enable: ' + cap);
+	}
+
+}
+
+function glDisable(cap) {
+	var ctx;
+	
+	ctx = cnvgl_context.getCurrentContext();
+
+	switch (cap) {
+		case GL_CULL_FACE:
+			ctx.polygon.cullFlag = GL_TRUE;
+			break;
+		case GL_DEPTH_TEST:
+			ctx.depth.test = GL_TRUE;
+			break;
+		case GL_BLEND:
+			ctx.color.blendEnabled = GL_FALSE;
+			break;
 
 		default:
 			throw new Error('Bad Enable: ' + cap);

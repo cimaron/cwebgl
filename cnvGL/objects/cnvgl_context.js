@@ -26,6 +26,7 @@ var cnvgl_context = (function() {
 		this.current_error_code = 0;
 	
 		//states
+		this.color = {};
 		this.depth = {};
 		this.pack = {};
 		this.polygon = {};
@@ -34,7 +35,6 @@ var cnvgl_context = (function() {
 		this.viewport = {};
 
 		//Frame Buffers
-		this.clear_color = [0,0,0,0];
 		this.color_buffer = null;
 		this.depth_buffer = null;
 
@@ -57,6 +57,10 @@ var cnvgl_context = (function() {
 
 	cnvgl_context.cnvgl_context = function() {
 		var i;
+
+		//color state
+		this.color.clearColor = [0,0,0,0];
+		this.color.blendEnabled = GL_FALSE;
 
 		//depth state
 		this.depth.clear = 1.0;

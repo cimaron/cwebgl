@@ -20,16 +20,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-function glClearColor(r, g, b, a) {
+function glBlendFunc(sfactor, dfactor) {
 	var ctx, c;
 
 	ctx = cnvgl_context.getCurrentContext();
-
-	r = Math.max(Math.min(r, 1), 0);
-	g = Math.max(Math.min(g, 1), 0);
-	b = Math.max(Math.min(b, 1), 0);
-	a = Math.max(Math.min(a, 1), 0);
-
-	ctx.color.clearColor = [r, g, b, a];
 }
 

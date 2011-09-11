@@ -21,12 +21,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 function glClearDepth(depth) {
+	var ctx;
+	
+	ctx = cnvgl_context.getCurrentContext();
 
-	/*if (between glBegin and glEnd) {
-		cnvgl_throw_error(GL_INVALID_OPERATION);
-		return 0;
-	} */
+	depth = Math.max(Math.min(depth, 1), 0);
 
-	cnvgl_context.getCurrentContext().clear_depth = depth > 1 ? 1 : (depth < 0 ? 0 : depth);
+	ctx.clear_depth = depth;
 }
 

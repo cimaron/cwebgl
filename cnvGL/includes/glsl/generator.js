@@ -64,7 +64,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				vec4 : { type : 'vec4', func : 'mat4.multiplyVec4(%s,%s,[])' }
 			},
 			vec3 : {
-				float : { type : 'vec3', func : 'vec3.multipleScalar(%s,%s,[])' }
+				float : { type : 'vec3', func : 'vec3.multiplyScalar(%s,%s,[])' }
 			}
 		},
 		41 : { //glsl.ast.operators.function_call
