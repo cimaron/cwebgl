@@ -21,7 +21,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 function glDrawArrays(mode, first, count) {
-	var ctx, renderer, program, attr_data, i, loc, vertex, j, buffer, attr, vtx_data, stride, size, start, k;
+	var ctx, renderer, program, i, vertex, name, buffer, attr, data, vtx_data, start, k;
 
 	ctx = cnvgl_context.getCurrentContext();
 	renderer = ctx.renderer;
@@ -29,37 +29,38 @@ function glDrawArrays(mode, first, count) {
 
 	renderer.setMode(mode);
 
-	//gather vertex attribute buffers
-	attr_data = [];
-	for (i in program.active_attributes) {
-		loc = program.active_attributes[i].location;
-		attr_data[loc] = ctx.vertex_attrib_arrays[loc];
-	}
-
 	//each vertex
 	for (i = first; i < count; i++) {
 
 		vertex = new cnvgl_vertex();
 
-		//build attribute set and initialize
-		for (j = 0; j < attr_data.length; j++) {
+		//initialize attributes for vertex
+		for (name in program.active_attributes) {
+			
+			attr = program.active_attributes[name];
 
 			vtx_data = [];
-			vertex.attributes[j] = vtx_data;
+			vertex.attributes[attr.location] = vtx_data;
+			//initialize
+
+			data = ctx.vertex_attrib_arrays[attr.location];
 
 			//no buffer data was specified for this attribute
-			if (!(buffer = attr_data[j].buffer_obj)) {
+			if (!(buffer = data.buffer_obj)) {
 				continue;
 			}
 
-			attr = attr_data[j];
-			stride = attr.stride;
-			size = attr.size;
-			start = attr.pointer + (i * size + stride);
+			start = data.pointer + (i * data.size + data.stride);
 
-			//can replace the following with TypedArray view
-			for (k = 0; k < size; k++) {
-				vtx_data[k] = buffer.data[k + start];
+			for (k = 0; k < attr.size; k++) {
+				if (k < data.size) {
+					vtx_data[k] = buffer.data[k + start];
+				} else {
+					vtx_data[k] = 0;	
+				}
+			}
+			if (attr.size == 1) {
+				vertex.attributes[attr.location] = vtx_data[0];
 			}
 		}
 

@@ -24,7 +24,7 @@ function cnvgl_attribute(name, definition) {
 
 	//state
 	this.location = null;
-	this.size = 4;
+	this.size = 0;
 	this.type = GL_FLOAT;
 	this.name = name;
 

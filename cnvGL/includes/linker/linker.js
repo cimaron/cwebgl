@@ -33,6 +33,8 @@ GlslLinker = (function() {
 		this.fragment = null;
 		this.vertex = null;
 		this.external = {};
+
+		this.sizes = {};
 	}
 
 	var linker = jClass('linker', Initializer);
@@ -46,6 +48,12 @@ GlslLinker = (function() {
 		this.addExternalReference('@dot@', 'vec3.dot');
 		this.addExternalReference('@max@', 'Math.max');
 		this.addExternalReference('@texture2D@', 'this._%s');
+
+		this.sizes.float = 1;
+		this.sizes.vec2 = 2;
+		this.sizes.vec3 = 3;
+		this.sizes.vec4 = 4;
+		this.sizes.mat4 = 16;
 	};
 
 	linker.addExternalReference = function(object_name, output) {
@@ -121,7 +129,7 @@ GlslLinker = (function() {
 	};
 
 	linker.processSymbols = function(shader) {
-		var symbol_table, code, location, name, entry, uniform_obj, attr_obj, i, e;
+		var symbol_table, code, location, name, entry, uniform_obj, attrib_obj, i, e;
 
 		symbol_table = shader.symbol_table.table.data;
 		code = shader.object_code;
@@ -146,10 +154,12 @@ GlslLinker = (function() {
 				case 'attribute':
 					if (this.program.active_attributes[entry.name]) {
 						attrib_obj = this.program.active_attributes[entry.name];
+						attrib_obj.definition = entry;
 					} else {
 						attrib_obj = new cnvgl_attribute(entry.name, entry);
 						this.addActiveAttribute(attrib_obj);
 					}
+					attrib_obj.size = this.sizes[entry.type];
 					code = this.replaceSymbol(code, entry.object_name, 'this.vertex.attributes['+attrib_obj.location+']');
 					break;
 
