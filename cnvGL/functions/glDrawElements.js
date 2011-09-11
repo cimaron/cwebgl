@@ -21,7 +21,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 function glDrawElements(mode, count, type, indices) {
-	var ctx, renderer, program, elements, vtas, active_attrs, attr_buffers, prgm_attr_loc, i;
+	var ctx, renderer, program, attr_data, i, loc, vertex, index, j, buffer, attr, vtx_data, stride, size, start, k;
 
 	ctx = cnvgl_context.getCurrentContext();
 	renderer = ctx.renderer;
@@ -31,25 +31,13 @@ function glDrawElements(mode, count, type, indices) {
 
 	elements = cnvgl_objects[ctx.bound_buffers[GL_ELEMENT_ARRAY_BUFFER]];
 
-	//gather vertex attributes
-
-	vtas = ctx.vertex_attrib_arrays;
-
-	active_attrs = [];
-	attr_buffers = [];
-	for (i = 0; i < program.active_attributes_count; i++) {
-		
-		prgm_attr_loc = program.active_attributes[i].location;
-
-		active_attrs[prgm_attr_loc] = vtas[i];
-		if (vtas[i].buffer_obj) {
-			attr_buffers[prgm_attr_loc] = vtas[i].buffer_obj.data;
-		}
+	//gather vertex attribute buffers
+	attr_data = [];
+	for (i in program.active_attributes) {
+		loc = program.active_attributes[i].location;
+		attr_data[loc] = ctx.vertex_attrib_arrays[loc];
 	}
 
-	//generate primitive/vertices
-	var vertex, attr_data, vtx_attr_data, attr, start, stride, size, index, j, k;
-	
 	//each vertex
 	for (i = 0; i < count; i++) {
 
@@ -58,25 +46,24 @@ function glDrawElements(mode, count, type, indices) {
 		index = elements.data[i];
 
 		//build attribute set and initialize
-		for (j = 0; j < active_attrs.length; j++) {
+		for (j = 0; j < attr_data.length; j++) {
+
+			vtx_data = [];
+			vertex.attributes[j] = vtx_data;
 
 			//no buffer data was specified for this attribute
-			if (!(attr_data = attr_buffers[j])) {
+			if (!(buffer = attr_data[j].buffer_obj)) {
 				continue;
 			}
 
-			attr = active_attrs[j];
-
-			vtx_attr_data = [];
-			vertex.attributes[j] = vtx_attr_data;
-
+			attr = attr_data[j];
 			stride = attr.stride;
 			size = attr.size;
 			start = attr.pointer + (index * size + stride);
 
 			//can replace the following with TypedArray view
 			for (k = 0; k < size; k++) {
-				vtx_attr_data[k] = attr_data[k + start];
+				vtx_data[k] = buffer.data[k + start];
 			}
 		}
 

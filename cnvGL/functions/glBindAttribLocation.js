@@ -20,52 +20,27 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-function glDrawArrays(mode, first, count) {
-	var ctx, renderer, program, attr_data, i, loc, vertex, j, buffer, attr, vtx_data, stride, size, start, k;
+function glBindAttribLocation(program, index, name) {
+	var ctx, program_obj, attr_obj;
 
 	ctx = cnvgl_context.getCurrentContext();
-	renderer = ctx.renderer;
-	program = ctx.current_program;
-
-	renderer.setMode(mode);
-
-	//gather vertex attribute buffers
-	attr_data = [];
-	for (i in program.active_attributes) {
-		loc = program.active_attributes[i].location;
-		attr_data[loc] = ctx.vertex_attrib_arrays[loc];
+	program_obj = ctx.shared.program_objects[program];
+	
+	//no program exists
+	if (!program_obj) {
+		cnvgl_throw_error(GL_INVALID_OPERATION);
+		return;
 	}
 
-	//each vertex
-	for (i = first; i < count; i++) {
-
-		vertex = new cnvgl_vertex();
-
-		//build attribute set and initialize
-		for (j = 0; j < attr_data.length; j++) {
-
-			vtx_data = [];
-			vertex.attributes[j] = vtx_data;
-
-			//no buffer data was specified for this attribute
-			if (!(buffer = attr_data[j].buffer_obj)) {
-				continue;
-			}
-
-			attr = attr_data[j];
-			stride = attr.stride;
-			size = attr.size;
-			start = attr.pointer + (i * size + stride);
-
-			//can replace the following with TypedArray view
-			for (k = 0; k < size; k++) {
-				vtx_data[k] = buffer.data[k + start];
-			}
-		}
-
-		renderer.send(vertex);
+	if (program_obj.attributes[name]) {
+		attr_obj = program_obj.attributes[name];	
+	} else {
+		attr_obj = new cnvgl_attribute(name);
 	}
 
-	renderer.end();
+	//do check that index is valid
+	attr_obj.location = index;
+
+	program_obj.attributes[name] = attr_obj;
 }
 

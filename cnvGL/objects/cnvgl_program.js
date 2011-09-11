@@ -40,6 +40,7 @@ function cnvgl_program() {
 	this.active_uniforms_values = [];
 
 	//attributes
+	this.attributes = {};
 	this.active_attributes_count = 0;
 	this.active_attributes = [];
 	this.active_attributes_values = [];

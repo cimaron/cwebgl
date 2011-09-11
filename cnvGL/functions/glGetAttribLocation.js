@@ -21,12 +21,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 function glGetAttribLocation(program, name) {
-
 	var ctx, program_obj, i;
 
-	ctx = cnvgl_context.getCurrentContext();
-
 	//get program
+	ctx = cnvgl_context.getCurrentContext();
 	program_obj = ctx.shared.program_objects[program];
 
 	//no program exists
@@ -40,13 +38,10 @@ function glGetAttribLocation(program, name) {
 		return;
 	}
 
-	var t = program_obj.active_attributes;
-	for (i = 0; i < program_obj.active_attributes_count; i++) {
-		if (t[i].name == name) {
-			return t[i].location;
-		}
+	if (name.indexOf('gl_') == 0 || !program_obj.active_attributes[name]) {
+		return -1;
 	}
-
-	return -1;
+	
+	return program_obj.active_attributes[name].location;
 }
 

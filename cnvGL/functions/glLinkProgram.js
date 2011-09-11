@@ -21,7 +21,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 function glLinkProgram(program) {
-	var ctx, program_obj, linker, i;
+	var ctx, program_obj, linker, i, attrib_obj;
 
 	//get program
 	ctx = cnvgl_context.getCurrentContext();

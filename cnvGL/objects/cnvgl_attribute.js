@@ -20,13 +20,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-function cnvgl_attribute(definition) {
+function cnvgl_attribute(name, definition) {
 
 	//state
-	this.location = 0;
+	this.location = null;
 	this.size = 4;
 	this.type = GL_FLOAT;
-	this.name = definition.name;
+	this.name = name;
 
 	//custom state
 	this.definition = definition;

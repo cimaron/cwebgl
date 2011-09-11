@@ -43,6 +43,8 @@ GlslLinker = (function() {
 		this.addExternalReference('@gl_Position@', 'this.vertex[\'%s\']');
 		this.addExternalReference('@gl_FragDepth@', 'this.fragment[\'%s\']');
 		this.addExternalReference('@gl_FragColor@', 'this.fragment[\'%s\']');
+		this.addExternalReference('@dot@', 'vec3.dot');
+		this.addExternalReference('@max@', 'Math.max');
 		this.addExternalReference('@texture2D@', 'this._%s');
 	};
 
@@ -63,6 +65,7 @@ GlslLinker = (function() {
 		this.errors = [];
 
 		for (i = 0; i < this.input.length; i++) {
+			this.processAttributes(this.input[i]);
 			this.merge(this.input[i]);
 		}
 
@@ -86,24 +89,54 @@ GlslLinker = (function() {
 			this.vertex += code;
 		}
 	};
+	
+	linker.processAttributes = function(shader) {
+		var symbol_table, name, entry;
+		symbol_table = shader.symbol_table.table.data;
+
+		//look for active attributes in symbol table and match them to bound attributes
+		for (name in symbol_table) {
+			entry = symbol_table[name];
+			if (entry.qualifier_name == 'attribute' && this.program.attributes[name]) {
+				attrib_obj = this.program.attributes[name];
+				this.addActiveAttribute(attrib_obj);
+			}
+		}
+	};
+	
+	linker.addActiveAttribute = function(attrib_obj) {
+		var i;
+		if (typeof attrib_obj.location != 'number') {
+			for (i = 0; i <= this.program.active_attributes_values.length; i++) {
+				if (typeof this.program.active_attributes_values[i] == 'undefined') {
+					break;
+				}
+			}
+			attrib_obj.location = i;
+		}
+		i = attrib_obj.location;
+		this.program.active_attributes[attrib_obj.name] = attrib_obj;
+		this.program.active_attributes_values[attrib_obj.location] = null;
+		this.program.active_attributes_count++;
+	};
 
 	linker.processSymbols = function(shader) {
-		var name;
-		var symbol_table = shader.symbol_table.table.data;
-		var code = shader.object_code;
-		var location = 0;
-		var i, e;
+		var symbol_table, code, location, name, entry, uniform_obj, attr_obj, i, e;
+
+		symbol_table = shader.symbol_table.table.data;
+		code = shader.object_code;
+		location = 0;
 
 		for (name in symbol_table) {
 
-			var entry = symbol_table[name];
+			entry = symbol_table[name];
 
 			switch (entry.qualifier_name) {
 
 				//external communication (special cases)
 
 				case 'uniform':
-					var uniform_obj = new cnvgl_uniform(entry);
+					uniform_obj = new cnvgl_uniform(entry);
 					uniform_obj.location = this.program.active_uniforms_count;
 					this.program.active_uniforms.push(uniform_obj);
 					this.program.active_uniforms_count++;
@@ -111,11 +144,13 @@ GlslLinker = (function() {
 					break;
 
 				case 'attribute':
-					var attribute_obj = new cnvgl_attribute(entry);
-					attribute_obj.location = this.program.active_attributes_count;
-					this.program.active_attributes.push(attribute_obj);
-					this.program.active_attributes_count++;
-					code = this.replaceSymbol(code, entry.object_name, 'this.vertex.attributes['+attribute_obj.location+']');
+					if (this.program.active_attributes[entry.name]) {
+						attrib_obj = this.program.active_attributes[entry.name];
+					} else {
+						attrib_obj = new cnvgl_attribute(entry.name, entry);
+						this.addActiveAttribute(attrib_obj);
+					}
+					code = this.replaceSymbol(code, entry.object_name, 'this.vertex.attributes['+attrib_obj.location+']');
 					break;
 
 				case 'out':
