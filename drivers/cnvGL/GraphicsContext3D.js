@@ -83,13 +83,13 @@ GraphicsContext3D = (function() {
 	};
 
 	GraphicsContext3D.bufferData = function(target, data, usage) {
-		/*
-		if (typeof data == 'number') {
-		}
-		*/
 		glBufferData(target, data.length, data, usage);			 
 	};
-	
+
+	GraphicsContext3D.bufferSubData = function(target, offset, data) {
+		glBufferSubData(target, offset, data.length, data);
+	};
+
 	GraphicsContext3D.clear = function(mask) {
 		this._dirty = true;
 		glClear(mask);

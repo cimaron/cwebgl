@@ -24,6 +24,7 @@ var cnvgl_context = (function() {
 	function Initializer() {
 
 		//states
+		this.array = {};
 		this.color = {};
 		this.depth = {};
 		this.pack = {};
@@ -40,7 +41,6 @@ var cnvgl_context = (function() {
 		this.depth_buffer = null;
 
 		//Buffers
-		this.bound_buffers = {};
 		this.bound_textures = {};
 
 		this.current_program = null;
@@ -58,6 +58,9 @@ var cnvgl_context = (function() {
 
 	cnvgl_context.cnvgl_context = function() {
 		var i;
+		//array state
+		this.array.arrayBufferObj = null;
+		this.array.elementArrayBufferObj = null;
 
 		//color state
 		this.color.clearColor = [0,0,0,0];
@@ -88,9 +91,6 @@ var cnvgl_context = (function() {
 
 		//direct
 		this.errorValue = GL_NO_ERROR;
-
-		this.bound_buffers[GL_ARRAY_BUFFER] = 0;
-		this.bound_buffers[GL_ELEMENT_ARRAY_BUFFER] = 0;
 
 		//Vertex attribute arrays
 		for (i = 0; i < cnvgl_const.GL_MAX_VERTEX_ATTRIBS; i++) {

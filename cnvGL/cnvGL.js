@@ -25,7 +25,7 @@ include('cnvGL/constants.js');
 
 include('cnvGL/objects/cnvgl_attrib_array.js');
 include('cnvGL/objects/cnvgl_attribute.js');
-include('cnvGL/objects/cnvgl_buffer.js');
+include('cnvGL/objects/buffer.js');
 include('cnvGL/objects/cnvgl_context.js');
 include('cnvGL/objects/context_shared.js');
 include('cnvGL/objects/cnvgl_fragment.js');
@@ -76,6 +76,7 @@ include('cnvGL/functions/glBindAttribLocation.js');
 include('cnvGL/functions/glBindBuffer.js');
 include('cnvGL/functions/glBindTexture.js');
 include('cnvGL/functions/glBufferData.js');
+include('cnvGL/functions/glBufferSubData.js');
 include('cnvGL/functions/glClear.js');
 include('cnvGL/functions/glClearColor.js');
 include('cnvGL/functions/glClearDepth.js');

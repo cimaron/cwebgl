@@ -446,4 +446,5 @@ var GL_TEXTURE_1D					= 0x0DE0;
 var GL_TEXTURE_2D					= 0x0DE1;
 var GL_TEXTURE_3D					= 0x806F;
 
+var GL_READ_WRITE					= 0x88BA;
 

@@ -20,36 +20,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-function glBufferData(target, size, data, usage) {
+function glBufferSubData(target, offset, size, data) {
 	var ctx, buffer_obj, temp, i;
 
 	ctx = cnvgl_context.getCurrentContext();
-
-	if (usage != GL_STREAM_DRAW &&
-			usage != GL_STREAM_READ && 
-			usage != GL_STREAM_COPY &&
-			usage != GL_STATIC_DRAW &&
-			usage != GL_STATIC_READ &&
-			usage != GL_STATIC_COPY &&
-			usage != GL_DYNAMIC_DRAW &&
-			usage != GL_DYNAMIC_READ && 
-			usage != GL_DYNAMIC_COPY) {
-
-		cnvgl_throw_error(GL_INVALID_ENUM);
-		return;
-	}
-
-	if (size < 0) {
-		cnvgl_throw_error(GL_INVALID_VALUE);
-		return;
-	}
 
 	switch (target) {
 		case GL_ARRAY_BUFFER:
 			buffer_obj = ctx.array.arrayBufferObj;
 			break;
 		case GL_ELEMENT_ARRAY_BUFFER:
-			buffer_obj = ctx.array.elementArrayBufferObj;
+			bufer_obj = ctx.array.elementArrayBufferObj;
 			break;
 		default:
 			cnvgl_throw_error(GL_INVALID_ENUM);
@@ -61,20 +42,14 @@ function glBufferData(target, size, data, usage) {
 		return;
 	}
 
-	buffer_obj.target = target;
-	buffer_obj.usage = usage;
+	if (offset < 0 || size < 0 || offset + size > buffer_obj.size) {
+		cnvgl_throw_error(GL_INVALID_VALUE);
+		return;
+	}
 
 	//probably need to add check for source type
-
-	if (Float32Array.native) {
-		temp = new Float32Array(data);
-		buffer_obj.data = new Float32Array(temp, 0, size);
-	} else {
-		buffer_obj.data	= new Array(size);
-		for (i = 0; i < size; i++) {
-			buffer_obj.data[i] = data[i];
-		}
+	for (i = offset; i < offset + size; i++) {
+		buffer_obj.data[i] = data[i];	
 	}
 }
-
 

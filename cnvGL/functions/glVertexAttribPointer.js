@@ -21,9 +21,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 function glVertexAttribPointer(index, size, type, normalized, stride, pointer) {
+	var ctx, buffer_obj, vtx_attrib_obj;
 
-	var state;
-	state = cnvgl_context.getCurrentContext();
+	ctx = cnvgl_context.getCurrentContext();
 
 	if (index > GL_MAX_VERTEX_ATTRIBS) {
 		cnvgl_throw_error(GL_INVALID_VALUE);
@@ -35,31 +35,27 @@ function glVertexAttribPointer(index, size, type, normalized, stride, pointer) {
 		return;
 	}
 	
-	var valid_types = [GL_BYTE, GL_UNSIGNED_BYTE, GL_SHORT, GL_UNSIGNED_SHORT, GL_INT, GL_UNSIGNED_INT, GL_FLOAT, GL_DOUBLE];
-	
-	if (valid_types.indexOf(type) == -1) {
+
+	if ([GL_BYTE, GL_UNSIGNED_BYTE, GL_SHORT, GL_UNSIGNED_SHORT, GL_INT, GL_UNSIGNED_INT, GL_FLOAT, GL_DOUBLE].indexOf(type) == -1) {
 		cnvgl_throw_error(GL_INVALID_ENUM);
 		return;			
 	}
-	
+
 	if (stride < 0) {
 		cnvgl_throw_error(GL_INVALID_VALUE);
 		return;			
 	}
 
-	var buffer, buffer_obj;
 	//check for buffer
-	if (buffer = state.bound_buffers[GL_ARRAY_BUFFER]) {
-		buffer_obj = cnvgl_objects[buffer];
-	}
+	buffer_obj = ctx.array.arrayBufferObj;
 
-	var vertex_attribute = state.vertex_attrib_arrays[index];
-	vertex_attribute.size = size;
-	vertex_attribute.type = type;
-	vertex_attribute.normalized = normalized;
-	vertex_attribute.stride = stride;
-	vertex_attribute.pointer = pointer;	
-	vertex_attribute.buffer_obj = buffer_obj;
+	vtx_attrib_obj = ctx.vertex_attrib_arrays[index];
+	vtx_attrib_obj.size = size;
+	vtx_attrib_obj.type = type;
+	vtx_attrib_obj.normalized = normalized;
+	vtx_attrib_obj.stride = stride;
+	vtx_attrib_obj.pointer = pointer;	
+	vtx_attrib_obj.buffer_obj = buffer_obj;
 
 }
 

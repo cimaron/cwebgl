@@ -523,7 +523,11 @@ cWebGLRenderingContext = (function() {
 		//@validation
 		this._context.bufferData(target, data, usage);
 	};
-	
+
+	cWebGLRenderingContext.bufferSubData = function(target, offset, data) {
+		this._context.bufferSubData(target, offset, data);
+	};
+
 	cWebGLRenderingContext.clear = function(mask) {
 		//@validation
 		this._context.clear(mask);
