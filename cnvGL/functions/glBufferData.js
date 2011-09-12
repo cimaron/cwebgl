@@ -21,7 +21,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 function glBufferData(target, size, data, usage) {
-	var ctx, buffer_obj, temp, i;
+	var ctx, buffer_obj, data_type, view, temp, i;
 
 	ctx = cnvgl_context.getCurrentContext();
 
@@ -63,18 +63,24 @@ function glBufferData(target, size, data, usage) {
 
 	buffer_obj.target = target;
 	buffer_obj.usage = usage;
+	buffer_obj.size = size;
 
-	//probably need to add check for source type
-
-	if (Float32Array.native) {
-		temp = new Float32Array(data);
-		buffer_obj.data = new Float32Array(temp, 0, size);
-	} else {
-		buffer_obj.data	= new Array(size);
+	data_type = TypedArray.getType(data);
+	view = ArrayBuffer(size);
+	if (data) {
+		size /= data_type.BYTES_PER_ELEMENT;
+		if (ArrayBuffer.native) {
+			temp = data_type(view);
+		} else {
+			temp = view;	
+		}
 		for (i = 0; i < size; i++) {
-			buffer_obj.data[i] = data[i];
+			temp[i] = data[i];
 		}
 	}
+
+	buffer_obj.data_type = data_type;
+	buffer_obj.data = view;
 }
 
 

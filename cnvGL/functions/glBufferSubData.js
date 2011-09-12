@@ -21,7 +21,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 function glBufferSubData(target, offset, size, data) {
-	var ctx, buffer_obj, temp, i;
+	var ctx, buffer_obj, view, data_type, temp, i;
 
 	ctx = cnvgl_context.getCurrentContext();
 
@@ -46,10 +46,20 @@ function glBufferSubData(target, offset, size, data) {
 		cnvgl_throw_error(GL_INVALID_VALUE);
 		return;
 	}
+	
+	view = buffer_obj.data;
 
-	//probably need to add check for source type
+	if (ArrayBuffer.native) {
+		data_type = TypedArray.getType(data);
+		offset /= data_type.BYTES_PER_ELEMENT;
+		size /= data_type.BYTES_PER_ELEMENT;
+		temp = data_type(view);
+	} else {
+		temp = view;
+	}
+	
 	for (i = offset; i < offset + size; i++) {
-		buffer_obj.data[i] = data[i];	
+		temp[i] = data[i];
 	}
 }
 

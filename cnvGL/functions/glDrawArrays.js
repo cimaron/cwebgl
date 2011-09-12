@@ -21,7 +21,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 function glDrawArrays(mode, first, count) {
-	var ctx, renderer, program, i, vertex, name, buffer, attr, data, vtx_data, start, k;
+	var ctx, renderer, program, i, vertex, name, buffer_obj, buffer_data, attr, data, vtx_data, start, k;
 
 	ctx = cnvgl_context.getCurrentContext();
 	renderer = ctx.renderer;
@@ -46,15 +46,17 @@ function glDrawArrays(mode, first, count) {
 			data = ctx.vertex_attrib_arrays[attr.location];
 
 			//no buffer data was specified for this attribute
-			if (!(buffer = data.buffer_obj)) {
+			if (!(buffer_obj = data.buffer_obj)) {
 				continue;
 			}
+			
+			buffer_data = buffer_obj.getData();
 
 			start = data.pointer + (i * data.size + data.stride);
 
 			for (k = 0; k < attr.size; k++) {
 				if (k < data.size) {
-					vtx_data[k] = buffer.data[k + start];
+					vtx_data[k] = buffer_data[k + start];
 				} else {
 					vtx_data[k] = 0;	
 				}

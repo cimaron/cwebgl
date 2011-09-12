@@ -43,12 +43,18 @@ GraphicsContext3D = (function() {
 	//public:
 
 	GraphicsContext3D.GraphicsContext3D = function(webglCtx) {
+		var threshold, This;
 		this.webglCtx = webglCtx;
 		this.canvas = webglCtx.canvas;
 		this.context = this.canvas.getContext('2d');
 
-		//create our cnvGL context here;
-		this._scale = 1;
+		this._quality.startThreshold = 250000;
+		if (this.canvas.width * this.canvas.height > this._quality.startThreshold) {
+			this._quality.factor = (this.canvas.width * this.canvas.height) / this._quality.startThreshold;
+		} else {
+			this._quality.factor = 1;
+		}
+		this.setTargetFps(2);
 
 		this._createBuffer();
 
@@ -57,10 +63,7 @@ GraphicsContext3D = (function() {
 		glClearDepth(1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		this._quality.factor = 1;
-		this.setTargetFps(2);
-
-		var This = this;
+		This = this;
 		setInterval(function() { This._redraw(); }, 0);
 	};
 
@@ -74,6 +77,10 @@ GraphicsContext3D = (function() {
 		glAttachShader(program, shader);
 	};
 	
+	GraphicsContext3D.bindAttribLocation = function(program, index, name) {
+		glBindAttribLocation(program, index, name);
+	};
+
 	GraphicsContext3D.bindBuffer = function(target, buffer) {
 		glBindBuffer(target, buffer);
 	};
@@ -82,8 +89,19 @@ GraphicsContext3D = (function() {
 		glBindTexture(target, texture);
 	};
 
+	GraphicsContext3D.blendFunc = function(sfactor, dfactor) {
+		glBlendFunc(sfactor, dfactor);
+	};
+
 	GraphicsContext3D.bufferData = function(target, data, usage) {
-		glBufferData(target, data.length, data, usage);			 
+		var size;
+		if (typeof data == 'number') {
+			size = data;
+			data = null;
+		} else {
+			size = data.byteLength;	
+		}
+		glBufferData(target, size, data, usage);
 	};
 
 	GraphicsContext3D.bufferSubData = function(target, offset, data) {
@@ -97,6 +115,10 @@ GraphicsContext3D = (function() {
 
 	GraphicsContext3D.clearColor = function(red, green, blue, alpha) {
 		glClearColor(red, green, blue, alpha);
+	};
+
+	GraphicsContext3D.clearDepth = function(depth) {
+		glClearDepth(depth);
 	};
 
 	GraphicsContext3D.compileShader = function(shader) {
@@ -140,6 +162,10 @@ GraphicsContext3D = (function() {
 	GraphicsContext3D.enableVertexAttribArray = function(index) {
 		glEnableVertexAttribArray(index);
 	};
+	
+	GraphicsContext3D.generateMipmap = function(target) {
+		return glGetAttribLocation(program, name);
+	};
 
 	GraphicsContext3D.getAttribLocation = function(program, name) {
 		return glGetAttribLocation(program, name);
@@ -147,7 +173,7 @@ GraphicsContext3D = (function() {
 
 	GraphicsContext3D.getError = function() {
 		if (this.errors.length > 0) {
-			return this.errors.shift();     
+			return this.errors.shift();	
 		}
 		return glGetError();
 	};
@@ -368,7 +394,6 @@ GraphicsContext3D = (function() {
 	GraphicsContext3D._redraw = function() {
 
 		this._updateFrame();
-		
 		if (this._dirty) {
 			this._dirty = false;
 

@@ -31,7 +31,6 @@ function glUniform3f(location, v0, v1, v2) {
 
 function glUniformMatrix4fv(location, count, transpose, value) {
 	//GL_INVALID_OPERATION is generated if a sampler is loaded using a command other than glUniform1i and glUniform1iv.
-debugger;
 	if (count < 0) {
 		cnvgl_throw_error(GL_INVALID_VALUE);
 		return;

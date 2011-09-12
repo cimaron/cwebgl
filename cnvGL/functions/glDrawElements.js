@@ -21,7 +21,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 function glDrawElements(mode, count, type, indices) {
-	var ctx, renderer, program, buffer_obj, elements, i, vertex, name, buffer, attr, data, vtx_data, start, k;
+	var ctx, renderer, program, buffer_obj, elements, i, vertex, index, name, buffer, buffer_data, attr, data, vtx_data, start, k;
 
 	ctx = cnvgl_context.getCurrentContext();
 	renderer = ctx.renderer;
@@ -30,7 +30,7 @@ function glDrawElements(mode, count, type, indices) {
 	renderer.setMode(mode);
 
 	buffer_obj = ctx.array.elementArrayBufferObj;
-	elements = buffer_obj.data;
+	elements = buffer_obj.getData();
 
 	//each vertex
 	for (i = 0; i < count; i++) {
@@ -54,12 +54,14 @@ function glDrawElements(mode, count, type, indices) {
 			if (!(buffer = data.buffer_obj)) {
 				continue;
 			}
+			
+			buffer_data = buffer.getData(Float32Array);
 
 			start = data.pointer + (index * data.size + data.stride);
 
 			for (k = 0; k < attr.size; k++) {
 				if (k < data.size) {
-					vtx_data[k] = buffer.data[k + start];
+					vtx_data[k] = buffer_data[k + start];
 				} else {
 					vtx_data[k] = 0;
 				}
