@@ -62,6 +62,7 @@ GraphicsContext3D = (function() {
 		glClearColor(0, 0, 0, 255);
 		glClearDepth(1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glViewport(0, 0, this.canvas.width, this.canvas.height);
 
 		This = this;
 		setInterval(function() { This._redraw(); }, 0);
@@ -105,7 +106,7 @@ GraphicsContext3D = (function() {
 	};
 
 	GraphicsContext3D.bufferSubData = function(target, offset, data) {
-		glBufferSubData(target, offset, data.length, data);
+		glBufferSubData(target, offset, data.byteLength, data);
 	};
 
 	GraphicsContext3D.clear = function(mask) {
@@ -127,7 +128,7 @@ GraphicsContext3D = (function() {
 
 	GraphicsContext3D.createBuffer = function() {
 		var buffers = [];
-		glGenBuffers(1, buffers);	
+		glGenBuffers(1, buffers);
 		return buffers[0][0];
 	};
 	
@@ -345,7 +346,7 @@ GraphicsContext3D = (function() {
 		//initialize buffers
 		this.buffer = this.context.createImageData(width, height);
 		ctx.color_buffer = this.buffer.data;
-		ctx.depth_buffer = new Float32Array(width * height);
+		ctx.depth_buffer = new Float32Array(width * height);		
 	};
 
 	GraphicsContext3D._updateFrame = function() {

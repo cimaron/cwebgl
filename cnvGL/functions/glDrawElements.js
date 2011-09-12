@@ -57,7 +57,7 @@ function glDrawElements(mode, count, type, indices) {
 			
 			buffer_data = buffer.getData(Float32Array);
 
-			start = data.pointer + (index * data.size + data.stride);
+			start = (data.pointer / buffer_data.BYTES_PER_ELEMENT) + (index * data.size + data.stride);
 
 			for (k = 0; k < attr.size; k++) {
 				if (k < data.size) {

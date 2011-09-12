@@ -52,7 +52,7 @@ function glDrawArrays(mode, first, count) {
 			
 			buffer_data = buffer_obj.getData();
 
-			start = data.pointer + (i * data.size + data.stride);
+			start = (data.pointer / buffer_data.BYTES_PER_ELEMENT) + (i * data.size + data.stride);
 
 			for (k = 0; k < attr.size; k++) {
 				if (k < data.size) {

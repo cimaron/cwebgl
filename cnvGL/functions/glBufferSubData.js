@@ -47,19 +47,22 @@ function glBufferSubData(target, offset, size, data) {
 		return;
 	}
 	
+	data_type = TypedArray.getType(data);
 	view = buffer_obj.data;
-
 	if (ArrayBuffer.native) {
-		data_type = TypedArray.getType(data);
 		offset /= data_type.BYTES_PER_ELEMENT;
 		size /= data_type.BYTES_PER_ELEMENT;
 		temp = data_type(view);
 	} else {
 		temp = view;
 	}
+
+	for (i = 0; i < size; i++) {
+		temp[offset + i] = data[i];
+	}
 	
-	for (i = offset; i < offset + size; i++) {
-		temp[i] = data[i];
+	if (!buffer_obj.data_type) {
+		buffer_obj.data_type = data_type;
 	}
 }
 
