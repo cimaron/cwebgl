@@ -36,7 +36,9 @@ function cWebGLIncludeFile($file) {
 		continue;
 	}
 
-	$output = file_get_contents($file);
+	ob_start();
+	include $file;
+	$output = ob_get_clean();
 	$output = preg_replace('#//.*\n#', "\n", $output);	
 	$output = preg_replace('#/\*(.|[\r\n])*?\*/#', '', $output);
 	$output = preg_replace('#\n\n+#', "\n", $output);
@@ -66,7 +68,6 @@ function include(file) {
 	$include .= 'Debug';
 }
 
-$include('cWebGL.js');
 $include('library/jClass/jClass.js');
 $include('library/glMatrix/glMatrix.js');
 $include('library/glMatrix/constructors.js');
@@ -103,4 +104,5 @@ $include('WebGL/WebGLTexture.js');
 $include('WebGL/WebGLRenderbuffer.js');
 $include('WebGL/WebGLRenderingContext.js');
 $include('WebGL/WebGLUniformLocation.js');
+$include('cWebGL.js');
 
