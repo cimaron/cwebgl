@@ -1618,7 +1618,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	};
 	*/
 
-	var YY_SYMBOL_PRINT = function(Title, Type, Value, Location) {
+	function YY_SYMBOL_PRINT(Title, Type, Value, Location) {
 		if (yydebug) {
 			glsl.fprintf(2, "%s ", Title);
 			yy_symbol_print(2, Type, Value, Location);

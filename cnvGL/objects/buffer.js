@@ -46,7 +46,7 @@ cnvgl_buffer = (function() {
 			return type(this.data);	
 		}
 		return this.data;
-	}
+	};
 	
 	return cnvgl_buffer.Constructor;
 

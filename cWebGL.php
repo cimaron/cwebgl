@@ -23,6 +23,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 $debug = (int)$_GET['debug'];
 $base = dirname($_SERVER['SCRIPT_NAME']);
+$basepath = dirname(__FILE__);
 
 function cWebGLInclude($file) {
 	$output = cWebGLIncludeFile($file);
@@ -30,14 +31,15 @@ function cWebGLInclude($file) {
 }
 
 function cWebGLIncludeFile($file) {
-	if (!file_exists($file)) {
+	global $basepath;
+	if (!file_exists($basepath.'/'.$file)) {
 		echo "alert('Could not find \'$file\'');";
 		//should we provide an error to the end user?
 		continue;
 	}
 
 	ob_start();
-	include $file;
+	include $basepath.'/'.$file;
 	$output = ob_get_clean();
 	$output = preg_replace('#//.*\n#', "\n", $output);	
 	$output = preg_replace('#/\*(.|[\r\n])*?\*/#', '', $output);
@@ -59,7 +61,9 @@ function cWebGLIncludeDebug($file) {
 
 $include = 'cWebGLInclude';
 
-header('Content-Type: text/javascript');
+if (!$_SERVER['argv']) {
+	header('Content-Type: text/javascript');
+}
 if ($debug) { ?>
 function include(file) {
 	document.write('<scr'+'ipt type="text/javascript" src="<? echo $base; ?>/'+file+'"></script>');
