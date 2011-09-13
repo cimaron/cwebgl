@@ -48,13 +48,19 @@ GraphicsContext3D = (function() {
 		this.canvas = webglCtx.canvas;
 		this.context = this.canvas.getContext('2d');
 
+		/*
+		//The following attempts to adjust the initial quality setting based
+		//the number of pixels in the canvas. This threshold is mostly arbitrary
+		//and could stand some more intelligent calculation
 		this._quality.startThreshold = 250000;
 		if (this.canvas.width * this.canvas.height > this._quality.startThreshold) {
 			this._quality.factor = (this.canvas.width * this.canvas.height) / this._quality.startThreshold;
 		} else {
 			this._quality.factor = 1;
 		}
-		this.setTargetFps(2);
+		*/
+		this._quality.factor = 1;
+		this.setTargetFps(4);
 
 		this._createBuffer();
 
@@ -165,7 +171,7 @@ GraphicsContext3D = (function() {
 	};
 	
 	GraphicsContext3D.generateMipmap = function(target) {
-		return glGetAttribLocation(program, name);
+		//glGenerateMipmap(target);
 	};
 
 	GraphicsContext3D.getAttribLocation = function(program, name) {
@@ -288,7 +294,7 @@ GraphicsContext3D = (function() {
 			}
 			source = t;
 		}
-		
+
 		glTexImage2D(target, level, internalformat, width, height, border, format, type, source);
 	};
 
