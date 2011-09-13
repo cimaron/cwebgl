@@ -40,7 +40,7 @@ cnvgl_rendering_texture = (function() {
 	//Note: all the following functions will be executed in the 'this' context of cnvgl_rendering_data
 
 	cnvgl_rendering_texture.texture2D = function(sampler, coord, bias) {
-		var texture_obj, mipmap_level, img, u, v, s, t, c, i;
+		var texture_obj, mipmap_level, img, u, v, u1, v1, s, t, c, i, i1, tao;
 
 		texture_obj = this._ctx.texture.unit[sampler].current_texture[GL_TEXTURE_2D];
 
@@ -55,15 +55,39 @@ cnvgl_rendering_texture = (function() {
 		//how to determine if using mag or min?
 
 		switch (texture_obj.min_filter) {
+			case GL_LINEAR:
+				u = (s * img.width - .5)|0; //floor(s * img.width - .5)
+				v = (t * img.height - .5)|0; //floor(t * img.height - .5)
+				u1 = u + 1;
+				v1 = v + 1;
+				var a, b;
+				a = (s - .5)%1; //fpart(s - .5)
+				b = (t - .5)%1; //fpart(t - .5)
+				
+				var u0v0, u1v0, u0v1, v1v1;
+				u0v0 = (1 - a) * (1 - b);
+				u1v0 =      a  * (1 - b);
+				u0v1 = (1 - a) *      b ;
+				u1v1 =      a  *      b ;
+
+				i = (v * img.width + u) * 4;
+				i1 = i + (img.width * 4);
+
+				c[0] = u0v0 * img.data[i    ] + u1v0 * img.data[i + 4] + u0v1 * img.data[i1    ] + u1v1 * img.data[i1 + 4];
+				c[1] = u0v0 * img.data[i + 1] + u1v0 * img.data[i + 5] + u0v1 * img.data[i1 + 1] + u1v1 * img.data[i1 + 5];
+				c[2] = u0v0 * img.data[i + 2] + u1v0 * img.data[i + 6] + u0v1 * img.data[i1 + 2] + u1v1 * img.data[i1 + 6];
+				c[3] = u0v0 * img.data[i + 3] + u1v0 * img.data[i + 7] + u0v1 * img.data[i1 + 3] + u1v1 * img.data[i1 + 7];
+				break;
+				
 			case GL_NEAREST:
 			default:
-				u = Math.floor(s * img.width);
-				v = Math.floor(t * img.height);
+				u = (s * img.width)|0; //floor(s * img.width)
+				v = (t * img.height)|0; //floor(t * img.height)
 				if (u == img.width) {
 					u--;
 				}
 				if (v == img.height) {
-					v--;	
+					v--;
 				}
 				i = (v * img.width + u) * 4;
 				c[0] = img.data[i];
