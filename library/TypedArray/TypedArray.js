@@ -30,7 +30,9 @@ if (typeof ArrayBuffer == 'undefined') {
 			this[i] = 0;
 		}
 		this.byteLength = length;
+		this.BYTES_PER_ELEMENT;
 	}
+	Array.BYTES_PER_ELEMENT = 1;
 	ArrayBuffer.prototype = Array;
 	ArrayBuffer.native = false;
 } else {
