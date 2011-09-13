@@ -24,9 +24,11 @@ var cnvgl_context_shared = (function() {
 	function Initializer() {
 		//public:
 		this.linker = null;
-		
+
 		this.program_objects = [];
 		this.texture_objects = [];
+
+		this.default_texture_objects = {};
 	}
 
 	var cnvgl_context_shared = jClass('cnvgl_context_shared', Initializer);
@@ -43,9 +45,26 @@ var cnvgl_context_shared = (function() {
 	//public:
 
 	cnvgl_context_shared.cnvgl_context_shared = function() {
+
 		this.linker = new GlslLinker();
-		this.texture_objects = [0];
-		this.program_objects = [0];
+		this.program_objects[0] = 0;
+
+		this.initTextures();
+	};
+	
+	cnvgl_context_shared.initTextures = function() {
+		var tex2d, tex2di;
+		this.texture_objects[0] = 0;
+
+		//default texture objects
+		tex2d = new cnvgl_texture_object(0, GL_TEXTURE_2D);
+		this.default_texture_objects[GL_TEXTURE_2D] = tex2d;
+		tex2di = new cnvgl_texture_object(tex2d);
+		tex2di.data = new Uint8Array([0,0,0,255]);
+		tex2di.width = 1;
+		tex2di.height = 1;
+		tex2di.internalFormat = GL_RGBA;
+		tex2d.images[0] = tex2di;
 	};
 
 	return cnvgl_context_shared.Constructor;

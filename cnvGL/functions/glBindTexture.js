@@ -37,7 +37,7 @@ function glBindTexture(target, texture) {
 	texture_unit = ctx.texture.unit[unit - GL_TEXTURE0];
 
 	if (texture == 0) {
-		texture_obj = ctx.shared.default_texture_objects[target];
+		texture_obj = ctx.shared.default_texture_objects[GL_TEXTURE_2D];
 	} else {
 		texture_obj = ctx.shared.texture_objects[texture];
 		if (texture_obj) {
@@ -46,10 +46,9 @@ function glBindTexture(target, texture) {
 				return;
 			}
 		} else {
-			texture_obj = new cnvgl_texture_object(ctx, texture, target);
+			texture_obj = new cnvgl_texture_object(texture);
 			ctx.shared.texture_objects[texture] = texture_obj;
 		}
-		texture_obj.target = target;
 	}
 
 	texture_unit.current_texture[target] = texture_obj;

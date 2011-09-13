@@ -41,10 +41,7 @@ var cnvgl_context = (function() {
 		this.depth_buffer = null;
 
 		//Buffers
-		this.bound_textures = {};
-
 		this.current_program = null;
-
 		this.vertex_attrib_arrays = [];
 
 		this.shared = null;
@@ -58,6 +55,9 @@ var cnvgl_context = (function() {
 
 	cnvgl_context.cnvgl_context = function() {
 		var i;
+
+		this.shared = cnvgl_context_shared.getInstance();
+
 		//array state
 		this.array.arrayBufferObj = null;
 		this.array.elementArrayBufferObj = null;
@@ -76,10 +76,7 @@ var cnvgl_context = (function() {
 		this.polygon.cullFlag = GL_FALSE;
 		this.polygon.frontFace = GL_CCW;
 
-		//texture state
-		this.texture.currentUnit = GL_TEXTURE0;
-		this.texture.unit = [];
-		this.texture.unit[0] = new cnvgl_texture_unit(this, GL_TEXTURE0);
+		this.initTextures();
 
 		//viewport state
 		this.viewport.near = 0;
@@ -97,9 +94,18 @@ var cnvgl_context = (function() {
 			this.vertex_attrib_arrays[i] = new cnvgl_attrib_array_object();
 		}
 
-		this.shared = cnvgl_context_shared.getInstance();
-
 		this.renderer = new cnvgl_renderer(this);
+	};
+
+	cnvgl_context.initTextures = function() {
+		var units, i, unit;
+		this.texture.currentUnit = GL_TEXTURE0;
+		this.texture.unit = [];
+		for (i = 0; i < cnvgl_const.GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS; i++) {
+			unit = new cnvgl_texture_unit(this, GL_TEXTURE0 + i);
+			unit.current_texture[GL_TEXTURE_2D] = this.shared.default_texture_objects[GL_TEXTURE_2D];
+			this.texture.unit[i] = unit;
+		}
 	};
 
 	//static:
