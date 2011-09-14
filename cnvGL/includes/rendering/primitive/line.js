@@ -80,7 +80,7 @@ cnvgl_rendering_primitive_line = (function() {
 
 		for (xi = xi_start; xi <= xi_end; xi++) {
 
-			yi = Math.floor(y);
+			yi = (y|0); //floor(y)
 			p = [xi, yi, 0, 1];
 			this.renderer.interpolate.setPoint(p);
 			for (v in v1.varying) {
@@ -115,12 +115,12 @@ cnvgl_rendering_primitive_line = (function() {
 		y_start = v1.yw;
 		y_end = v2.yw;
 		yi_start = Math.ceil(y_start);
-		yi_end = Math.floor(y_end);
+		yi_end = (y_end)|0; //floor(y_end)
 		x = v1.xw + (yi_start - v1.yw) * dx;
 
 		for (yi = yi_start; yi <= yi_end; yi++) {
 
-			xi = Math.floor(x);
+			xi = (x|0); //floor(x)
 			p = [xi, yi, 0, 1];
 			this.renderer.interpolate.setPoint(p);
 

@@ -80,7 +80,7 @@ cnvgl_rendering_primitive_triangle = (function() {
 		dx3 = this.renderer.vertex.slope(v2.xw, v2.yw, v3.xw, v3.yw);
 
 		//top and bottom bounds
-		yi_start = Math.floor(v1.yw) + .5;
+		yi_start = (v1.yw|0) + .5; //floor(v1.yw) + .5
 		if (yi_start < v1.yw) {
 			yi_start++;
 		}
@@ -132,11 +132,11 @@ cnvgl_rendering_primitive_triangle = (function() {
 		p = [0, yi, 0, 1];
 
 		//left and right bounds
-		xi_start = Math.floor(x_start) + .5;
+		xi_start = (x_start|0) + .5; //floor(x_start) + .5
 		if (xi_start < x_start) {
 			xi_start++;	
 		}
-		xi_end = Math.ceil(x_end) - .5;
+		xi_end = /*ceil*/((x_end + 1-1e-10)|0) - .5;
 		if (xi_end >= x_end) {
 			xi_end--;	
 		}
