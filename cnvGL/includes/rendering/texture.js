@@ -96,11 +96,6 @@ cnvgl_rendering_texture = (function() {
 				c[3] = img.data[i + 3];
 		}
 
-		c[0] /= 255;
-		c[1] /= 255;
-		c[2] /= 255;
-		c[3] /= 255;
-
 		return c;
 	};
 

@@ -71,12 +71,19 @@ var cnvgl_context = (function() {
 		this.depth.func = GL_LESS;
 		this.depth.test = GL_FALSE;
 
+		//pack state
+		this.pack.alignment = 4;
+
 		//polygon state
 		this.polygon.cullFaceMode = GL_BACK;
 		this.polygon.cullFlag = GL_FALSE;
 		this.polygon.frontFace = GL_CCW;
 
+		//texture state
 		this.initTextures();
+
+		//unpack state
+		this.unpack.alignment = 4;
 
 		//viewport state
 		this.viewport.near = 0;

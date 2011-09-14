@@ -20,6 +20,28 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 function glPixelStorei(pname, param) {
-	throw new Error('glPixelStore not implemented');	
+	var ctx, valid_range;
+	
+	ctx = cnvgl_context.getCurrentContext();
+
+	valid_range = [1, 2, 4, 8].indexOf(param) != -1;
+
+	switch (pname) {
+		case GL_PACK_ALIGNMENT:
+			if (!valid_range) {
+				cnvgl_throw_error(GL_INVALID_VALUE);
+			}
+			ctx.pack.alignment = param;
+			break;
+		case GL_UNPACK_ALIGNMENT:
+			if (!valid_range) {
+				cnvgl_throw_error(GL_INVALID_VALUE);
+			}
+			ctx.unpack.alignment = param;
+			break;
+		default:
+			cnvgl_throw_error(GL_INVALID_ENUM);
+			return;
+	}	
 }
 

@@ -21,7 +21,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 function glTexImage2D(target, level, internalFormat, width, height, border, format, type, data) {
-	var ctx, unit, texture_unit, texture_obj, texture_img, size, temp;
+	var ctx, unit, texture_unit, texture_obj, texture_img, size, a, n, s, k, size, group, j, src, dest;
 
 	if (target != GL_TEXTURE_1D
 		&& target != GL_TEXTURE_2D
@@ -44,15 +44,65 @@ function glTexImage2D(target, level, internalFormat, width, height, border, form
 	
 	texture_obj.images.push(texture_img);
 
+	//get bytes per group
+	switch (format) {
+		case GL_RGB:
+			n = 3;
+			s = 3;
+			break;
+		case GL_RGBA:
+			n = 4;
+			s = 4;
+			break;
+		case GL_COLOR_INDEX:
+		case GL_RED:
+		case GL_GREEN:
+		case GL_BLUE:
+		case GL_ALPHA:
+		case GL_INTENSITY:
+		case GL_BGR:
+		case GL_BGRA:
+		case GL_LUMINANCE:
+		case GL_LUMINANCE_ALPHA:
+		case GL_DEPTH_COMPONENT:
+			throw new Error('glTextImage2D format not implemented');
+		default:		
+	}
+
+	a = ctx.unpack.alignment;
+	if (s < a) {
+		k = a / s * Math.ceil(s * n * width / a);	
+	} else {
+		k = n * width;	
+	}
 	size = width * height * 4;
 
-	if (Uint8Array.native) {
-		temp = new Uint8Array(data);
-		texture_img.data = new Uint8Array(temp, 0, size);
-	} else {
-		texture_img.data = new Array(size);
-		for (i = 0; i < size; i++) {
-			texture_img.data[i] = data[i];
+	texture_img.data = new Float32Array(size);
+
+	group = Float32Array(4);
+	group[1] = 1.0;
+
+	dest = 0;
+	for (i = 0; i < height; i++) {
+		for (j = 0; j < width; j++) {
+			src = (i * k) + (j * s);
+			switch (format) {
+				case GL_RGB:
+					group[0] = data[src    ] / 255;
+					group[1] = data[src + 1] / 255;
+					group[2] = data[src + 2] / 255;
+					break;
+				case GL_RGBA:
+					group[0] = data[src    ] / 255;
+					group[1] = data[src + 1] / 255;
+					group[2] = data[src + 2] / 255;
+					group[3] = data[src + 3] / 255;
+					break;
+			}
+			texture_img.data[dest++] = group[0];
+			texture_img.data[dest++] = group[1];
+			texture_img.data[dest++] = group[2];
+			texture_img.data[dest++] = group[3];
 		}
 	}
 }
