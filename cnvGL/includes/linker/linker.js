@@ -77,8 +77,8 @@ GlslLinker = (function() {
 			this.merge(this.input[i]);
 		}
 
-		this.buildExecutable(this.fragment, 1);
-		this.buildExecutable(this.vertex, 2);
+		this.program.fragment_program = this.fragment;
+		this.program.vertex_program = this.vertex;
 
 		this.status = 1;
 	};
@@ -90,10 +90,10 @@ GlslLinker = (function() {
 	linker.merge = function(shader) {
 		var code = this.processSymbols(shader);
 		if (shader.mode == 1) {
-			code = code.replace(/@fragment.main@/g, '__fragment_main');
+			code = code.replace(/@fragment.main@/g, 'main');
 			this.fragment += code;
 		} else {
-			code = code.replace(/@vertex.main@/g, '__vertex_main');
+			code = code.replace(/@vertex.main@/g, 'main');
 			this.vertex += code;
 		}
 	};
@@ -197,17 +197,6 @@ GlslLinker = (function() {
 
 	linker.replaceSymbol = function(code, object_name, repl) {
 		return code.replace(new RegExp(object_name, 'g'), repl);
-	};
-
-	linker.buildExecutable = function(__code, __mode) {
-
-		eval(__code);
-
-		if (__mode == 1) {
-			this.program.fragment_program = __fragment_main;
-		} else {
-			this.program.vertex_program = __vertex_main;
-		}
 	};
 
 	return linker.Constructor;

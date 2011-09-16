@@ -41,17 +41,21 @@ cnvgl_rendering_fragment = (function() {
 		
 		//build environment for fragment executable
 		this.data = new cnvgl_rendering_program(ctx, renderer);
+		this.setProgram(null);
 	};
 
 	cnvgl_rendering_fragment.setProgram = function(program) {
-		this.program = program.fragment_program;
-		this.data._uniforms = program.active_uniforms_values;
+		if (program) {
+			this.program = this.data.setProgram(program.fragment_program);
+			this.data._uniforms = program.active_uniforms_values;
+		} else {
+			this.program = this.defaultProgram;	
+		}
 	};
 
-	cnvgl_rendering_fragment.prepareContext = function() {
-		//this.data.prepareContext();
+	cnvgl_rendering_fragment.defaultProgram = function() {
 	};
-	
+
 	cnvgl_rendering_fragment.process = function(fragment) {
 
 		this.data.fragment = fragment;

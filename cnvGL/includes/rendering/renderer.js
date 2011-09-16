@@ -63,8 +63,6 @@ cnvgl_renderer = (function() {
 	cnvgl_renderer.setMode = function(mode) {
 		this.mode = mode;
 		this.primitive.setMode(mode);
-		this.vertex.prepareContext();
-		this.fragment.prepareContext();
 	};
 
 	cnvgl_renderer.send = function(vertex) {

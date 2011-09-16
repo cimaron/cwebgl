@@ -40,19 +40,20 @@ cnvgl_rendering_vertex = (function() {
 
 		//build environment for vertex executable
 		this.data = new cnvgl_rendering_program(ctx, renderer);
+		this.setProgram(null);
 	};
 
 	cnvgl_rendering_vertex.setProgram = function(program) {
-		this.program = program.vertex_program;
-		this.data._uniforms = program.active_uniforms_values;
+		if (program) {
+			this.program = this.data.setProgram(program.vertex_program);
+			this.data._uniforms = program.active_uniforms_values;
+		} else {
+			this.program = this.defaultProgram;	
+		}
 	};
 
 	cnvgl_rendering_vertex.setMode = function(mode) {
 		this.mode = mode;
-	};
-
-	cnvgl_rendering_vertex.prepareContext = function() {
-		//this.data.prepareContext();
 	};
 
 	cnvgl_rendering_vertex.process = function(v) {
@@ -66,6 +67,9 @@ cnvgl_rendering_vertex = (function() {
 
 		this.setNormalizedCoordinates(v);
 		this.setWindowCoordinates(v);
+	};
+
+	cnvgl_rendering_vertex.defaultProgram = function() {
 	};
 
 	cnvgl_rendering_vertex.setNormalizedCoordinates = function(v) {
@@ -119,7 +123,7 @@ cnvgl_rendering_vertex = (function() {
 		prim.vertices = vertices;
 		prim.sorted = true;
 	};
-	
+
 	cnvgl_rendering_vertex.slope = function(x1, y1, x2, y2) {
 		x1 = x2 - x1;
 		y1 = y2 - y1;
