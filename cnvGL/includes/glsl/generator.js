@@ -33,6 +33,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	g_type_qualifiers[glsl.ast.type_qualifier.flags.varying] = 'varying';
 	function g_type_default_value(type) {
 		switch (type.type_specifier) {
+			case glsl.ast.types.bool:
+				return 'false';
 			case glsl.ast.types.float:
 				return '0.0';
 			case glsl.ast.types.vec2:
@@ -41,6 +43,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				return '[0,0,0]';
 			case glsl.ast.types.vec4:
 				return '[0,0,0,0]';
+			case glsl.ast.types.mat3:
+				return '[0,0,0,0,0,0,0,0,0]';
 			case glsl.ast.types.mat4:
 				return '[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]';
 			case glsl.ast.types.sampler2d:
@@ -58,13 +62,22 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			vec3 : { type : 'vec3', func : 'vec.construct(3,%s)' },
 			vec4 : { type : 'vec4', func : 'vec.construct(4,%s)' }
 		},
+		3 : { //glsl.ast.operators.mul
+			vec3 : {
+				vec3  : { type : 'vec3', func : 'vec3.add(%s,%s,[])' }
+			},			
+		},
 		5 : { //glsl.ast.operators.mul
+			vec3 : {
+				float : { type : 'vec3', func : 'vec3.scale(%s,%s,[])' },
+				vec3  : { type : 'vec3', func : 'vec.vec3.multiply(%s,%s,[])' }
+			},
+			mat3 : {
+				vec3 : { type : 'vec3', func : 'mat3.multiplyVec3(%s,%s,[])' }
+			},
 			mat4 : {
 				mat4 : { type : 'mat4', func : 'mat4.multiply(%s,%s,[])' },
 				vec4 : { type : 'vec4', func : 'mat4.multiplyVec4(%s,%s,[])' }
-			},
-			vec3 : {
-				float : { type : 'vec3', func : 'vec3.multiplyScalar(%s,%s,[])' }
 			}
 		},
 		41 : { //glsl.ast.operators.function_call
@@ -74,6 +87,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	function g_get_operation(op, type1, type2) {
 		op = g_operations_types[op];
+		if (!op) {
+			return false;	
+		}
 		if (op[type1] && !type2) {
 			return op[type1];
 		}
@@ -265,6 +281,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				return exp;
 
 			//case glsl.ast.operators.*
+			case glsl.ast.operators.add:
 			case glsl.ast.operators.mul:
 				var op = g_get_operation(e.oper, left.type, right.type);
 				if (!(exp.type = op.type)) {
@@ -304,7 +321,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				} else {
 					throw new Error(g_error("Invalid field selection " + left.code + "." + e.primary_expression.identifier, e));					
 				}
-
+			case glsl.ast.operators.logic_not:
+				if (left.type != 'bool') {
+					throw new Error(g_error("Could not apply logic_not operation to type " + left.type, e));	
+				}
+				exp.type = 'bool';
+				exp.code = '!' + left.code;
+				return exp;
 			default:
 				throw new Error(g_error("Could not translate unknown expression " + e.typeOf() + '(' + e.oper + ')', e));
 		}
@@ -383,7 +406,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	}
 
 	function g_ast_compound_statement(cs) {
-		var code, i, stmts, start, node, stmt, exp, es;
+		var code, i, stmts, start, node, stmt, exp, es, thencode, elsecode;
 
 		glsl.state.symbols.push_scope();
 
@@ -409,7 +432,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				case 'ast_declarator_list':
 					exp = g_ast_declarator_list(stmt);
 					if (exp) {
-						code += exp;
+						code += g_indent() + exp;
+					}
+					break;
+				case 'ast_selection_statement':
+					exp = g_ast_expression(stmt.condition);
+					thencode = g_ast_compound_statement(stmt.then_statement);
+					//should we add a check that condition is bool type?
+					code += g_indent() + glsl.sprintf("if(%s)%s", exp.code, thencode);
+					if (stmt.else_statement) {
+						elsecode = g_ast_compound_statement(stmt.else_statement);
+						code += g_indent() + glsl.sprintf("else%s\n", elsecode);
 					}
 					break;
 				default:

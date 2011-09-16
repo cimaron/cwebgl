@@ -761,6 +761,34 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 	}());
 
+
+	var ast_selection_statement = (function() {
+
+		//Internal Constructor
+		function Initializer() {
+			ast_node.Initializer.apply(this);
+			this.condition = null;
+			this.then_statement = null;
+			this.else_statement = null;
+		}
+
+		var ast_selection_statement = jClass('ast_selection_statement', Initializer, ast_node);
+
+		//public:
+		ast_selection_statement.ast_selection_statement = function(condition, then_statement, else_statement) {
+			this.condition = condition;
+			this.then_statement = then_statement;
+			this.else_statement = else_statement;
+		};
+
+		ast_selection_statement.print = function() {	
+		};
+
+		return ast_selection_statement.Constructor;
+
+	}());
+
+
 	//-----------------------------------------------------------
 	//	External interface
 
@@ -780,7 +808,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		compound_statement : ast_compound_statement,
 		function_definition : ast_function_definition,
 		expression_bin : ast_expression_bin,
-		function_expression : ast_function_expression
+		function_expression : ast_function_expression,
+		selection_statement : ast_selection_statement
 	};
 
 }(glsl));

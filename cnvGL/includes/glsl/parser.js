@@ -2107,6 +2107,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						yyval.expression = new glsl.ast.function_expression(callee);
 						yyval.expression.set_location(yylloc);
 						break;
+					
+					case 57:
+						yyval = {};
+						yyval.expression = new glsl.ast.expression(yyvsa[yyvsp - 1].n, yyvsa[yyvsp].expression, null, null);
+						yyval.expression.set_location(yylloc);
+						break;
+
+					case 60:
+						yyval = {};
+						yyval.n = glsl.ast.operators.logic_not;
+						break;
 
 					case 63:
 						yyval = {};
@@ -2114,6 +2125,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						yyval.expression.set_location(yylloc);
 						break;
 					
+					case 67:
+						yyval = {};
+						yyval.expression = new glsl.ast.expression_bin(glsl.ast.operators.add, yyvsa[yyvsp - 2].expression, yyvsa[yyvsp].expression);
+						yyval.expression.set_location(yylloc);
+						break;
+
 					case 95:
 						yyval = {};
 						yyval.expression = new glsl.ast.expression(yyvsa[yyvsp - 1].n, yyvsa[yyvsp - 2].expression, yyvsa[yyvsp].expression, null);
@@ -2243,6 +2260,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						yyval.n = glsl.ast.types.float;
 					    break;
 
+					case 185:
+						yyval = {};
+						yyval.n = glsl.ast.types.bool;
+						break;
+
 					case 186:
 						yyval = {};
 						yyval.n = glsl.ast.types.vec2;
@@ -2256,6 +2278,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					case 188:
 						yyval = {};
 						yyval.n = glsl.ast.types.vec4;
+						break;
+					
+					case 202:
+						yyval = {};
+						yyval.n = glsl.ast.types.mat3;
 						break;
 					
 					case 206:
@@ -2282,6 +2309,23 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						}
 						yyval = {};
 						yyval.n = glsl.ast.precision.medium;
+						break;
+					
+					case 246:
+						yyval = {};
+						//cast to node
+						yyval.node = yyvsa[yyvsp].compound_statement;
+						break;
+
+					case 256:
+						state.symbols.push_scope();
+						break;
+
+					case 257:
+						yyval = {};
+						yyval.compound_statement = new glsl.ast.compound_statement(true, yyvsa[yyvsp - 1].node);
+						yyval.compound_statement.set_location(yylloc);
+						state.symbols.pop_scope();
 						break;
 
 					case 261:
@@ -2312,6 +2356,21 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						yyval = {};
 						yyval.node = new glsl.ast.expression_statement(yyvsa[yyvsp - 1].expression);
 						yyval.node.set_location(yylloc);
+						break;
+					
+					case 266:
+						yyval = {};
+						yyval.node = new glsl.ast.selection_statement(yyvsa[yyvsp - 2].expression,
+																	yyvsa[yyvsp].selection_rest_statement.then_statement,
+																	yyvsa[yyvsp].selection_rest_statement.else_statement);
+						yyval.node.set_location(yylloc);
+						break;
+
+					case 267:
+						yyval = {};
+						yyval.selection_rest_statement = {};
+						yyval.selection_rest_statement.then_statement = yyvsa[yyvsp - 2].node;
+						yyval.selection_rest_statement.else_statement = yyvsa[yyvsp].node;						
 						break;
 
 					case 288:
@@ -2353,14 +2412,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					case 53:
 					case 55:
 					case 56:
-					case 57:
 					case 58:
 					case 59:
 					case 60:
 					case 61:
 					case 64:
 					case 65:
-					case 67:
 					case 68:
 					case 70:
 					case 71:
@@ -2436,7 +2493,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					case 180:
 					case 183:
 					case 184:
-					case 185:
 					case 187:
 					case 189:
 					case 190:
@@ -2451,7 +2507,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					case 199:
 					case 200:
 					case 201:
-					case 202:
 					case 203:
 					case 204:
 					case 205:
@@ -2488,17 +2543,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					case 241:
 					case 242:
 					case 243:
-					case 246:
 					case 251:
 					case 252:
 					case 255:
-					case 256:
-					case 257:
 					case 258:
 					case 260:
 					case 264:
-					case 266:
-					case 267:
 					case 268:
 					case 269:
 					case 270:
