@@ -73,8 +73,6 @@ function include(file) {
 }
 
 $include('library/jClass/jClass.js');
-//$include('library/glMatrix/glMatrix.js');
-//$include('library/glMatrix/constructors.js');
 
 $cnvGL = true;
 if ($cnvGL) {

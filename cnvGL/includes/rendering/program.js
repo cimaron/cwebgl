@@ -91,6 +91,123 @@ cnvgl_rendering_program = (function() {
 		}
 		return v;
 	};
+				
+	/*
+	 * vec3.add
+	 * Performs a vector addition
+	 *
+	 * Params:
+	 * vec - vec3, first operand
+	 * vec2 - vec3, second operand
+	 * dest - Optional, vec3 receiving operation result. If not specified result is written to vec
+	 *
+	 * Returns:
+	 * dest if specified, vec otherwise
+	 */
+	vec3.add = function(vec, vec2, dest) {
+		if(!dest || vec == dest) {
+				vec[0] += vec2[0];
+				vec[1] += vec2[1];
+				vec[2] += vec2[2];
+				return vec;
+		}
+		
+		dest[0] = vec[0] + vec2[0];
+		dest[1] = vec[1] + vec2[1];
+		dest[2] = vec[2] + vec2[2];
+		return dest;
+	};
+
+	/*
+	 * vec3.multiply
+	 * Performs a vector multiplication
+	 *
+	 * Params:
+	 * vec - vec3, first operand
+	 * vec2 - vec3, second operand
+	 * dest - Optional, vec3 receiving operation result. If not specified result is written to vec
+	 *
+	 * Returns:
+	 * dest if specified, vec otherwise
+	 */
+	vec3.multiply = function(vec, vec2, dest) {
+		if(!dest || vec == dest) {
+				vec[0] *= vec2[0];
+				vec[1] *= vec2[1];
+				vec[2] *= vec2[2];
+				return vec;
+		}
+
+		dest[0] = vec[0] * vec2[0];
+		dest[1] = vec[1] * vec2[1];
+		dest[2] = vec[2] * vec2[2];
+		return dest;
+	};
+
+	/*
+	 * vec3.scale
+	 * Multiplies the components of a vec3 by a scalar value
+	 *
+	 * Params:
+	 * vec - vec3 to scale
+	 * val - Numeric value to scale by
+	 * dest - Optional, vec3 receiving operation result. If not specified result is written to vec
+	 *
+	 * Returns:
+	 * dest if specified, vec otherwise
+	 */
+	vec3.scale = function(vec, val, dest) {
+		if(!dest || vec == dest) {
+				vec[0] *= val;
+				vec[1] *= val;
+				vec[2] *= val;
+				return vec;
+		}
+		
+		dest[0] = vec[0]*val;
+		dest[1] = vec[1]*val;
+		dest[2] = vec[2]*val;
+		return dest;
+	};
+
+	/*
+	 * vec3.dot
+	 * Caclulates the dot product of two vec3s
+	 *
+	 * Params:
+	 * vec - vec3, first operand
+	 * vec2 - vec3, second operand
+	 *
+	 * Returns:
+	 * Dot product of vec and vec2
+	 */
+	vec3.dot = function(vec, vec2){
+		return vec[0]*vec2[0] + vec[1]*vec2[1] + vec[2]*vec2[2];
+	};
+
+	/*
+	 * mat3.multiplyVec3
+	 * Transforms a vec3 with the given matrix
+	 *
+	 * Params:
+	 * mat - mat3 to transform the vector with
+	 * vec - vec3 to transform
+	 * dest - Optional, vec3 receiving operation result. If not specified result is written to vec
+	 *
+	 * Returns:
+	 * dest if specified, vec otherwise
+	 */
+	mat3.multiplyVec3 = function(mat, vec, dest) {
+		if(!dest) { dest = vec; }
+		
+		var x = vec[0], y = vec[1], z = vec[2];
+		
+		dest[0] = mat[0]*x + mat[3]*y + mat[6]*z;
+		dest[1] = mat[1]*x + mat[4]*y + mat[7]*z;
+		dest[2] = mat[2]*x + mat[5]*y + mat[8]*z;
+
+		return dest;
+	};
 
 	/*
 	 * mat4.multiply
@@ -151,16 +268,16 @@ cnvgl_rendering_program = (function() {
 	 * dest if specified, vec otherwise
 	 */
 	mat4.multiplyVec4 = function(mat, vec, dest) {
-			if(!dest) { dest = vec; }
-			
-			var x = vec[0], y = vec[1], z = vec[2], w = vec[3];
-			
-			dest[0] = mat[0]*x + mat[4]*y + mat[8]*z + mat[12]*w;
-			dest[1] = mat[1]*x + mat[5]*y + mat[9]*z + mat[13]*w;
-			dest[2] = mat[2]*x + mat[6]*y + mat[10]*z + mat[14]*w;
-			dest[3] = mat[3]*x + mat[7]*y + mat[11]*z + mat[15]*w;
-			
-			return dest;
+		if(!dest) { dest = vec; }
+		
+		var x = vec[0], y = vec[1], z = vec[2], w = vec[3];
+		
+		dest[0] = mat[0]*x + mat[4]*y + mat[8]*z + mat[12]*w;
+		dest[1] = mat[1]*x + mat[5]*y + mat[9]*z + mat[13]*w;
+		dest[2] = mat[2]*x + mat[6]*y + mat[10]*z + mat[14]*w;
+		dest[3] = mat[3]*x + mat[7]*y + mat[11]*z + mat[15]*w;
+		
+		return dest;
 	};
 
 

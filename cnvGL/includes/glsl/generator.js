@@ -58,9 +58,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	var g_valid_type_operations = {};
 	var g_operations_types = {
 		'cons' : {
-			vec2 : { type : 'vec2', func : 'vec.construct(2,%s)' },
-			vec3 : { type : 'vec3', func : 'vec.construct(3,%s)' },
-			vec4 : { type : 'vec4', func : 'vec.construct(4,%s)' }
+			vec2 : { type : 'vec2', func : 'constructor(2,%s)' },
+			vec3 : { type : 'vec3', func : 'constructor(3,%s)' },
+			vec4 : { type : 'vec4', func : 'constructor(4,%s)' }
 		},
 		3 : { //glsl.ast.operators.mul
 			vec3 : {
@@ -70,7 +70,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		5 : { //glsl.ast.operators.mul
 			vec3 : {
 				float : { type : 'vec3', func : 'vec3.scale(%s,%s,[])' },
-				vec3  : { type : 'vec3', func : 'vec.vec3.multiply(%s,%s,[])' }
+				vec3  : { type : 'vec3', func : 'vec3.multiply(%s,%s,[])' }
 			},
 			mat3 : {
 				vec3 : { type : 'vec3', func : 'mat3.multiplyVec3(%s,%s,[])' }
