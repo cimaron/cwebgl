@@ -226,15 +226,23 @@ GraphicsContext3D = (function() {
 	};
 	
 	GraphicsContext3D.uniform1i = function(location, v0) {
-		return glUniform1i(location, v0);
+		glUniform1i(location, v0);
 	};
 
 	GraphicsContext3D.uniform3f = function(location, v0, v1, v2) {
-		return glUniform3f(location, v0, v1, v2);
+		glUniform3f(location, v0, v1, v2);
+	};
+
+	GraphicsContext3D.uniform3fv = function(location, value) {
+		glUniform3fv(location, 1, value);
+	};
+
+	GraphicsContext3D.uniformMatrix3fv = function(location, transpose, value) {
+		glUniformMatrix3fv(location, value.length / 9, transpose, value);
 	};
 
 	GraphicsContext3D.uniformMatrix4fv = function(location, transpose, value) {
-		return glUniformMatrix4fv(location, value.length / 16, transpose, value);
+		glUniformMatrix4fv(location, value.length / 16, transpose, value);
 	};
 	
 	GraphicsContext3D.useProgram = function(program) {

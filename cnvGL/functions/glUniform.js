@@ -21,16 +21,39 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 function glUniform1i(location, v0) {
-	__glUniform(location, v0, 'int', true);
+	v0 = v0|0; //floor(v0);
+	__glUniform(location, v0, ['bool', 'int', 'sampler2D'], true);
 }
 
 function glUniform3f(location, v0, v1, v2) {
 	//GL_INVALID_OPERATION is generated if a sampler is loaded using a command other than glUniform1i and glUniform1iv.
-	__glUniform(location, [v0, v1, v2], 'vec3');
+	__glUniform(location, [v0, v1, v2], ['vec3']);
+}
+
+function glUniform3fv(location, count, value) {
+	var i, v;
+	for (i = 0; i < count; i++) {
+		v = 3 * i;
+		__glUniform(i + location, [value[v], value[v + 1], value[v + 2]], ['vec3']);
+	}
+}
+
+function glUniformMatrix3fv(location, count, transpose, value) {
+
+	if (count < 0) {
+		cnvgl_throw_error(GL_INVALID_VALUE);
+		return;
+	}
+
+	if (count > 1) {
+		throw new Error('glUniformMatrix3fv with array not implemented yet');
+	}
+
+	__glUniform(location, value, ['mat3']);
 }
 
 function glUniformMatrix4fv(location, count, transpose, value) {
-	//GL_INVALID_OPERATION is generated if a sampler is loaded using a command other than glUniform1i and glUniform1iv.
+
 	if (count < 0) {
 		cnvgl_throw_error(GL_INVALID_VALUE);
 		return;
@@ -40,10 +63,10 @@ function glUniformMatrix4fv(location, count, transpose, value) {
 		throw new Error('glUniformMatrix4fv with array not implemented yet');
 	}
 	
-	__glUniform(location, value, 'mat4');	
+	__glUniform(location, value, ['mat4']);
 }
 
-function __glUniform(location, value, type, allow_sampler) {
+function __glUniform(location, value, types) {
 	var ctx, program_obj, uniform_obj;
 
 	ctx = cnvgl_context.getCurrentContext();
@@ -65,11 +88,7 @@ function __glUniform(location, value, type, allow_sampler) {
 
 	uniform_obj = program_obj.active_uniforms[location];
 
-	if (uniform_obj.definition.type.indexOf('sampler') == 0 && allow_sampler) {
-		type = uniform_obj.definition.type;	
-	}
-
-	if (uniform_obj.definition.type != type) {
+	if (types.indexOf(uniform_obj.definition.type) == -1) {
 		cnvgl_throw_error(GL_INVALID_OPERATION);
 		return;
 	}
