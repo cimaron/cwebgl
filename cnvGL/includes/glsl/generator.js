@@ -68,6 +68,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			},			
 		},
 		5 : { //glsl.ast.operators.mul
+			float : {
+				float : { type : 'float', func : '%s * %s' }
+			},
 			vec3 : {
 				float : { type : 'vec3', func : 'vec3.scale(%s,%s,[])' },
 				vec3  : { type : 'vec3', func : 'vec3.multiply(%s,%s,[])' }

@@ -21,8 +21,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 function glBlendFunc(sfactor, dfactor) {
-	var ctx, c;
+	var ctx, i;
 
 	ctx = cnvgl_context.getCurrentContext();
+	
+	//todo: add checks here
+	
+	ctx.color.blendSrcRGB = sfactor;
+	ctx.color.blendSrcA = sfactor;
+	ctx.color.blendDestRGB = dfactor;
+	ctx.color.blendDestA = dfactor;
 }
 

@@ -61,10 +61,64 @@ cnvgl_rendering_fragment = (function() {
 		this.data.fragment = fragment;
 		this.program.apply(this.data);
 
-		fragment.r = Math.round(fragment.gl_FragColor[0] * 255);
-		fragment.g = Math.round(fragment.gl_FragColor[1] * 255);
-		fragment.b = Math.round(fragment.gl_FragColor[2] * 255);
-		fragment.a = Math.round(fragment.gl_FragColor[3] * 255);		
+		fragment.r = fragment.gl_FragColor[0];
+		fragment.g = fragment.gl_FragColor[1];
+		fragment.b = fragment.gl_FragColor[2];
+		fragment.a = fragment.gl_FragColor[3];
+	};
+
+	cnvgl_rendering_fragment.write = function(buffer, i, frag) {
+		var r, g, b, a, c;
+		
+		r = frag.r;
+		g = frag.g;
+		b = frag.b;
+		a = frag.a;
+
+		if (this.ctx.color.blendEnabled == GL_TRUE) {
+			c = this.blend(r, g, b, a, buffer[i] / 255, buffer[i + 1] / 255, buffer[i + 2] / 255, buffer[i + 3] / 255);
+			r = c[0];
+			g = c[1];
+			b = c[2];
+			a = c[3];
+		}
+
+		buffer[i    ] = (r * 255 + .5)|0; //round(frag.r * 255)
+		buffer[i + 1] = (g * 255 + .5)|0; //round(frag.g * 255)
+		buffer[i + 2] = (b * 255 + .5)|0; //round(frag.b * 255)
+		buffer[i + 3] = (a * 255 + .5)|0; //round(frag.a * 255)
+
+	};
+	
+	cnvgl_rendering_fragment.blend = function(rs, gs, bs, as, rd, gd, bd, ad) {
+		var state, sr, sg, sb, sa, dr, dg, db, da, f, c;
+		
+		state = this.ctx.color;
+
+		switch (state.blendSrcA) {
+			case GL_SRC_ALPHA:
+				sr = sg = sb = sa = as;
+				break;
+			default:
+				throw new Error('Blend source ' + state.blendSrcA + ' not implemented');
+		}
+		switch (state.blendDestA) {
+			case GL_ONE:
+				dr = dg = db = da = 1;
+				break;
+			default:
+				throw new Error('Blend source ' + state.blendSrcD + ' not implemented');					
+		}
+
+		f = sr + dr;
+		rd = (sr * rs) + (dr * rd) / f;
+		gd = (sg * gs) + (dg * gd) / f;
+		bd = (sb * bs) + (db * bd) / f;
+		ad = (sa * as) + (da * ad) / f;
+		
+		c = [rd, gd, bd, ad];
+
+		return c;
 	};
 
 	return cnvgl_rendering_fragment.Constructor;

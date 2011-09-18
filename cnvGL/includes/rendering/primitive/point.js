@@ -57,12 +57,10 @@ cnvgl_rendering_primitive_point = (function() {
 			frag.varying[i] = v.varying[i];	
 		}
 
-		this.renderer.fragment.process(frag);
-
 		ic = (vw * y + x) * 4;
-		c_buffer[ic] = frag.r;
-		c_buffer[ic + 1] = frag.g;
-		c_buffer[ic + 2] = frag.b;
+
+		this.renderer.fragment.process(frag);
+		this.renderer.fragment.write(c_buffer, ic, this.frag);
 	};
 
 	return cnvgl_rendering_primitive_point.Constructor;

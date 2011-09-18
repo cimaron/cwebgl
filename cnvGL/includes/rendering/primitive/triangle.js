@@ -148,6 +148,10 @@ cnvgl_rendering_primitive_triangle = (function() {
 
 			p[0] = xi;
 			int.setPoint(p);
+
+			//Early depth test
+			//Nneed to add check for if shader writes to depth value.
+			//If so, this needs to run after processing the fragment
 			if (this.ctx.depth.test == GL_TRUE) {
 				this.frag.gl_FragDepth = int.interpolateTriangle(this.v1.zw, this.v2.zw, this.v3.zw);
 				if (!this.renderer.checkDepth(id, this.frag.gl_FragDepth)) {
@@ -164,10 +168,7 @@ cnvgl_rendering_primitive_triangle = (function() {
 			}
 
 			this.renderer.fragment.process(this.frag);
-
-			c_buffer[ic] = this.frag.r;
-			c_buffer[ic + 1] = this.frag.g;
-			c_buffer[ic + 2] = this.frag.b;
+			this.renderer.fragment.write(c_buffer, ic, this.frag);
 
 			id++;
 			ic += 4;

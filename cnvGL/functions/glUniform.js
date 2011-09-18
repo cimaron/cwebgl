@@ -25,6 +25,11 @@ function glUniform1i(location, v0) {
 	__glUniform(location, v0, ['bool', 'int', 'sampler2D'], true);
 }
 
+function glUniform1f(location, v0) {
+	v0 = v0 * 1.0; //force bool to float
+	__glUniform(location, v0, ['bool', 'float'], true);
+}
+
 function glUniform3f(location, v0, v1, v2) {
 	//GL_INVALID_OPERATION is generated if a sampler is loaded using a command other than glUniform1i and glUniform1iv.
 	__glUniform(location, [v0, v1, v2], ['vec3']);

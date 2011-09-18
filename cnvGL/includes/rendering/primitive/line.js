@@ -128,12 +128,10 @@ cnvgl_rendering_primitive_line = (function() {
 				this.frag.varying[v] = this.renderer.interpolate.interpolateLine(v1.varying[v], v2.varying[v]);
 			}
 
-			this.renderer.fragment.process(this.frag);
-
 			ic = (vw * yi + xi) * 4;
-			c_buffer[ic] = this.frag.r;
-			c_buffer[ic + 1] = this.frag.g;
-			c_buffer[ic + 2] = this. frag.b;
+
+			this.renderer.fragment.process(this.frag);
+			this.renderer.fragment.write(c_buffer, ic, this.frag);
 
 			x += dx;
 		}

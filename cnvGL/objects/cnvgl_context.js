@@ -65,6 +65,10 @@ var cnvgl_context = (function() {
 		//color state
 		this.color.clearColor = [0,0,0,0];
 		this.color.blendEnabled = GL_FALSE;
+		this.color.blendSrcRGB = GL_ONE;
+		this.color.blendSrcA = GL_ONE;
+		this.color.blendDestRGB = GL_ZERO;
+		this.color.blendDestA = GL_ZERO;
 
 		//depth state
 		this.depth.clear = 1.0;

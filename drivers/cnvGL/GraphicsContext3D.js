@@ -60,7 +60,7 @@ GraphicsContext3D = (function() {
 		}
 		*/
 		this._quality.factor = 1;
-		this.setTargetFps(4);
+		this.setTargetFps(10);
 
 		this._createBuffer();
 
@@ -162,6 +162,10 @@ GraphicsContext3D = (function() {
 		glDrawElements(mode, count, type, offset);
 	};
 
+	GraphicsContext3D.disable = function(cap) {
+		glDisable(cap);
+	};
+
 	GraphicsContext3D.enable = function(cap) {
 		glEnable(cap);
 	};
@@ -227,6 +231,10 @@ GraphicsContext3D = (function() {
 	
 	GraphicsContext3D.uniform1i = function(location, v0) {
 		glUniform1i(location, v0);
+	};
+
+	GraphicsContext3D.uniform1f = function(location, v0) {
+		glUniform1f(location, v0);
 	};
 
 	GraphicsContext3D.uniform3f = function(location, v0, v1, v2) {
