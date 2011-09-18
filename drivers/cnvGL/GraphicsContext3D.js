@@ -355,8 +355,8 @@ GraphicsContext3D = (function() {
 			width = Math.round(this.canvas.width / this._quality.factor);
 			height = Math.round(this.canvas.height / this._quality.factor);
 
-			width = Math.min(this.canvas.width, 1);
-			height = Math.min(this.canvas.height, 1);
+			width = Math.max(this.canvas.width, 1);
+			height = Math.max(this.canvas.height, 1);
 
 			this.webglCtx.drawingBufferWidth = width;
 			this.webglCtx.drawingBufferHeight = height;
