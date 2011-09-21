@@ -21,30 +21,28 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 (function() {
 
-	var getNativeContext, hasCanvas;
-	
-	hasCanvas = (typeof HTMLCanvasElement != 'undefined');
-	if (hasCanvas) {
+	var getNativeContext, i, validContext, hasCanvas, hasWebGL;
+
+	validContext = ["webgl","experimental-webgl"] 
+	hasCanvas = (typeof HTMLCanvasElement != "undefined");
+
+	for (i = 0; i < validContext.length; i++) {
+		try {
+			if (document.createElement("canvas").getContext(validContext[i])) {
+				hasWebGL = true;
+			}
+		} catch (e) {
+		}
+	}
+
+	if (hasCanvas && !hasWebGL) {
 		getNativeContext = HTMLCanvasElement.prototype.getContext;
-	}
-
-	function hook() {
-		if (hasCanvas) {
-			HTMLCanvasElement.prototype.getContext = function(contextId, nativeCtx) {
-				if (contextId == 'experimental-webgl' && !nativeCtx) {
-					return cWebGLRenderingContext.create(this);
-				}
-				return getNativeContext.call(this, contextId);
-			};
-		}
-	}
-
-	try {
-		if (!document.createElement('canvas').getContext('experimental-webgl')) {
-			hook();
-		}
-	} catch (e) {
-		hook();
+		HTMLCanvasElement.prototype.getContext = function(contextId, nativeCtx) {
+			if (validContext.indexOf(contextId) !== -1 && !nativeCtx) {
+				return cWebGLRenderingContext.create(this);
+			}
+			return getNativeContext.call(this, contextId);
+		};
 	}
 
 	if (typeof WebGLRenderingContext != 'undefined') {
