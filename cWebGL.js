@@ -40,10 +40,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		getNativeContext = HTMLCanvasElement.prototype.getContext;
 		HTMLCanvasElement.prototype.getContext = function(contextId, config, nativeCtx) {
 			if (validContext.indexOf(contextId) !== -1 && !nativeCtx) {
-				if (current[this]) {
-					return current[this];
+				if (!current[this]) {
+					current[this] = cWebGLRenderingContext.create(this, new cWebGLContextAttributes(config));
 				}
-				return cWebGLRenderingContext.create(this, new cWebGLContextAttributes(config));
+				return current[this];
 			}
 			return getNativeContext.call(this, contextId);
 		};
