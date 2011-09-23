@@ -74,20 +74,21 @@ function include(file) {
 
 $include('library/jClass/jClass.js');
 
-$cnvGL = true;
-if ($cnvGL) {
-	//CanvasGL Library
+$drivers = array('cnvGL', 'Flash', 'WebGL');
+$driver = 0;
+
+$include('drivers/'.$drivers[$driver].'/GraphicsContext3D.js');
+
+//cnvGL Library
+if ($drivers[$driver] == 'cnvGL') {
 	$include('cnvGL/cnvGL.js');
-	$include('drivers/cnvGL/GraphicsContext3D.js');
-} else {
-	//Passthru Driver
-	$include('drivers/WebGL/GraphicsContext3D.js');
 }
 
 //WebGLInclude('WebGLMath.js');
 $include('library/TypedArray/TypedArray.js');
 $include('WebGL/WebGLObject.js');
 $include('WebGL/WebGLBuffer.js');
+$include('WebGL/WebGLContextAttributes.js');
 $include('WebGL/WebGLFramebuffer.js');
 $include('WebGL/WebGLProgram.js');
 $include('WebGL/WebGLShader.js');

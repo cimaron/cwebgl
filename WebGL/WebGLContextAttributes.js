@@ -19,41 +19,39 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function() {
 
-	var getNativeContext, i, validContext, hasCanvas, hasWebGL, current;
+cWebGLContextAttributes = (function() {
+						  
+	function Initializer() {
+		//public:
+		this.alpha = null;
+		this.depth = null;
+		this.stencil = null;
+		this.antialias = null;
+		this.premultipliedAlpha = null;
+		this.preserveDrawingBuffer = null;	
+	}
 
-	validContext = ["webgl","experimental-webgl"] 
-	hasCanvas = (typeof HTMLCanvasElement != "undefined");
-	current = [];
-
-	for (i = 0; i < validContext.length; i++) {
-		try {
-			if (document.createElement("canvas").getContext(validContext[i])) {
-				hasWebGL = true;
+	var cWebGLContextAttributes = jClass('cWebGLContextAttributes', Initializer);
+	
+	//public:
+	
+	cWebGLContextAttributes.cWebGLContextAttributes = function(req) {
+		var i;
+		this.alpha = true;
+		this.depth = true;
+		this.stencil = true;
+		this.antialias = true;
+		this.premultipliedAlpha = true;
+		this.preserveDrawingBuffer = true;
+		for (i in req) {
+			if (this[i]) {
+				this[i] = !!req[i];
 			}
-		} catch (e) {
 		}
-	}
+	};
 
-	if (hasCanvas && !hasWebGL) {
-		getNativeContext = HTMLCanvasElement.prototype.getContext;
-		HTMLCanvasElement.prototype.getContext = function(contextId, config, nativeCtx) {
-			if (validContext.indexOf(contextId) !== -1 && !nativeCtx) {
-				if (current[this]) {
-					return current[this];
-				}
-				return cWebGLRenderingContext.create(this, new cWebGLContextAttributes(config));
-			}
-			return getNativeContext.call(this, contextId);
-		};
-	}
-
-	if (typeof WebGLRenderingContext != 'undefined') {
-		WebGLRenderingContext.prototype.setTargetFps = function() {};
-	} else {
-		window.WebGLRenderingContext = cWebGLRenderingContext;
-	}
+	return cWebGLContextAttributes.Constructor;
 
 }());
 

@@ -25,8 +25,7 @@ cWebGLRenderingContext = (function() {
 	function Initializer() {
 		//public:
 		this.canvas = null;
-		this.drawingBufferWidth = null;
-		this.drawingBufferWidth = null;
+		this.attr = null;
 		this._context = null;
 	}
 
@@ -459,14 +458,15 @@ cWebGLRenderingContext = (function() {
 
 	//static:
 
-	cWebGLRenderingContext.Constructor.create = function(canvas) {
-		return new cWebGLRenderingContext.Constructor(canvas);
+	cWebGLRenderingContext.Constructor.create = function(canvas, config) {
+		return new cWebGLRenderingContext.Constructor(canvas, config);
 	};
 
 	//public
 	
-	cWebGLRenderingContext.cWebGLRenderingContext = function(canvas) {
+	cWebGLRenderingContext.cWebGLRenderingContext = function(canvas, config) {
 		this.canvas = canvas;
+		this.attr = config;
 		this._context = new GraphicsContext3D(this);
 	};
 	
@@ -633,10 +633,18 @@ cWebGLRenderingContext = (function() {
 		return this._context.getAttribLocation(program.object(), name);
 	};
 
+	cWebGLRenderingContext.getContextAttributes = function() {
+		return this.attr;
+	};
+
 	cWebGLRenderingContext.getError = function() {
 		return this._context.getError();
 	};
 	
+	cWebGLRenderingContext.getParameter = function(pname) {
+		return null;
+	};
+
 	cWebGLRenderingContext.getProgramParameter = function(program, pname) {
 		//@validation
 		return this._context.getProgramParameter(program.object(), pname);
