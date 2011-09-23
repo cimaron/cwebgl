@@ -80,7 +80,7 @@ function glTexImage2D(target, level, internalFormat, width, height, border, form
 	texture_img.data = new Float32Array(size);
 
 	group = Float32Array(4);
-	group[1] = 1.0;
+	group[3] = 1.0;
 
 	dest = 0;
 	for (i = 0; i < height; i++) {
