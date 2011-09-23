@@ -22,6 +22,119 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 (function(glsl) {
 
 	//-------------------------------------------------
+	//	Helper Classes
+	//-------------------------------------------------
+
+	/**
+	 * Type class
+	 */
+	var gType = (function() {
+
+		//Internal Constructor
+		function Initializer() {
+			//public:
+			this.type = null;
+			this.name = null;
+		}
+
+		var gType = jClass('gType', Initializer);
+
+		//static:
+
+		gType.names = [
+			"void", "float", "int", "uint", "bool", "vec2", "vec3", "vec4", "bvec2", "bvec3", "bvec4", "ivec2",
+			"ivec3", "ivec4", "uvec2", "uvec3", "uvec4", "mat2", "mat2x3", "mat2x4", "mat3x2", "mat3", "mat3x4",
+			"mat4x2", "mat4x3", "mat4", "sampler1d", "sampler2d", "sampler2drect", "sampler3d", "samplercube",
+			"sampler1dshadow", "sampler2dshadow", "sampler2drectshadow", "samplercubeshadow", "sampler1darray",
+			"sampler2darray", "sampler1darrayshadow", "sampler2darrayshadow", "isampler1d", "isampler2d",
+			"isampler3d", "isamplercube", "isampler1darray", "isampler2darray", "usampler1d", "usampler2d",
+			"usampler3d", "usamplercube", "usampler1darray", "usampler2darray", "struct", "type_name"
+			];
+
+		gType.length = [
+			 1,  1, 1, 1, 1, 2,  3, 4,
+			 2,  3, 4, 2, 3, 4,  2, 3,
+			 4,  4, 6, 8, 6, 9, 12, 8,
+			12, 16, 1, 1, 1, 1,  1, 1,
+			 1,  1, 1, 1, 1
+		];
+
+		gType.defaultValues = [
+			"null", "0.0", "0", "0", "0", "[0,0]", "[0,0,0]", "[0,0,0,0]",
+			"[0,0]", "[0,0,0]", "[0,0,0,0]", "[0,0]", "[0,0,0]", "[0,0,0,0]", "[0,0]", "[0,0,0]",
+			"[0,0,0,0]", "[0,0,0,0]", "[0,0,0,0,0,0,0,0]", "[0,0,0,0,0,0]",
+			"[0,0,0,0,0,0,0,0,0]", "[0,0,0,0,0,0,0,0,0,0,0,0]", "[0,0,0,0,0,0,0,0]",
+			"[0,0,0,0,0,0,0,0,0,0,0,0]", "[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]", "0", "0", "0", "0", "0", "0", 
+			"0", "0", "0", "0", "0"
+		];
+
+		//public:
+
+		gType.gType = function(type) {
+			this.type = type;
+			this.name = gType.names[type];
+		};
+
+		gType.getDefaultValue = function() {
+			return gType.defaultValues[this.type];
+		};
+
+		return gType.Constructor;
+
+	}());
+
+	/**
+	 * Code class
+	 */
+	var objCode = (function() {
+
+		//Internal Constructor
+		function Initializer() {
+			//public:
+			this.code = null;
+			this.type = null;
+			this.ast_node = null;
+		}
+
+		var objCode = jClass('objCode', Initializer);
+
+		//public:
+
+		objCode.objCode = function(code, type, ast_node) {
+			this.code = "";
+			if (code) {
+				this.addCode(code);
+			}
+			this.type = type;
+			this.ast_node = ast_node;
+		};
+
+		objCode.toString = function() {
+			return this.code;
+		};
+
+		objCode.addCode = function(c) {
+			this.code += c.toString();
+		};
+
+		objCode.addLine = function(l) {
+			this.code +=
+				  g_indent()
+				+ l.toString()
+				+ "\n";
+		};
+
+		objCode.apply = function() {
+			Array.prototype.unshift.call(arguments, this.code);
+			this.code = glsl.sprintf.apply(glsl, arguments);
+		};
+
+		return objCode.Constructor;
+
+	}());
+
+
+	//-------------------------------------------------
 	//	Code Generation Options/Data
 	//-------------------------------------------------
 
@@ -31,94 +144,60 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	g_type_qualifiers[glsl.ast.type_qualifier.flags.uniform] = 'uniform';
 	g_type_qualifiers[glsl.ast.type_qualifier.flags.out] = 'out';
 	g_type_qualifiers[glsl.ast.type_qualifier.flags.varying] = 'varying';
-	function g_type_default_value(type) {
-		switch (type.type_specifier) {
-			case glsl.ast.types.bool:
-				return 'false';
-			case glsl.ast.types.float:
-				return '0.0';
-			case glsl.ast.types.vec2:
-				return '[0,0]';
-			case glsl.ast.types.vec3:
-				return '[0,0,0]';
-			case glsl.ast.types.vec4:
-				return '[0,0,0,0]';
-			case glsl.ast.types.mat3:
-				return '[0,0,0,0,0,0,0,0,0]';
-			case glsl.ast.types.mat4:
-				return '[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]';
-			case glsl.ast.types.sampler2d:
-				return 'null';
-			default:
-				throw new Error(g_error('Cannot generate default value for type ' + type.type_name, type));
-		}
-	}
 
-	//table for valid type operations
-	var g_valid_type_operations = {};
-	var g_operations_types = {
-		'cons' : {
-			vec2 : { type : 'vec2', func : 'constructor(2,%s)' },
-			vec3 : { type : 'vec3', func : 'constructor(3,%s)' },
-			vec4 : { type : 'vec4', func : 'constructor(4,%s)' }
-		},
-		3 : { //glsl.ast.operators.mul
-			vec3 : {
-				vec3  : { type : 'vec3', func : 'vec3.add(%s,%s,[])' }
-			},			
-		},
-		5 : { //glsl.ast.operators.mul
-			float : {
-				float : { type : 'float', func : '%s * %s' }
-			},
-			vec3 : {
-				float : { type : 'vec3', func : 'vec3.scale(%s,%s,[])' },
-				vec3  : { type : 'vec3', func : 'vec3.multiply(%s,%s,[])' }
-			},
-			mat3 : {
-				vec3 : { type : 'vec3', func : 'mat3.multiplyVec3(%s,%s,[])' }
-			},
-			mat4 : {
-				mat4 : { type : 'mat4', func : 'mat4.multiply(%s,%s,[])' },
-				vec4 : { type : 'vec4', func : 'mat4.multiplyVec4(%s,%s,[])' }
-			}
-		},
-		41 : { //glsl.ast.operators.function_call
-			'*' : { type : 'null', func : '%s(%s)' }
-		}
-	};
+	//Autogenerated
+	var g_operation_table = {"3":{"6":{"6":0}},"5":{"1":{"1":1},"6":{"1":2,"6":3},"21":{"6":4},"25":{"25":5,"7":6}},"41":7,"48":{"5":8,"6":9,"7":10}};
 
-	function g_get_operation(op, type1, type2) {
-		op = g_operations_types[op];
-		if (!op) {
-			return false;	
-		}
-		if (op[type1] && !type2) {
-			return op[type1];
-		}
-		if (op[type1] && op[type1][type2]) {
-			return op[type1][type2];
-		}
-		if (op['*'] && !type2) {
-			return op['*'];
-		}		
-		if (op['*'] && op['*'][type2]) {
-			return op['*'][type2];
-		}
-		if (op['*'] && op['*']['*']) {
-			return op['*']['*'];
-		}
-		return false;
-	}
+	var g_operation_functions = ["vec3.add(%s,%s,[])","float %s * %s","vec3 vec3.scale(%s,%s,[])","vec3 vec3.add(%s,%s,[])","vec3 mat3.multiplyVec3(%s,%s,[])","mat4 mat4.multiply(%s,%s,[])","vec4 mat4.multiplyVec4(%s,%s,[])","any %s(%s)","vec2 constructor(2,%s)","vec3 constructor(3,%s)","vec4 constructor(4,%s)"];
 
 	var g_operations_field_selection_names = {
-		vec2 : [ 'xy', 'rg', 'st' ],
-		vec3 : [ 'xyz', 'rgb', 'stp' ],
-		vec4 : [ 'xyzw', 'rgba', 'stpq' ]
+		"5" : [ 'xy', 'rg', 'st' ],
+		"6" : [ 'xyz', 'rgb', 'stp' ],
+		"7" : [ 'xyzw', 'rgba', 'stpq' ]
 	};
 
+	/**
+	 * Returns a code block for an operation
+	 *
+	 * @return  objCode;
+	 */
+	function g_get_operation() {
+		var table, next, code;
+
+		table = Array.prototype.shift.apply(arguments);
+		if (typeof table == "number") {
+			next = table;
+			table = g_operation_table;
+		} else {
+			next = Array.prototype.shift.apply(arguments);
+		}
+
+		if (!table[next]) {
+			return false;	
+		}
+
+		if (typeof table[next] == "number") {
+			next = table[next];
+			code = g_operation_functions[next].split(' ');
+			return new objCode(code[1], glsl.ast.types[code[0]]);
+		}
+
+		Array.prototype.unshift.call(arguments, table[next]);
+		return g_get_operation.apply(this, arguments);
+	}
+
+	/**
+	 * Returns a code block for a right side field selection
+	 *
+	 * @identifier  string  name of vector
+	 * @fields      string  fields to select
+	 * @type        int     type of source vector
+	 *
+	 * @return  objCode;
+	 */
 	function g_get_field_selection_r_type(identifier, fields, type) {
-		var i, sets, set, exp, j, keys;
+		var code, i, j, sets, set, keys;
+
 		fields = fields.split('');
 
 		//invalid number of field selections
@@ -147,18 +226,21 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			keys[i] = glsl.sprintf('%s[%s]', identifier, j);
 		}
 
-		exp = {};
 		if (keys.length == 1) {
-			exp.type = 'float';
-			exp.code = keys[0];
+			code = new objCode(keys[0], glsl.ast.types.float);
 		} else {
-			exp.type = 'vec' + keys.length;
-			exp.code = glsl.sprintf("[%s]", keys.join(","));
+			code = new objCode("[%s]", glsl.ast.types['vec' + keys.length]);
+			code.apply(keys.join(","));
 		}
 
-		return exp;
+		return code;
 	}
 
+	/**
+	 * Returns indentation for the current scope
+	 *
+	 * @return  string
+	 */
 	function g_indent() {
 		return new Array(glsl.generator.depth + 1).join("\t");
 	}
@@ -167,322 +249,380 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	//	Code Generation
 	//-------------------------------------------------
 
+	/**
+	 * Constructs a type specifier code block
+	 *
+	 * @param   ast_node    ast_node that represents a type specifier
+	 *
+	 * @return  objCode
+	 */
 	function g_ast_type_specifier(ts) {
 		if (ts.is_precision_statement) {
-			return "\n";	
+			return new objCode();
 		}
 		throw new Error(g_error('Cannot generate type specifier', ts));
 	}
 
+	/**
+	 * Constructs a declaration list code block
+	 *
+	 * @param   ast_node    ast_node that represents a declaration list
+	 *
+	 * @return  objCode
+	 */
 	function g_ast_declarator_list(dl) {
-		var code, type, specifier, list, d_code, i, decl, name, entry, exp, i_code;
+		var code, type, defCode, i, decl, name, entry, decCode, expCode;
 
-		code = '';
+		code = new objCode();
 
 		//get default initialization values
 		type = dl.type;
-		specifier = type.specifier;
-		d_code = g_type_default_value(specifier);
-		if (!d_code) {
+		defCode = new gType(type.specifier.type_specifier).getDefaultValue();
+		if (!defCode) {
 			return false;
 		}
 
-		list = dl.declarations;
-		for (i = 0; i < list.length; i++) {
-			decl = list[i];
+		for (i = 0; i < dl.declarations.length; i++) {
+
+			decl = dl.declarations[i];
 			name = decl.identifier;
 
 			//add symbol table entry
 			entry = glsl.state.symbols.add_variable(name);
-			entry.type = specifier.type_name;
-
+			entry.type = dl.type.specifier.type_name;
 			if (dl.type.qualifier) {
+
 				entry.qualifier_name = g_type_qualifiers[type.qualifier.flags.q];
-				//code += entry.object_name + " = " + d_code + ";\n";
-				code += "\n";
+			
 			} else {
+				decCode = new objCode("var %s = %s;");
 				if (decl.initializer) {
-					exp = g_ast_expression(decl.initializer);
-					if (exp.type != entry.type) {
-						throw new Error(g_error("Could not assign value of type " + exp.type + " to " + entry.type, dl));
+					expCode = g_ast_expression(decl.initializer);
+					if (expCode.type != entry.type) {
+						throw new Error(g_error("Could not assign value of type " + expCode.type + " to " + entry.type, dl));
 					}
-					i_code = exp.code;
 				} else {
-					i_code = d_code;
+					expCode = defCode;
 				}
-				code += "var " + entry.name + " = " + i_code + ";\n";
+				decCode.apply(entry.name, expCode);
+				code.addLine(decCode);
 			}
 		}
+
 		return code;
 	}
 
+	/**
+	 * Constructs a function header code block
+	 *
+	 * @param   ast_node    ast_node that represents an operator expression
+	 *
+	 * @return  objCode
+	 */
 	function g_ast_function(f) {
-		var code = '', p_code = '', i;
+		var code, params, param, i, name, entry;
 
-		var name = f.identifier;
-		var entry = glsl.state.symbols.get_function(name);
-
-		var parameters = f.parameters;
-
-		var params = [];
-		for (i = 0; i < parameters.length; i++) {
-			var param = parameters[i];
+		//generate param list
+		params = [];
+		for (i = 0; i < f.parameters.length; i++) {
+			param = f.parameters[i];
 			if (param.is_void) {
+				debugger;
 				return '';
 			}
 			params.push(param.identifier);
 		}
-		p_code = params.join(", ");
+		params = params.join(", ");
 
-		code = "function " + entry.object_name + "(" + p_code + ")";
+		//generate 
+		name = f.identifier;
+		entry = glsl.state.symbols.get_function(name);
+
+		code = new objCode("function %s(%s)");
+		code.apply(entry.object_name, params);
 
 		return code;
 	}
 
+	/**
+	 * Constructs an operator expression code block
+	 *
+	 * @param   ast_node    ast_node that represents an operator expression
+	 *
+	 * @return  objCode
+	 */
 	function g_ast_expression_op(e) {
+		var code, se, se1, se2, se3, i, entry;
 
-		var exp = {};
-		var se = e.subexpressions;
-		if (se) {
-			var se1 = se[0], se2 = se[1], se3 = se[2];
-		}
-
-		var left, right, third;
-		//ast_expression una/bin/tri
-
-		if (se1) {
-			left = g_ast_expression(se1);
-		}
-
-		if (se2) {
-			right = g_ast_expression(se2);
-		}
-
-		if (se3) {
-			third = g_ast_expression(se3);
+		if (se = e.subexpressions) {
+			se1 = g_ast_expression(se[0]);
+			se2 = g_ast_expression(se[1]);
+			se3 = g_ast_expression(se[2]);
 		}
 
 		switch (e.oper) {
 
+			//simple expression
 			case glsl.ast.operators.int_constant:
 			case glsl.ast.operators.identifier:
-				exp = g_ast_expression_simple(e);
-				return exp;
 
+				code = g_ast_expression_simple(e);
+				break;
+
+			//assignment operator
 			case glsl.ast.operators.assign:
 
-				if (left.type != right.type) {
-					throw new Error(g_error("Could not assign value of type " + right.type + " to " + left.type, e));
+				if (se1.type != se2.type) {
+					throw new Error(g_error("Could not assign value of type " + se2.type + " to " + se1.type, e));
 				}
 
 				//@todo:
-				//check that left is a valid type for assignment
-				//if left has a quantifier, generate that
+				//check that se1 is a valid type for assignment
+				//if se1 has a quantifier, generate that
 
-				exp.type = left.type;
-				exp.code = left.code + " = " + right.code;
-				return exp;
+				code = new objCode("%s = %s", se2.type);
+				code.apply(se1, se2);
+				break;
 
-			//case glsl.ast.operators.*
+			//normal unary operator
+			case glsl.ast.operators.logic_not:
+
+				code = g_get_operation(e.oper, se1.type);
+				if (!code) {
+					throw new Error(g_error("Could not apply operation to type " + se1.type, e));
+				}
+				code.apply(se1);
+				break;
+
+			//normal binary operator
 			case glsl.ast.operators.add:
 			case glsl.ast.operators.mul:
-				var op = g_get_operation(e.oper, left.type, right.type);
-				if (!(exp.type = op.type)) {
-					throw new Error(g_error("Cannot apply operation to " + left.type + " and " + right.type, e));
-				}
-				exp.code = glsl.sprintf(op.func, left.code, right.code);				
-				return exp;
 
+				code = g_get_operation(e.oper, se1.type, se2.type);
+				if (!code) {
+					throw new Error(g_error("Cannot apply operation to " + se1.type + " and " + se2.type, e));
+				}
+				code.apply(se1, se2);
+				break;
+
+			//function call
 			case glsl.ast.operators.function_call:
-				var es = [], i;
 
+				//@todo: check types of parameters
+				se3 = [];
 				for (i = 0; i < e.expressions.length; i++) {
-					es.push(g_ast_expression(e.expressions[i]).code);
+					se3.push(g_ast_expression(e.expressions[i]));
 				}
-
-				//todo: check types of parameters
+				se3 = se3.join(',');
 
 				if (e.cons) {
-					op = g_get_operation('cons', left.type);
-					exp.type = op.type;
-					exp.code = glsl.sprintf(op.func, es.join(','));
-					return exp;
+					//48 is special constructor operator
+					code = g_get_operation(48, se1.type);
+					code.apply(se3);
 				} else {
-					op = g_get_operation(e.oper, left.type);
-					var entry = glsl.state.symbols.get_variable(se1.primary_expression.identifier);
-					exp.type = entry.type;
-					exp.code = glsl.sprintf(op.func, left.code, es.join(','));
-					return exp;					
+					code = g_get_operation(e.oper, se1.type);
+					entry = glsl.state.symbols.get_variable(se[0].primary_expression.identifier);
+					code.type = glsl.ast.types[entry.type];
+					code.apply(se1, se3);
 				}
-				
-				throw new Error(g_error("Could not translate function call", e));
+				break;
 
 			case glsl.ast.operators.field_selection:
-				exp = g_get_field_selection_r_type(left.code, e.primary_expression.identifier, left.type);
-				if (exp) {
-					return exp;
-				} else {
-					throw new Error(g_error("Invalid field selection " + left.code + "." + e.primary_expression.identifier, e));					
+
+				code = g_get_field_selection_r_type(se1, e.primary_expression.identifier, se1.type);
+				if (!code) {
+					throw new Error(g_error("Invalid field selection " + se1 + "." + e.primary_expression.identifier, e));
 				}
-			case glsl.ast.operators.logic_not:
-				if (left.type != 'bool') {
-					throw new Error(g_error("Could not apply logic_not operation to type " + left.type, e));	
-				}
-				exp.type = 'bool';
-				exp.code = '!' + left.code;
-				return exp;
+				break;
+
 			default:
 				throw new Error(g_error("Could not translate unknown expression " + e.typeOf() + '(' + e.oper + ')', e));
 		}
+
+		return code;
 	}
 
+	/**
+	 * Constructs a simple expression code block
+	 *
+	 * @param   ast_node    ast_node that represents a simple expression
+	 *                      (either an identifier or a single value)
+	 *
+	 * @return  objCode
+	 */
 	function g_ast_expression_simple(e) {
-		var exp = {};
+		var code, name, entry;
 
 		//identifier
 		if (e.primary_expression.identifier) {
 
-			var identifier = e.primary_expression.identifier;
-			//lookup type in symbol table
-			var entry = glsl.state.symbols.get_variable(identifier);
+			//lookup identifier in symbol table
+			name = e.primary_expression.identifier;
+			entry = glsl.state.symbols.get_variable(name);
 
 			if (!entry || !entry.type) {
-				throw new Error(g_error(e.primary_expression.identifier + " is undefined", e));
+				throw new Error(g_error(name + " is undefined", e));
 			}
 
+			//global vs local scope
 			if (entry.depth == 0) {
-				exp.code = entry.object_name;
+				code = new objCode(entry.object_name, glsl.ast.types[entry.type]);
 			} else {
-				exp.code = identifier;	
+				code = new objCode(name, glsl.ast.types[entry.type]);
 			}
-			exp.type = entry.type;
 
-			return exp;
+			return code;
 		}
-		
+
+		//float constant
 		if (typeof e.primary_expression.float_constant != 'undefined') {
-			exp.code = e.primary_expression.float_constant;
-			exp.type = 'float';
-			return exp;
+			code = new objCode(String(e.primary_expression.float_constant), glsl.ast.types.float);
+			return code;
 		}
 
+		//int constant
 		if (typeof e.primary_expression.int_constant != 'undefined') {
-			exp.code = e.primary_expression.int_constant;
-			exp.type = 'int';
-			return exp;
+			code = new objCode(String(e.primary_expression.int_constant), glsl.ast.types.int);
+			return code;
 		}
 
 		throw new Error(g_error("Cannot translate unkown simple expression type", e));
 	}
 
+	/**
+	 * Constructs an expression code block
+	 *
+	 * @param   ast_node    ast_node that represents an expression
+	 *
+	 * @return  objCode
+	 */
 	function g_ast_expression(e) {
+		var code;
 
-		var exp = {};
+		if (!e) {
+			return;	
+		}
 
 		//operator
 		if (typeof e.oper == 'number') {
-			exp = g_ast_expression_op(e);
-			return exp;
+			code = g_ast_expression_op(e);
+			return code;
 		}
 
 		//simple (variable, or value)
 		if (e.primary_expression) {
-			exp = g_ast_expression_simple(e);
-			return exp;
+			code = g_ast_expression_simple(e);
+			return code;
 		}
 
 		//cast
 		if (e.typeOf('ast_type_specifier')) {
-			exp.type = e.type_name;
-			return exp;
+			code = new objCode(null, e.type_specifier);
+			return code;
 		}
 
 		throw new Error(g_error("Could not translate unknown expression type", e));
 	}
 
-	function g_ast_expression_statement(es) {
-		var exp = g_ast_expression(es.expression);
-		if (exp.code) {
-			exp.code += ";\n";
-		}
-		return exp.code;
-	}
-
+	/**
+	 * Constructs a compound statement code block
+	 *
+	 * @param   ast_node    ast_node that represents a compound statement type
+	 *
+	 * @return  objCode
+	 */
 	function g_ast_compound_statement(cs) {
-		var code, i, stmts, start, node, stmt, exp, es, thencode, elsecode;
+		var code, start, node, stmt, code1, code2, code3, code4;
+
+		code = new objCode();
+		code.addLine("{");
 
 		glsl.state.symbols.push_scope();
-
-		code = '';
-		stmts = cs.statements;
-		start = stmts.head;
-
 		glsl.generator.depth++;
 
+		node = cs.statements.head;
+		start = null;
+
 		while (node != start) {
-			if (!node) {
-				node = start;
-			}
+
 			stmt = node.data;
+
 			switch (stmt.typeOf()) {
+
 				case 'ast_expression_statement':
-					es = g_ast_expression_statement(stmt);
-					if (!es) {
-						return false;
-					}
-					code += g_indent() + es;
+					code1 = g_ast_expression(stmt.expression);
+					code1.addCode(";");
 					break;
+
 				case 'ast_declarator_list':
-					exp = g_ast_declarator_list(stmt);
-					if (exp) {
-						code += g_indent() + exp;
-					}
+					code1 = g_ast_declarator_list(stmt);
+					code1.addCode(";");
 					break;
+
 				case 'ast_selection_statement':
-					exp = g_ast_expression(stmt.condition);
-					thencode = g_ast_compound_statement(stmt.then_statement);
+					code1 = new objCode("if(%s)%s");
+
 					//should we add a check that condition is bool type?
-					code += g_indent() + glsl.sprintf("if(%s)%s", exp.code, thencode);
+					code2 = g_ast_expression(stmt.condition);
+					code3 = g_ast_compound_statement(stmt.then_statement);
 					if (stmt.else_statement) {
-						elsecode = g_ast_compound_statement(stmt.else_statement);
-						code += g_indent() + glsl.sprintf("else%s\n", elsecode);
+						code4 = g_ast_compound_statement(stmt.else_statement);
+						code1.addLine("else%s");
 					}
+					code1.apply(code2, code3, code4);
 					break;
+
 				default:
 					throw new Error(g_error("Could not translate statement type (" + stmt.typeOf() + ")", stmt));
 			}
 
+			code.addLine(code1);
+
+			if (!start) {
+				start = node;
+			}
 			node = node.next;
 		}
 
 		glsl.state.symbols.pop_scope();
-
 		glsl.generator.depth--;
-		code = g_indent() + "{\n" + code + g_indent() + "}\n";
+		code.addLine("}");
+
 		return code;
 	}
 
+	/**
+	 * Constructs a function definition block
+	 *
+	 * @param   ast_node    ast_node that represents a function definition
+	 *
+	 * @return  objCode
+	 */
 	function g_ast_function_definition(fd) {
-		var code = '', p_code = '', b_code = '';
+		var code, b_code;
+
+		code = new objCode();
 
 		if (fd.is_definition) {
-			//just need to add to symbol table
-			return "\n";
+			code.addCode("\n");
+			return code;
 		}
 
-		p_code = g_ast_function(fd.proto_type);
-		b_code = g_ast_compound_statement(fd.body);
-		if (!b_code) {
-			return false;	
-		}
+		code.addLine(g_ast_function(fd.proto_type));
+		code.addLine(g_ast_compound_statement(fd.body));
 
-		code = p_code + "\n" + b_code;
 		return code;
 	}
 
+	/**
+	 * Constructs a translation unit
+	 *
+	 * @param   ast_node    ast_node that represents a translation unit
+	 *
+	 * @return  objCode
+	 */
 	function g_translation_unit(tu) {
-		var t = tu.typeOf();
-		switch (t) {
+		switch (tu.typeOf()) {
 			case 'ast_declarator_list':
 				return g_ast_declarator_list(tu);
 			case 'ast_type_specifier':
@@ -490,10 +630,18 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			case 'ast_function_definition':
 				return g_ast_function_definition(tu);
 			default:
-				throw new Error(g_error('Cannot translate syntax tree node (' + d.typeOf() + ')'  , tu));
+				throw new Error(g_error('Invalid translation unit node', tu));
 		}
 	}
 
+	/**
+	 * Constructs an error message
+	 *
+	 * @param   string      The error message
+	 * @param   ast_node    The error ast_node
+	 *
+	 * @return  string
+	 */
 	function g_error(msg, n) {
 		if (n && n.location) {
 			msg += " at line " + n.location.line + ", column " + n.location.column;	
@@ -512,23 +660,34 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		status : false,
 		errors : [],
 
+		/**
+		 * Constructs a program's object code from an ast and symbol table
+		 *
+		 * @param   string      The error message
+		 * @param   ast_node    The error ast_node
+		 *
+		 * @return  string
+		 */
 		createObjectCode : function(state) {
-			var i;
+			var code;
+
 			//initialize
 			this.output = '';
 			this.status = false;
 			this.errors = [];
 
 			try {
+				code = new objCode();
 				for (i = 0; i < state.translation_unit.length; i++) {
-					var tu = state.translation_unit[i];
-					this.output += g_translation_unit(tu);
+					code.addLine(g_translation_unit(state.translation_unit[i]));
 				}
 			} catch (e) {
 				this.errors.push(e);
 				throw e;
 				//return false;
 			}
+
+			this.output += code;
 
 			this.status = true;
 			return true;

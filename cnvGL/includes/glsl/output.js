@@ -35,10 +35,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			switch (m[2]) {
 				case 'u':
 				case 'd':
-					d = parseInt(arguments[i], 10);
+					d = parseInt(arguments[i].toString(), 10);
 					break;
 				case 's':
-					d = arguments[i];
+					d = arguments[i].toString();
 					break;
 				case '%':
 					d = '%';
