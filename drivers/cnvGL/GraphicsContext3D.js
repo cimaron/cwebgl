@@ -29,7 +29,6 @@ GraphicsContext3D = (function() {
 
 		this.buffer = null;
 		this.context = null;
-		this.errors = [];
 
 		this._state = {};
 		this._dirty = false;
@@ -83,7 +82,7 @@ GraphicsContext3D = (function() {
 	GraphicsContext3D.attachShader = function(program, shader) {
 		glAttachShader(program, shader);
 	};
-	
+
 	GraphicsContext3D.bindAttribLocation = function(program, index, name) {
 		glBindAttribLocation(program, index, name);
 	};
@@ -100,19 +99,12 @@ GraphicsContext3D = (function() {
 		glBlendFunc(sfactor, dfactor);
 	};
 
-	GraphicsContext3D.bufferData = function(target, data, usage) {
-		var size;
-		if (typeof data == 'number') {
-			size = data;
-			data = null;
-		} else {
-			size = data.byteLength;	
-		}
+	GraphicsContext3D.bufferData = function(target, size, data, usage) {
 		glBufferData(target, size, data, usage);
 	};
 
-	GraphicsContext3D.bufferSubData = function(target, offset, data) {
-		glBufferSubData(target, offset, data.byteLength, data);
+	GraphicsContext3D.bufferSubData = function(target, offset, size, data) {
+		glBufferSubData(target, offset, size, data);
 	};
 
 	GraphicsContext3D.clear = function(mask) {
@@ -183,9 +175,6 @@ GraphicsContext3D = (function() {
 	};
 
 	GraphicsContext3D.getError = function() {
-		if (this.errors.length > 0) {
-			return this.errors.shift();	
-		}
 		return glGetError();
 	};
 
@@ -194,7 +183,7 @@ GraphicsContext3D = (function() {
 		glGetProgramiv(program, pname, params);
 		return params[0];
 	};
-	
+
 	GraphicsContext3D.getShaderInfoLog = function(shader) {
 		var length = [], infoLog = [];
 		glGetShaderInfoLog(shader, null, length, infoLog);
@@ -216,13 +205,7 @@ GraphicsContext3D = (function() {
 	};
 	
 	GraphicsContext3D.pixelStorei = function(pname, param) {
-		switch (pname) {
-			case 0x9240:
-				this._state.UNPACK_FLIP_Y_WEBGL = pname;
-				break;
-			default:
-				glPixelStorei(pname, param);
-		}
+		glPixelStorei(pname, param);
 	};
 
 	GraphicsContext3D.shaderSource = function(shader, string) {
@@ -257,60 +240,7 @@ GraphicsContext3D = (function() {
 		glUseProgram(program);
 	};
 
-	GraphicsContext3D.texImage2D = function(target, level, internalformat, format, type, source) {
-		var width, height, border, cnv, ctx, cnv, i, j, id, is, t;
-
-		//todo: check origin-clean flag
-
-		if (source instanceof HTMLImageElement) {
-			cnv = document.createElement('canvas');
-			cnv.width = source.width;
-			cnv.height = source.height;
-			ctx = cnv.getContext('2d');
-			ctx.drawImage(source, 0, 0, source.width, source.height);
-			source = cnv;
-		}
-
-		if (source instanceof HTMLCanvasElement) {
-			if (!ctx) {
-				ctx = source.getContext('2d');
-			}
-			source = ctx.getImageData(0, 0, source.width, source.height);
-		}
-
-		if (source.data) {
-			width = source.width;
-			height = source.height;
-			border = 0;
-			source = source.data;
-		} else {
-			width = format;
-			height = type;
-			border = source;
-			format = arguments[6];
-			type = arguments[7];
-			source = arguments[8];
-			if (!source) {
-				source = new Uint8Array(width * height * 4);
-			}
-		}
-
-		//need to invert data rows
-		if (this._state.UNPACK_FLIP_Y_WEBGL) {
-			t = new Uint8Array(width * height * 4);
-			for (i = 0; i < height; i++) {
-				for (j = 0; j < width; j++) {
-					is = ((width * i) + j) * 4;
-					id = ((width * (height - i - 1)) + j) * 4;
-					t[id] = source[is];
-					t[id + 1] = source[is + 1];
-					t[id + 2] = source[is + 2];
-					t[id + 3] = source[is + 3];
-				}
-			}
-			source = t;
-		}
-
+	GraphicsContext3D.texImage2D = function(target, level, internalformat, width, height, border, format, type, source) {
 		glTexImage2D(target, level, internalformat, width, height, border, format, type, source);
 	};
 

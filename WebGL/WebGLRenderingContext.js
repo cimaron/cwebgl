@@ -27,6 +27,9 @@ cWebGLRenderingContext = (function() {
 		this.canvas = null;
 		this.attr = null;
 		this._context = null;
+
+		this._state = {};
+		this.errors = [];
 	}
 
 	var cWebGLRenderingContext = jClass('cWebGLRenderingContext', Initializer);
@@ -488,10 +491,20 @@ cWebGLRenderingContext = (function() {
 	};
 
 	cWebGLRenderingContext.bindBuffer = function(target, buffer) {
-		//@validation
-		this._context.bindBuffer(target, buffer ? buffer.object() : null);
+		if (buffer && buffer.target && buffer.target != target) {
+			this.errors.push(this.INVALID_OPERATION);
+			return;
+		}
+		if (target != this.ARRAY_BUFFER && target != this.ELEMENT_ARRAY_BUFFER) {
+			this.errors.push(this.INVALID_OPERATION);
+			return;
+		}
+		this._context.bindBuffer(target, buffer ? buffer.object() : 0);
+		if (buffer) {
+			buffer.target = target;
+		}
 	};
-	
+
 	cWebGLRenderingContext.bindFramebuffer = function(target, framebuffer) {
 	
 		//@validation
@@ -520,12 +533,36 @@ cWebGLRenderingContext = (function() {
 	};
 	
 	cWebGLRenderingContext.bufferData = function(target, data, usage) {
-		//@validation
-		this._context.bufferData(target, data, usage);
+		var size;
+		if (typeof data == 'number') {
+			size = parseInt(data);
+			if (size > 0) {
+				data = new ArrayBuffer(size);
+			} else {
+				size = 0;
+			}
+		}
+		if (data && data.byteLength) {
+			size = data.byteLength;	
+		}
+		if (!size) {
+			this.errors.push(this.INVALID_VALUE);
+			return;
+		}
+
+		this._context.bufferData(target, size, data, usage);
 	};
 
 	cWebGLRenderingContext.bufferSubData = function(target, offset, data) {
-		this._context.bufferSubData(target, offset, data);
+		var size;
+		if (data && data.byteLength) {
+			size = data.byteLength;
+		}
+		if (!size) {
+			this.errors.push(this.INVALID_VALUE);
+			return;
+		}
+		this._context.bufferSubData(target, offset, size, data);
 	};
 
 	cWebGLRenderingContext.clear = function(mask) {
@@ -638,9 +675,12 @@ cWebGLRenderingContext = (function() {
 	};
 
 	cWebGLRenderingContext.getError = function() {
+		if (this.errors.length > 0) {
+			return this.errors.shift();	
+		}
 		return this._context.getError();
 	};
-	
+
 	cWebGLRenderingContext.getParameter = function(pname) {
 		return null;
 	};
@@ -677,8 +717,13 @@ cWebGLRenderingContext = (function() {
 	};
 	
 	cWebGLRenderingContext.pixelStorei = function(pname, param) {
-		//@validation
-		this._context.pixelStorei(pname, param);
+		switch (pname) {
+			case this.UNPACK_FLIP_Y_WEBGL:
+				this._state.UNPACK_FLIP_Y_WEBGL = pname;
+				break;
+			default:
+				this._context.pixelStorei(pname, param);
+		}
 	};
 	
 	cWebGLRenderingContext.renderbufferStorage = function(target, internalformat, width, height) {
@@ -692,8 +737,61 @@ cWebGLRenderingContext = (function() {
 		this._context.shaderSource(shader.object(), string);
 	};
 	
-	cWebGLRenderingContext.texImage2D = function() {
-		this._context.texImage2D.apply(this._context, arguments);
+	cWebGLRenderingContext.texImage2D = function(target, level, internalformat, format, type, source) {
+		var width, height, border, cnv, ctx, cnv, i, j, id, is, t;
+
+		//todo: check origin-clean flag
+
+		if (source instanceof HTMLImageElement) {
+			cnv = document.createElement('canvas');
+			cnv.width = source.width;
+			cnv.height = source.height;
+			ctx = cnv.getContext('2d');
+			ctx.drawImage(source, 0, 0, source.width, source.height);
+			source = cnv;
+		}
+
+		if (source instanceof HTMLCanvasElement) {
+			if (!ctx) {
+				ctx = source.getContext('2d');
+			}
+			source = ctx.getImageData(0, 0, source.width, source.height);
+		}
+
+		if (source.data) {
+			width = source.width;
+			height = source.height;
+			border = 0;
+			source = source.data;
+		} else {
+			width = format;
+			height = type;
+			border = source;
+			format = arguments[6];
+			type = arguments[7];
+			source = arguments[8];
+			if (!source) {
+				source = new Uint8Array(width * height * 4);
+			}
+		}
+
+		//need to invert data rows
+		if (this._state.UNPACK_FLIP_Y_WEBGL) {
+			t = new Uint8Array(width * height * 4);
+			for (i = 0; i < height; i++) {
+				for (j = 0; j < width; j++) {
+					is = ((width * i) + j) * 4;
+					id = ((width * (height - i - 1)) + j) * 4;
+					t[id] = source[is];
+					t[id + 1] = source[is + 1];
+					t[id + 2] = source[is + 2];
+					t[id + 3] = source[is + 3];
+				}
+			}
+			source = t;
+		}
+
+		this._context.texImage2D(target, level, internalformat, width, height, border, format, type, source);
 	};
 	
 	cWebGLRenderingContext.texParameteri = function(target, pname, param) {
@@ -751,6 +849,8 @@ cWebGLRenderingContext = (function() {
 		}
 	};
 
+	//private:
+	
 	cWebGLRenderingContext.setTargetFps = function(low, high) {
 		this._context.setTargetFps(low, high);
 	};
