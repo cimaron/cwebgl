@@ -21,8 +21,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 function glGetError() {
-	var ctx;
+	var ctx, error;
 	ctx = cnvgl_context.getCurrentContext();
-	return ctx.errorValue;
+	error = ctx.errorValue;
+	ctx.errorValue = GL_NO_ERROR;
+	return error;
 }
 

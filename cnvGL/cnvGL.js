@@ -112,7 +112,7 @@ include('cnvGL/functions/glViewport.js');
 function cnvgl_throw_error(error) {
 	var ctx;
 	ctx = cnvgl_context.getCurrentContext();
-	if (error && error.errorValue == GL_NO_ERROR) {
+	if (error && ctx.errorValue == GL_NO_ERROR) {
 		ctx.errorValue = error;
 	}
 }
