@@ -63,7 +63,7 @@ function TypedArray(buffer, byteOffset, length, bytes) {
 TypedArray.prototype = Array;
 TypedArray.getType = function(a) {
 	var i, types;
-	types = [Uint8Array, Uint16Array, Float32Array];
+	types = [ArrayBuffer, Uint8Array, Uint16Array, Float32Array];
 	for (i = 0; i < types.length; i++) {
 		if (a instanceof types[i]) {
 			return types[i];
@@ -73,25 +73,34 @@ TypedArray.getType = function(a) {
 
 if (typeof Uint8Array == 'undefined') {
 	//we have a special shortcut for Uint8Arrays (Canvas ImageData!)
-	(function() {
-		var ctx = document.createElement('canvas').getContext('2d');
+	if (typeof HTMLCanvasElement != "undefined") {
+		(function() {
+			var ctx = document.createElement('canvas').getContext('2d');
+			Uint8Array = function(buffer, byteOffset, length) {
+				if (this == window) {
+					return new Uint8Array(buffer, byteOffset, length);
+				}
+				if (typeof length == 'undefined') {
+					if (typeof buffer == 'object') {
+						length = buffer.length;	
+					} else {
+						length = buffer;
+						buffer = null;
+					}
+				}
+				var data = ctx.createImageData(length, 1).data;
+				TypedArray.apply(data, [buffer, byteOffset, length, Uint8Array.BYTES_PER_ELEMENT]);
+				return data;
+			};
+		}());
+	} else {
 		Uint8Array = function(buffer, byteOffset, length) {
 			if (this == window) {
 				return new Uint8Array(buffer, byteOffset, length);
 			}
-			if (typeof length == 'undefined') {
-				if (typeof buffer == 'object') {
-					length = buffer.length;	
-				} else {
-					length = buffer;
-					buffer = null;
-				}
-			}
-			var data = ctx.createImageData(length, 1).data;
-			TypedArray.apply(data, [buffer, byteOffset, length, Uint8Array.BYTES_PER_ELEMENT]);
-			return data;
+			TypedArray.apply(this, [buffer, byteOffset, length, Uint8Array.BYTES_PER_ELEMENT]);
 		};
-	}());
+	}
 	Uint8Array.BYTES_PER_ELEMENT = 1;
 	Uint8Array.native = false;
 } else {
