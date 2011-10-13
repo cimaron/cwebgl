@@ -86,7 +86,7 @@ HASH		^{SPC}#{SPC}
 				   return yy.token.IDENTIFIER;
 				}
 <PP>[1-9][0-9]*			{
-				    yylval.n = strtol(yytext, NULL, 10);
+				    yylval.n = parseInt(yytext);
 				    return yy.token.INTCONSTANT;
 				}
 <PP>[\n]				{ this.begin('INITIAL'); yylineno++; yycolumn = 0; return yy.token.EOL; }
@@ -220,23 +220,23 @@ HASH		^{SPC}#{SPC}
 			    return yy.token.FLOATCONSTANT;;
 			}
 "0"[xX][0-9a-fA-F]+[uU]?	{
-			    yylval.n = strtol(yytext + 2, NULL, 16);
-			    return IS_UINT ? UINTCONSTANT : INTCONSTANT;
+			    this.yylval.n = parseInt(yytext + 2, 16);
+			    return this.IS_UINT(yytext) ? yy.token.UINTCONSTANT : yy.token.INTCONSTANT;
 			}
 "0"[0-7]*[uU]?		{
-			    yylval.n = strtol(yytext, NULL, 8);
-			    return IS_UINT ? UINTCONSTANT : INTCONSTANT;
+			    this.yylval.n = parseInt(yytext, 8);
+			    return this.IS_UINT(yytext) ? yy.token.UINTCONSTANT : yy.token.INTCONSTANT;
 			}
 [1-9][0-9]*[uU]?	{
-				this.yylval.n = parseInt(yytext, 10);
+				this.yylval.n = parseInt(yytext);
 				return this.IS_UINT(yytext) ? yy.token.UINTCONSTANT : yy.token.INTCONSTANT;
 			}
 "true"			{
-			    yylval.n = 1;
+			    this.yylval.n = 1;
 			    return yy.token.BOOLCONSTANT;
 			}
 "false"			{
-			    yylval.n = 0;
+			    this.yylval.n = 0;
 			    return yy.token.BOOLCONSTANT;
 			}
 

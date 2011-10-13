@@ -238,7 +238,7 @@ var lexer = (function () {
 
 			break;
 		case 18:
-			yylval.n = strtol(yy_.yytext, NULL, 10);
+			yylval.n = parseInt(yy_.yytext);
 			return yy.token.INTCONSTANT;
 
 			break;
@@ -566,27 +566,27 @@ var lexer = (function () {
 
 			break;
 		case 122:
-			yylval.n = strtol(yy_.yytext + 2, NULL, 16);
-			return IS_UINT ? UINTCONSTANT : INTCONSTANT;
+			this.yylval.n = parseInt(yy_.yytext + 2, 16);
+			return this.IS_UINT(yy_.yytext) ? yy.token.UINTCONSTANT : yy.token.INTCONSTANT;
 
 			break;
 		case 123:
-			yylval.n = strtol(yy_.yytext, NULL, 8);
-			return IS_UINT ? UINTCONSTANT : INTCONSTANT;
+			this.yylval.n = parseInt(yy_.yytext, 8);
+			return this.IS_UINT(yy_.yytext) ? yy.token.UINTCONSTANT : yy.token.INTCONSTANT;
 
 			break;
 		case 124:
-			this.yylval.n = parseInt(yy_.yytext, 10);
+			this.yylval.n = parseInt(yy_.yytext);
 			return this.IS_UINT(yy_.yytext) ? yy.token.UINTCONSTANT : yy.token.INTCONSTANT;
 
 			break;
 		case 125:
-			yylval.n = 1;
+			this.yylval.n = 1;
 			return yy.token.BOOLCONSTANT;
 
 			break;
 		case 126:
-			yylval.n = 0;
+			this.yylval.n = 0;
 			return yy.token.BOOLCONSTANT;
 
 			break;
