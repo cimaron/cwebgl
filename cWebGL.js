@@ -23,7 +23,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	var getNativeContext, i, validContext, hasCanvas, hasWebGL, current;
 
-	validContext = ["webgl","experimental-webgl"] 
+	validContext = ["webgl","experimental-webgl"];
 	hasCanvas = (typeof HTMLCanvasElement != "undefined");
 	current = [];
 

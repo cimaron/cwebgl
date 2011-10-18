@@ -163,7 +163,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	function g_get_operation() {
 		var table, next, code;
-			debugger;
 
 		table = Array.prototype.shift.apply(arguments);
 		if (typeof table == "number") {
