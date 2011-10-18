@@ -21,24 +21,24 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 function glClear(mask) {
-
-	var ctx, buffer, clear, i;
+	var ctx, buffer, clear, i, l;
 
 	ctx = cnvgl_context.getCurrentContext();
 
-	if (mask & ~(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ACCUM_BUFFER_BIT | GL_STENCIL_BUFFER_BIT)) {
+	if (mask & ~(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT)) {
 		cnvgl_throw_error(GL_INVALID_VALUE);
 		return;
 	}
 
-	//GL_COLOR_BUFFER_BIT
+	//Color Buffer
 	if (mask & GL_COLOR_BUFFER_BIT) {
 		buffer = ctx.color_buffer;
 		clear = [];
 		for (i = 0; i < 4; i++) {
 			clear[i] = Math.round(255 * ctx.color.clearColor[i]);
 		}
-		for (i = 0; i < buffer.length; i += 4) {
+		l = buffer.length;
+		for (i = 0; i < l; i += 4) {
 			buffer[i] = clear[0];
 			buffer[i + 1] = clear[1];
 			buffer[i + 2] = clear[2];
@@ -46,18 +46,19 @@ function glClear(mask) {
 		}
 	}
 
-	//GL_DEPTH_BUFFER_BIT
+	//Depth Buffer
 	if (mask & GL_DEPTH_BUFFER_BIT) {
 		buffer = ctx.depth_buffer;
 		clear = ctx.depth.clear;
-		for (i = 0; i < buffer.length; i ++) {
+		l = buffer.length;
+		for (i = 0; i < l; i++) {
 			buffer[i] = clear;
 		}
 	}
 
-	if (mask & ~(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT)) {
+	//Stencil Buffer
+	if (mask & GL_STENCIL_BUFFER_BIT) {
 		throw new Error('glClear: todo');
 	}
-
 }
 
