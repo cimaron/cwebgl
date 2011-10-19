@@ -22,14 +22,27 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 cnvgl_rendering_clipping = (function() {
 
 	function Initializer() {
+		//public:
+		this.ctx = null;
+		this.renderer = null;
+		
+		this.planes = [];
 	}
 
 	var cnvgl_rendering_clipping = jClass('cnvgl_rendering_clipping', Initializer);	
 
-	cnvgl_rendering_clipping.cnvgl_rendering_clipping = function() {
+	cnvgl_rendering_clipping.cnvgl_rendering_clipping = function(ctx, renderer) {
+		this.ctx = ctx;
+		this.renderer = renderer;
 	};
 
-	cnvgl_rendering_clipping.clip = function(vertex) {
+	cnvgl_rendering_clipping.clipPoint = function(v) {
+	};
+
+	cnvgl_rendering_clipping.clipLine = function(v1, v2) {		
+	};
+
+	cnvgl_rendering_clipping.clipPrimitive = function(prim) {
 	};
 
 	return cnvgl_rendering_clipping.Constructor;
