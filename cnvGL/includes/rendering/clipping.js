@@ -36,7 +36,17 @@ cnvgl_rendering_clipping = (function() {
 		this.renderer = renderer;
 	};
 
-	cnvgl_rendering_clipping.clipPoint = function(v) {
+	cnvgl_rendering_clipping.clipPoint = function(p) {
+		var w, h;
+		w = this.ctx.viewport.w;
+		h = this.ctx.viewport.h;
+		
+		if (p[0] < 0 || p[0] > w - 1 ||
+			p[1] < 0 || p[1] > h - 1) {
+			return false;	
+		}
+
+		return true;
 	};
 
 	cnvgl_rendering_clipping.clipLine = function(v1, v2) {		

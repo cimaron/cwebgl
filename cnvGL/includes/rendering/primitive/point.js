@@ -38,28 +38,33 @@ cnvgl_rendering_primitive_point = (function() {
 	cnvgl_rendering_primitive_point.cnvgl_rendering_primitive_point = function(ctx, renderer) {
 		this.ctx = ctx;
 		this.renderer = renderer;
+		this.frag = new cnvgl_fragment();
 	};
 
 	cnvgl_rendering_primitive_point.render = function(prim) {
 		var c_buffer, vw, v, x, y, p, frag, i;
 
 		this.prim = prim;
-		c_buffer = this.ctx.color_buffer;
-		vw = this.ctx.viewport.w;
-		frag = new cnvgl_fragment();
-		
+
 		v = prim.vertices[0];
 		x = Math.round(v.xw);
 		y = Math.round(v.yw);
 		p = [x, y, 0, v.w];
 
+		if (!this.renderer.clipping.clipPoint(p)) {
+			return;
+		}
+
+		c_buffer = this.ctx.color_buffer;
+		vw = this.ctx.viewport.w;
+
 		for (i in v.varying) {
-			frag.varying[i] = v.varying[i];	
+			this.frag.varying[i] = v.varying[i];	
 		}
 
 		ic = (vw * y + x) * 4;
 
-		this.renderer.fragment.process(frag);
+		this.renderer.fragment.process(this.frag);
 		this.renderer.fragment.write(c_buffer, ic, this.frag);
 	};
 
