@@ -25,6 +25,7 @@ cWebGLBuffer = (function() {
 	function Initializer() {
 		cWebGLObject.Initializer.apply(this);
 		//public:
+		this.target = null;
 	}
 	
 	var cWebGLBuffer = jClass('cWebGLBuffer', Initializer, cWebGLObject);
@@ -35,7 +36,7 @@ cWebGLBuffer = (function() {
 		this.cWebGLObject(context);
 		this.setObject(this.context().graphicsContext3D().createBuffer());
 	};
-	
+
 	return cWebGLBuffer.Constructor;
 	
 }());

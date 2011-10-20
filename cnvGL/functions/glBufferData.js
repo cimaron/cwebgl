@@ -79,7 +79,9 @@ function glBufferData(target, size, data, usage) {
 		}
 	}
 
-	buffer_obj.data_type = data_type;
+	if (data_type != ArrayBuffer) {
+		buffer_obj.data_type = data_type;
+	}
 	buffer_obj.data = view;
 }
 

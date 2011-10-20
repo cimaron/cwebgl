@@ -60,8 +60,8 @@ function glBufferSubData(target, offset, size, data) {
 	for (i = 0; i < size; i++) {
 		temp[offset + i] = data[i];
 	}
-	
-	if (!buffer_obj.data_type) {
+
+	if (!buffer_obj.data_type && data_type != ArrayBuffer) {
 		buffer_obj.data_type = data_type;
 	}
 }
