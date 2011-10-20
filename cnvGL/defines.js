@@ -87,7 +87,11 @@ var GL_STREAM_DRAW                    = 0x88E0;
 var GL_STREAM_READ                    = 0x88E1;
 var GL_STREAM_COPY                    = 0x88E2;
 var GL_STATIC_DRAW                    = 0x88E4;
+var GL_STATIC_READ                    = 0x88E5;
+var GL_STATIC_COPY                    = 0x88E6;
 var GL_DYNAMIC_DRAW                   = 0x88E8;
+var GL_DYNAMIC_READ                   = 0x88E9;
+var GL_DYNAMIC_COPY                   = 0x88EA;
 
 var GL_BUFFER_SIZE                    = 0x8764;
 var GL_BUFFER_USAGE                   = 0x8765;
