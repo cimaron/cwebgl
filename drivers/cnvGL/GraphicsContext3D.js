@@ -278,31 +278,39 @@ GraphicsContext3D = (function() {
 
 		ctx = cnvgl_context.getCurrentContext();
 
-		if (this._quality.factor > 1) {
-			if (!this._quality.cnv) {
-				this._quality.cnv = document.createElement('canvas');
-			}
-			width = Math.round(this.canvas.width / this._quality.factor);
-			height = Math.round(this.canvas.height / this._quality.factor);
+		if (!this.buffer) {
+			this.buffer = this.context.createImageData(this.canvas.width, this.canvas.height);
+		}
+		if (!this._quality.cnv) {
+			this._quality.cnv = document.createElement('canvas');
+		}
 
+		width = this.canvas.width;
+		height = this.canvas.height;
+
+		if (this._quality.factor > 1) {
+
+			width = Math.round(width / this._quality.factor);
+			height = Math.round(height / this._quality.factor);
 			width = Math.max(width, 1);
 			height = Math.max(height, 1);
 
 			this.webglCtx.drawingBufferWidth = width;
 			this.webglCtx.drawingBufferHeight = height;
+
 			this._quality.cnv.width = width;
 			this._quality.cnv.height = height;
 			this._quality.ctx = this._quality.cnv.getContext('2d');
 			this.context.mozImageSmoothingEnabled = false;
+
+			this._quality.buffer = this.context.createImageData(width, height);
+			ctx.color_buffer = this._quality.buffer.data;
+
 		} else {
-			width = this.canvas.width;
-			height = this.canvas.height;
+			ctx.color_buffer = this.buffer.data;
 		}
 
-		//initialize buffers
-		this.buffer = this.context.createImageData(width, height);
-		ctx.color_buffer = this.buffer.data;
-		ctx.depth_buffer = new Float32Array(width * height);		
+		ctx.depth_buffer = new Float32Array(width * height);
 	};
 
 	GraphicsContext3D._updateFrame = function() {
@@ -354,11 +362,11 @@ GraphicsContext3D = (function() {
 		if (this._dirty) {
 			this._dirty = false;
 
-			if (this._quality.factor <= 1) {
-				this.context.putImageData(this.buffer, 0, 0);
-			} else {
-				this._quality.ctx.putImageData(this.buffer, 0, 0);
+			if (this._quality.factor > 1) {
+				this._quality.ctx.putImageData(this._quality.buffer, 0, 0);
 				this.context.drawImage(this._quality.cnv, 0, 0, this.canvas.width, this.canvas.height);
+			} else {
+				this.context.putImageData(this.buffer, 0, 0);
 			}
 		}
 
