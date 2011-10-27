@@ -34,9 +34,13 @@ function cnvgl_vertex() {
 	this.xw = 0;
 	this.yw = 0;
 	this.zw = 0;
+	
+	this.xc = 0;
+	this.yc = 0;
+	this.zc = 0;
 
 	//communication with program
-	this.gl_Position = [0,0,0,1];
+	this.gl_Position = [0,0,0,0];
 
 	this.attributes = [];
 	this.varying = {};

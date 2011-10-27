@@ -25,7 +25,7 @@ cnvgl_rendering_clipping = (function() {
 		//public:
 		this.ctx = null;
 		this.renderer = null;
-		
+
 		this.planes = [];
 	}
 
@@ -37,19 +37,17 @@ cnvgl_rendering_clipping = (function() {
 	};
 
 	cnvgl_rendering_clipping.clipPoint = function(p) {
-		var w, h;
-		w = this.ctx.viewport.w;
-		h = this.ctx.viewport.h;
-		
-		if (p[0] < 0 || p[0] > w - 1 ||
-			p[1] < 0 || p[1] > h - 1) {
-			return false;	
+
+		if (p.xd < -1 || p.xd > 1 ||
+			p.yd < -1 || p.yd > 1 ||
+			p.zd < -1 || p.zd > 1) {
+			return false;
 		}
 
 		return true;
 	};
 
-	cnvgl_rendering_clipping.clipLine = function(v1, v2) {		
+	cnvgl_rendering_clipping.clipLine = function(v1, v2) {
 	};
 
 	cnvgl_rendering_clipping.clipPrimitive = function(prim) {
