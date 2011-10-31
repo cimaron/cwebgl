@@ -23,9 +23,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 if (typeof ArrayBuffer == 'undefined') {
 	ArrayBuffer = function(length) {
 		var i;
-		if (this == window) {
-			return new ArrayBuffer(length);
-		}
 		for (i = 0; i < length; i++) {
 			this[i] = 0;
 		}
@@ -77,9 +74,6 @@ if (typeof Uint8Array == 'undefined') {
 		(function() {
 			var ctx = document.createElement('canvas').getContext('2d');
 			Uint8Array = function(buffer, byteOffset, length) {
-				if (this == window) {
-					return new Uint8Array(buffer, byteOffset, length);
-				}
 				if (typeof length == 'undefined') {
 					if (typeof buffer == 'object') {
 						length = buffer.length;	
@@ -95,9 +89,6 @@ if (typeof Uint8Array == 'undefined') {
 		}());
 	} else {
 		Uint8Array = function(buffer, byteOffset, length) {
-			if (this == window) {
-				return new Uint8Array(buffer, byteOffset, length);
-			}
 			TypedArray.apply(this, [buffer, byteOffset, length, Uint8Array.BYTES_PER_ELEMENT]);
 		};
 	}
@@ -109,9 +100,6 @@ if (typeof Uint8Array == 'undefined') {
 
 if (typeof Uint16Array == 'undefined') {
 	Uint16Array = function(buffer, byteOffset, length) {
-		if (this == window) {
-			return new Uint16Array(buffer, byteOffset, length);
-		}
 		TypedArray.apply(this, [buffer, byteOffset, length, Uint16Array.BYTES_PER_ELEMENT]);
 	};
 	Uint16Array.BYTES_PER_ELEMENT = 1;
@@ -122,9 +110,6 @@ if (typeof Uint16Array == 'undefined') {
 
 if (typeof Float32Array == 'undefined') {
 	Float32Array = function(buffer, byteOffset, length) {
-		if (this == window) {
-			return new Float32Array(buffer, byteOffset, length);
-		}
 		TypedArray.apply(this, [buffer, byteOffset, length, Float32Array.BYTES_PER_ELEMENT]);
 	};
 	Float32Array.BYTES_PER_ELEMENT = 1;
