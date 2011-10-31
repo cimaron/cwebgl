@@ -43,7 +43,7 @@ cnvgl_buffer = (function() {
 			type = this.data_type;	
 		}
 		if (type.native) {
-			return type(this.data);	
+			return new type(this.data);	
 		}
 		return this.data;
 	};

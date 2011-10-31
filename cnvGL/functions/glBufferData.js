@@ -66,11 +66,11 @@ function glBufferData(target, size, data, usage) {
 	buffer_obj.size = size;
 
 	data_type = TypedArray.getType(data);
-	view = ArrayBuffer(size);
+	view = new ArrayBuffer(size);
 	if (data) {
 		size /= data_type.BYTES_PER_ELEMENT;
 		if (ArrayBuffer.native) {
-			temp = data_type(view);
+			temp = new data_type(view);
 		} else {
 			temp = view;	
 		}
