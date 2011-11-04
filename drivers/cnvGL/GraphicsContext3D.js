@@ -59,7 +59,7 @@ GraphicsContext3D = (function() {
 		}
 		*/
 		this._quality.factor = 1;
-		this.setTargetFps(10);
+		this.setTargetFps(0);
 
 		this._createBuffer();
 
