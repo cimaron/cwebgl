@@ -51,6 +51,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	if (typeof WebGLRenderingContext != 'undefined') {
 		WebGLRenderingContext.prototype.setTargetFps = function() {};
+		WebGLRenderingContext.native = true;
 	} else {
 		window.WebGLRenderingContext = cWebGLRenderingContext;
 	}
