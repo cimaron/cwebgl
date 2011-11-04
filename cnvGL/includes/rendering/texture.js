@@ -40,7 +40,7 @@ cnvgl_rendering_texture = (function() {
 	//Note: all the following functions will be executed in the 'this' context of cnvgl_rendering_data
 
 	cnvgl_rendering_texture.texture2D = function(sampler, coord, bias) {
-		var texture_obj, mipmap_level, img, u, v, u1, v1, s, t, c, i, i1, tao;
+		var texture_obj, mipmap_level, img, u, v, u1, v1, s, t, c, i, i1, tao, img_w, img_h, img_d;
 
 		texture_obj = this._ctx.texture.unit[sampler].current_texture[GL_TEXTURE_2D];
 
@@ -52,12 +52,22 @@ cnvgl_rendering_texture = (function() {
 		t = coord[1];
 		c = [];
 
+		if (img) {
+			img_w = img.width;
+			img_h = img.height;
+			img_d = img.data;
+		} else {
+			img_w = 1;
+			img_h = 1;
+			img_d = [0,0,0,1];
+		}
+
 		//how to determine if using mag or min?
 
 		switch (texture_obj.min_filter) {
 			case GL_LINEAR:
-				u = (s * img.width - .5)|0; //floor(s * img.width - .5)
-				v = (t * img.height - .5)|0; //floor(t * img.height - .5)
+				u = (s * img_w - .5)|0; //floor(s * img.width - .5)
+				v = (t * img_h - .5)|0; //floor(t * img.height - .5)
 				u1 = u + 1;
 				v1 = v + 1;
 				var a, b;
@@ -70,30 +80,30 @@ cnvgl_rendering_texture = (function() {
 				u0v1 = (1 - a) *      b ;
 				u1v1 =      a  *      b ;
 
-				i = (v * img.width + u) * 4;
-				i1 = i + (img.width * 4);
+				i = (v * img_w + u) * 4;
+				i1 = i + (img_w * 4);
 
-				c[0] = u0v0 * img.data[i    ] + u1v0 * img.data[i + 4] + u0v1 * img.data[i1    ] + u1v1 * img.data[i1 + 4];
-				c[1] = u0v0 * img.data[i + 1] + u1v0 * img.data[i + 5] + u0v1 * img.data[i1 + 1] + u1v1 * img.data[i1 + 5];
-				c[2] = u0v0 * img.data[i + 2] + u1v0 * img.data[i + 6] + u0v1 * img.data[i1 + 2] + u1v1 * img.data[i1 + 6];
-				c[3] = u0v0 * img.data[i + 3] + u1v0 * img.data[i + 7] + u0v1 * img.data[i1 + 3] + u1v1 * img.data[i1 + 7];
+				c[0] = u0v0 * img_d[i    ] + u1v0 * img_d[i + 4] + u0v1 * img_d[i1    ] + u1v1 * img_d[i1 + 4];
+				c[1] = u0v0 * img_d[i + 1] + u1v0 * img_d[i + 5] + u0v1 * img_d[i1 + 1] + u1v1 * img_d[i1 + 5];
+				c[2] = u0v0 * img_d[i + 2] + u1v0 * img_d[i + 6] + u0v1 * img_d[i1 + 2] + u1v1 * img_d[i1 + 6];
+				c[3] = u0v0 * img_d[i + 3] + u1v0 * img_d[i + 7] + u0v1 * img_d[i1 + 3] + u1v1 * img_d[i1 + 7];
 				break;
 				
 			case GL_NEAREST:
 			default:
-				u = (s * img.width)|0; //floor(s * img.width)
-				v = (t * img.height)|0; //floor(t * img.height)
-				if (u == img.width) {
+				u = (s * img_w)|0; //floor(s * img.width)
+				v = (t * img_h)|0; //floor(t * img.height)
+				if (u == img_w) {
 					u--;
 				}
-				if (v == img.height) {
+				if (v == img_h) {
 					v--;
 				}
-				i = (v * img.width + u) * 4;
-				c[0] = img.data[i];
-				c[1] = img.data[i + 1];
-				c[2] = img.data[i + 2];
-				c[3] = img.data[i + 3];
+				i = (v * img_w + u) * 4;
+				c[0] = img_d[i];
+				c[1] = img_d[i + 1];
+				c[2] = img_d[i + 2];
+				c[3] = img_d[i + 3];
 		}
 
 		return c;
