@@ -55,42 +55,11 @@ cnvgl_rendering_program = (function() {
 		return main;
 	};
 
-	cnvgl_rendering_program._dot = function(vec1, vec2) {
-	};
-
 	//--------------------------------------------------------------------
 	//	The following implements the math library for glsl programs.
 	//	Most of the code is taken from or derived from glMatrix.js library
 	//--------------------------------------------------------------------
-	var constructor, vec2 = {}, vec3 = {}, vec4 = {}, mat2 = {}, mat3 = {}, mat4 = {};
-
-	/*
-	 * constructor
-	 * Construct a vector/matrix from passed argument elements
-	 *
-	 * Params:
-	 * l - size of vector/matrix
-	 * arguments[1]+ - list of mixed types to gather components from
-	 *
-	 * Returns:
-	 * vec{l}/mat{?}
-	 */
-	constructor = function(l) {
-		var i = 0, j = 1, k = 0, v = [];
-		while (i < l) {
-			if (typeof arguments[j] == 'number') {
-				v[i] = arguments[j]; i++; j++;
-			} else {
-				if (arguments[j].length <= k) {
-					k = 0; j++;
-					continue;
-				}
-				v[i] = arguments[j][k];
-				i++; k++;
-			}
-		}
-		return v;
-	};
+	var vec2 = {}, vec3 = {}, vec4 = {}, mat2 = {}, mat3 = {}, mat4 = {};
 				
 	/*
 	 * vec3.add
@@ -106,10 +75,10 @@ cnvgl_rendering_program = (function() {
 	 */
 	vec3.add = function(vec, vec2, dest) {
 		if(!dest || vec == dest) {
-				vec[0] += vec2[0];
-				vec[1] += vec2[1];
-				vec[2] += vec2[2];
-				return vec;
+			vec[0] += vec2[0];
+			vec[1] += vec2[1];
+			vec[2] += vec2[2];
+			return vec;
 		}
 		
 		dest[0] = vec[0] + vec2[0];
@@ -132,10 +101,10 @@ cnvgl_rendering_program = (function() {
 	 */
 	vec3.multiply = function(vec, vec2, dest) {
 		if(!dest || vec == dest) {
-				vec[0] *= vec2[0];
-				vec[1] *= vec2[1];
-				vec[2] *= vec2[2];
-				return vec;
+			vec[0] *= vec2[0];
+			vec[1] *= vec2[1];
+			vec[2] *= vec2[2];
+			return vec;
 		}
 
 		dest[0] = vec[0] * vec2[0];
@@ -158,10 +127,10 @@ cnvgl_rendering_program = (function() {
 	 */
 	vec3.scale = function(vec, val, dest) {
 		if(!dest || vec == dest) {
-				vec[0] *= val;
-				vec[1] *= val;
-				vec[2] *= val;
-				return vec;
+			vec[0] *= val;
+			vec[1] *= val;
+			vec[2] *= val;
+			return vec;
 		}
 		
 		dest[0] = vec[0]*val;
@@ -185,6 +154,34 @@ cnvgl_rendering_program = (function() {
 		return vec[0]*vec2[0] + vec[1]*vec2[1] + vec[2]*vec2[2];
 	};
 
+	/*
+	 * vec4.multiply
+	 * Performs a vector multiplication
+	 *
+	 * Params:
+	 * vec - vec4, first operand
+	 * vec2 - vec4, second operand
+	 * dest - Optional, vec3 receiving operation result. If not specified result is written to vec
+	 *
+	 * Returns:
+	 * dest if specified, vec otherwise
+	 */
+	vec4.multiply = function(vec, vec2, dest) {
+		if(!dest || vec == dest) {
+			vec[0] *= vec2[0];
+			vec[1] *= vec2[1];
+			vec[2] *= vec2[2];
+			vec[3] *= vec2[3];
+			return vec;
+		}
+
+		dest[0] = vec[0] * vec2[0];
+		dest[1] = vec[1] * vec2[1];
+		dest[2] = vec[2] * vec2[2];
+		dest[3] = vec[3] * vec2[3];
+		return dest;
+	};
+	
 	/*
 	 * mat3.multiplyVec3
 	 * Transforms a vec3 with the given matrix
