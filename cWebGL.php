@@ -20,8 +20,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-
-$debug = (int)$_GET['debug'];
+$debug = isset($_GET['debug']) ? true : false;
 $base = dirname($_SERVER['SCRIPT_NAME']);
 $basepath = dirname(__FILE__);
 
