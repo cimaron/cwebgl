@@ -87,7 +87,6 @@ include('cnvGL/functions/glDrawElements.js');
 include('cnvGL/functions/glEnable.js');
 include('cnvGL/functions/glEnableVertexAttribArray.js');
 include('cnvGL/functions/glGenBuffers.js');
-include('cnvGL/functions/glGenerateMipmap.js');
 include('cnvGL/functions/glGenTextures.js');
 include('cnvGL/functions/glGet.js');
 include('cnvGL/functions/glGetAttribLocation.js');
