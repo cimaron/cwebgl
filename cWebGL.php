@@ -33,9 +33,7 @@ function cWebGLInclude($file) {
 function cWebGLIncludeFile($file) {
 	global $basepath;
 	if (!file_exists($basepath.'/'.$file)) {
-		echo "alert('Could not find \'$file\'');";
-		//should we provide an error to the end user?
-		continue;
+		return "throw new Error('Could not load file \'$file\'');";
 	}
 
 	ob_start();
