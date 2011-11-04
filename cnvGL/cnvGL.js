@@ -53,7 +53,6 @@ include('cnvGL/includes/glsl/generator.js');
 
 //Linker
 include('cnvGL/includes/linker/linker.js');
-include('cnvGL/includes/linker/symbol.js');
 
 //Rendering Pipeline
 include('cnvGL/includes/rendering/primitive/line.js');
