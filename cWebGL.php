@@ -25,8 +25,12 @@ $base = dirname($_SERVER['SCRIPT_NAME']);
 $basepath = dirname(__FILE__);
 
 function cWebGLInclude($file) {
-	$output = cWebGLIncludeFile($file);
-	echo $output;
+	static $included = array();
+	if (!isset($included[$file])) {
+		$included[$file] = true;
+		$output = cWebGLIncludeFile($file);
+		echo $output;
+	}
 }
 
 function cWebGLIncludeFile($file) {
@@ -52,8 +56,11 @@ function cWebGLIncludeCallback($matches) {
 }
 
 function cWebGLIncludeDebug($file) {
-	global $base;
-	echo "include('$file');\n";
+	static $included = array();
+	if (!isset($included[$file])) {
+		$included[$file] = true;
+		echo "include('$file');\n";
+	}
 }
 
 $include = 'cWebGLInclude';
@@ -71,15 +78,9 @@ function include(file) {
 
 $include('library/jClass/jClass.js');
 
-$drivers = array('cnvGL', 'Flash', 'WebGL');
-$driver = 0;
-
-$include('drivers/'.$drivers[$driver].'/GraphicsContext3D.js');
-
 //cnvGL Library
-if ($drivers[$driver] == 'cnvGL') {
-	$include('cnvGL/cnvGL.js');
-}
+$include('cnvGL/cnvGL.js');
+$include('drivers/cnvGL/GraphicsContext3D.js');
 
 //WebGLInclude('WebGLMath.js');
 $include('library/TypedArray/TypedArray.js');
