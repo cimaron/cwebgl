@@ -19,42 +19,156 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function() {
 
-	var getNativeContext, i, validContext, hasCanvas, hasWebGL, current;
+cWebGL = {
 
-	validContext = ["webgl","experimental-webgl"];
-	hasCanvas = (typeof HTMLCanvasElement != "undefined");
-	current = [];
+	version : '0.0.6',
 
-	for (i = 0; i < validContext.length; i++) {
-		try {
-			if (document.createElement("canvas").getContext(validContext[i])) {
-				hasWebGL = true;
+	/**
+	 * List of WebGLRenderingContext contexts
+	 *
+	 * @var    array
+	 */	
+	contexts : [],
+
+	/**
+	 * Can use a native context
+	 *
+	 * @var    boolean
+	 */	
+	native : null,
+
+	/**
+	 * List of possible native webgl context names
+	 *
+	 * @var    array
+	 */	
+	names : ["webgl", "experimental-webgl"],
+
+	/**
+	 * List of valid native webgl context names
+	 *
+	 * @var    array
+	 */
+	valid : [],
+
+	/**
+	 * Properties to extend to native contexts
+	 *
+	 * @var    object
+	 */	
+		//define extended properties
+	extensions : {
+		native : true,
+		setTargetFps : function() {}
+	},
+
+	/**
+	 * The native browser HTMLCanvasElement.getContext method
+	 *
+	 * @param    string    name    The context name to generate
+	 * @param    string    config  (Optional) configuration object
+	 *
+	 * @return   object
+	 */
+	getNativeContext : HTMLCanvasElement.prototype.getContext,
+
+	/**
+	 * Tests for a native webgl context type
+	 *
+	 * @param    string    name    The context name to check for
+	 *
+	 * @return   boolean
+	 */
+	test : function() {
+		var i, e;
+
+		for (i = 0; i < this.names.length; i++) {
+			try {
+				if (document.createElement("canvas").getContext(this.names[i], null)) {
+					this.valid.push(this.names[i]);
+				}
+			} catch (e) {
+				//can't generate context
 			}
-		} catch (e) {
+		}
+		
+		this.native = this.valid.length > 0;
+		
+		return this.native;
+	},
+
+	/**
+	 * The HTMLCanvasElement.getContext method hook
+	 *
+	 * @param    string    name    The context name to generate
+	 * @param    string    config  (Optional) configuration object
+	 * @param    string    native  (Optional) Force a native context
+	 *
+	 * @return   object
+	 */
+	getContext : function(name, config, native) {
+		var _, ctx;
+
+		//with(WebGLRenderingContextNative)
+		_ = cWebGL;
+
+		//return native 2d context
+		if (_.names.indexOf(name) == -1) {
+			return _.getNativeContext.call(this, name, config);
+		}
+
+		//if context does not exist, create it
+		if (!_.contexts[this]) {
+
+			//use a known valid 3d context name if possible
+			if (_.native) {
+				name = _.valid[0];
+			}
+
+			//native or software context
+			if (native || _.native) {
+				ctx = _.getNativeContext.call(this, name, config);
+				_.extend(ctx);
+			} else {
+				ctx = WebGLRenderingContext.create(this, new cWebGLContextAttributes(config));
+			}
+
+			_.contexts[this] = ctx;
+		}
+
+		return _.contexts[this];	
+	},
+
+	/**
+	 * Extend a native WebGLRenderingContext with extra properties
+	 *
+	 * @param    WebGLRenderingContext    name    The context
+	 */
+	extend : function(ctx) {
+		var i;
+
+		for (i in this.extensions) {
+			if (this.extensions.hasOwnProperty(i)) {
+				ctx[i] = this.extensions[i];
+			}
+		}
+	},
+
+	/**
+	 * Initialize library
+	 */
+	initialize : function() {
+		if (typeof HTMLCanvasElement != "undefined") {
+			if (!this.test()) {
+				WebGLRenderingContext = cWebGLRenderingContext;
+			}
+			HTMLCanvasElement.prototype.getContext = this.getContext;
 		}
 	}
 
-	if (hasCanvas && !hasWebGL) {
-		getNativeContext = HTMLCanvasElement.prototype.getContext;
-		HTMLCanvasElement.prototype.getContext = function(contextId, config, nativeCtx) {
-			if (validContext.indexOf(contextId) !== -1 && !nativeCtx) {
-				if (!current[this]) {
-					current[this] = cWebGLRenderingContext.create(this, new cWebGLContextAttributes(config));
-				}
-				return current[this];
-			}
-			return getNativeContext.call(this, contextId);
-		};
-	}
+};
 
-	if (typeof WebGLRenderingContext != 'undefined') {
-		WebGLRenderingContext.prototype.setTargetFps = function() {};
-		WebGLRenderingContext.native = true;
-	} else {
-		window.WebGLRenderingContext = cWebGLRenderingContext;
-	}
+cWebGL.initialize();
 
-}());
 
