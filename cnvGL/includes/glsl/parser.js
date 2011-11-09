@@ -2292,7 +2292,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 					case 208:
 						yyval = {};
-						yyval.n = glsl.ast.types.sampler2d;
+						yyval.n = glsl.ast.types.sampler2D;
 						break;
 
 					case 232:
