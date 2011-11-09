@@ -127,8 +127,6 @@ var glsl = (function() {
 	function initialize_types(state) {
 		var i, j, symbols, entry, types;
 		
-		var genType = [['float','float'], ['vec2','vec2'], ['vec3','vec3'], ['vec4','vec4']];
-
 		symbols = {
 			variables : {
 				'gl_Position' : 'vec4',
@@ -136,8 +134,11 @@ var glsl = (function() {
 				'gl_FragDepth' : 'float',
 			},
 			functions : {
-				'dot' : [['float','float']],
-				'max' : [['float','float']],
+				'dot' : [['float','vec3','vec3']],
+				'max' : [['float','float','float']],
+				'normalize' : [['vec2','vec2'], ['vec3','vec3'], ['vec4','vec4']],
+				'reflect' : [['vec2','vec2','vec2'], ['vec3','vec3','vec3'], ['vec4','vec4','vec4']],
+				'sqrt' : [['float','float']],
 				'texture2D' : [['vec4', 'sampler2D', 'vec2']]
 			}
 		};

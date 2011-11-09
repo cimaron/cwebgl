@@ -46,7 +46,7 @@ cnvgl_rendering_program = (function() {
 
 	cnvgl_rendering_program.cnvgl_rendering_program = function(ctx, renderer) {
 		this._ctx = ctx;
-		this._renderer = renderer;		
+		this._renderer = renderer;
 		this._texture2D = renderer.texture.texture2D;
 	};
 
@@ -60,7 +60,7 @@ cnvgl_rendering_program = (function() {
 	//	Most of the code is taken from or derived from glMatrix.js library
 	//--------------------------------------------------------------------
 	var vec2 = {}, vec3 = {}, vec4 = {}, mat2 = {}, mat3 = {}, mat4 = {};
-				
+
 	/*
 	 * vec3.add
 	 * Performs a vector addition
@@ -68,19 +68,12 @@ cnvgl_rendering_program = (function() {
 	 * Params:
 	 * vec - vec3, first operand
 	 * vec2 - vec3, second operand
-	 * dest - Optional, vec3 receiving operation result. If not specified result is written to vec
 	 *
 	 * Returns:
-	 * dest if specified, vec otherwise
+	 * vec3
 	 */
 	vec3.add = function(vec, vec2, dest) {
-		if(!dest || vec == dest) {
-			vec[0] += vec2[0];
-			vec[1] += vec2[1];
-			vec[2] += vec2[2];
-			return vec;
-		}
-		
+		var dest = [];
 		dest[0] = vec[0] + vec2[0];
 		dest[1] = vec[1] + vec2[1];
 		dest[2] = vec[2] + vec2[2];
@@ -94,22 +87,51 @@ cnvgl_rendering_program = (function() {
 	 * Params:
 	 * vec - vec3, first operand
 	 * vec2 - vec3, second operand
-	 * dest - Optional, vec3 receiving operation result. If not specified result is written to vec
 	 *
 	 * Returns:
-	 * dest if specified, vec otherwise
+	 * vec3
 	 */
-	vec3.multiply = function(vec, vec2, dest) {
-		if(!dest || vec == dest) {
-			vec[0] *= vec2[0];
-			vec[1] *= vec2[1];
-			vec[2] *= vec2[2];
-			return vec;
-		}
-
+	vec3.multiply = function(vec, vec2) {
+		var dest = [];
 		dest[0] = vec[0] * vec2[0];
 		dest[1] = vec[1] * vec2[1];
 		dest[2] = vec[2] * vec2[2];
+		return dest;
+	};
+
+	/*
+	 * vec3.normalize
+	 * Generates a unit vector of the same direction as the provided vec3
+	 * If vector length is 0, returns [0, 0, 0]
+	 *
+	 * Params:
+	 * vec - vec3 to normalize
+	 *
+	 * Returns:
+	 * vec3
+	 */
+	vec3.normalize = function(vec) {
+		var dest = [];
+		
+		var x = vec[0], y = vec[1], z = vec[2];
+		var len = Math.sqrt(x*x + y*y + z*z);
+
+		if (!len) {
+			dest[0] = 0;
+			dest[1] = 0;
+			dest[2] = 0;
+			return dest;
+		} else if (len == 1) {
+			dest[0] = x;
+			dest[1] = y;
+			dest[2] = z;
+			return dest;
+		}
+
+		len = 1 / len;
+		dest[0] = x*len;
+		dest[1] = y*len;
+		dest[2] = z*len;
 		return dest;
 	};
 
@@ -120,19 +142,12 @@ cnvgl_rendering_program = (function() {
 	 * Params:
 	 * vec - vec3 to scale
 	 * val - Numeric value to scale by
-	 * dest - Optional, vec3 receiving operation result. If not specified result is written to vec
 	 *
 	 * Returns:
-	 * dest if specified, vec otherwise
+	 * vec3
 	 */
-	vec3.scale = function(vec, val, dest) {
-		if(!dest || vec == dest) {
-			vec[0] *= val;
-			vec[1] *= val;
-			vec[2] *= val;
-			return vec;
-		}
-		
+	vec3.scale = function(vec, val) {
+		var dest = [];
 		dest[0] = vec[0]*val;
 		dest[1] = vec[1]*val;
 		dest[2] = vec[2]*val;
@@ -155,26 +170,53 @@ cnvgl_rendering_program = (function() {
 	};
 
 	/*
+	 * vec4.add
+	 * Performs a vector addition
+	 *
+	 * Params:
+	 * vec - vec4, first operand
+	 * vec2 - vec4, second operand
+	 *
+	 * Returns:
+	 * vec4
+	 */
+	vec4.add = function(vec, vec2, dest) {
+		var dest = [];
+		dest[0] = vec[0] + vec2[0];
+		dest[1] = vec[1] + vec2[1];
+		dest[2] = vec[2] + vec2[2];
+		dest[3] = vec[3] + vec2[3];
+		return dest;
+	};
+
+	/*
+	 * vec4.dot
+	 * Caclulates the dot product of two vec4s
+	 *
+	 * Params:
+	 * vec - vec4, first operand
+	 * vec2 - vec4, second operand
+	 *
+	 * Returns:
+	 * Dot product of vec and vec2
+	 */
+	vec4.dot = function(vec, vec2){
+		return vec[0]*vec2[0] + vec[1]*vec2[1] + vec[2]*vec2[2] + vec[3]*vec2[3];
+	};
+	
+	/*
 	 * vec4.multiply
 	 * Performs a vector multiplication
 	 *
 	 * Params:
 	 * vec - vec4, first operand
 	 * vec2 - vec4, second operand
-	 * dest - Optional, vec3 receiving operation result. If not specified result is written to vec
 	 *
 	 * Returns:
-	 * dest if specified, vec otherwise
+	 * vec4
 	 */
-	vec4.multiply = function(vec, vec2, dest) {
-		if(!dest || vec == dest) {
-			vec[0] *= vec2[0];
-			vec[1] *= vec2[1];
-			vec[2] *= vec2[2];
-			vec[3] *= vec2[3];
-			return vec;
-		}
-
+	vec4.multiply = function(vec, vec2) {
+		var dest = [];
 		dest[0] = vec[0] * vec2[0];
 		dest[1] = vec[1] * vec2[1];
 		dest[2] = vec[2] * vec2[2];
@@ -183,22 +225,95 @@ cnvgl_rendering_program = (function() {
 	};
 	
 	/*
+	 * vec4.normalize
+	 * Generates a unit vector of the same direction as the provided vec4
+	 * If vector length is 0, returns [0, 0, 0, 0]
+	 *
+	 * Params:
+	 * vec - vec4 to normalize
+	 *
+	 * Returns:
+	 * vec4
+	 */
+	vec4.normalize = function(vec) {
+		var dest = [];
+
+		var x = vec[0], y = vec[1], z = vec[2], w = vec[3];
+		var len = Math.sqrt(x*x + y*y + z*z + w*w);
+
+		if (!len) {
+			dest[0] = 0;
+			dest[1] = 0;
+			dest[2] = 0;
+			dest[3] = 0;
+			return dest;
+		} else if (len == 1) {
+			dest[0] = x;
+			dest[1] = y;
+			dest[2] = z;
+			dest[3] = w;
+			return dest;
+		}
+		
+		len = 1 / len;
+		dest[0] = x*len;
+		dest[1] = y*len;
+		dest[2] = z*len;
+		dest[3] = w*len;
+		return dest;
+	};
+
+	/*
+	 * vec4.reflect
+	 * For the incident vector I and surface orientation N, returns the reflection direction:
+	 * I – 2 * dot(N, I) * N
+	 * N must already be normalized in order to achieve the desired result.
+	 *
+	 * Params:
+	 * vec - vec4, first operand
+	 * vec2 - vec4, second operand
+	 *
+	 * Returns:
+	 * vec4
+	 */
+	vec4.reflect = function(vec1, vec2) {
+		return vec4.sub(vec1, vec4.scale(vec2, 2 * vec4.dot(vec2, vec1)));
+	};
+
+	/*
+	 * vec4.sub
+	 * Performs a vector subtraction
+	 *
+	 * Params:
+	 * vec - vec4, first operand
+	 * vec2 - vec4, second operand
+	 *
+	 * Returns:
+	 * vec4
+	 */
+	vec4.sub = function(vec, vec2) {
+		var dest = [];
+		dest[0] = vec[0] - vec2[0];
+		dest[1] = vec[1] - vec2[1];
+		dest[2] = vec[2] - vec2[2];
+		dest[3] = vec[3] - vec2[3];
+		return dest;
+	};
+
+	/*
 	 * mat3.multiplyVec3
 	 * Transforms a vec3 with the given matrix
 	 *
 	 * Params:
 	 * mat - mat3 to transform the vector with
 	 * vec - vec3 to transform
-	 * dest - Optional, vec3 receiving operation result. If not specified result is written to vec
 	 *
 	 * Returns:
-	 * dest if specified, vec otherwise
+	 * vec3
 	 */
-	mat3.multiplyVec3 = function(mat, vec, dest) {
-		if(!dest) { dest = vec; }
-		
+	mat3.multiplyVec3 = function(mat, vec) {
+		var dest = [];
 		var x = vec[0], y = vec[1], z = vec[2];
-		
 		dest[0] = mat[0]*x + mat[3]*y + mat[6]*z;
 		dest[1] = mat[1]*x + mat[4]*y + mat[7]*z;
 		dest[2] = mat[2]*x + mat[5]*y + mat[8]*z;
@@ -213,13 +328,12 @@ cnvgl_rendering_program = (function() {
 	 * Params:
 	 * mat - mat4, first operand
 	 * mat2 - mat4, second operand
-	 * dest - Optional, mat4 receiving operation result. If not specified result is written to mat
 	 *
 	 * Returns:
-	 * dest if specified, mat otherwise
+	 * mat4
 	 */
-	mat4.multiply = function(mat, mat2, dest) {
-        if(!dest) { dest = mat; }
+	mat4.multiply = function(mat, mat2) {
+		var dest = [];
         
         // Cache the matrix values (makes for huge speed increases!)
         var a00 = mat[0], a01 = mat[1], a02 = mat[2], a03 = mat[3];
@@ -248,7 +362,7 @@ cnvgl_rendering_program = (function() {
         dest[13] = b30*a01 + b31*a11 + b32*a21 + b33*a31;
         dest[14] = b30*a02 + b31*a12 + b32*a22 + b33*a32;
         dest[15] = b30*a03 + b31*a13 + b32*a23 + b33*a33;
-        
+
         return dest;
 	};
 	
@@ -259,13 +373,12 @@ cnvgl_rendering_program = (function() {
 	 * Params:
 	 * mat - mat4 to transform the vector with
 	 * vec - vec4 to transform
-	 * dest - Optional, vec4 receiving operation result. If not specified result is written to vec
 	 *
 	 * Returns:
-	 * dest if specified, vec otherwise
+	 * vec4
 	 */
-	mat4.multiplyVec4 = function(mat, vec, dest) {
-		if(!dest) { dest = vec; }
+	mat4.multiplyVec4 = function(mat, vec) {
+		var dest = [];
 		
 		var x = vec[0], y = vec[1], z = vec[2], w = vec[3];
 		

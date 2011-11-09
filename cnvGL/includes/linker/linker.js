@@ -45,6 +45,13 @@ GlslLinker = (function() {
 		'@gl_FragColor@' : 'this.fragment[\'%s\']',
 		'@dot.vec3.vec3@' : 'vec3.dot',
 		'@max.float.float@' : 'Math.max',
+		'@reflect.vec2.vec2@' : 'vec2.reflect',
+		'@reflect.vec3.vec3@' : 'vec3.reflect',
+		'@reflect.vec4.vec4@' : 'vec4.reflect',
+		'@normalize.vec2@' : 'vec2.normalize',
+		'@normalize.vec3@' : 'vec3.normalize',
+		'@normalize.vec4@' : 'vec4.normalize',
+		'@sqrt.float@' : 'Math.sqrt',
 		'@texture2D.sampler2D.vec2@' : 'this._%s'
 	};
 

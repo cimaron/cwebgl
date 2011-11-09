@@ -2068,7 +2068,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						yyval.expression.set_location(yylloc);
 						yyval.expression.primary_expression.float_constant = yyvsa[yyvsp].real;
 						break;
-					
+
+					case 26:
+						yyval = {};
+						yyval.expression = yyvsa[yyvsp - 1].expression;
+						break;
+
 					case 29:
 						yyval = {};
 						yyval.expression = yyvsa[yyvsp].expression;
@@ -2107,7 +2112,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						yyval.expression = new glsl.ast.function_expression(callee);
 						yyval.expression.set_location(yylloc);
 						break;
-					
+
 					case 57:
 						yyval = {};
 						yyval.expression = new glsl.ast.expression(yyvsa[yyvsp - 1].n, yyvsa[yyvsp].expression, null, null);
@@ -2124,10 +2129,22 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						yyval.expression = new glsl.ast.expression_bin(glsl.ast.operators.mul, yyvsa[yyvsp - 2].expression, yyvsa[yyvsp].expression);
 						yyval.expression.set_location(yylloc);
 						break;
-					
+
+					case 64:
+						yyval = {};
+						yyval.expression = new glsl.ast.expression_bin(glsl.ast.operators.div, yyvsa[yyvsp - 2].expression, yyvsa[yyvsp].expression);
+						yyval.expression.set_location(yylloc);
+						break;
+
 					case 67:
 						yyval = {};
 						yyval.expression = new glsl.ast.expression_bin(glsl.ast.operators.add, yyvsa[yyvsp - 2].expression, yyvsa[yyvsp].expression);
+						yyval.expression.set_location(yylloc);
+						break;
+						
+					case 68:
+						yyval = {};
+						yyval.expression = new glsl.ast.expression_bin(glsl.ast.operators.sub, yyvsa[yyvsp - 2].expression, yyvsa[yyvsp].expression);
 						yyval.expression.set_location(yylloc);
 						break;
 
@@ -2401,7 +2418,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					case 16:
 					case 23:
 					case 25:
-					case 26:
 					case 28:
 					case 31:
 					case 32:
@@ -2416,9 +2432,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					case 59:
 					case 60:
 					case 61:
-					case 64:
 					case 65:
-					case 68:
 					case 70:
 					case 71:
 					case 73:

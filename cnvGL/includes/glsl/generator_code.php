@@ -1,15 +1,25 @@
 <?php
 
 $rules = "
-add				vec3	vec3		: vec3	vec3.add(%s,%s,[])
-mul				float	float		: float	%s * %s
-mul				vec3	float		: vec3	vec3.scale(%s,%s,[])
-mul				vec3	vec3		: vec3	vec3.multiply(%s,%s,[])
-mul				vec4	vec4		: vec4	vec4.multiply(%s,%s,[])
-mul				mat3	vec3		: vec3	mat3.multiplyVec3(%s,%s,[])
-mul				mat4	mat4		: mat4	mat4.multiply(%s,%s,[])
-mul				mat4	vec4		: vec4	mat4.multiplyVec4(%s,%s,[])
+add				float	float		: float	(%s+%s)
+add				vec3	vec3		: vec3	vec3.add(%s,%s)
+add				vec4	vec4		: vec4	vec4.add(%s,%s)
+
+sub				float	float		: float	(%s-%s)
+sub				vec4	vec4		: vec4	vec4.sub(%s,%s)
+
+mul				float	float		: float	(%s*%s)
+mul				vec3	float		: vec3	vec3.scale(%s,%s)
+mul				vec3	vec3		: vec3	vec3.multiply(%s,%s)
+mul				vec4	vec4		: vec4	vec4.multiply(%s,%s)
+mul				mat3	vec3		: vec3	mat3.multiplyVec3(%s,%s)
+mul				mat4	vec4		: vec4	mat4.multiplyVec4(%s,%s)
+mul				mat4	mat4		: mat4	mat4.multiply(%s,%s)
+
+div				float	float		: float	(%s/%s)
+
 logic_not		bool				: bool	!(%s)
+
 function_call						: any	%s(%s)
 ";
 
@@ -128,6 +138,9 @@ $rules = trim($rules);
 $rules = explode("\n", $rules);
 
 foreach ($rules as $rule) {
+	if (trim($rule) == "") {
+		continue;
+	}
 	$rule = explode(":", $rule);
 	$func = trim(preg_replace('#\s#', ' ', $rule[1]));
 	if (!in_array($func, $functions)) {
