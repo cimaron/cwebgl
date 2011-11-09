@@ -402,7 +402,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 * @return  objCode
 	 */
 	function g_ast_expression_op(e) {
-		var code, se, se1, se2, se3, i, entry;
+		var code, se, se1, se2, se3, i, entry, se_types;
 
 		if (se = e.subexpressions) {
 			se1 = g_ast_expression(se[0]);
@@ -463,13 +463,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 				} else {
 					//@todo: check types of parameters
 					se3 = [];
+					se_types = [];
 					for (i = 0; i < e.expressions.length; i++) {
-						se3.push(g_ast_expression(e.expressions[i]));
+						se2 = g_ast_expression(e.expressions[i]);
+						se3.push(se2);
+						se_types.push(new gType(se2.type).name);
 					}
 					se3 = se3.join(',');
 
 					code = g_get_operation(e.oper, se1.type);
-					entry = glsl.state.symbols.get_variable(se[0].primary_expression.identifier);
+					entry = glsl.state.symbols.get_function(se[0].primary_expression.identifier, null, se_types);
+
 					code.type = glsl.ast.types[entry.type];
 					code.apply(se1, se3);
 				}

@@ -30,6 +30,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		this.object_name = null;
 		this.qualifier = null;
+		this.next = null;
 	};
 
 	SymbolTableEntry.typedef = {
@@ -80,8 +81,20 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			return this.add_entry(entry);
 		};
 	
-		symbol_table.add_function = function(name) {
-			var entry = new SymbolTableEntry(name, SymbolTableEntry.typedef.func);
+		symbol_table.add_function = function(name, type, def) {
+			var entry;
+			
+			//don't readd the exact same function definition
+			if (entry = this.get_function(name, type, def)) {
+				return entry;
+			}
+
+			entry = new SymbolTableEntry(name, SymbolTableEntry.typedef.func);
+			entry.type = type;
+			if (def) {
+				entry.definition = def;	
+			}
+			
 			if (name != 'main') {
 				entry.object_name = '@' + name + '@';
 			} else {
@@ -90,11 +103,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			return this.add_entry(entry);
 		};
 
-		/*
-		symbol_table.add_global_function = function(f) {
-		}
-		*/
-		
 		symbol_table.get_variable = function(name) {
 			var entry = this.get_entry(name, SymbolTableEntry.typedef.variable);
 			return entry;
@@ -105,14 +113,39 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			return entry;
 		};
 
-		symbol_table.get_function = function(name) {
-			var entry = this.get_entry(name, SymbolTableEntry.typedef.func);
+		symbol_table.get_function = function(name, type, def) {
+			var i;
+			var entry = this.get_entry(name, SymbolTableEntry.typedef.func);	
+			while (def && entry) {
+				if (!this.match_definition(def, entry.definition)) {
+					entry = entry.next;	
+					continue;
+				}
+				break;
+			}
 			return entry;
 		};
-	
+
 		//private:
-		
+
+		symbol_table.match_definition = function(def, entry) {
+			var i;
+			if (def.length != entry.length) {
+				return false;	
+			}
+			for (i = 0; i < def.length; i++) {
+				if (def[i] != entry[i]) {
+					return false;
+				}
+			}
+			return true;
+		};
+
 		symbol_table.add_entry = function(entry) {
+			//insert to head of linked list if same name
+			if (this.table.data[entry.name]) {
+				entry.next = this.table.data[entry.name];	
+			}
 			this.table.data[entry.name] = entry;
 			entry.depth = this.table.depth;
 			return entry;

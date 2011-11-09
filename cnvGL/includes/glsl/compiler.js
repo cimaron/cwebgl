@@ -125,20 +125,20 @@ var glsl = (function() {
 	}
 
 	function initialize_types(state) {
-		var i, symbols, entry;
+		var i, j, symbols, entry, types;
 		
-		var genType = ['float', 'vec2', 'vec3', 'vec4'];
+		var genType = [['float','float'], ['vec2','vec2'], ['vec3','vec3'], ['vec4','vec4']];
 
 		symbols = {
 			variables : {
-				'gl_Position' : { type : 'vec4' },
-				'gl_FragColor' : { type : 'vec4' },
-				'gl_FragDepth' : { type : 'float' },
+				'gl_Position' : 'vec4',
+				'gl_FragColor' : 'vec4',
+				'gl_FragDepth' : 'float',
 			},
 			functions : {
-				'dot' : { type : 'float' },
-				'max' : { type : 'float' },
-				'texture2D' : { type : 'vec4' }
+				'dot' : [['float','float']],
+				'max' : [['float','float']],
+				'texture2D' : [['vec4', 'sampler2D', 'vec2']]
 			}
 		};
 
@@ -146,12 +146,14 @@ var glsl = (function() {
 
 		for (i in symbols.variables) {
 			entry = state.symbols.add_variable(i);
-			entry.type = symbols.variables[i].type;
+			entry.type = symbols.variables[i];
 		}
 
 		for (i in symbols.functions) {
-			entry = state.symbols.add_function(i);
-			entry.type = symbols.functions[i].type;
+			types = symbols.functions[i];
+			for (j = 0; j < types.length; j++) {
+				entry = state.symbols.add_function(i, types[j][0], types[j].slice(1));
+			}
 		}
 	}
 
