@@ -92,11 +92,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			entry = new SymbolTableEntry(name, SymbolTableEntry.typedef.func);
 			entry.type = type;
 			if (def) {
-				entry.definition = def;	
+				entry.definition = def;
 			}
-			
+
 			if (name != 'main') {
-				entry.object_name = '@' + name + '@';
+				entry.object_name = '@' + name + (def ? "." + def.join('.') : '') + '@';
 			} else {
 				entry.object_name = (glsl.mode == 1) ? '@fragment.main@' : '@vertex.main@';
 			}

@@ -39,16 +39,22 @@ GlslLinker = (function() {
 
 	var linker = jClass('linker', Initializer);
 
+	var func_table = {
+		'@gl_Position@' : 'this.vertex[\'%s\']',
+		'@gl_FragDepth@' : 'this.fragment[\'%s\']',
+		'@gl_FragColor@' : 'this.fragment[\'%s\']',
+		'@dot.vec3.vec3@' : 'vec3.dot',
+		'@max.float.float@' : 'Math.max',
+		'@texture2D.sampler2D.vec2@' : 'this._%s'
+	};
+
 	//public:
 
 	linker.linker = function() {
-		this.addExternalReference('@gl_Position@', 'this.vertex[\'%s\']');
-		this.addExternalReference('@gl_FragDepth@', 'this.fragment[\'%s\']');
-		this.addExternalReference('@gl_FragColor@', 'this.fragment[\'%s\']');
-		this.addExternalReference('@dot@', 'vec3.dot');
-		this.addExternalReference('@max@', 'Math.max');
-		this.addExternalReference('@texture2D@', 'this._%s');
-
+		var i;
+		for (i in func_table) {
+			this.addExternalReference(i, func_table[i]);
+		}
 		this.sizes.float = 1;
 		this.sizes.vec2 = 2;
 		this.sizes.vec3 = 3;
