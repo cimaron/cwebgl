@@ -60,6 +60,7 @@ cWebGL = {
 		//define extended properties
 	extensions : {
 		native : true,
+		ready : true,
 		setTargetFps : function() {}
 	},
 
@@ -107,7 +108,7 @@ cWebGL = {
 	 *
 	 * @return   object
 	 */
-	getContext : function(name, config, native) {
+	getContext : function(name, config, ntv) {
 		var _, ctx;
 
 		//with(WebGLRenderingContextNative)
@@ -127,7 +128,7 @@ cWebGL = {
 			}
 
 			//native or software context
-			if (native || _.native) {
+			if (ntv || _.native) {
 				ctx = _.getNativeContext.call(this, name, config);
 				_.extend(ctx);
 			} else {
