@@ -180,7 +180,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		array_index : 40,
 		
 		function_call : 41,
-		
+
 		identifier : 42,
 		int_constant : 43,
 		uint_constant : 44,
@@ -195,63 +195,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		high : 1,
 		medium : 2,
 		low : 3
-	};
-
-	var ast_types = {
-		'void' : 0,
-		float : 1,
-		int : 2,
-		uint : 3,
-		bool : 4,
-		vec2 : 5,
-		vec3 : 6,
-		vec4 : 7,
-		bvec2 : 8,
-		bvec3 : 9,
-		bvec4 : 10,
-		ivec2 : 11,
-		ivec3 : 12,
-		ivec4 : 13,
-		uvec2 : 14,
-		uvec3 : 15,
-		uvec4 : 16,
-		mat2 : 17,
-		mat2x3 : 18,
-		mat2x4 : 19,
-		mat3x2 : 20,
-		mat3 : 21,
-		mat3x4 : 22,
-		mat4x2 : 23,
-		mat4x3 : 24,
-		mat4 : 25,
-		sampler1D : 26,
-		sampler2D : 27,
-		sampler2Drect : 28,
-		sampler3D : 29,
-		samplercube : 30,
-		sampler1Dshadow : 31,
-		sampler2Dshadow : 32,
-		sampler2Drectshadow : 33,
-		samplercubeshadow : 34,
-		sampler1Darray : 35,
-		sampler2Darray : 36,
-		sampler1Darrayshadow : 37,
-		sampler2Darrayshadow : 38,
-		isampler1D : 39,
-		isampler2D : 40,
-		isampler3D : 41,
-		isamplercube : 42,
-		isampler1Darray : 43,
-		isampler2Darray : 44,
-		usampler1D : 45,
-		usampler2D : 46,
-		usampler3D : 47,
-		usamplercube : 48,
-		usampler1Darray : 49,
-		usampler2Darray : 50,
-		
-		struct : 51,
-		type_name : 52
 	};
 
 	var ast_type_specifier = (function() {
@@ -282,64 +225,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			this.type_specifier = specifier;
 			this.precision = ast_precision.none;
 			this.is_precision_statement = false;
-			var names = [
-				"void",
-				"float",
-				"int",
-				"uint",
-				"bool",
-				"vec2",
-				"vec3",
-				"vec4",
-				"bvec2",
-				"bvec3",
-				"bvec4",
-				"ivec2",
-				"ivec3",
-				"ivec4",
-				"uvec2",
-				"uvec3",
-				"uvec4",
-				"mat2",
-				"mat2x3",
-				"mat2x4",
-				"mat3x2",
-				"mat3",
-				"mat3x4",
-				"mat4x2",
-				"mat4x3",
-				"mat4",
-				"sampler1D",
-				"sampler2D",
-				"sampler2DRect",
-				"sampler3D",
-				"samplerCube",
-				"sampler1DShadow",
-				"sampler2DShadow",
-				"sampler2DRectShadow",
-				"samplerCubeShadow",
-				"sampler1DArray",
-				"sampler2DArray",
-				"sampler1DArrayShadow",
-				"sampler2DArrayShadow",
-				"isampler1D",
-				"isampler2D",
-				"isampler3D",
-				"isamplerCube",
-				"isampler1DArray",
-				"isampler2DArray",
-				"usampler1D",
-				"usampler2D",
-				"usampler3D",
-				"usamplerCube",
-				"usampler1DArray",
-				"usampler2DArray",
-				
-				null, /* ast_struct */
-				null  /* ast_type_name */
-			];
-
-			this.type_name = names[specifier];
+			this.type_name = glsl.type.names[specifier];
 		};
 
 		ast_type_specifier.ast_type_specifier.string = function(name) {
@@ -793,7 +679,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	//	External interface
 
 	glsl.ast = {
-		types : ast_types,
 		precision : ast_precision,
 		type_qualifier : ast_type_qualifier,
 		type_specifier : ast_type_specifier,

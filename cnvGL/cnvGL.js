@@ -47,6 +47,7 @@ include('cnvGL/includes/glsl/preprocessor.js');
 include('cnvGL/includes/glsl/lexer.js');
 include('cnvGL/includes/glsl/lexer_extern.js');
 include('cnvGL/includes/glsl/parser.js');
+include('cnvGL/includes/glsl/type.js');
 //include('cnvGL/includes/glsl/parser_debug.js');
 include('cnvGL/includes/glsl/ast.js');
 include('cnvGL/includes/glsl/generator.js');

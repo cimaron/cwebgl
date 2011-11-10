@@ -20,73 +20,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 (function(glsl) {
-
-	//-------------------------------------------------
-	//	Helper Classes
-	//-------------------------------------------------
-
-	/**
-	 * Type class
-	 */
-	var gType = (function() {
-
-		//Internal Constructor
-		function Initializer() {
-			//public:
-			this.type = null;
-			this.name = null;
-		}
-
-		var gType = jClass('gType', Initializer);
-
-		//static:
-
-		gType.names = [
-			"void", "float", "int", "uint", "bool", "vec2", "vec3", "vec4", "bvec2", "bvec3", "bvec4", "ivec2",
-			"ivec3", "ivec4", "uvec2", "uvec3", "uvec4", "mat2", "mat2x3", "mat2x4", "mat3x2", "mat3", "mat3x4",
-			"mat4x2", "mat4x3", "mat4", "sampler1D", "sampler2D", "sampler2Drect", "sampler3D", "samplercube",
-			"sampler1Dshadow", "sampler2Dshadow", "sampler2Drectshadow", "samplercubeshadow", "sampler1Darray",
-			"sampler2Darray", "sampler1Darrayshadow", "sampler2Darrayshadow", "isampler1D", "isampler2D",
-			"isampler3D", "isamplercube", "isampler1Darray", "isampler2Darray", "usampler1D", "usampler2D",
-			"usampler3D", "usamplercube", "usampler1Darray", "usampler2Darray", "struct", "type_name"
-			];
-
-		gType.size = [
-			 1,  1, 1, 1, 1, 2,  3, 4,
-			 2,  3, 4, 2, 3, 4,  2, 3,
-			 4,  4, 6, 8, 6, 9, 12, 8,
-			12, 16, 1, 1, 1, 1,  1, 1,
-			 1,  1, 1, 1, 1
-		];
-
-		gType.defaultValues = [
-			"null", "0.0", "0", "0", "0", "[0,0]", "[0,0,0]", "[0,0,0,0]",
-			"[0,0]", "[0,0,0]", "[0,0,0,0]", "[0,0]", "[0,0,0]", "[0,0,0,0]", "[0,0]", "[0,0,0]",
-			"[0,0,0,0]", "[0,0,0,0]", "[0,0,0,0,0,0,0,0]", "[0,0,0,0,0,0]",
-			"[0,0,0,0,0,0,0,0,0]", "[0,0,0,0,0,0,0,0,0,0,0,0]", "[0,0,0,0,0,0,0,0]",
-			"[0,0,0,0,0,0,0,0,0,0,0,0]", "[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]", "0", "0", "0", "0", "0", "0", 
-			"0", "0", "0", "0", "0"
-		];
-
-		//public:
-
-		gType.gType = function(type) {
-			this.type = type;
-			this.name = gType.names[type];
-		};
-
-		gType.getSize = function() {
-			return gType.size[this.type];
-		};
-
-		gType.getDefaultValue = function() {
-			return gType.defaultValues[this.type];
-		};
-
-		return gType.Constructor;
-
-	}());
-
+		  
 	/**
 	 * Code class
 	 */
@@ -97,6 +31,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			//public:
 			this.code = null;
 			this.type = null;
+			this.type_name = null;
 			this.ast_node = null;
 		}
 
@@ -109,8 +44,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			if (code) {
 				this.addCode(code);
 			}
-			this.type = type;
+			this.setType(type);
 			this.ast_node = ast_node;
+		};
+
+		objCode.setType = function(type) {
+			this.type = type;
+			this.type_name = glsl.type.names[type];
 		};
 
 		objCode.toString = function() {
@@ -183,7 +123,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		if (typeof table[next] == "number") {
 			next = table[next];
 			code = g_operation_functions[next].split(' ');
-			return new objCode(code[1], glsl.ast.types[code[0]]);
+			return new objCode(code[1], glsl.type[code[0]]);
 		}
 
 		Array.prototype.unshift.call(arguments, table[next]);
@@ -231,9 +171,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 
 		if (keys.length == 1) {
-			code = new objCode(keys[0], glsl.ast.types.float);
+			code = new objCode(keys[0], glsl.type.float);
 		} else {
-			code = new objCode("[%s]", glsl.ast.types['vec' + keys.length]);
+			code = new objCode("[%s]", glsl.type['vec' + keys.length]);
 			code.apply(keys.join(","));
 		}
 
@@ -281,10 +221,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 		//get default initialization values
 		type = dl.type;
-		defCode = new gType(type.specifier.type_specifier).getDefaultValue();
-		if (!defCode) {
-			return false;
-		}
+		defCode = glsl.type.defaultValues[type.specifier.type_specifier];
 
 		for (i = 0; i < dl.declarations.length; i++) {
 
@@ -293,8 +230,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 			//add symbol table entry
 			entry = glsl.state.symbols.add_variable(name);
-			entry.type = type.specifier.type_name;
-			entry.typedef = type.specifier.type_specifier;
+			entry.type = type.specifier.type_specifier;
 
 			if (type.qualifier) {
 
@@ -304,8 +240,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 				decCode = new objCode("var %s = %s;");
 				if (decl.initializer) {
 					expCode = g_ast_expression(decl.initializer);
-					if (expCode.type != entry.typedef) {
-						throw new Error(g_error("Could not assign value of type " + expCode.type + " to " + entry.type, dl));
+					if (expCode.type != entry.type) {
+						throw new Error(g_error("Could not assign value of type " + expCode.type_name + " to " + glsl.type.names[entry.type], dl));
 					}
 				} else {
 					expCode = defCode;
@@ -363,7 +299,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		for (i = 0; i < c.length; i++) {
 
 			e = g_ast_expression(c[i]);
-			l = new gType(e.type).getSize();
+			l = glsl.type.size[e.type];
 
 			if (l == 1) {
 				//simple variable
@@ -379,14 +315,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			}
 		}
 
-		l = new gType(con.type).getSize();
+		l = glsl.type.size[con.type];
 		if (list.length > l) {
 			list = list.slice(0, l);	
 		}
 		if (list.length < l) {
 			throw new Error(g_error("Not enough parameters to constructor", con));
 		}
-		
+
 		//code = new objCode("(new Float32Array([%s]))", con.type);
 		code = new objCode("([%s])", con.type);
 		code.apply(list.join(","));
@@ -414,6 +350,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 			//simple expression
 			case glsl.ast.operators.int_constant:
+			case glsl.ast.operators.float_constant:
 			case glsl.ast.operators.identifier:
 
 				code = g_ast_expression_simple(e);
@@ -423,7 +360,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			case glsl.ast.operators.assign:
 
 				if (se1.type != se2.type) {
-					throw new Error(g_error("Could not assign value of type " + se2.type + " to " + se1.type, e));
+					throw new Error(g_error("Could not assign value of type " + se2.type_name + " to " + se1.type_name, e));
 				}
 
 				//@todo:
@@ -439,7 +376,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 				code = g_get_operation(e.oper, se1.type);
 				if (!code) {
-					throw new Error(g_error("Could not apply operation to type " + se1.type, e));
+					throw new Error(g_error("Could not apply operation to type " + se1.type_name, e));
 				}
 				code.apply(se1);
 				break;
@@ -452,7 +389,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 				code = g_get_operation(e.oper, se1.type, se2.type);
 				if (!code) {
-					throw new Error(g_error("Cannot apply operation to " + se1.type + " and " + se2.type, e));
+					throw new Error(g_error("Cannot apply operation to " + se1.type_name + " and " + se2.type_name, e));
 				}
 				code.apply(se1, se2);
 				break;
@@ -469,14 +406,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 					for (i = 0; i < e.expressions.length; i++) {
 						se2 = g_ast_expression(e.expressions[i]);
 						se3.push(se2);
-						se_types.push(new gType(se2.type).name);
+						se_types.push(se2.type);
 					}
 					se3 = se3.join(',');
 
-					code = g_get_operation(e.oper, se1.type);
 					entry = glsl.state.symbols.get_function(se[0].primary_expression.identifier, null, se_types);
-
-					code.type = glsl.ast.types[entry.type];
+					code = g_get_operation(e.oper, null);
+					code.type = entry.type;
 					code.apply(se1, se3);
 				}
 				break;
@@ -520,9 +456,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 			//global vs local scope
 			if (entry.depth == 0) {
-				code = new objCode(entry.object_name, glsl.ast.types[entry.type]);
+				code = new objCode(entry.object_name, entry.type);
 			} else {
-				code = new objCode(name, glsl.ast.types[entry.type]);
+				code = new objCode(name, entry.type);
 			}
 
 			return code;
@@ -530,13 +466,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 		//float constant
 		if (typeof e.primary_expression.float_constant != 'undefined') {
-			code = new objCode(String(e.primary_expression.float_constant), glsl.ast.types.float);
+			code = new objCode(String(e.primary_expression.float_constant), glsl.type.float);
 			return code;
 		}
 
 		//int constant
 		if (typeof e.primary_expression.int_constant != 'undefined') {
-			code = new objCode(String(e.primary_expression.int_constant), glsl.ast.types.int);
+			code = new objCode(String(e.primary_expression.int_constant), glsl.type.int);
 			return code;
 		}
 

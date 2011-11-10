@@ -2064,7 +2064,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 					case 24:
 						yyval = {};
-						yyval.expression = new glsl.ast.expression(glsl.ast.types.float_constant, null, null, null);
+						yyval.expression = new glsl.ast.expression(glsl.ast.operators.float_constant, null, null, null);
 						yyval.expression.set_location(yylloc);
 						yyval.expression.primary_expression.float_constant = yyvsa[yyvsp].real;
 						break;
@@ -2274,42 +2274,42 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 					case 182:
 						yyval = {};
-						yyval.n = glsl.ast.types.float;
+						yyval.n = glsl.type.float;
 					    break;
 
 					case 185:
 						yyval = {};
-						yyval.n = glsl.ast.types.bool;
+						yyval.n = glsl.type.bool;
 						break;
 
 					case 186:
 						yyval = {};
-						yyval.n = glsl.ast.types.vec2;
+						yyval.n = glsl.type.vec2;
 						break;
 
 					case 187:
 						yyval = {};
-						yyval.n = glsl.ast.types.vec3;
+						yyval.n = glsl.type.vec3;
 						break;
 					    
 					case 188:
 						yyval = {};
-						yyval.n = glsl.ast.types.vec4;
+						yyval.n = glsl.type.vec4;
 						break;
 					
 					case 202:
 						yyval = {};
-						yyval.n = glsl.ast.types.mat3;
+						yyval.n = glsl.type.mat3;
 						break;
 					
 					case 206:
 						yyval = {};
-						yyval.n = glsl.ast.types.mat4;
-						break;						
+						yyval.n = glsl.type.mat4;
+						break;
 
 					case 208:
 						yyval = {};
-						yyval.n = glsl.ast.types.sampler2D;
+						yyval.n = glsl.type.sampler2D;
 						break;
 
 					case 232:

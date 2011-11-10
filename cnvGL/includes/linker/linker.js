@@ -39,21 +39,7 @@ GlslLinker = (function() {
 
 	var linker = jClass('linker', Initializer);
 
-	var func_table = {
-		'@gl_Position@' : 'this.vertex[\'%s\']',
-		'@gl_FragDepth@' : 'this.fragment[\'%s\']',
-		'@gl_FragColor@' : 'this.fragment[\'%s\']',
-		'@dot.vec3.vec3@' : 'vec3.dot',
-		'@max.float.float@' : 'Math.max',
-		'@reflect.vec2.vec2@' : 'vec2.reflect',
-		'@reflect.vec3.vec3@' : 'vec3.reflect',
-		'@reflect.vec4.vec4@' : 'vec4.reflect',
-		'@normalize.vec2@' : 'vec2.normalize',
-		'@normalize.vec3@' : 'vec3.normalize',
-		'@normalize.vec4@' : 'vec4.normalize',
-		'@sqrt.float@' : 'Math.sqrt',
-		'@texture2D.sampler2D.vec2@' : 'this._%s'
-	};
+	var func_table = {"@gl_Position@":"this.vertex['%s']","@gl_FragDepth@":"this.fragment['%s']","@gl_FragColor@":"this.fragment['%s']","@dot.6.6@":"vec3.%s","@max.1.1@":"Math.%s","@reflect.5.6@":"vec2.%s","@reflect.6.6@":"vec3.%s","@reflect.7.7@":"vec4.%s","@normalize.5@":"vec2.%s","@normalize.6@":"vec3.%s","@normalize.7@":"vec4.%s","@sqrt.1@":"Math.%s","@texture2D.27.5@":"this._%s"};
 
 	//public:
 
@@ -62,11 +48,6 @@ GlslLinker = (function() {
 		for (i in func_table) {
 			this.addExternalReference(i, func_table[i]);
 		}
-		this.sizes.float = 1;
-		this.sizes.vec2 = 2;
-		this.sizes.vec3 = 3;
-		this.sizes.vec4 = 4;
-		this.sizes.mat4 = 16;
 	};
 
 	linker.addExternalReference = function(object_name, output) {
@@ -142,7 +123,7 @@ GlslLinker = (function() {
 	};
 
 	linker.processSymbols = function(shader) {
-		var symbol_table, code, location, name, entry, uniform_obj, attrib_obj, i, e;
+		var symbol_table, code, location, name, entry, uniform_obj, attrib_obj, i, e, f;
 
 		symbol_table = shader.symbol_table.table.data;
 		code = shader.object_code;
@@ -155,7 +136,6 @@ GlslLinker = (function() {
 			switch (entry.qualifier_name) {
 
 				//external communication (special cases)
-
 				case 'uniform':
 					uniform_obj = new cnvgl_uniform(entry);
 					uniform_obj.location = this.program.active_uniforms_count;
@@ -172,7 +152,7 @@ GlslLinker = (function() {
 						attrib_obj = new cnvgl_attribute(entry.name, entry);
 						this.addActiveAttribute(attrib_obj);
 					}
-					attrib_obj.size = this.sizes[entry.type];
+					attrib_obj.size = glsl.type.size[entry.type];
 					code = this.replaceSymbol(code, entry.object_name, 'this.vertex.attributes['+attrib_obj.location+']');
 					break;
 
@@ -189,17 +169,20 @@ GlslLinker = (function() {
 					break;
 
 				default:
+
+					f = false;
 					//search for external object references
 					for (i in this.external) {
-						if (this.external[i].indexOf(entry.object_name) != -1) {
+						f = this.external[i].indexOf(entry.object_name) != -1;
+						if (f) {
 							e = i.replace('%s', entry.name);
 							code = this.replaceSymbol(code, entry.object_name, e);
-							continue;
+							break;
 						}
 					}
 
 					//nothing found, just replace symbol
-					if (entry.typedef == 0) {
+					if (!f && entry.typedef == 0) {
 						code = this.replaceSymbol(code, entry.object_name, entry.name);
 					}
 			}

@@ -129,17 +129,17 @@ var glsl = (function() {
 		
 		symbols = {
 			variables : {
-				'gl_Position' : 'vec4',
-				'gl_FragColor' : 'vec4',
-				'gl_FragDepth' : 'float',
+				'gl_Position' : 7,
+				'gl_FragColor' : 7,
+				'gl_FragDepth' : 1,
 			},
 			functions : {
-				'dot' : [['float','vec3','vec3']],
-				'max' : [['float','float','float']],
-				'normalize' : [['vec2','vec2'], ['vec3','vec3'], ['vec4','vec4']],
-				'reflect' : [['vec2','vec2','vec2'], ['vec3','vec3','vec3'], ['vec4','vec4','vec4']],
-				'sqrt' : [['float','float']],
-				'texture2D' : [['vec4', 'sampler2D', 'vec2']]
+				'dot' : [[1,6,6]],
+				'max' : [[1,1,1]],
+				'normalize' : [[5,5], [6,6], [7,7]],
+				'reflect' : [[5,5,5], [6,6,6], [7,7,7]],
+				'sqrt' : [[1,1]],
+				'texture2D' : [[7,27,5]]
 			}
 		};
 
