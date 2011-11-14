@@ -37,7 +37,7 @@ function glEnable(cap) {
 			break;
 
 		default:
-			throw new Error('Bad Enable: ' + cap);
+			throw new Error('Enable for ' + cap + ' not implemented yet');
 	}
 
 }
@@ -49,17 +49,17 @@ function glDisable(cap) {
 
 	switch (cap) {
 		case GL_CULL_FACE:
-			ctx.polygon.cullFlag = GL_TRUE;
+			ctx.polygon.cullFlag = GL_FALSE;
 			break;
 		case GL_DEPTH_TEST:
-			ctx.depth.test = GL_TRUE;
+			ctx.depth.test = GL_FALSE;
 			break;
 		case GL_BLEND:
 			ctx.color.blendEnabled = GL_FALSE;
 			break;
 
 		default:
-			throw new Error('Bad Enable: ' + cap);
+			throw new Error('Disable for ' + cap + ' not implemented yet');
 	}
 
 }

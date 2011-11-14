@@ -208,8 +208,8 @@ GraphicsContext3D = (function() {
 		glPixelStorei(pname, param);
 	};
 
-	GraphicsContext3D.shaderSource = function(shader, string) {
-		glShaderSource(shader, 1, [string], [string.length]);
+	GraphicsContext3D.shaderSource = function(shader, source) {
+		glShaderSource(shader, 1, [source], [source.length]);
 	};
 	
 	GraphicsContext3D.uniform1i = function(location, v0) {
@@ -266,7 +266,7 @@ GraphicsContext3D = (function() {
 		this._frame.fps = 0;
 		this._frame.last = [];
 		this._quality.fpsLow = low;
-		this._quality.fpsHigh = high ? high : 4 * low;
+		this._quality.fpsHigh = high ? high : 1.5 * low;
 		this._quality.fpsLowThreshold = 0;
 		this._quality.fpsHighThreshold = 0;
 	};
@@ -371,7 +371,6 @@ GraphicsContext3D = (function() {
 		}
 
 		this._checkFps();
-
 	};
 
 	return GraphicsContext3D.Constructor;

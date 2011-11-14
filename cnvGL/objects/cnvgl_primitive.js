@@ -42,7 +42,7 @@ cnvgl_primitive = (function() {
 		var a, E, i, th, n;
 
 		if (this.direction) {
-			return direction;	
+			return this.direction;	
 		}
 
 		n = this.vertices.length;

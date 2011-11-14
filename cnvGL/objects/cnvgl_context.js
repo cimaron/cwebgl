@@ -59,43 +59,57 @@ var cnvgl_context = (function() {
 		this.shared = cnvgl_context_shared.getInstance();
 
 		//array state
-		this.array.arrayBufferObj = null;
-		this.array.elementArrayBufferObj = null;
+		this.array = {
+			arrayBufferObj : null,
+			elementArrayBufferObj : null
+		};
 
 		//color state
-		this.color.clearColor = [0,0,0,0];
-		this.color.blendEnabled = GL_FALSE;
-		this.color.blendSrcRGB = GL_ONE;
-		this.color.blendSrcA = GL_ONE;
-		this.color.blendDestRGB = GL_ZERO;
-		this.color.blendDestA = GL_ZERO;
+		this.color = {
+			clearColor : [0,0,0,0],
+			blendEnabled = GL_FALSE,
+			blendSrcRGB : GL_ONE,
+			blendSrcA : GL_ONE,
+			blendDestRGB : GL_ZERO,
+			blendDestA : GL_ZERO
+		};
 
 		//depth state
-		this.depth.clear = 1.0;
-		this.depth.func = GL_LESS;
-		this.depth.test = GL_FALSE;
+		this.depth = {
+			clear : 1.0,
+			func : GL_LESS,
+			test : GL_FALSE
+		};
 
 		//pack state
-		this.pack.alignment = 4;
+		this.pack = {
+			alignment : 4
+		};
 
 		//polygon state
-		this.polygon.cullFaceMode = GL_BACK;
-		this.polygon.cullFlag = GL_FALSE;
-		this.polygon.frontFace = GL_CCW;
+		this.polygon = {
+			cullFaceMode : GL_BACK,
+			cullFlag : GL_FALSE,
+			frontFace : GL_CCW
+		};
 
 		//texture state
 		this.initTextures();
 
 		//unpack state
-		this.unpack.alignment = 4;
+		this.unpack = {
+			alignment : 4
+		};
 
 		//viewport state
-		this.viewport.near = 0;
-		this.viewport.far = 1;
-		this.viewport.x = 0;
-		this.viewport.y = 0;
-		this.viewport.w = 0;
-		this.viewport.h = 0;
+		this.viewport = {
+			near : 0.0,
+			far : 1.0,
+			x : 0,
+			y : 0,
+			w : 0,
+			h : 0
+		};
 
 		//direct
 		this.errorValue = GL_NO_ERROR;
