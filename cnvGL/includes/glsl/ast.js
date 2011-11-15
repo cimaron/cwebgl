@@ -21,7 +21,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 (function(glsl) {
 
-
 	var exec_node = (function() {
 		
 		function Initializer() {
@@ -133,7 +132,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	/**
 	 * Operators for AST expression nodes.
 	 */
-	var ast_operators = {
+	var operators = {
 		assign : 0,
 		plus : 1,        /**< Unary + operator. */
 		neg : 2,
@@ -189,6 +188,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		
 		sequence : 47
 	};
+
+	//inverse of operators
+	var i, op_names = [];
+	for (i in operators) {
+		op_names[operators[i]] = i;
+	}
 
 	var ast_precision = {
 		none : 0,
@@ -626,12 +631,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		};
 
 		ast_function_expression.ast_function_expression.ast_expression = function(callee) {
-			this.ast_expression(ast_operators.function_call, callee, null, null);
+			this.ast_expression(operators.function_call, callee, null, null);
 			this.cons = false;
 		};
 
 		ast_function_expression.ast_function_expression.ast_type_specifier = function(type) {
-			this.ast_expression(ast_operators.function_call, type, null, null);
+			this.ast_expression(operators.function_call, type, null, null);
 			this.cons = true;			
 		};
 
@@ -688,7 +693,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		'function' : ast_function,
 		parameter_declarator : ast_parameter_declarator,
 		expression : ast_expression,
-		operators : ast_operators,
+		operators : operators,
+		op_names : op_names,
 		expression_statement : ast_expression_statement,
 		compound_statement : ast_compound_statement,
 		function_definition : ast_function_definition,

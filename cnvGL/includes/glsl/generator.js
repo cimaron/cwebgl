@@ -338,13 +338,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 * @return  objCode
 	 */
 	function g_ast_expression_op(e) {
-		var code, se, se1, se2, se3, i, entry, se_types;
+		var code, se, se1, se2, se3, i, entry, se_types, se_type_names, op_name;
 
 		if (se = e.subexpressions) {
 			se1 = g_ast_expression(se[0]);
 			se2 = g_ast_expression(se[1]);
 			se3 = g_ast_expression(se[2]);
 		}
+		
+		op_name = glsl.ast.op_names[e.oper];
 
 		switch (e.oper) {
 
@@ -376,7 +378,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 				code = g_get_operation(e.oper, se1.type);
 				if (!code) {
-					throw new Error(g_error("Could not apply operation to type " + se1.type_name, e));
+					throw new Error(g_error("Could not apply operation " + op_name + " to " + se1.type_name, e));
 				}
 				code.apply(se1);
 				break;
@@ -389,7 +391,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 				code = g_get_operation(e.oper, se1.type, se2.type);
 				if (!code) {
-					throw new Error(g_error("Cannot apply operation to " + se1.type_name + " and " + se2.type_name, e));
+					throw new Error(g_error("Cannot apply operation " + op_name + " to " + se1.type_name + " and " + se2.type_name, e));
 				}
 				code.apply(se1, se2);
 				break;
@@ -403,14 +405,20 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 					//@todo: check types of parameters
 					se3 = [];
 					se_types = [];
+					se_type_names = [];
 					for (i = 0; i < e.expressions.length; i++) {
 						se2 = g_ast_expression(e.expressions[i]);
 						se3.push(se2);
 						se_types.push(se2.type);
+						se_type_names.push(se2.type_name);
 					}
 					se3 = se3.join(',');
 
 					entry = glsl.state.symbols.get_function(se[0].primary_expression.identifier, null, se_types);
+					if (!entry) {
+						throw new Error("Function " + se[0].primary_expression.identifier + "(" + se_type_names.join(",") + ") not found");
+					}				
+					
 					code = g_get_operation(e.oper, null);
 					code.type = entry.type;
 					code.apply(se1, se3);

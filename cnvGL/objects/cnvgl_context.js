@@ -67,7 +67,7 @@ var cnvgl_context = (function() {
 		//color state
 		this.color = {
 			clearColor : [0,0,0,0],
-			blendEnabled = GL_FALSE,
+			blendEnabled : GL_FALSE,
 			blendSrcRGB : GL_ONE,
 			blendSrcA : GL_ONE,
 			blendDestRGB : GL_ZERO,
