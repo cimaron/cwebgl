@@ -613,7 +613,11 @@ cWebGLRenderingContext = (function() {
 		var o = new cWebGLTexture(this);
 		return o;
 	};
-	
+
+	cWebGLRenderingContext.cullFace = function(mode) {
+		this._context.cullFace(mode);
+	};
+
 	cWebGLRenderingContext.disable = function(cap) {
 		this._context.disable(cap);
 	};
@@ -641,7 +645,11 @@ cWebGLRenderingContext = (function() {
 	cWebGLRenderingContext.framebufferTexture2D = function(target, attachment, textarget, texture, level) {
 		this._context.framebufferTexture2D(target, attachment, textarget, texture.object(), level);
 	};
-	
+
+	cWebGLRenderingContext.frontFace = function(mode) {
+		this._context.frontFace(mode);
+	};
+
 	cWebGLRenderingContext.generateMipmap = function(target) {
 		this._context.generateMipmap(target);
 	};

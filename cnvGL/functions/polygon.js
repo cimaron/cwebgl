@@ -19,34 +19,30 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-function _glEnableDisable(cap, s) {
+function glCullFace(mode) {
 	var ctx;
-	
 	ctx = cnvgl_context.getCurrentContext();
-	s = s ? GL_TRUE : GL_FALSE;
-
-	switch (cap) {
-		case GL_CULL_FACE:
-			ctx.polygon.cullFlag = s;
-			break;
-		case GL_DEPTH_TEST:
-			ctx.depth.test = s;
-			break;
-		case GL_BLEND:
-			ctx.color.blendEnabled = s;
-			break;
-
-		default:
-			throw new Error('Enable/Disable for ' + cap + ' not implemented yet');
-	}
 	
+	if (mode != GL_FRONT_AND_BACK
+		&& mode != GL_FRONT
+		&& mode != GL_BACK) {
+		cnvgl_throw_error(GL_INVALID_ENUM);
+		return;
+	}
+
+	ctx.polygon.cullFaceMode = mode;
 }
 
-function glEnable(cap) {
-	_glEnableDisable(cap, true);
-}
+function glFrontFace(mode) {
+	var ctx;
+	ctx = cnvgl_context.getCurrentContext();
 
-function glDisable(cap) {
-	_glEnableDisable(cap, false);
+	if (mode != GL_CW
+		&& mode != GL_CCW) {
+		cnvgl_throw_error(GL_INVALID_ENUM);
+		return;
+	}
+
+	ctx.polygon.frontFace = mode;
 }
 

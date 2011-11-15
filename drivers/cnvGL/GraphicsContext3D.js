@@ -143,7 +143,11 @@ GraphicsContext3D = (function() {
 		glGenTextures(1, textures);
 		return textures[0][0];
 	};	
-	
+
+	GraphicsContext3D.cullFace = function(mode) {
+		glCullFace(mode);
+	};
+
 	GraphicsContext3D.drawArrays = function(mode, first, count) {
 		this._dirty = true;
 		glDrawArrays(mode, first, count);
@@ -165,7 +169,11 @@ GraphicsContext3D = (function() {
 	GraphicsContext3D.enableVertexAttribArray = function(index) {
 		glEnableVertexAttribArray(index);
 	};
-	
+
+	GraphicsContext3D.frontFace = function(mode) {
+		glFrontFace(mode);
+	};
+
 	GraphicsContext3D.generateMipmap = function(target) {
 		//glGenerateMipmap(target);
 	};

@@ -69,6 +69,10 @@ include('cnvGL/includes/rendering/renderer.js');
 include('cnvGL/includes/rendering/texture.js');
 include('cnvGL/includes/rendering/vertex.js');
 
+
+include('cnvGL/functions/polygon.js');
+
+//the following files need to be merged into logical groups as done above
 include('cnvGL/functions/glActiveTexture.js');
 include('cnvGL/functions/glAttachShader.js');
 include('cnvGL/functions/glBlendFunc.js');
