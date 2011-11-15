@@ -132,7 +132,7 @@ cWebGL = {
 				ctx = _.getNativeContext.call(this, name, config);
 				_.extend(ctx);
 			} else {
-				ctx = WebGLRenderingContext.create(this, new cWebGLContextAttributes(config));
+				ctx = new WebGLRenderingContext(this, new cWebGLContextAttributes(config));
 			}
 
 			_.contexts[this] = ctx;
