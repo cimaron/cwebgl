@@ -279,6 +279,11 @@ GraphicsContext3D = (function() {
 		this._quality.fpsHighThreshold = 0;
 	};
 
+	GraphicsContext3D.setQuality = function(q) {
+		this._quality.factor = 1 / q;
+		this._createBuffer();
+	};
+
 	//private:
 
 	GraphicsContext3D._createBuffer = function() {

@@ -61,7 +61,8 @@ cWebGL = {
 	extensions : {
 		native : true,
 		ready : true,
-		setTargetFps : function() {}
+		setTargetFps : function() {},
+		setQuality : function() {}
 	},
 
 	/**

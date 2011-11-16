@@ -473,6 +473,10 @@ cWebGLRenderingContext = (function() {
 		this._context.setTargetFps(low, high);
 	};
 
+	cWebGLRenderingContext.setQuality = function(q) {
+		this._context.setQuality(q);
+	};
+
 	cWebGLRenderingContext.activeTexture = function(texture) {
 		//@validation
 		this._context.activeTexture(texture);
@@ -621,7 +625,7 @@ cWebGLRenderingContext = (function() {
 	cWebGLRenderingContext.disable = function(cap) {
 		this._context.disable(cap);
 	};
-	
+
 	cWebGLRenderingContext.drawArrays = function(mode, first, count) {
 		this._context.drawArrays(mode, first, count);	
 	};
