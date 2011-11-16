@@ -128,6 +128,8 @@ div				float	float		: float	(%s/%s)
 
 logic_not		bool				: bool	!(%s)
 
+array_index							: any	%s[%s]
+
 function_call						: any	%s(%s)
 ";
 

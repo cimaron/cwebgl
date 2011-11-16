@@ -2073,6 +2073,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						yyval = {};
 						yyval.expression = yyvsa[yyvsp - 1].expression;
 						break;
+						
+					case 28:
+						yyval = {};
+						yyval.expression = new glsl.ast.expression(glsl.ast.operators.array_index, yyvsa[yyvsp - 3].expression, yyvsa[yyvsp - 1].expression, null);
+						yyval.expression.set_location(yylloc);
+						break;
 
 					case 29:
 						yyval = {};
@@ -2418,7 +2424,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					case 16:
 					case 23:
 					case 25:
-					case 28:
 					case 31:
 					case 32:
 					case 36:

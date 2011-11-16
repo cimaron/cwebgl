@@ -129,9 +129,15 @@ var glsl = (function() {
 		
 		symbols = {
 			variables : {
+
+				//vertex
+				'gl_Color' : 7,
 				'gl_Position' : 7,
+				'gl_TexCoord' : 7,
+
+				//fragment
 				'gl_FragColor' : 7,
-				'gl_FragDepth' : 1,
+				'gl_FragDepth' : 1
 			},
 			functions : {
 				'dot' : [[1,6,6]],
