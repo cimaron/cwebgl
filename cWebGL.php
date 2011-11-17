@@ -42,9 +42,9 @@ function cWebGLIncludeFile($file) {
 	ob_start();
 	include $basepath.'/'.$file;
 	$output = ob_get_clean();
-	$output = preg_replace('#//.*\n#', "\n", $output);	
-	$output = preg_replace('#/\*(.|[\r\n])*?\*/#', '', $output);
-	$output = preg_replace('#\n\n+#', "\n", $output);
+	//$output = preg_replace('#//.*\n#', "\n", $output);	
+	//$output = preg_replace('#/\*(.|[\r\n])*?\*/#', '', $output);
+	//$output = preg_replace('#\n\n+#', "\n", $output);
 
 	$output = preg_replace_callback('#include\(\'([^\']+)\'\);#', 'cWebGLIncludeCallback', $output);
 	return $output;
