@@ -20,6 +20,59 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
+function glDrawArrays(mode, first, count) {
+	var ctx, renderer, program, i, vertex, name, buffer_obj, buffer_data, attr, data, vtx_data, start, k;
+
+	ctx = cnvgl_context.getCurrentContext();
+	renderer = ctx.renderer;
+	program = ctx.current_program;
+
+	renderer.setMode(mode);
+
+	//each vertex
+	for (i = first; i < count; i++) {
+
+		vertex = new cnvgl_vertex();
+
+		//initialize attributes for vertex
+		for (name in program.active_attributes) {
+			
+			attr = program.active_attributes[name];
+
+			vtx_data = [];
+			vertex.attributes[attr.location] = vtx_data;
+			//initialize
+
+			data = ctx.vertex_attrib_arrays[attr.location];
+
+			//no buffer data was specified for this attribute
+			if (!(buffer_obj = data.buffer_obj)) {
+				continue;
+			}
+			
+			buffer_data = buffer_obj.getData();
+
+			start = (data.pointer / buffer_data.BYTES_PER_ELEMENT) + (i * data.size + data.stride);
+
+			for (k = 0; k < attr.size; k++) {
+				if (k < data.size) {
+					vtx_data[k] = buffer_data[k + start];
+				} else {
+					vtx_data[k] = 0;	
+				}
+			}
+			if (attr.size == 1) {
+				vertex.attributes[attr.location] = vtx_data[0];
+			}
+		}
+
+		renderer.send(vertex);
+	}
+
+	renderer.end();
+}
+
+
 function glDrawElements(mode, count, type, indices) {
 	var ctx, renderer, program, buffer_obj, elements, i, vertex, index, name, buffer, buffer_data, attr, data, vtx_data, start, k;
 
