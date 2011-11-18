@@ -152,6 +152,10 @@ GraphicsContext3D = (function() {
 		glCullFace(mode);
 	};
 
+	GraphicsContext3D.depthMask = function(flag) {
+		glDepthMask(flag);
+	};
+
 	GraphicsContext3D.drawArrays = function(mode, first, count) {
 		this._dirty = true;
 		glDrawArrays(mode, first, count);
@@ -164,6 +168,10 @@ GraphicsContext3D = (function() {
 
 	GraphicsContext3D.disable = function(cap) {
 		glDisable(cap);
+	};
+
+	GraphicsContext3D.disableVertexAttribArray = function(index) {
+		glDisableVertexAttribArray(index);
 	};
 
 	GraphicsContext3D.enable = function(cap) {

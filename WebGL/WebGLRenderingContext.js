@@ -634,6 +634,10 @@ cWebGLRenderingContext = (function() {
 		this._context.disable(cap);
 	};
 
+	cWebGLRenderingContext.disableVertexAttribArray = function(index) {
+		this._context.disableVertexAttribArray(index);
+	};
+
 	cWebGLRenderingContext.drawArrays = function(mode, first, count) {
 		this._context.drawArrays(mode, first, count);	
 	};
