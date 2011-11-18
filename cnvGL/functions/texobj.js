@@ -54,3 +54,29 @@ function glBindTexture(target, texture) {
 	texture_unit.current_texture[target] = texture_obj;
 }
 
+
+function glGenTextures(n, textures) {
+
+	var current, list, i, t, texture_obj;
+
+	if (n < 0) {
+		cnvgl_throw_error(GL_INVALID_VALUE);
+		return;
+	}
+
+	current = cnvgl_context.getCurrentContext().shared.texture_objects;
+
+	list = [];
+	for (i = 0; i < n; i++) {
+		t = current.indexOf(null);
+		if (t == -1) {
+			t = current.length;
+		}
+		texture_obj = new cnvgl_texture_object(t, 0);
+		current[t] = texture_obj;
+		list[i] = t;
+	}
+
+	textures[0] = list;
+}
+
