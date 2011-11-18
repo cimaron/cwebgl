@@ -19,6 +19,20 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+function glBlendFunc(sfactor, dfactor) {
+	var ctx, i;
+
+	ctx = cnvgl_context.getCurrentContext();
+	
+	//todo: add checks here
+	
+	ctx.color.blendSrcRGB = sfactor;
+	ctx.color.blendSrcA = sfactor;
+	ctx.color.blendDestRGB = dfactor;
+	ctx.color.blendDestA = dfactor;
+}
+
+
 function glColorMask(r, g, b, a) {
 	var ctx;
 
