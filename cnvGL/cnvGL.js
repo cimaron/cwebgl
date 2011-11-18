@@ -71,6 +71,7 @@ include('cnvGL/includes/rendering/vertex.js');
 
 
 include('cnvGL/functions/blend.js');
+include('cnvGL/functions/depth.js');
 include('cnvGL/functions/polygon.js');
 
 //the following files need to be merged into logical groups as done above
@@ -83,7 +84,6 @@ include('cnvGL/functions/glBufferData.js');
 include('cnvGL/functions/glBufferSubData.js');
 include('cnvGL/functions/glClear.js');
 include('cnvGL/functions/glClearColor.js');
-include('cnvGL/functions/glClearDepth.js');
 include('cnvGL/functions/glCompileShader.js');
 include('cnvGL/functions/glCreateProgram.js');
 include('cnvGL/functions/glCreateShader.js');

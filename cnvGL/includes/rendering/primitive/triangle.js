@@ -123,10 +123,8 @@ cnvgl_rendering_primitive_triangle = (function() {
 	};
 
 	cnvgl_rendering_primitive_triangle.rasterizeScanline = function(yi, x_start, x_end) {
-		var c_buffer, d_buffer, vw, int, p, xi_start, xi_end, xi, id, ib;
+		var c_buffer, d_buffer, vw, int, p, xi_start, xi_end, xi, i;
 
-		c_buffer = this.ctx.color_buffer;
-		d_buffer = this.ctx.depth_buffer;
 		vw = this.ctx.viewport.w;
 		int = this.renderer.interpolate;
 		p = [0, yi, 0, 1];
@@ -141,8 +139,7 @@ cnvgl_rendering_primitive_triangle = (function() {
 			xi_end--;	
 		}
 
-		id = vw * (yi - .5) + (xi_start - .5);
-		ic = id * 4;
+		i = vw * (yi - .5) + (xi_start - .5);
 
 		for (xi = xi_start; xi <= xi_end; xi++) {
 
@@ -150,16 +147,14 @@ cnvgl_rendering_primitive_triangle = (function() {
 			int.setPoint(p);
 
 			//Early depth test
-			//Nneed to add check for if shader writes to depth value.
+			//Need to add check for shader writing to depth value.
 			//If so, this needs to run after processing the fragment
 			if (this.ctx.depth.test == GL_TRUE) {
 				this.frag.gl_FragDepth = int.interpolateTriangle(this.v1.zw, this.v2.zw, this.v3.zw);
-				if (!this.renderer.checkDepth(id, this.frag.gl_FragDepth)) {
-					id++;
-					ic += 4;
+				if (!this.renderer.checkDepth(i, this.frag.gl_FragDepth)) {
+					i++;
 					continue;
 				}
-				d_buffer[id] = this.frag.gl_FragDepth;
 			}
 
 			//interpolate varying
@@ -168,10 +163,9 @@ cnvgl_rendering_primitive_triangle = (function() {
 			}
 
 			this.renderer.fragment.process(this.frag);
-			this.renderer.fragment.write(c_buffer, ic, this.frag);
+			this.renderer.fragment.write(i, this.frag);
 
-			id++;
-			ic += 4;
+			i++;
 		}		
 	};
 

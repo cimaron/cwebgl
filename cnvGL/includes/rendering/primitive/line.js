@@ -60,9 +60,8 @@ cnvgl_rendering_primitive_line = (function() {
 	};
 
 	cnvgl_rendering_primitive_line.lineX = function(v1, v2, dy) {
-		var c_buffer, vw, frag, x_start, x_end, xi_start, xi_end, y, v, xi, yi, p, ic;
+		var vw, frag, x_start, x_end, xi_start, xi_end, y, v, xi, yi, p, i;
 
-		c_buffer = this.ctx.color_buffer;
 		vw = this.ctx.viewport.w;
 
 		//make v1 left vertex
@@ -87,19 +86,18 @@ cnvgl_rendering_primitive_line = (function() {
 				this.frag.varying[v] = this.renderer.interpolate.interpolateLine(v1.varying[v], v2.varying[v]);
 			}
 
-			ic = (vw * yi + xi) * 4;
+			i = (vw * yi + xi);
 
 			this.renderer.fragment.process(this.frag);
-			this.renderer.fragment.write(c_buffer, ic, this.frag);
+			this.renderer.fragment.write(i, this.frag);
 
 			y += dy;
 		}
 	};
 
 	cnvgl_rendering_primitive_line.lineY = function(v1, v2, dx) {
-		var c_buffer, vw, frag, y_start, y_end, yi_start, yi_end, x, v, yi, xi, p, ic;
+		var vw, frag, y_start, y_end, yi_start, yi_end, x, v, yi, xi, p, i;
 
-		c_buffer = this.ctx.color_buffer;
 		vw = this.ctx.viewport.w;
 
 		//make v1 top vertex
@@ -126,10 +124,10 @@ cnvgl_rendering_primitive_line = (function() {
 				this.frag.varying[v] = this.renderer.interpolate.interpolateLine(v1.varying[v], v2.varying[v]);
 			}
 
-			ic = (vw * yi + xi) * 4;
+			i = (vw * yi + xi);
 
 			this.renderer.fragment.process(this.frag);
-			this.renderer.fragment.write(c_buffer, ic, this.frag);
+			this.renderer.fragment.write(i, this.frag);
 
 			x += dx;
 		}

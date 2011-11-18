@@ -67,28 +67,28 @@ cnvgl_rendering_fragment = (function() {
 		fragment.a = fragment.gl_FragColor[3];
 	};
 
-	cnvgl_rendering_fragment.write = function(buffer, i, frag) {
-		var r, g, b, a, c, mask;
-		
-		r = frag.r;
-		g = frag.g;
-		b = frag.b;
-		a = frag.a;
-		mask = this.ctx.color.colorMask;
+	cnvgl_rendering_fragment.write = function(i, frag) {
+		var c_buffer, d_buffer, c, c_mask;
 
-		if (this.ctx.color.blendEnabled == GL_TRUE) {
-			c = this.blend(r, g, b, a, buffer[i] / 255, buffer[i + 1] / 255, buffer[i + 2] / 255, buffer[i + 3] / 255);
-			r = c[0];
-			g = c[1];
-			b = c[2];
-			a = c[3];
+		c_buffer = this.ctx.color_buffer;
+		d_buffer = this.ctx.depth_buffer;
+
+		c = [frag.r, frag.g, frag.b, frag.a];
+		c_mask = this.ctx.color.colorMask;
+
+		if (this.ctx.depth.mask) {
+			d_buffer[i] = frag.gl_FragDepth;
 		}
 
-		buffer[i    ] = mask[0] & (r * 255 + .5)|0; //round(frag.r * 255)
-		buffer[i + 1] = mask[1] & (g * 255 + .5)|0; //round(frag.g * 255)
-		buffer[i + 2] = mask[2] & (b * 255 + .5)|0; //round(frag.b * 255)
-		buffer[i + 3] = mask[3] & (a * 255 + .5)|0; //round(frag.a * 255)
+		i <<= 2;
+		if (this.ctx.color.blendEnabled == GL_TRUE) {
+			c = this.blend(c[0], c[1], c[2], c[3], c_buffer[i] / 255, c_buffer[i + 1] / 255, c_buffer[i + 2] / 255, c_buffer[i + 3] / 255);
+		}
 
+		c_buffer[i    ] = c_mask[0] & (c[0] * 255 + .5)|0; //round(frag.r * 255)
+		c_buffer[i + 1] = c_mask[1] & (c[1] * 255 + .5)|0; //round(frag.g * 255)
+		c_buffer[i + 2] = c_mask[2] & (c[2] * 255 + .5)|0; //round(frag.b * 255)
+		c_buffer[i + 3] = c_mask[3] & (c[3] * 255 + .5)|0; //round(frag.a * 255)
 	};
 	
 	cnvgl_rendering_fragment.blend = function(rs, gs, bs, as, rd, gd, bd, ad) {

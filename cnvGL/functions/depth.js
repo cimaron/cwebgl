@@ -22,11 +22,37 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 function glClearDepth(depth) {
 	var ctx;
-	
 	ctx = cnvgl_context.getCurrentContext();
 
 	depth = Math.max(Math.min(depth, 1), 0);
-
 	ctx.clear_depth = depth;
+}
+
+
+function glDepthFunc(func) {
+	var ctx;
+	ctx = cnvgl_context.getCurrentContext();
+	
+	if (func != GL_NEVER
+		&& func != GL_LESS
+		&& func != GL_EQUAL
+		&& func != GL_LEQUAL
+		&& func != GL_GREATER
+		&& func != GL_NOTEQUAL
+		&& func != GL_GEQUAL
+		&& func != GL_ALWAYS) {
+		cnvgl_throw_error(GL_INVALID_ENUM);
+		return;		
+	}
+
+	ctx.depth.func = func;
+}
+
+
+function glDepthMask(mask) {
+	var ctx;
+	ctx = cnvgl_context.getCurrentContext();
+
+	ctx.depth.mask = mask ? GL_TRUE : GL_FALSE;
 }
 

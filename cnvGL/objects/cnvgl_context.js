@@ -79,6 +79,7 @@ var cnvgl_context = (function() {
 		this.depth = {
 			clear : 1.0,
 			func : GL_LESS,
+			mask : GL_TRUE,
 			test : GL_FALSE
 		};
 

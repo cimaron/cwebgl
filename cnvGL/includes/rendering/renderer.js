@@ -75,9 +75,9 @@ cnvgl_renderer = (function() {
 	};
 
 	cnvgl_renderer.checkDepth = function(i, z) {
-		var mode, depth_buffer, pass;
+		var mode, depth, pass;
 		mode = this.ctx.depth.func;
-		depth_buffer = this.ctx.depth_buffer;
+		depth = this.ctx.depth_buffer[i];
 		switch (mode) {
 			case GL_NEVER:
 				pass = false;
@@ -86,22 +86,22 @@ cnvgl_renderer = (function() {
 				pass = true;
 				break;
 			case GL_LESS:
-				pass = z < depth_buffer[i];
+				pass = z < depth;
 				break;
 			case GL_LEQUAL:
-				pass = z < depth_buffer[i];
+				pass = z <= depth;
 				break;
 			case GL_EQUAL:
-				pass = z == depth_buffer[i];
+				pass = z == depth;
 				break;
 			case GL_GREATER:
-				pass = z > depth_buffer[i];
+				pass = z > depth;
 				break;
 			case GL_GEQUAL:
-				pass = z >= depth_buffer[i];
+				pass = z >= depth;
 				break;
 			case GL_NOTEQUAL:
-				pass = z != depth_buffer[i];
+				pass = z != depth;
 				break;
 			default:
 				pass = true;
