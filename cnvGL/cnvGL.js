@@ -78,12 +78,12 @@ include('cnvGL/functions/polygon.js');
 include('cnvGL/functions/shaderapi.js');
 include('cnvGL/functions/texobj.js');
 include('cnvGL/functions/texstate.js');
+include('cnvGL/functions/varray.js');
 
 //the following files need to be merged into logical groups as done above
 include('cnvGL/functions/glDrawArrays.js');
 include('cnvGL/functions/glDrawElements.js');
 include('cnvGL/functions/glEnable.js');
-include('cnvGL/functions/glEnableVertexAttribArray.js');
 include('cnvGL/functions/glGet.js');
 include('cnvGL/functions/glGetError.js');
 include('cnvGL/functions/glGetUniformLocation.js');
@@ -91,7 +91,6 @@ include('cnvGL/functions/glPixelStore.js');
 include('cnvGL/functions/glTexImage2D.js');
 include('cnvGL/functions/glTexParameter.js');
 include('cnvGL/functions/glUniform.js');
-include('cnvGL/functions/glVertexAttribPointer.js');
 include('cnvGL/functions/glViewport.js');
 
 
