@@ -76,6 +76,7 @@ include('cnvGL/functions/clear.js');
 include('cnvGL/functions/depth.js');
 include('cnvGL/functions/draw.js');
 include('cnvGL/functions/enable.js');
+include('cnvGL/functions/get.js');
 include('cnvGL/functions/polygon.js');
 include('cnvGL/functions/shaderapi.js');
 include('cnvGL/functions/texobj.js');
@@ -83,8 +84,6 @@ include('cnvGL/functions/texstate.js');
 include('cnvGL/functions/varray.js');
 
 //the following files need to be merged into logical groups as done above
-include('cnvGL/functions/glGet.js');
-include('cnvGL/functions/glGetError.js');
 include('cnvGL/functions/glGetUniformLocation.js');
 include('cnvGL/functions/glPixelStore.js');
 include('cnvGL/functions/glTexImage2D.js');
