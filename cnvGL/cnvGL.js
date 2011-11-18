@@ -74,9 +74,9 @@ include('cnvGL/functions/blend.js');
 include('cnvGL/functions/depth.js');
 include('cnvGL/functions/polygon.js');
 include('cnvGL/functions/shaderapi.js');
+include('cnvGL/functions/texstate.js');
 
 //the following files need to be merged into logical groups as done above
-include('cnvGL/functions/glActiveTexture.js');
 include('cnvGL/functions/glBindBuffer.js');
 include('cnvGL/functions/glBindTexture.js');
 include('cnvGL/functions/glBufferData.js');
