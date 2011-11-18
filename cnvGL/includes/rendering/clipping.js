@@ -36,21 +36,28 @@ cnvgl_rendering_clipping = (function() {
 		this.renderer = renderer;
 	};
 
-	cnvgl_rendering_clipping.clipPoint = function(p) {
+	cnvgl_rendering_clipping.clipPoint = function(prim) {
+		var p;
+
+		p = prim.vertices[0];
 
 		if (p.xd < -1 || p.xd > 1 ||
 			p.yd < -1 || p.yd > 1 ||
 			p.zd < -1 || p.zd > 1) {
-			return false;
+			return 0;
 		}
 
-		return true;
+		return 1;
 	};
 
-	cnvgl_rendering_clipping.clipLine = function(v1, v2) {
+	cnvgl_rendering_clipping.clipLine = function(prim) {
+		clipped.push(prim);
+		return 1;		
 	};
 
-	cnvgl_rendering_clipping.clipPrimitive = function(prim) {
+	cnvgl_rendering_clipping.clipTriangle = function(prim, clipped) {
+		clipped.push(prim);
+		return 1;
 	};
 
 	return cnvgl_rendering_clipping.Constructor;

@@ -42,10 +42,14 @@ cnvgl_rendering_primitive_point = (function() {
 	};
 
 	cnvgl_rendering_primitive_point.render = function(prim) {
-		if (!this.renderer.clipping.clipPoint(prim.vertices[0])) {
-			return;
+		var num;
+		
+		num = this.renderer.clipping.clipLine(prim);		
+
+		if (num) {
+			this.renderClipped(prim);
 		}
-		this.renderClipped(prim);
+
 	};
 
 	cnvgl_rendering_primitive_point.renderClipped = function(prim) {

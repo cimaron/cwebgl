@@ -43,6 +43,17 @@ cnvgl_rendering_primitive_line = (function() {
 	};
 
 	cnvgl_rendering_primitive_line.render = function(prim) {
+		var clipped, num, i;
+
+		clipped = [];
+		num = this.renderer.clipping.clipLine(prim, clipped);
+
+		for (i = 0; i < num; i++) {
+			this.renderClipped(clipped[i]);
+		}
+	};
+
+	cnvgl_rendering_primitive_line.renderClipped = function(prim) {
 		var v1, v2, dx, dy, dir;
 		this.prim = prim;
 		v1 = prim.vertices[0];

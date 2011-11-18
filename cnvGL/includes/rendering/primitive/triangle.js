@@ -45,13 +45,25 @@ cnvgl_rendering_primitive_triangle = (function() {
 	};
 
 	cnvgl_rendering_primitive_triangle.render = function(prim) {
-		var dir, t;
-
-		this.prim = prim;
+		var clipped, num, i;
 
 		if (this.renderer.culling.checkCull(prim)) {
 			return;
 		}
+
+		//clipping may split triangle into 0-5 new triangles
+		clipped = [];
+		num = this.renderer.clipping.clipTriangle(prim, clipped);
+
+		for (i = 0; i < num; i++) {
+			this.renderClipped(clipped[i]);
+		}
+	};
+
+	cnvgl_rendering_primitive_triangle.renderClipped = function(prim) {
+		var dir, t;
+
+		this.prim = prim;
 
 		//prepare (sort) vertices
 		this.renderer.vertex.sortVertices(prim);
@@ -63,7 +75,7 @@ cnvgl_rendering_primitive_triangle = (function() {
 			prim.vertices[1] = t;
 		}
 		
-		this.rasterize(prim);
+		this.rasterize(prim);		
 	};
 
 	cnvgl_rendering_primitive_triangle.rasterize = function(prim) {
