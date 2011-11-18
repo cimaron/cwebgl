@@ -20,6 +20,62 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
+function glBindBuffer(target, buffer) {
+	var ctx, buffer_obj;
+
+	ctx = cnvgl_context.getCurrentContext();
+	
+	if (buffer != 0) {
+	
+		buffer_obj = cnvgl_objects[buffer];
+	
+		//buffer does not exist
+		if (!buffer_obj) {
+			cnvgl_throw_error(GL_INVALID_VALUE);
+			return;
+		}
+	
+		//not a buffer object
+		if (!buffer_obj instanceof cnvgl_buffer) {
+			cnvgl_throw_error(GL_INVALID_OPERATION);
+			return;
+		}
+
+		buffer_obj.access = GL_READ_WRITE;
+		buffer_obj.usage = GL_STATIC_DRAW;
+
+	} else {
+		buffer_obj = null;	
+	}
+
+	switch (target) {
+		case GL_ARRAY_BUFFER:
+			ctx.array.arrayBufferObj = buffer_obj;
+			break;
+		case GL_ELEMENT_ARRAY_BUFFER:
+			ctx.array.elementArrayBufferObj = buffer_obj;
+			break;
+		default:
+			cnvgl_throw_error(GL_INVALID_ENUM);
+	}
+}
+
+
+function glGenBuffers(n, buffers) {
+
+	var list = [], buffer, ref, i;
+	
+	for (i = 0; i < n; i++) {
+		buffer = new cnvgl_buffer();
+		cnvgl_objects.push(buffer);
+		ref = cnvgl_objects.length - 1;
+		list.push(ref);
+	}
+
+	buffers[0] = list;
+}
+
+
 function glBufferData(target, size, data, usage) {
 	var ctx, buffer_obj, data_type, view, temp, i;
 
@@ -85,4 +141,50 @@ function glBufferData(target, size, data, usage) {
 	buffer_obj.data = view;
 }
 
+
+function glBufferSubData(target, offset, size, data) {
+	var ctx, buffer_obj, view, data_type, temp, i;
+
+	ctx = cnvgl_context.getCurrentContext();
+
+	switch (target) {
+		case GL_ARRAY_BUFFER:
+			buffer_obj = ctx.array.arrayBufferObj;
+			break;
+		case GL_ELEMENT_ARRAY_BUFFER:
+			bufer_obj = ctx.array.elementArrayBufferObj;
+			break;
+		default:
+			cnvgl_throw_error(GL_INVALID_ENUM);
+			return;
+	}
+	
+	if (!buffer_obj) {
+		cnvgl_throw_error(GL_INVALID_OPERATION);
+		return;
+	}
+
+	if (offset < 0 || size < 0 || offset + size > buffer_obj.size) {
+		cnvgl_throw_error(GL_INVALID_VALUE);
+		return;
+	}
+	
+	data_type = TypedArray.getType(data);
+	view = buffer_obj.data;
+	if (ArrayBuffer.native) {
+		offset /= data_type.BYTES_PER_ELEMENT;
+		size /= data_type.BYTES_PER_ELEMENT;
+		temp = data_type(view);
+	} else {
+		temp = view;
+	}
+
+	for (i = 0; i < size; i++) {
+		temp[offset + i] = data[i];
+	}
+
+	if (!buffer_obj.data_type && data_type != ArrayBuffer) {
+		buffer_obj.data_type = data_type;
+	}
+}
 

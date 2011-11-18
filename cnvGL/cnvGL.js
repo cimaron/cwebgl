@@ -71,6 +71,7 @@ include('cnvGL/includes/rendering/vertex.js');
 
 
 include('cnvGL/functions/blend.js');
+include('cnvGL/functions/bufferobj.js');
 include('cnvGL/functions/clear.js');
 include('cnvGL/functions/depth.js');
 include('cnvGL/functions/polygon.js');
@@ -78,15 +79,11 @@ include('cnvGL/functions/shaderapi.js');
 include('cnvGL/functions/texstate.js');
 
 //the following files need to be merged into logical groups as done above
-include('cnvGL/functions/glBindBuffer.js');
 include('cnvGL/functions/glBindTexture.js');
-include('cnvGL/functions/glBufferData.js');
-include('cnvGL/functions/glBufferSubData.js');
 include('cnvGL/functions/glDrawArrays.js');
 include('cnvGL/functions/glDrawElements.js');
 include('cnvGL/functions/glEnable.js');
 include('cnvGL/functions/glEnableVertexAttribArray.js');
-include('cnvGL/functions/glGenBuffers.js');
 include('cnvGL/functions/glGenTextures.js');
 include('cnvGL/functions/glGet.js');
 include('cnvGL/functions/glGetError.js');
