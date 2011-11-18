@@ -86,10 +86,7 @@ include('cnvGL/functions/texparam.js');
 include('cnvGL/functions/texstate.js');
 include('cnvGL/functions/uniforms.js');
 include('cnvGL/functions/varray.js');
-
-//the following files need to be merged into logical groups as done above
-include('cnvGL/functions/glViewport.js');
-
+include('cnvGL/functions/viewport.js');
 
 //internal functions
 function cnvgl_throw_error(error) {
