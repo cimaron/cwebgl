@@ -71,6 +71,7 @@ include('cnvGL/includes/rendering/vertex.js');
 
 
 include('cnvGL/functions/blend.js');
+include('cnvGL/functions/clear.js');
 include('cnvGL/functions/depth.js');
 include('cnvGL/functions/polygon.js');
 include('cnvGL/functions/shaderapi.js');
@@ -81,8 +82,6 @@ include('cnvGL/functions/glBindBuffer.js');
 include('cnvGL/functions/glBindTexture.js');
 include('cnvGL/functions/glBufferData.js');
 include('cnvGL/functions/glBufferSubData.js');
-include('cnvGL/functions/glClear.js');
-include('cnvGL/functions/glClearColor.js');
 include('cnvGL/functions/glDrawArrays.js');
 include('cnvGL/functions/glDrawElements.js');
 include('cnvGL/functions/glEnable.js');

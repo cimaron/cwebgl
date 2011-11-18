@@ -33,3 +33,46 @@ function glClearColor(r, g, b, a) {
 	ctx.color.clearColor = [r, g, b, a];
 }
 
+
+function glClear(mask) {
+	var ctx, buffer, clear, i, l;
+
+	ctx = cnvgl_context.getCurrentContext();
+
+	if (mask & ~(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT)) {
+		cnvgl_throw_error(GL_INVALID_VALUE);
+		return;
+	}
+
+	//Color Buffer
+	if (mask & GL_COLOR_BUFFER_BIT) {
+		buffer = ctx.color_buffer;
+		clear = [];
+		for (i = 0; i < 4; i++) {
+			clear[i] = Math.round(255 * ctx.color.clearColor[i]);
+		}
+		l = buffer.length;
+		for (i = 0; i < l; i += 4) {
+			buffer[i] = clear[0];
+			buffer[i + 1] = clear[1];
+			buffer[i + 2] = clear[2];
+			buffer[i + 3] = clear[3];
+		}
+	}
+
+	//Depth Buffer
+	if (mask & GL_DEPTH_BUFFER_BIT) {
+		buffer = ctx.depth_buffer;
+		clear = ctx.depth.clear;
+		l = buffer.length;
+		for (i = 0; i < l; i++) {
+			buffer[i] = clear;
+		}
+	}
+
+	//Stencil Buffer
+	if (mask & GL_STENCIL_BUFFER_BIT) {
+		throw new Error('glClear: todo');
+	}
+}
+
