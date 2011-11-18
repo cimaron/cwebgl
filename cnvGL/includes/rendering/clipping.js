@@ -26,6 +26,10 @@ cnvgl_rendering_clipping = (function() {
 		this.ctx = null;
 		this.renderer = null;
 
+		this.v1 = null;
+		this.v2 = null;
+		this.v3 = null;
+
 		this.planes = [];
 	}
 
@@ -34,6 +38,12 @@ cnvgl_rendering_clipping = (function() {
 	cnvgl_rendering_clipping.cnvgl_rendering_clipping = function(ctx, renderer) {
 		this.ctx = ctx;
 		this.renderer = renderer;
+		this.planes = [[ 1,  0,  0],
+					  [-1,  0,  0],
+					  [ 0,  1,  0],
+					  [ 0, -1,  0],
+					  [ 0,  0,  1],
+					  [ 0,  0, -1]];
 	};
 
 	cnvgl_rendering_clipping.clipPoint = function(prim) {
@@ -52,13 +62,131 @@ cnvgl_rendering_clipping = (function() {
 
 	cnvgl_rendering_clipping.clipLine = function(prim) {
 		clipped.push(prim);
-		return 1;		
+		return 1;
 	};
 
 	cnvgl_rendering_clipping.clipTriangle = function(prim, clipped) {
-		clipped.push(prim);
-		return 1;
+		var i, p, nprim;
+
+		//store for interpolation
+		this.v1 = prim.vertices[0];
+		this.v2 = prim.vertices[1];
+		this.v3 = prim.vertices[2];
+
+		this.renderer.interpolate.setVertices(this.v1, this.v2, this.v3);
+
+		for (i = 0; i < this.planes.length; i++) {
+			p = this.planes[i];
+			if (!this.clipTriangleToPlane(prim, p[0], p[1], p[2], 1)) {
+				return 0;
+			}
+		}
+
+		//prim is now clipped, and may have extra vertices
+		
+		for (i = 0; i < prim.vertices.length - 2; i++) {
+			nprim = new cnvgl_primitive();
+			nprim.vertices.push(prim.vertices[i]);
+			nprim.vertices.push(prim.vertices[i + 1]);
+			nprim.vertices.push(prim.vertices[i + 2]);
+			clipped.push(nprim);
+		}
+
+		return clipped.length;
 	};
+
+	cnvgl_rendering_clipping.interpolate = function(v1, v2, amt) {
+		var int, xw, yw, vr, namt, v;
+
+		int = this.renderer.interpolate;
+
+		namt = 1 - amt;
+
+		xw = v1.xw * namt + v2.xw * amt;
+		yw = v1.yw * namt + v2.yw * amt;
+
+		int.setPoint([xw, yw]);
+
+		vr = new cnvgl_vertex();
+
+		vr.x = int.interpolateTriangle(this.v1.x, this.v2.x, this.v3.x);
+		vr.y = int.interpolateTriangle(this.v1.y, this.v2.y, this.v3.y);
+		vr.z = int.interpolateTriangle(this.v1.z, this.v2.z, this.v3.z);
+
+		vr.xd = int.interpolateTriangle(this.v1.xd, this.v2.xd, this.v3.xd);
+		vr.yd = int.interpolateTriangle(this.v1.yd, this.v2.yd, this.v3.yd);
+		vr.zd = int.interpolateTriangle(this.v1.zd, this.v2.zd, this.v3.zd);
+
+		//interpolate varying
+		for (v in this.v1.attributes) {
+			vr.attributes[v] = int.interpolateTriangle(this.v1.attributes[v], this.v2.attributes[v], this.v3.attributes[v]);
+		}
+
+		return vr;
+	};
+
+	cnvgl_rendering_clipping.clipTriangleToPlane = function(prim, px,py,pz,pd) {
+		var v1, v2, v3, d1, d2, d3, cx, n, l;
+
+		n = 0;
+		l = prim.vertices.length;
+
+		while (n < l) {
+
+			v1 = prim.vertices[n];
+			v2 = prim.vertices[n + 1];
+			v3 = prim.vertices[n + 2];
+			
+			d1 = (v1.xd * px + v1.yd * py + v1.zd * pz);
+			d2 = (v2.xd * px + v2.yd * py + v2.zd * pz);
+			d3 = (v3.xd * px + v3.yd * py + v3.zd * pz);
+
+			cx = (d1 <= pd ? 1 : 0) + (d2 <= pd ? 1 : 0) + (d3 <= pd ? 1 : 0);
+
+			if (cx == 0) {
+
+				if (n == 0 && prim.vertices.length == 3) {
+					// totally clipped
+					return false;
+				}
+
+ 				prim.vertices.splice(n, 3); // remove 3 elements
+				l -= 3; // update length
+				n -= 3; // update counter so next time around we're ok
+
+			} else if (cx == 1) { // only one point unclipped, create one tri (reuse this)
+
+				if (d1 <= pd) { // v1 is fine
+					prim.vertices[n + 1] = this.interpolate(v1, v2, (pd -d1)/(d2-d1));
+					prim.vertices[n + 2] = this.interpolate(v1, v3, (pd-d1)/(d3-d1));
+				} else if (d2 <= pd) { // v2
+					prim.vertices[n + 0] = this.interpolate(v2, v1, (pd-d2)/(d1-d2));
+					prim.vertices[n + 2] = this.interpolate(v2, v3, (pd-d2)/(d3-d2));
+				} else { // v3
+					prim.vertices[n + 0] = this.interpolate(v3, v1, (pd-d3)/(d1-d3));
+					prim.vertices[n + 1] = this.interpolate(v3, v2, (pd-d3)/(d2-d3));
+				}
+
+			} else if (cx == 2) { // two points unclipped, must make a quad (reuse this, + add one tri)
+				// note that we don't increase l here, as we don't need to check this new tri
+				if (d1 > pd) { // v1 is Clipped
+					prim.vertices[n + 0] = this.interpolate(v2, v1, (pd-d2)/(d1-d2));
+					prim.vertices.push(prim.vertices[n], prim.vertices[n + 2], this.interpolate(v3, v1, (pd-d3)/(d1-d3)));
+				} else if (d2 > pd) { // v2 is Clipped
+					prim.vertices[n + 1] = this.interpolate(v3, v2, (pd-d3)/(d2-d3));
+					prim.vertices.push(prim.vertices[n], this.interpolate(v1, v2, (pd-d1)/(d2-d1)), prim.vertices[n + 1]);
+				} else { // v3
+					prim.vertices[n + 2] = this.interpolate(v1, v3, (pd-d1)/(d3-d1));
+					prim.vertices.push(this.interpolate(v2, v3, (pd-d2)/(d3-d2)), prim.vertices[n + 2], prim.vertices[n + 1]);
+				}
+			} // otherwise 3 = unclipped
+
+			n += 3;
+		}
+
+		return prim.vertices.length > 0;
+	};
+
 
 	return cnvgl_rendering_clipping.Constructor;
 
