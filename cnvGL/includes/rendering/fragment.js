@@ -68,12 +68,13 @@ cnvgl_rendering_fragment = (function() {
 	};
 
 	cnvgl_rendering_fragment.write = function(buffer, i, frag) {
-		var r, g, b, a, c;
+		var r, g, b, a, c, mask;
 		
 		r = frag.r;
 		g = frag.g;
 		b = frag.b;
 		a = frag.a;
+		mask = this.ctx.color.colorMask;
 
 		if (this.ctx.color.blendEnabled == GL_TRUE) {
 			c = this.blend(r, g, b, a, buffer[i] / 255, buffer[i + 1] / 255, buffer[i + 2] / 255, buffer[i + 3] / 255);
@@ -83,10 +84,10 @@ cnvgl_rendering_fragment = (function() {
 			a = c[3];
 		}
 
-		buffer[i    ] = (r * 255 + .5)|0; //round(frag.r * 255)
-		buffer[i + 1] = (g * 255 + .5)|0; //round(frag.g * 255)
-		buffer[i + 2] = (b * 255 + .5)|0; //round(frag.b * 255)
-		buffer[i + 3] = (a * 255 + .5)|0; //round(frag.a * 255)
+		buffer[i    ] = mask[0] & (r * 255 + .5)|0; //round(frag.r * 255)
+		buffer[i + 1] = mask[1] & (g * 255 + .5)|0; //round(frag.g * 255)
+		buffer[i + 2] = mask[2] & (b * 255 + .5)|0; //round(frag.b * 255)
+		buffer[i + 3] = mask[3] & (a * 255 + .5)|0; //round(frag.a * 255)
 
 	};
 	

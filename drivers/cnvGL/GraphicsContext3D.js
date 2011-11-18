@@ -124,6 +124,10 @@ GraphicsContext3D = (function() {
 		glCompileShader(shader);
 	};
 
+	GraphicsContext3D.colorMask = function(red, green, blue, alpha) {
+		glColorMask(red, green, blue, alpha);
+	};
+
 	GraphicsContext3D.createBuffer = function() {
 		var buffers = [];
 		glGenBuffers(1, buffers);

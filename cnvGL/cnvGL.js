@@ -70,6 +70,7 @@ include('cnvGL/includes/rendering/texture.js');
 include('cnvGL/includes/rendering/vertex.js');
 
 
+include('cnvGL/functions/blend.js');
 include('cnvGL/functions/polygon.js');
 
 //the following files need to be merged into logical groups as done above

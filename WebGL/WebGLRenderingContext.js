@@ -579,6 +579,10 @@ cWebGLRenderingContext = (function() {
 		this._context.clearDepth(depth);
 	};
 
+	cWebGLRenderingContext.colorMask = function(red, green, blue, alpha) {
+		this._context.colorMask(red, green, blue, alpha);
+	};
+
 	cWebGLRenderingContext.compileShader = function(shader) {
 		this._context.compileShader(shader.object());
 	};
