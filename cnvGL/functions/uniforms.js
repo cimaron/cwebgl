@@ -19,7 +19,6 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-
 function glUniform1i(location, v0) {
 	v0 = v0|0; //floor(v0);
 	__glUniform(location, v0, [glsl.type.bool, glsl.type.int, glsl.type.sampler2D], true);
@@ -99,5 +98,39 @@ function __glUniform(location, value, types) {
 	}
 
 	program_obj.active_uniforms_values[location] = value;
+}
+
+function glGetUniformLocation(program, name) {
+	var ctx, program_obj, t, i;
+
+	//get program
+	ctx = cnvgl_context.getCurrentContext();
+	program_obj = ctx.shared.program_objects[program];
+
+	//no program exists
+	if (!program_obj) {
+		cnvgl_throw_error(GL_INVALID_VALUE);
+		return;
+	}
+
+	//object is not a program (BAD!)
+	if (!program_obj instanceof cnvgl_program) {
+		cnvgl_throw_error(GL_INVALID_OPERATION);
+		return;
+	}	
+
+	if (!program_obj.link_status) {
+		cnvgl_throw_error(GL_INVALID_OPERATION);
+		return;
+	}
+
+	t = program_obj.active_uniforms;
+	for (i = 0; i < program_obj.active_uniforms_count; i++) {
+		if (t[i].name == name) {
+			return t[i].location;
+		}
+	}
+
+	return -1;
 }
 
