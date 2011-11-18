@@ -96,15 +96,46 @@ cnvgl_rendering_fragment = (function() {
 		state = this.ctx.color;
 
 		switch (state.blendSrcA) {
+			case GL_ONE:
+				sr = sg = sb = sa = 1;
+				break;
+			case GL_ZERO:
+				sr = sg = sb = sa = 0;
+				break;
 			case GL_SRC_ALPHA:
 				sr = sg = sb = sa = as;
+				break;
+			case GL_ONE_MINUS_SRC_ALPHA:
+				sr = sg = sb = sa = 1 - as;
+				break;
+			case GL_DST_ALPHA:
+				sr = sg = sb = sa = ad;
+				break;
+			case GL_ONE_MINUS_DST_ALPHA:
+				sr = sg = sb = sa = 1 - ad;
 				break;
 			default:
 				throw new Error('Blend source ' + state.blendSrcA + ' not implemented');
 		}
+
 		switch (state.blendDestA) {
 			case GL_ONE:
 				dr = dg = db = da = 1;
+				break;
+			case GL_ZERO:
+				dr = dg = db = da = 0;
+				break;
+			case GL_SRC_ALPHA:
+				dr = dg = db = da = as;
+				break;
+			case GL_ONE_MINUS_SRC_ALPHA:
+				dr = dg = db = da = 1 - as;
+				break;
+			case GL_DST_ALPHA:
+				dr = dg = db = da = ad;
+				break;
+			case GL_ONE_MINUS_DST_ALPHA:
+				dr = dg = db = da = 1 - ad;
 				break;
 			default:
 				throw new Error('Blend source ' + state.blendSrcD + ' not implemented');					
