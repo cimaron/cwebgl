@@ -46,7 +46,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 *
 	 * @return  objCode;
 	 */
-	function g_get_operation() {
+	function get_operation() {
 		var table, next, code;
 
 		table = Array.prototype.shift.apply(arguments);
@@ -68,7 +68,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 
 		Array.prototype.unshift.call(arguments, table[next]);
-		return g_get_operation.apply(this, arguments);
+		return get_operation.apply(this, arguments);
 	}
 
 	/**
@@ -80,7 +80,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 *
 	 * @return  objCode;
 	 */
-	function g_get_field_selection_r_type(identifier, fields, type) {
+	function get_field_selection_r_type(identifier, fields, type) {
 		var code, i, j, sets, set, keys;
 
 		fields = fields.split('');
@@ -141,7 +141,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 *
 	 * @return  objCode
 	 */
-	function g_ast_type_specifier(ts) {
+	function type_specifier(ts) {
 		if (ts.is_precision_statement) {
 			return new objCode();
 		}
@@ -155,7 +155,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 *
 	 * @return  objCode
 	 */
-	function g_ast_declarator_list(dl) {
+	function declarator_list(dl) {
 		var code, type, defCode, i, decl, name, entry, decCode, expCode;
 
 		code = new objCode();
@@ -180,7 +180,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			} else {
 				decCode = new objCode("var %s = %s;");
 				if (decl.initializer) {
-					expCode = g_ast_expression(decl.initializer);
+					expCode = expression(decl.initializer);
 					if (expCode.type != entry.type) {
 						throw new Error(g_error("Could not assign value of type " + expCode.type_name + " to " + glsl.type.names[entry.type], dl));
 					}
@@ -202,7 +202,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 *
 	 * @return  objCode
 	 */
-	function g_ast_function(f) {
+	function g_function(f) {
 		var code, params, param, i, name, entry;
 
 		//generate param list
@@ -233,13 +233,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 *
 	 * @return  objCode
 	 */
-	function g_constructor(con, c) {
+	function constructor(con, c) {
 		var code, i, j, l, e, list, e2;
 
 		list = [];
 		for (i = 0; i < c.length; i++) {
 
-			e = g_ast_expression(c[i]);
+			e = expression(c[i]);
 			l = glsl.type.size[e.type];
 
 			if (l == 1) {
@@ -278,13 +278,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 *
 	 * @return  objCode
 	 */
-	function g_ast_expression_op(e) {
+	function expression_op(e) {
 		var code, se, se1, se2, se3, i, entry, se_types, se_type_names, op_name;
 
 		if (se = e.subexpressions) {
-			se1 = g_ast_expression(se[0]);
-			se2 = g_ast_expression(se[1]);
-			se3 = g_ast_expression(se[2]);
+			se1 = expression(se[0]);
+			se2 = expression(se[1]);
+			se3 = expression(se[2]);
 		}
 		
 		op_name = glsl.ast.op_names[e.oper];
@@ -296,7 +296,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			case glsl.ast.operators.float_constant:
 			case glsl.ast.operators.identifier:
 
-				code = g_ast_expression_simple(e);
+				code = expression_simple(e);
 				break;
 
 			//assignment operator
@@ -309,7 +309,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 				//@todo:
 				//check that se1 is a valid type for assignment
 				//if se1 has a quantifier, generate that
-
+				
 				code = new objCode("%s = %s", se2.type);
 				code.apply(se1, se2);
 				break;
@@ -317,7 +317,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			//normal unary operator
 			case glsl.ast.operators.logic_not:
 
-				code = g_get_operation(e.oper, se1.type);
+				code = get_operation(e.oper, se1.type);
 				if (!code) {
 					throw new Error(g_error("Could not apply operation " + op_name + " to " + se1.type_name, e));
 				}
@@ -330,7 +330,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			case glsl.ast.operators.mul:
 			case glsl.ast.operators.div:
 
-				code = g_get_operation(e.oper, se1.type, se2.type);
+				code = get_operation(e.oper, se1.type, se2.type);
 				if (!code) {
 					throw new Error(g_error("Cannot apply operation " + op_name + " to " + se1.type_name + " and " + se2.type_name, e));
 				}
@@ -348,7 +348,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 				//need to add check that variable is an array
 				//throw new Error(glsl.sprintf("Variable %s is not an array", se[0].primary_expression.identifier));
 
-				code = g_get_operation(e.oper);
+				code = get_operation(e.oper);
 				code.type = entry.type;
 				code.apply(se1, se2);
 				break;
@@ -357,14 +357,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			case glsl.ast.operators.function_call:
 
 				if (e.cons) {
-					code = g_constructor(se1, e.expressions);
+					code = constructor(se1, e.expressions);
 				} else {
 					//@todo: check types of parameters
 					se3 = [];
 					se_types = [];
 					se_type_names = [];
 					for (i = 0; i < e.expressions.length; i++) {
-						se2 = g_ast_expression(e.expressions[i]);
+						se2 = expression(e.expressions[i]);
 						se3.push(se2);
 						se_types.push(se2.type);
 						se_type_names.push(se2.type_name);
@@ -376,7 +376,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 						throw new Error("Function " + se[0].primary_expression.identifier + "(" + se_type_names.join(",") + ") not found");
 					}				
 					
-					code = g_get_operation(e.oper, null);
+					code = get_operation(e.oper, null);
 					code.type = entry.type;
 					code.apply(se1, se3);
 				}
@@ -384,7 +384,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 			case glsl.ast.operators.field_selection:
 
-				code = g_get_field_selection_r_type(se1, e.primary_expression.identifier, se1.type);
+				code = get_field_selection_r_type(se1, e.primary_expression.identifier, se1.type);
 				if (!code) {
 					throw new Error(g_error("Invalid field selection " + se1 + "." + e.primary_expression.identifier, e));
 				}
@@ -405,7 +405,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 *
 	 * @return  objCode
 	 */
-	function g_ast_expression_simple(e) {
+	function expression_simple(e) {
 		var code, name, entry;
 
 		//identifier
@@ -418,7 +418,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			if (!entry || !entry.type) {
 				throw new Error(g_error(name + " is undefined", e));
 			}
-
+			
 			//global vs local scope
 			if (entry.depth == 0) {
 				code = new objCode(entry.object_name, entry.type);
@@ -451,7 +451,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 *
 	 * @return  objCode
 	 */
-	function g_ast_expression(e) {
+	function expression(e) {
 		var code;
 
 		if (!e) {
@@ -460,13 +460,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 		//operator
 		if (typeof e.oper == 'number') {
-			code = g_ast_expression_op(e);
+			code = expression_op(e);
 			return code;
 		}
 
 		//simple (variable, or value)
 		if (e.primary_expression) {
-			code = g_ast_expression_simple(e);
+			code = expression_simple(e);
 			return code;
 		}
 
@@ -486,7 +486,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 *
 	 * @return  objCode
 	 */
-	function g_ast_compound_statement(cs) {
+	function compound_statement(cs) {
 		var code, start, node, stmt, code1, code2, code3, code4;
 
 		code = new objCode();
@@ -505,12 +505,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			switch (stmt.typeOf()) {
 
 				case 'ast_expression_statement':
-					code1 = g_ast_expression(stmt.expression);
+					code1 = expression(stmt.expression);
 					code1.addCode(";");
 					break;
 
 				case 'ast_declarator_list':
-					code1 = g_ast_declarator_list(stmt);
+					code1 = declarator_list(stmt);
 					code1.addCode(";");
 					break;
 
@@ -518,10 +518,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 					code1 = new objCode("if(%s)%s");
 
 					//should we add a check that condition is bool type?
-					code2 = g_ast_expression(stmt.condition);
-					code3 = g_ast_compound_statement(stmt.then_statement);
+					code2 = expression(stmt.condition);
+					code3 = compound_statement(stmt.then_statement);
 					if (stmt.else_statement) {
-						code4 = g_ast_compound_statement(stmt.else_statement);
+						code4 = compound_statement(stmt.else_statement);
 						code1.addLine("else%s");
 					}
 					code1.apply(code2, code3, code4);
@@ -553,7 +553,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 *
 	 * @return  objCode
 	 */
-	function g_ast_function_definition(fd) {
+	function function_definition(fd) {
 		var code, b_code;
 
 		code = new objCode();
@@ -563,8 +563,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			return code;
 		}
 
-		code.addLine(g_ast_function(fd.proto_type));
-		code.addLine(g_ast_compound_statement(fd.body));
+		code.addLine(g_function(fd.proto_type));
+		code.addLine(compound_statement(fd.body));
 
 		return code;
 	}
@@ -576,14 +576,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 *
 	 * @return  objCode
 	 */
-	function g_translation_unit(tu) {
+	function translation_unit(tu) {
 		switch (tu.typeOf()) {
 			case 'ast_declarator_list':
-				return g_ast_declarator_list(tu);
+				return declarator_list(tu);
 			case 'ast_type_specifier':
-				return g_ast_type_specifier(tu);
+				return type_specifier(tu);
 			case 'ast_function_definition':
-				return g_ast_function_definition(tu);
+				return function_definition(tu);
 			default:
 				throw new Error(g_error('Invalid translation unit node', tu));
 		}
@@ -634,7 +634,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			try {
 				code = new objCode();
 				for (i = 0; i < state.translation_unit.length; i++) {
-					code.addLine(g_translation_unit(state.translation_unit[i]));
+					code.addLine(translation_unit(state.translation_unit[i]));
 				}
 			} catch (e) {
 				this.errors.push(e);
