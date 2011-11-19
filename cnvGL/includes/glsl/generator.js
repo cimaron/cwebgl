@@ -145,7 +145,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		if (ts.is_precision_statement) {
 			return new objCode();
 		}
-		throw new Error(g_error('Cannot generate type specifier', ts));
+		throw_error("Cannot generate type specifier", ts);
 	}
 
 	/**
@@ -176,13 +176,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			if (type.qualifier) {
 
 				entry.qualifier_name = g_type_qualifiers[type.qualifier.flags.q];
-			
+
 			} else {
 				decCode = new objCode("var %s = %s;");
 				if (decl.initializer) {
 					expCode = expression(decl.initializer);
 					if (expCode.type != entry.type) {
-						throw new Error(g_error("Could not assign value of type " + expCode.type_name + " to " + glsl.type.names[entry.type], dl));
+						throw_error(glsl.sprintf("Could not assign value of type %s to %s", expCode.type_name, glsl.type.names[entry.type]), dl);
 					}
 				} else {
 					expCode = defCode;
@@ -261,7 +261,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			list = list.slice(0, l);	
 		}
 		if (list.length < l) {
-			throw new Error(g_error("Not enough parameters to constructor", con));
+			throw_error("Not enough parameters to constructor", con);
 		}
 
 		//code = new objCode("(new Float32Array([%s]))", con.type);
@@ -303,7 +303,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			case glsl.ast.operators.assign:
 
 				if (se1.type != se2.type) {
-					throw new Error(g_error("Could not assign value of type " + se2.type_name + " to " + se1.type_name, e));
+					throw_error(glsl.sprintf("Could not assign value of type %s to %s", se2.type_name, se1.type_name), e);
 				}
 
 				//@todo:
@@ -319,7 +319,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 				code = get_operation(e.oper, se1.type);
 				if (!code) {
-					throw new Error(g_error("Could not apply operation " + op_name + " to " + se1.type_name, e));
+					throw_error(glsl.sprintf("Could not apply operation %s to %s", op_name, se1.type_name), e);
 				}
 				code.apply(se1);
 				break;
@@ -332,7 +332,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 				code = get_operation(e.oper, se1.type, se2.type);
 				if (!code) {
-					throw new Error(g_error("Cannot apply operation " + op_name + " to " + se1.type_name + " and " + se2.type_name, e));
+					throw_error(glsl.sprintf("Cannot apply operation %s to %s and %s", op_name, se1.type_name, se2.type_name), e);
 				}
 				code.apply(se1, se2);
 				break;
@@ -340,13 +340,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			case glsl.ast.operators.array_index:
 			
 				if (se2.type != glsl.type.int) {
-					throw new Error(g_error("Invalid array index type: " + se2.type_name, e));
+					throw_error(glsl.sprintf("Cannot use type %s to index array", se2.type_name), e);
 				}
 
 				entry = glsl.state.symbols.get_variable(se[0].primary_expression.identifier);
 
 				//need to add check that variable is an array
-				//throw new Error(glsl.sprintf("Variable %s is not an array", se[0].primary_expression.identifier));
+				//throw_error(glsl.sprintf("Variable %s is not an array", se[0].primary_expression.identifier), e);
 
 				code = get_operation(e.oper);
 				code.type = entry.type;
@@ -373,9 +373,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 					entry = glsl.state.symbols.get_function(se[0].primary_expression.identifier, null, se_types);
 					if (!entry) {
-						throw new Error("Function " + se[0].primary_expression.identifier + "(" + se_type_names.join(",") + ") not found");
-					}				
-					
+						throw_error(glsl.sprintf("Function %s(%s) is not defined", se[0].primary_expression.identifier, se_type_names.join(",")), e);
+					}
+
 					code = get_operation(e.oper, null);
 					code.type = entry.type;
 					code.apply(se1, se3);
@@ -386,12 +386,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 				code = get_field_selection_r_type(se1, e.primary_expression.identifier, se1.type);
 				if (!code) {
-					throw new Error(g_error("Invalid field selection " + se1 + "." + e.primary_expression.identifier, e));
+					throw_error(glsl.sprintf("Invalid field selection %s.%s", se1, e.primary_expression.identifier), e);
 				}
 				break;
 
 			default:
-				throw new Error(g_error("Could not translate unknown expression " + e.typeOf() + '(' + e.oper + ')', e));
+				throw_error(glsl.sprintf("Could not translate unknown expression %s (%s)", e.typeOf(), e.oper), e);
 		}
 
 		return code;
@@ -416,9 +416,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			entry = glsl.state.symbols.get_variable(name);
 
 			if (!entry || !entry.type) {
-				throw new Error(g_error(name + " is undefined", e));
+				throw_error(glsl.sprintf("Variable %s is undefined", name), e);
 			}
-			
+
 			//global vs local scope
 			if (entry.depth == 0) {
 				code = new objCode(entry.object_name, entry.type);
@@ -441,7 +441,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			return code;
 		}
 
-		throw new Error(g_error("Cannot translate unkown simple expression type", e));
+		throw_error("Cannot translate unkown simple expression type", e);
 	}
 
 	/**
@@ -476,7 +476,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			return code;
 		}
 
-		throw new Error(g_error("Could not translate unknown expression type", e));
+		throw_error("Could not translate unknown expression type", e);
 	}
 
 	/**
@@ -528,7 +528,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 					break;
 
 				default:
-					throw new Error(g_error("Could not translate statement type (" + stmt.typeOf() + ")", stmt));
+					throw_error(glsl.sprintf("Could not unknown translate statement type %s", stmt.typeOf()), stmt);
 			}
 
 			code.addLine(code1);
@@ -585,7 +585,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			case 'ast_function_definition':
 				return function_definition(tu);
 			default:
-				throw new Error(g_error('Invalid translation unit node', tu));
+				throw_error('Invalid translation unit node', tu);
 		}
 	}
 
@@ -597,13 +597,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 *
 	 * @return  string
 	 */
-	function g_error(msg, n) {
+	function throw_error(msg, n) {
 		if (n && n.location) {
 			msg += " at line " + n.location.line + ", column " + n.location.column;	
 		}
-		return msg;
+		throw new Error(msg);
 	}
-	
+
 	//-----------------------------------------------------------
 	//External interface
 
