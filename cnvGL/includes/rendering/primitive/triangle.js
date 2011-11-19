@@ -135,7 +135,7 @@ cnvgl_rendering_primitive_triangle = (function() {
 	};
 
 	cnvgl_rendering_primitive_triangle.rasterizeScanline = function(yi, x_start, x_end) {
-		var c_buffer, d_buffer, vw, int, p, xi_start, xi_end, xi, i;
+		var vw, int, p, xi_start, xi_end, xi, i, v;
 
 		vw = this.ctx.viewport.w;
 		int = this.renderer.interpolate;
@@ -148,7 +148,7 @@ cnvgl_rendering_primitive_triangle = (function() {
 		}
 		xi_end = /*ceil*/((x_end + 1-1e-10)|0) - .5;
 		if (xi_end >= x_end) {
-			xi_end--;	
+			xi_end--;
 		}
 
 		i = vw * (yi - .5) + (xi_start - .5);

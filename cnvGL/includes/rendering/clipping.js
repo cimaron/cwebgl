@@ -109,18 +109,21 @@ cnvgl_rendering_clipping = (function() {
 
 		vr = new cnvgl_vertex();
 
-		vr.xw = int.interpolateTriangle(this.v1.xw, this.v2.xw, this.v3.xw);
-		vr.yw = int.interpolateTriangle(this.v1.yw, this.v2.yw, this.v3.yw);
-		vr.zw = int.interpolateTriangle(this.v1.zw, this.v2.zw, this.v3.zw);
-		vr.w = int.interpolateTriangle(this.v1.w, this.v2.w, this.v3.w);
+		//we don't need to interpolate all values, only those used in the rest of the rendering pipeline
+		vr.xw = v1.xw * namt + v2.xw * amt;
+		vr.yw = v1.yw * namt + v2.yw * amt;
+		vr.zw = v1.zw * namt + v2.zw * amt;
 
-		vr.xd = int.interpolateTriangle(this.v1.xd, this.v2.xd, this.v3.xd);
-		vr.yd = int.interpolateTriangle(this.v1.yd, this.v2.yd, this.v3.yd);
-		vr.zd = int.interpolateTriangle(this.v1.zd, this.v2.zd, this.v3.zd);
+		vr.w = v1.w * namt + v2.w * amt;
 
-		//interpolate varying
+		//interpolate attributes
 		for (v in this.v1.attributes) {
 			vr.attributes[v] = int.interpolateTriangle(this.v1.attributes[v], this.v2.attributes[v], this.v3.attributes[v]);
+		}
+
+		//interpolate varying
+		for (v in this.v1.varying) {
+			vr.varying[v] = int.interpolateTriangle(this.v1.varying[v], this.v2.varying[v], this.v3.varying[v]);
 		}
 
 		return vr;
