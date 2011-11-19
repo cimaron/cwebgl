@@ -20,67 +20,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 (function(glsl) {
-		  
-	/**
-	 * Code class
-	 */
-	var objCode = (function() {
-
-		//Internal Constructor
-		function Initializer() {
-			//public:
-			this.code = null;
-			this.type = null;
-			this.type_name = null;
-			this.ast_node = null;
-		}
-
-		var objCode = jClass('objCode', Initializer);
-
-		//public:
-
-		objCode.objCode = function(code, type, ast_node) {
-			this.code = "";
-			if (code) {
-				this.addCode(code);
-			}
-			this.setType(type);
-			this.ast_node = ast_node;
-		};
-
-		objCode.setType = function(type) {
-			this.type = type;
-			this.type_name = glsl.type.names[type];
-		};
-
-		objCode.toString = function() {
-			return this.code;
-		};
-
-		objCode.addCode = function(c) {
-			this.code += c.toString();
-		};
-
-		objCode.addLine = function(l) {
-			this.code +=
-				  g_indent()
-				+ l.toString()
-				+ "\n";
-		};
-
-		objCode.apply = function() {
-			Array.prototype.unshift.call(arguments, this.code);
-			this.code = glsl.sprintf.apply(glsl, arguments);
-		};
-
-		return objCode.Constructor;
-
-	}());
-
-
-	//-------------------------------------------------
-	//	Code Generation Options/Data
-	//-------------------------------------------------
+	var objCode;
+	objCode = glsl.objCode;
 
 	//Type qualifier global variables
 	var g_type_qualifiers = [];
