@@ -84,7 +84,7 @@ cnvgl_rendering_clipping = (function() {
 
 		//prim is now clipped, and may have extra vertices
 		
-		for (i = 0; i < prim.vertices.length - 2; i++) {
+		for (i = 0; i < prim.vertices.length; i+=3) {
 			nprim = new cnvgl_primitive();
 			nprim.vertices.push(prim.vertices[i]);
 			nprim.vertices.push(prim.vertices[i + 1]);
@@ -109,9 +109,10 @@ cnvgl_rendering_clipping = (function() {
 
 		vr = new cnvgl_vertex();
 
-		vr.x = int.interpolateTriangle(this.v1.x, this.v2.x, this.v3.x);
-		vr.y = int.interpolateTriangle(this.v1.y, this.v2.y, this.v3.y);
-		vr.z = int.interpolateTriangle(this.v1.z, this.v2.z, this.v3.z);
+		vr.xw = int.interpolateTriangle(this.v1.xw, this.v2.xw, this.v3.xw);
+		vr.yw = int.interpolateTriangle(this.v1.yw, this.v2.yw, this.v3.yw);
+		vr.zw = int.interpolateTriangle(this.v1.zw, this.v2.zw, this.v3.zw);
+		vr.w = int.interpolateTriangle(this.v1.w, this.v2.w, this.v3.w);
 
 		vr.xd = int.interpolateTriangle(this.v1.xd, this.v2.xd, this.v3.xd);
 		vr.yd = int.interpolateTriangle(this.v1.yd, this.v2.yd, this.v3.yd);
@@ -125,7 +126,7 @@ cnvgl_rendering_clipping = (function() {
 		return vr;
 	};
 
-	cnvgl_rendering_clipping.clipTriangleToPlane = function(prim, px,py,pz,pd) {
+	cnvgl_rendering_clipping.clipTriangleToPlane = function(prim, px, py, pz, pd) {
 		var v1, v2, v3, d1, d2, d3, cx, n, l;
 
 		n = 0;
@@ -136,7 +137,7 @@ cnvgl_rendering_clipping = (function() {
 			v1 = prim.vertices[n];
 			v2 = prim.vertices[n + 1];
 			v3 = prim.vertices[n + 2];
-			
+
 			d1 = (v1.xd * px + v1.yd * py + v1.zd * pz);
 			d2 = (v2.xd * px + v2.yd * py + v2.zd * pz);
 			d3 = (v3.xd * px + v3.yd * py + v3.zd * pz);
@@ -150,7 +151,7 @@ cnvgl_rendering_clipping = (function() {
 					return false;
 				}
 
- 				prim.vertices.splice(n, 3); // remove 3 elements
+				prim.vertices.splice(n, 3); // remove 3 elements
 				l -= 3; // update length
 				n -= 3; // update counter so next time around we're ok
 

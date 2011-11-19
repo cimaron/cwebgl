@@ -74,8 +74,8 @@ cnvgl_rendering_primitive_triangle = (function() {
 			prim.vertices[2] = prim.vertices[1];
 			prim.vertices[1] = t;
 		}
-		
-		this.rasterize(prim);		
+
+		this.rasterize(prim);
 	};
 
 	cnvgl_rendering_primitive_triangle.rasterize = function(prim) {
