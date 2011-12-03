@@ -69,9 +69,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			return (this.table.data[name] ? true : false);
 		};
 
-		symbol_table.add_variable = function(name) {
+		symbol_table.add_variable = function(name, type) {
 			var entry = new SymbolTableEntry(name, SymbolTableEntry.typedef.variable);
 			entry.object_name = '@' + name + '@';
+			entry.type = type;
 			return this.add_entry(entry);
 		};
 	
