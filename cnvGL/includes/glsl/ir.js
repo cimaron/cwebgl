@@ -27,7 +27,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	//Internal Constructor
 	function Initializer() {
 		//public:
-		this.node = null;
 		this.d = null;
 		this.op = null;
 		this.s1 = null;
@@ -41,30 +40,38 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 	//static:
 	var count = 1;
-	function getNext() {
-		return count++;	
+	function getNextRegister(n) {
+		return n + count++;
 	}
+
+	var lbl = 0;
+	IR.Constructor.getLabel = function() {
+		return 'lbl' + lbl++;
+	};
+
 
 	//public:
 
-	IR.IR = function(node, op, s1, s2) {
-		this.node = node;
+	IR.IR = function(op, d, s1, s2, gen) {
 		this.op = op;
 		this.s1 = s1;
 		this.s2 = s2;
-		this.d = getNext();
+		if (d) {
+			this.d = d;	
+		} else if (gen) {
+			this.d = getNextRegister(gen);				
+		}
 	};
 
 	IR.toString = function() {
 		var out;
-		out = this.prev ? this.next.toString() : '';
-		out += glsl.sprintf("%s t%s %s %s\n", this.op, this.d || '', this.s1 || '', this.s2 || '');
+		out = glsl.sprintf("%s %s%s%s\n",
+			this.op,
+			this.d || '',
+			this.s1 ? ', ' + this.s1 : '',
+			this.s2 ? ', ' + this.s2 : ''
+			);
 		return out;
-	};
-
-	IR.add = function(next) {
-		next.prev = this;
-		return next;
 	};
 
 	glsl.IR = IR.Constructor;

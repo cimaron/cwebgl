@@ -20,7 +20,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 (function(glsl) {
-
 	var type, i;
 
 	type = {};
@@ -110,6 +109,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		"[0,0,0,0,0,0,0,0,0,0,0,0]", "[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]", "0", "0", "0", "0", "0", "0", 
 		"0", "0", "0", "0", "0"
 		];
+
+	type.qualifiers = [];
+	for (i in glsl.ast.type_qualifier.flags) {
+		type.qualifiers[glsl.ast.type_qualifier.flags[i]] = i;
+	}	
 
 	glsl.type = type;
 
