@@ -39,20 +39,7 @@ include('cnvGL/objects/cnvgl_uniform.js');
 include('cnvGL/objects/cnvgl_vertex.js');
 
 //Compiler
-include('cnvGL/includes/glsl/object.js');
-include('cnvGL/includes/glsl/compiler.js');
-include('cnvGL/includes/glsl/output.js');
-include('cnvGL/includes/glsl/symbol.js');
-include('cnvGL/includes/glsl/preprocessor.js');
-include('cnvGL/includes/glsl/lexer.js');
-include('cnvGL/includes/glsl/lexer_extern.js');
-include('cnvGL/includes/glsl/parser.js');
-include('cnvGL/includes/glsl/type.js');
-//include('cnvGL/includes/glsl/parser_debug.js');
-include('cnvGL/includes/glsl/ast.js');
-include('cnvGL/includes/glsl/generator.js');
-
-//Linker
+include('cnvGL/includes/glsl/glsl.js');
 include('cnvGL/includes/linker/linker.js');
 
 //Rendering Pipeline
