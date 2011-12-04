@@ -43,7 +43,7 @@ function cWebGLIncludeFile($file) {
 	include $basepath.'/'.$file;
 	$output = ob_get_clean();
 	//$output = preg_replace('#//.*\n#', "\n", $output);	
-	//$output = preg_replace('#/\*(.|[\r\n])*?\*/#', '', $output);
+	$output = preg_replace('#/\*(.|[\r\n])*?\*/#', '', $output);
 	//$output = preg_replace('#\n\n+#', "\n", $output);
 
 	$output = preg_replace_callback('#include\(\'([^\']+)\'\);#', 'cWebGLIncludeCallback', $output);
@@ -70,9 +70,9 @@ if (!$_SERVER['argv']) {
 }
 if ($debug) { ?>
 function include(file) {
-	document.write('<scr'+'ipt type="text/javascript" src="<? echo $base; ?>/'+file+'"></script>');
+	document.write('<scr'+'ipt type="text/javascript" src="<?php echo $base; ?>/'+file+'<?php echo ($debug ? '?debug=1' : ''); ?>"></script>');
 }
-<?
+<?php
 	$include .= 'Debug';
 }
 
@@ -82,7 +82,6 @@ $include('library/jClass/jClass.js');
 $include('cnvGL/cnvGL.js');
 $include('drivers/cnvGL/GraphicsContext3D.js');
 
-//WebGLInclude('WebGLMath.js');
 $include('library/TypedArray/TypedArray.js');
 $include('WebGL/WebGLObject.js');
 $include('WebGL/WebGLBuffer.js');
