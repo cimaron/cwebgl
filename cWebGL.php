@@ -33,6 +33,75 @@ function cWebGLInclude($file) {
 	}
 }
 
+function strip_comments($str) {
+
+	$out = '';
+	$state = 0;
+
+	$in_single_line_comment = 1;
+	$in_multi_line_comment = 2;
+	$in_single_string = 4;
+	$in_double_string = 8;
+
+	for ($i = 0; $i < strlen($str); $i++) {
+
+		$c = $str[$i];
+		$la = $str[$i + 1];
+
+		//start single string ('...')
+		if ($c == "'" && ($state == 0)) {
+			$state |= $in_single_string;
+			$out .= $c;
+			continue;
+		}
+
+		//end single string ('...')
+		if ($c == "'" && ($state & $in_single_string)) {
+			$state ^= $in_single_string;
+		}
+
+		//start double string ("...")
+		if ($c == '"' && ($state == 0)) {
+			$state |= $in_double_string;
+			$out .= $c;
+			continue;
+		}
+
+		//end double string ("...")
+		if ($c == '"' && ($state & $in_double_string)) {
+			$state ^= $in_double_string;
+		}
+
+		//start single-line comment
+		if (($c == '/' && $la == '/') && ($state == 0)) {
+			$state |= $in_single_line_comment;
+		}
+
+		//end single-line comment
+		if ($c == "\n" && ($state & $in_single_line_comment)) {
+			$state ^= $in_single_line_comment;
+		}
+
+		//start multi-line comment
+		if (($c == '/' && $la == '*') && ($state == 0)) {
+			$state |= $in_multi_line_comment;
+		}
+
+		//end multi-line comment
+		if (($c == '*' && $la == '/') && ($state & $in_multi_line_comment)) {
+			$state ^= $in_multi_line_comment;
+			$i++;
+			$c = '';
+		}
+
+		if (!($state & ($in_single_line_comment | $in_multi_line_comment))) {
+			$out .= $c;		
+		}
+	}
+
+	return $out;
+}
+
 function cWebGLIncludeFile($file) {
 	global $basepath;
 	if (!file_exists($basepath.'/'.$file)) {
@@ -42,9 +111,8 @@ function cWebGLIncludeFile($file) {
 	ob_start();
 	include $basepath.'/'.$file;
 	$output = ob_get_clean();
-	//$output = preg_replace('#//.*\n#', "\n", $output);	
-	$output = preg_replace('#/\*(.|[\r\n])*?\*/#', '', $output);
-	//$output = preg_replace('#\n\n+#', "\n", $output);
+	$output = strip_comments($output);
+	$output = preg_replace('#\n\n+#', "\n", $output);
 
 	$output = preg_replace_callback('#include\(\'([^\']+)\'\);#', 'cWebGLIncludeCallback', $output);
 	return $output;
