@@ -143,7 +143,6 @@ var lexer = (function () {
 		}
 	});
 	lexer.performAction = function anonymous(yy, yy_, $avoiding_name_collisions, YY_START) {
-
 		var YYSTATE = YY_START;
 		switch ($avoiding_name_collisions) {
 		case 0:
@@ -469,7 +468,7 @@ var lexer = (function () {
 			return this.KEYWORD(130, 130, USAMPLER2DARRAY);
 			break;
 		case 93:
-			return 218;
+			return yy.token.STRUCT;
 			break;
 		case 94:
 			return yy.token.VOID_TOK;
