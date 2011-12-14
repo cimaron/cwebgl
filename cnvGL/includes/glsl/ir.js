@@ -31,9 +31,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		this.op = null;
 		this.s1 = null;
 		this.s2 = null;
-
-		//single link-list
-		this.prev = null;
 	}
 
 	var IR = jClass('IR', Initializer);
@@ -45,10 +42,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	}
 
 	var lbl = 0;
-	IR.Constructor.getLabel = function() {
+	IR.Constructor.genLabel = function() {
 		return 'lbl' + lbl++;
 	};
-
 
 	//public:
 
@@ -65,7 +61,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 	IR.toString = function() {
 		var out;
-		out = glsl.sprintf("%s %s%s%s\n",
+		out = glsl.sprintf("%s %s%s%s",
 			this.op,
 			this.d || '',
 			this.s1 ? ', ' + this.s1 : '',

@@ -47,59 +47,11 @@ var glsl = (function() {
 			MaxCombinedTextureImageUnits : 0,
 			MaxTextureImageUnits : 0,
 			MaxFragmentUniformComponents : 0,
-			
 			/* ARB_draw_buffers */
-			MaxDrawBuffers : 0,
-			
-			/**
-			* Set of GLSL versions supported by the current context
-			*
-			* Knowing that version X is supported doesn't mean that versions before
-			* X are also supported.  Version 1.00 is only supported in an ES2
-			* context or when GL_ARB_ES2_compatibility is supported.  In an OpenGL
-			* 3.0 "forward compatible" context, GLSL 1.10 and 1.20 are \b not
-			* supported.
-			*/
-			/*@{*/
-			GLSL_100ES : 1,
-			GLSL_110 : 2,
-			GLSL_120 : 4,
-			GLSL_130 : 8
+			MaxDrawBuffers : 0			
 		};
-
-
-		/**
-		* During AST to IR conversion, pointer to current IR function
-		*
-		* Will be \c NULL whenever the AST to IR conversion is not inside a
-		* function definition.
-		*/
-		this.current_function = null;
 		
-		/** Have we found a return statement in this function? */
-		this.found_return = false;
-		
-		/** Was there an error during compilation? */
-		this.error = false;
-		
-		/**
-		* Are all shader inputs / outputs invariant?
-		*
-		* This is set when the 'STDGL invariant(all)' pragma is used.
-		*/
-		this.all_invariant = false;
-		
-		/** Loop or switch statement containing the current instructions. */
-		this.loop_or_switch_nesting = null;
-		this.loop_or_switch_nesting_ast = null;
-		
-		this.user_structures = null;
-		this.num_user_structures = 0;
-		this.info_log = null;
-
-		/** Shaders containing built-in functions that are used for linking. */
-		this.builtins_to_link = new Array(16);
-		this.num_builtines_to_link = 0;
+		this.error = false;		
 	};
 
 	var token;
@@ -125,43 +77,6 @@ var glsl = (function() {
 	}
 
 	function initialize_types(state) {
-		var i, j, symbols, entry, types;
-		
-		symbols = {
-			variables : {
-
-				//vertex
-				'gl_Color' : 7,
-				'gl_Position' : 7,
-				'gl_TexCoord' : 7,
-
-				//fragment
-				'gl_FragColor' : 7,
-				'gl_FragDepth' : 1
-			},
-			functions : {
-				'dot' : [[1,6,6]],
-				'max' : [[1,1,1]],
-				'normalize' : [[5,5], [6,6], [7,7]],
-				'reflect' : [[5,5,5], [6,6,6], [7,7,7]],
-				'sqrt' : [[1,1]],
-				'texture2D' : [[7,27,5]]
-			}
-		};
-
-		//later, check compiler mode (shader vs fragment) when initializing types
-
-		for (i in symbols.variables) {
-			entry = state.symbols.add_variable(i);
-			entry.type = symbols.variables[i];
-		}
-
-		for (i in symbols.functions) {
-			types = symbols.functions[i];
-			for (j = 0; j < types.length; j++) {
-				entry = state.symbols.add_function(i, types[j][0], types[j].slice(1));
-			}
-		}
 	}
 
 	var state = null;
@@ -171,6 +86,10 @@ var glsl = (function() {
 		output : null,
 		status : false,
 		errors : [],
+		include : {
+			vertex : [],
+			fragment : []
+		},
 
 		mode : 0,
 
@@ -217,6 +136,12 @@ var glsl = (function() {
 			this.mode = (typeof mode != 'undefined') ? mode : this.mode;
 
 			var parse_tree = null;
+
+			if (this.mode == 1) {
+				source = this.include.fragment.join("\n") + source;
+			} else {
+				source = this.include.vertex.join("\n") + source;	
+			}
 
 			//preprocess
 			this.preprocessor.preprocess(source);

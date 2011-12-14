@@ -21,64 +21,47 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 /**
- * Code class
+ * objCode class
  */
 (function(glsl) {
-
-	/**
-	 * Returns indentation for the current scope
-	 *
-	 * @return  string
-	 */
-	function g_indent() {
-		return new Array(glsl.generator.depth + 1).join("\t");
-	}
 
 	//Internal Constructor
 	function Initializer() {
 		//public:
-		this.code = null;
-		this.type = null;
-		this.type_name = null;
-		this.ast_node = null;
+		this.vars = null;
+		this.code = [];
+		this.last = null;
 	}
 
 	var objCode = jClass('objCode', Initializer);
 
 	//public:
 
-	objCode.objCode = function(code, type, ast_node) {
-		this.code = "";
-		if (code) {
-			this.addCode(code);
-		}
-		this.setType(type);
-		this.ast_node = ast_node;
+	objCode.objCode = function() {
+		this.vars = {
+			uniform : [],
+			attribute : [],
+			varying : [],
+		};
 	};
 
-	objCode.setType = function(type) {
-		this.type = type;
-		this.type_name = glsl.type.names[type];
+	objCode.varUsed = function(name, type) {
+		if (this.vars[type].indexOf(name) == -1) {
+			this.vars[type].push(name);	
+		}
+	};
+	
+	objCode.get = function(i) {
+		return this.code[i];	
+	};
+
+	objCode.push = function(ir) {
+		this.code.push(ir);
+		this.last = ir;
 	};
 
 	objCode.toString = function() {
-		return this.code;
-	};
-
-	objCode.addCode = function(c) {
-		this.code += c.toString();
-	};
-
-	objCode.addLine = function(l) {
-		this.code +=
-			  g_indent()
-			+ l.toString()
-			+ "\n";
-	};
-
-	objCode.apply = function() {
-		Array.prototype.unshift.call(arguments, this.code);
-		this.code = glsl.sprintf.apply(glsl, arguments);
+		return this.code.join("\n");
 	};
 
 	glsl.objCode = objCode.Constructor;
