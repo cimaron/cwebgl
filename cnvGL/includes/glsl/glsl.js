@@ -21,7 +21,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 include('cnvGL/includes/glsl/object.js');
 include('cnvGL/includes/glsl/compiler.js');
-include('cnvGL/includes/glsl/output.js');
 include('cnvGL/includes/glsl/symbol.js');
 include('cnvGL/includes/glsl/preprocessor.js');
 include('cnvGL/includes/glsl/lexer.js');

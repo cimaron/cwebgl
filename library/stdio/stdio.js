@@ -19,12 +19,22 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function() {
+var StdIO = (function() {
 
-	//stdin, stdout, stderr
+	/**
+	 * Standard I/O streams
+	 * (stdin, stdout, stderr)
+	 */
 	var output = [null, '', ''];
 	var log = [null, '', ''];
 
+	/**
+	 * Returns formatted string (simplified sprintf)
+	 *
+	 * @param   string    Input string
+	 *
+	 * @return  string
+	 */
 	function sprintf(str) {
 		if (!str) {
 			return "";
@@ -53,12 +63,22 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		return str;
 	}
 
+	/**
+	 * Writes formatted string to stdout
+	 *
+	 * @param   string    Input string
+	 */
 	function printf() {
 		var args = [].splice.call(arguments, 0);
 		args.unshift(1);
 		fprintf.apply(null, args);
 	}
 
+	/**
+	 * Writes formatted string to file stream
+	 *
+	 * @param   string    Input string
+	 */
 	function fprintf(file, str) {
 		var args = [].splice.call(arguments, 1);	
 		str = sprintf.apply(null, args);
@@ -66,6 +86,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		ob_stream(file, str);
 	}
 
+	/**
+	 * Writes string to file stream
+	 *
+	 * @param   file      Output file stream
+	 * @param   string    Input string
+	 */
 	function ob_stream(file, str) {
 		var i;
 		str = log[file] + str;
@@ -80,12 +106,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		log[file] = str;
 	}
 
-	//-----------------------------------------------------------
-	//External interface
-
-	glsl.sprintf = sprintf;
-	glsl.printf = printf;
-	glsl.fprintf = fprintf;
+	/**
+	 * External Interface
+	 */
+	return {
+		sprintf : sprintf,
+		printf : printf,
+		fprintf : fprintf
+	};
 
 }());
 
