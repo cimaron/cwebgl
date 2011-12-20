@@ -1,4 +1,3 @@
-<?php
 /*
 Copyright (c) 2011 Cimaron Shanahan
 
@@ -20,11 +19,8 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-require_once 'include.php';
+var GPU = {};
 
-$include('library/jClass/jClass.js');
-$include('library/TypedArray/TypedArray.js');
-$include('library/stdio/stdio.js');
-$include('cnvGL/includes/gpu/gpu.js');
-$include('cnvGL/includes/glsl/glsl.js');
+include('cnvGL/includes/gpu/memory.js');
+include('cnvGL/includes/gpu/shader.js');
 

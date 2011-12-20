@@ -40,9 +40,11 @@ include('cnvGL/objects/cnvgl_vertex.js');
 
 //Compiler
 include('cnvGL/includes/glsl/glsl.js');
+include('cnvGL/includes/glsl/ARB.js');
 include('cnvGL/includes/linker/linker.js');
 
 //Rendering Pipeline
+include('cnvGL/includes/gpu/gpu.js');
 include('cnvGL/includes/rendering/primitive/line.js');
 include('cnvGL/includes/rendering/primitive/point.js');
 include('cnvGL/includes/rendering/primitive/triangle.js');
