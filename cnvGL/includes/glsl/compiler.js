@@ -83,7 +83,6 @@ var glsl = (function() {
 
 	var glsl = {
 
-		translators : {},
 		status : false,
 		errors : [],
 		include : {
