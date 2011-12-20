@@ -22,13 +22,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 require_once 'include.php';
 
+//Extra Libraries
 $include('library/jClass/jClass.js');
+$include('library/stdio/stdio.js');
+$include('library/TypedArray/TypedArray.js');
 
 //cnvGL Library
 $include('cnvGL/cnvGL.js');
 $include('drivers/cnvGL/GraphicsContext3D.js');
 
-$include('library/TypedArray/TypedArray.js');
+//WebGL Library
 $include('WebGL/WebGLObject.js');
 $include('WebGL/WebGLBuffer.js');
 $include('WebGL/WebGLContextAttributes.js');
@@ -39,5 +42,6 @@ $include('WebGL/WebGLTexture.js');
 $include('WebGL/WebGLRenderbuffer.js');
 $include('WebGL/WebGLRenderingContext.js');
 $include('WebGL/WebGLUniformLocation.js');
+
 $include('cWebGL.js');
 

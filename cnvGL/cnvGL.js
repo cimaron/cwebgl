@@ -39,8 +39,8 @@ include('cnvGL/objects/cnvgl_uniform.js');
 include('cnvGL/objects/cnvgl_vertex.js');
 
 //Compiler
+include('cnvGL/includes/ARB/ARB.js');
 include('cnvGL/includes/glsl/glsl.js');
-include('cnvGL/includes/glsl/ARB.js');
 include('cnvGL/includes/linker/linker.js');
 
 //Rendering Pipeline

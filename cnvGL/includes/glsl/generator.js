@@ -19,15 +19,15 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(glsl) {
-	var objCode, IR, sprintf;
-	objCode = glsl.objCode;
-	IR = glsl.IR;
-	sprintf = glsl.sprintf;
+(function(glsl, StdIO) {
 
-	//-------------------------------------------------
-	//	Code Generation
-	//-------------------------------------------------
+	/**
+	 * Import into local scope
+	 */
+	var objCode = glsl.objCode;
+	var IR = glsl.IR;
+	var sprintf = StdIO.sprintf;
+
 
 	var irs, ir;
 
@@ -509,5 +509,5 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		}		
 	};
 
-}(glsl));
+}(glsl, StdIO));
 

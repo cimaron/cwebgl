@@ -145,22 +145,3 @@ function include(file) {
 	$include .= 'Debug';
 }
 
-$include('library/jClass/jClass.js');
-
-//cnvGL Library
-$include('cnvGL/cnvGL.js');
-$include('drivers/cnvGL/GraphicsContext3D.js');
-
-$include('library/TypedArray/TypedArray.js');
-$include('WebGL/WebGLObject.js');
-$include('WebGL/WebGLBuffer.js');
-$include('WebGL/WebGLContextAttributes.js');
-$include('WebGL/WebGLFramebuffer.js');
-$include('WebGL/WebGLProgram.js');
-$include('WebGL/WebGLShader.js');
-$include('WebGL/WebGLTexture.js');
-$include('WebGL/WebGLRenderbuffer.js');
-$include('WebGL/WebGLRenderingContext.js');
-$include('WebGL/WebGLUniformLocation.js');
-$include('cWebGL.js');
-

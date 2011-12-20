@@ -22,7 +22,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 /**
  * IR class
  */
-(function(glsl) {
+(function(glsl, StdIO) {
 
 	//Internal Constructor
 	function Initializer() {
@@ -61,7 +61,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 	IR.toString = function() {
 		var out;
-		out = glsl.sprintf("%s %s%s%s",
+		out = StdIO.sprintf("%s %s%s%s",
 			this.op,
 			this.d || '',
 			this.s1 ? ', ' + this.s1 : '',
@@ -72,5 +72,5 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 	glsl.IR = IR.Constructor;
 
-}(glsl));
+}(glsl, StdIO));
 
