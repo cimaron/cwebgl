@@ -19,8 +19,159 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-include('cnvGL/includes/glsl/object.js');
-include('cnvGL/includes/glsl/compiler.js');
+
+var glsl = (function(ARB) {
+
+	/**
+	 * Local Scope
+	 */
+	var glsl, initialized;
+
+	/**
+	 * parse_state object
+	 */
+	function parse_state(target) {
+		this.es_shader = true;
+		this.language_version = 110;
+		this.translation_unit = [];
+		this.symbols = new glsl.symbol_table();
+		this.target = null;
+		this.scanner = glsl.lexer;
+	};
+
+	/**
+	 * Get next token from lexer
+	 *
+	 * @param   object    Reference to array to store token in
+	 * @param   object    Reference to array to store location of token in source file
+	 * @param   object    Unused
+	 *
+	 * @return  boolean
+	 */
+	function next_token(yylval, yylloc, scanner) {
+		lexer.yylval = {};
+		var result = lexer.lex();
+		if (result == 1) {
+			result = 0; //YYEOF	
+		}
+		yylval[0] = lexer.yylval;
+		yylloc[0] = lexer.yylloc;
+		return result;
+	}
+
+	/*IF DEBUG
+	function print_token_value(yyoutput, yytoknum, yyvaluep) {
+		glsl.fprintf(2, JSON.stringify(yyvaluep).replace(/"/g, ''));
+	}
+	*/
+
+	/**
+	 * Store parse error
+	 *
+	 * @param   object    Location of error
+	 * @param   object    Unused
+	 * @param   object    Error string
+	 */
+	function print_error(yylloc, state, error) {
+		glsl.errors.push(error + " at line " + yylloc.first_line + " column " + yylloc.first_column);
+	}
+
+	/**
+	 * Compiler object
+	 */
+	glsl = {
+
+		/**
+		 * Compilation mode enumerations
+		 */
+		mode : {
+			vertex : 0,
+			fragment : 1
+		},
+
+		/**
+		 * Compilation results
+		 */
+		status : false,
+		errors : [],
+
+		//expose to lexer/parser
+		token : null,
+		parseError : function(str, hash) {
+			yyerror(lexer.yylloc, state, str);
+		},
+
+		initialize : function() {
+
+			//lexer
+			this.lexer.yy = this;
+
+			//parser
+			this.parser.yy = this;
+
+			this.parser.yylex = next_token;
+			this.parser.yyerror = print_error;
+			/*IF DEBUG
+			this.parser.YYPRINT = print_token_value;
+			*/
+			//this.parser.initialize_types = initialize_types;
+
+			this.token = this.parser.yytokentype;
+		},
+ 
+		compile : function(source, mode) {
+			var parse_tree;
+
+			if (!initialized) {
+				this.initialize();
+				initialized = true;
+			}
+
+			//reset output
+			this.output = null;
+			this.status = false;
+			this.errors = [];
+			this.state = new parse_state(mode);
+
+			//preprocess
+			this.preprocessor.preprocess(source);
+			this.errors.concat(this.preprocessor.errors);
+			if (!this.preprocessor.status) {
+				return false;
+			}
+
+			//parse
+			lexer.setInput(this.preprocessor.output);
+			//need to get errors here
+			if (this.parser.yyparse(this.state) != 0) {
+				return false;
+			}
+
+			//generate IR code
+			this.generator.createObjectCode(this.state);
+			this.errors.concat(this.generator.errors);
+			if (!this.generator.status) {
+				return false;
+			}
+
+			//generate ARB code
+			this.ARB.generate(this.generator.output, this.state.symbols);
+			this.ARB.output
+
+			this.output = new GlslObject();
+			this.output.object_code = this.generator.output;
+			this.output.symbol_table = this.state.symbols;
+			this.output.mode = this.mode;
+
+			this.status = true;
+			return true;
+		}
+	};
+	
+	return glsl;
+}(ARB));
+
+
 include('cnvGL/includes/glsl/symbol.js');
 include('cnvGL/includes/glsl/preprocessor.js');
 include('cnvGL/includes/glsl/lexer.js');
@@ -29,6 +180,5 @@ include('cnvGL/includes/glsl/parser.js');
 //include('cnvGL/includes/glsl/parser_debug.js');
 include('cnvGL/includes/glsl/ast.js');
 include('cnvGL/includes/glsl/type.js');
-include('cnvGL/includes/glsl/objCode.js');
 include('cnvGL/includes/glsl/ir.js');
 include('cnvGL/includes/glsl/generator.js');

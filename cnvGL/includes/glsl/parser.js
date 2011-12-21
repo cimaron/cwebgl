@@ -2369,17 +2369,19 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						break;
 
 					case 232:
-						if (!state.es_shader && state.language_version < 130) {
+						/*if (!state.es_shader && state.language_version < 130) {
 							yyerror(yylsa[yylsp], state, "precision qualifier forbidden in %s (1.30 or later required)\n", state.version_string);
-						}
+						}*/
 						yyval = {};
 						yyval.n = glsl.ast.precision.high;
 						break;
 
 					case 233:
+						/*
 						if (!state.es_shader && state.language_version < 130) {
 							yyerror(yylsa[yylsp], state, "precision qualifier forbidden in %s (1.30 or later required)\n", state.version_string);
 						}
+						*/
 						yyval = {};
 						yyval.n = glsl.ast.precision.medium;
 						break;
@@ -2679,9 +2681,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				/* Now `shift' the result of the reduction.  Determine what state
 				 that goes to, based on the state we popped back to and the rule
 				 number reduced by.  */
-				
+
 				yyn = yyr1[yyn];
-				
+
 				yystate = yypgoto[yyn - YYNTOKENS] + yyssa[yyssp];
 				if (0 <= yystate && yystate <= YYLAST && yycheck[yystate] == yyssa[yyssp]) {
 					yystate = yytable[yystate];

@@ -24,53 +24,112 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
  */
 (function(glsl, StdIO) {
 
-	//Internal Constructor
-	function Initializer() {
-		//public:
-		this.d = null;
-		this.op = null;
-		this.s1 = null;
-		this.s2 = null;
-	}
+	/**
+	 * IR Class
+	 *
+	 * Stores intermediate representation (3-address code)
+	 */	
+	var IR = (function() {
 
-	var IR = jClass('IR', Initializer);
-
-	//static:
-	var count = 1;
-	function getNextRegister(n) {
-		return n + count++;
-	}
-
-	var lbl = 0;
-	IR.Constructor.genLabel = function() {
-		return 'lbl' + lbl++;
-	};
-
-	//public:
-
-	IR.IR = function(op, d, s1, s2, gen) {
-		this.op = op;
-		this.s1 = s1;
-		this.s2 = s2;
-		if (d) {
-			this.d = d;	
-		} else if (gen) {
-			this.d = getNextRegister(gen);				
+		//Internal Constructor
+		function Initializer() {
+			//public:
+			this.d = null;
+			this.op = null;
+			this.s1 = null;
+			this.s2 = null;
 		}
-	};
+	
+		var IR = jClass('IR', Initializer);
+	
+		//static:
+		var count = 1;
+		function getNextRegister(n) {
+			return n + count++;
+		}
+	
+		//public:
+	
+		IR.IR = function(op, d, s1, s2, gen) {
+			this.op = op;
+			this.s1 = s1;
+			this.s2 = s2;
+			if (d) {
+				this.d = d;
+			} else if (gen) {
+				this.d = getNextRegister(gen);				
+			}
+		};
+	
+		IR.toString = function() {
+			var out;
+			out = StdIO.sprintf("%s %s%s%s",
+				this.op,
+				this.d || '',
+				this.s1 ? ', ' + this.s1 : '',
+				this.s2 ? ', ' + this.s2 : ''
+				);
+			return out;
+		};
+		
+		return IR.Constructor;
+	}());
 
-	IR.toString = function() {
-		var out;
-		out = StdIO.sprintf("%s %s%s%s",
-			this.op,
-			this.d || '',
-			this.s1 ? ', ' + this.s1 : '',
-			this.s2 ? ', ' + this.s2 : ''
-			);
-		return out;
-	};
 
-	glsl.IR = IR.Constructor;
+	/**
+	 * IRS Class
+	 *
+	 * Stores IR code tree
+	 */	
+	var IRS = (function() {
+	
+		//Internal Constructor
+		function Initializer() {
+			//public:
+			this.vars = null;
+			this.code = [];
+			this.last = null;
+		}
+	
+		var IRS = jClass('IRS', Initializer);
+	
+		//public:
+	
+		IRS.IRS = function() {
+			this.vars = {
+				uniform : [],
+				attribute : [],
+				varying : [],
+			};
+		};
+	
+		IRS.varUsed = function(name, type) {
+			if (this.vars[type].indexOf(name) == -1) {
+				this.vars[type].push(name);	
+			}
+		};
+		
+		IRS.get = function(i) {
+			return this.code[i];	
+		};
+	
+		IRS.push = function(ir) {
+			this.code.push(ir);
+			this.last = ir;
+		};
+	
+		IRS.toString = function() {
+			return this.code.join("\n");
+		};
+
+		return IRS.Constructor;
+	}());
+
+	/**
+	 * External interface
+	 */
+	glsl.IR = IR;
+	glsl.IRS = IRS;
 
 }(glsl, StdIO));
 

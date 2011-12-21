@@ -24,7 +24,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	/**
 	 * Import into local scope
 	 */
-	var objCode = glsl.objCode;
+	var IRS = glsl.IRS;
 	var IR = glsl.IR;
 	var sprintf = StdIO.sprintf;
 
@@ -232,7 +232,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 *
 	 * @param   ast_node    ast_node that represents an operator expression
 	 *
-	 * @return  objCode
+	 * @return  IRS
 	 */
 	function expression_op(e) {
 		var se, se1, se2, se3, i, entry, se_types, se_type_names, op_name;
@@ -488,7 +488,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			this.status = false;
 			this.errors = [];
 
-			irs = new objCode();
+			irs = new IRS();
 
 			try {
 				for (i = 0; i < state.translation_unit.length; i++) {
