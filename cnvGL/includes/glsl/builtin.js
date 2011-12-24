@@ -16,46 +16,31 @@ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 (function(glsl) {
 
-	/**
-	 * Preprocesses a source string
-	 *
-	 * @param   string      The source
-	 *
-	 * @return  string
-	 */
-	function preprocess(source) {
-		var output, s, e;
-	
-		//pretty basic, just want to make it work for right now
+	var vertex_vars = [
+		['out', 0, 'vec4', 'gl_Position', 'result.position']
+	];
 
-		//remove preprocessor directives
-		output = source.replace(/[ \t]*\#[^\n]+/g, '');
+	var fragment_vars = [
+		['out', 1, 'vec4', 'gl_FragColor', 'result.color.primary']
+	];
 
-		//remove single-line comments
-		output = output.replace(/\/\/[^\n]*/g, '');
+	glsl.parser.initialize_types = function(state) {
+		var i, vars, funcs, types, v, entry;
 
-		//remove multi-line comments
-		while ((s = output.indexOf("/*")) != -1) {
-			if ((e = output.indexOf("*/", s + 2)) == -1) {
-				glsl.errors.push("Unterminated comment");
-				return false;
-			}
-			output = output.slice(0, s) + output.slice(e + 2);
+		vars = state.mode == glsl.mode.vertex ? vertex_vars : fragment_vars;
+		for (i = 0; i < vars.length; i++) {
+			v = vars[i];
+			entry = state.symbols.add_variable(v[3]);
+			entry.type = glsl.type[v[2]];
+			entry.position = v[1];
+			entry.out = v[4];
 		}
+	};
 
-		return output;
-	}
-	
-	/**
-	 * External interface
-	 */
-
-	glsl.preprocess = preprocess;
-
+		  
 }(glsl));
-

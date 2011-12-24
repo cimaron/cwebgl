@@ -30,12 +30,12 @@ var glsl = (function(ARB) {
 	/**
 	 * parse_state object
 	 */
-	function parse_state(target) {
+	function parse_state(mode) {
 		this.es_shader = true;
 		this.language_version = 110;
 		this.translation_unit = [];
 		this.symbols = new glsl.symbol_table();
-		this.target = null;
+		this.mode = mode;
 		this.scanner = glsl.lexer;
 	};
 
@@ -92,7 +92,6 @@ var glsl = (function(ARB) {
 		/**
 		 * Compilation results
 		 */
-		status : false,
 		errors : [],
 
 		//expose to lexer/parser
@@ -120,7 +119,7 @@ var glsl = (function(ARB) {
 		},
  
 		compile : function(source, mode) {
-			var parse_tree;
+			var status, irs;
 
 			if (!initialized) {
 				this.initialize();
@@ -129,45 +128,39 @@ var glsl = (function(ARB) {
 
 			//reset output
 			this.output = null;
-			this.status = false;
 			this.errors = [];
 			this.state = new parse_state(mode);
 
 			//preprocess
-			this.preprocessor.preprocess(source);
-			this.errors.concat(this.preprocessor.errors);
-			if (!this.preprocessor.status) {
+			source = this.preprocess(source, this.state);
+			if (!source) {
 				return false;
 			}
 
-			//parse
-			lexer.setInput(this.preprocessor.output);
+			//scan/parse
+			lexer.setInput(source);
 			//need to get errors here
 			if (this.parser.yyparse(this.state) != 0) {
 				return false;
 			}
 
 			//generate IR code
-			this.generator.createObjectCode(this.state);
-			this.errors.concat(this.generator.errors);
-			if (!this.generator.status) {
+			irs = this.generate_ir(this.state);
+			if (!irs) {
 				return false;
 			}
 
+			//optimize
+			//@todo:
+
 			//generate ARB code
-			this.ARB.generate(this.generator.output, this.state.symbols);
-			this.ARB.output
+			this.output = this.generate_arb(irs, this.state);
 
-			this.output = new GlslObject();
-			this.output.object_code = this.generator.output;
-			this.output.symbol_table = this.state.symbols;
-			this.output.mode = this.mode;
-
-			this.status = true;
-			return true;
+			status = (this.output ? true : false)
+			return status;
 		}
 	};
-	
+
 	return glsl;
 }(ARB));
 
@@ -178,7 +171,10 @@ include('cnvGL/includes/glsl/lexer.js');
 include('cnvGL/includes/glsl/lexer_extern.js');
 include('cnvGL/includes/glsl/parser.js');
 //include('cnvGL/includes/glsl/parser_debug.js');
+include('cnvGL/includes/glsl/builtin.js');
 include('cnvGL/includes/glsl/ast.js');
 include('cnvGL/includes/glsl/type.js');
 include('cnvGL/includes/glsl/ir.js');
+include('cnvGL/includes/glsl/ir_generator.js');
 include('cnvGL/includes/glsl/generator.js');
+

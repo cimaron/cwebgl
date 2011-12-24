@@ -27,9 +27,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		this.type = null;
 		this.definition = null;
 		this.depth = null;
-
-		this.object_name = null;
 		this.qualifier = null;
+		this.out = name;
 	}
 
 	SymbolTableEntry.typedef = {
@@ -42,8 +41,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		//Internal Constructor
 		function Initializer() {
-			this.table = {
-			};
+			this.table = {};
+			this.depth = 0;
 		}
 
 		var symbol_table = jClass('symbol_table', Initializer);
@@ -75,7 +74,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		symbol_table.add_variable = function(name, type) {
 			var entry = new SymbolTableEntry(name, SymbolTableEntry.typedef.variable);
-			entry.object_name = '@' + name + '@';
 			entry.type = type;
 			return this.add_entry(entry);
 		};
@@ -100,11 +98,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				entry.definition = def;
 			}
 
-			if (name != 'main') {
-				entry.object_name = '@' + name + (def ? "." + def.join('.') : '') + '@';
-			} else {
-				entry.object_name = (glsl.mode == 1) ? '@fragment.main@' : '@vertex.main@';
-			}
 			return this.add_entry(entry);
 		};
 
@@ -146,7 +139,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				this.table[entry.name] = [];	
 			}
 			this.table[entry.name].splice(0, 0, entry);
-			entry.depth = this.table.depth;
+			entry.depth = this.depth;
 			return entry;
 		};
 

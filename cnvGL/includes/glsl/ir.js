@@ -42,12 +42,33 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		var IR = jClass('IR', Initializer);
 	
-		//static:
-		var count = 1;
-		function getNextRegister(n) {
-			return n + count++;
-		}
-	
+		//private:
+
+		function parseOperand(name) {
+			var n, obj, i, c;
+			
+			if (!name) {
+				return;	
+			}
+
+			obj = {
+				name : name,
+				swizzle : "",
+				comp : [0,1,2,3]
+			};
+
+			if (n = name.match(/(.*)(\.([xyzw]+))/)) {
+				obj.name = n[1];
+				obj.swizzle = n[3];
+				obj.comp = obj.swizzle.split("");
+				for (i = 0; i < obj.comp.length; i++) {
+					obj.comp[i] = "xyzw".indexOf(obj.comp[i]);
+				}
+			}
+
+			return obj;
+		};
+
 		//public:
 	
 		IR.IR = function(op, d, s1, s2, gen) {
@@ -57,21 +78,33 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			if (d) {
 				this.d = d;
 			} else if (gen) {
-				this.d = getNextRegister(gen);				
+				this.d = IRS.getTemp(gen);				
 			}
 		};
-	
+
+		IR.getDest = function(obj) {
+			return obj ? parseOperand.call(this, this.d) : this.d;
+		};
+
+		IR.getSrc1 = function(obj) {
+			return obj ? parseOperand.call(this, this.s1) : this.s1;
+		};
+
+		IR.getSrc2 = function(obj) {
+			return obj ? parseOperand.call(this, this.s2) : this.s2;
+		};
+
 		IR.toString = function() {
 			var out;
-			out = StdIO.sprintf("%s %s%s%s",
+			out = StdIO.sprintf("%s%s%s%s",
 				this.op,
-				this.d || '',
+				this.d  ? ' '  + this.d  : '',
 				this.s1 ? ', ' + this.s1 : '',
 				this.s2 ? ', ' + this.s2 : ''
 				);
 			return out;
 		};
-		
+
 		return IR.Constructor;
 	}());
 
@@ -82,33 +115,27 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Stores IR code tree
 	 */	
 	var IRS = (function() {
-	
+
 		//Internal Constructor
 		function Initializer() {
 			//public:
-			this.vars = null;
 			this.code = [];
 			this.last = null;
 		}
-	
+
 		var IRS = jClass('IRS', Initializer);
-	
+
+		//static:
+		var count = 1;
+		IRS.getTemp = function(n) {
+			return n + count++;
+		}
+
 		//public:
-	
+
 		IRS.IRS = function() {
-			this.vars = {
-				uniform : [],
-				attribute : [],
-				varying : [],
-			};
 		};
-	
-		IRS.varUsed = function(name, type) {
-			if (this.vars[type].indexOf(name) == -1) {
-				this.vars[type].push(name);	
-			}
-		};
-		
+
 		IRS.get = function(i) {
 			return this.code[i];	
 		};

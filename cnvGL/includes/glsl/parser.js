@@ -2022,11 +2022,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						break;
 
 					case 3:
-						/*
-						delete state.symbols;
-						state.symbols = new this.yy.symbol_table();						
-						*/
-						initialize_types(state);
+						//state.symbols = new this.yy.symbol_table();
+						//initialize_types(state);
 					    break;
 
 					case 17:
