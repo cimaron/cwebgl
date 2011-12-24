@@ -25,7 +25,7 @@ function glClearDepth(depth) {
 	ctx = cnvgl_context.getCurrentContext();
 
 	depth = Math.max(Math.min(depth, 1), 0);
-	ctx.clear_depth = depth;
+	ctx.depth.clear = depth;
 }
 
 

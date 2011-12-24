@@ -626,6 +626,10 @@ cWebGLRenderingContext = (function() {
 		this._context.cullFace(mode);
 	};
 
+	cWebGLRenderingContext.depthFunc = function(func) {
+		this._context.depthFunc(func);
+	};
+
 	cWebGLRenderingContext.depthMask = function(flag) {
 		this._context.depthMask(flag);
 	};
