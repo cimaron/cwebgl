@@ -29,6 +29,7 @@ var cnvgl_context = (function() {
 		this.depth = {};
 		this.pack = {};
 		this.polygon = {};
+		this.shader = {};
 		this.texture = {};
 		this.unpack = {};
 		this.viewport = {};
@@ -41,7 +42,6 @@ var cnvgl_context = (function() {
 		this.depth_buffer = null;
 
 		//Buffers
-		this.current_program = null;
 		this.vertex_attrib_arrays = [];
 
 		this.shared = null;
@@ -93,6 +93,11 @@ var cnvgl_context = (function() {
 			cullFaceMode : GL_BACK,
 			cullFlag : GL_FALSE,
 			frontFace : GL_CCW
+		};
+
+		//shader state
+		this.shader = {
+			activeProgram : null	
 		};
 
 		//texture state

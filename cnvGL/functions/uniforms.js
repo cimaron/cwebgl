@@ -74,7 +74,7 @@ function __glUniform(location, value, types) {
 	var ctx, program_obj, uniform_obj;
 
 	ctx = cnvgl_context.getCurrentContext();
-	program_obj = ctx.current_program;
+	program_obj = ctx.shader.activeProgram;
 
 	if (!program_obj) {
 		cnvgl_throw_error(GL_INVALID_OPERATION);
@@ -105,7 +105,7 @@ function glGetUniformLocation(program, name) {
 
 	//get program
 	ctx = cnvgl_context.getCurrentContext();
-	program_obj = ctx.shared.program_objects[program];
+	program_obj = ctx.shared.shaderObjects[program];
 
 	//no program exists
 	if (!program_obj) {
@@ -125,7 +125,7 @@ function glGetUniformLocation(program, name) {
 	}
 
 	t = program_obj.active_uniforms;
-	for (i = 0; i < program_obj.active_uniforms_count; i++) {
+	for (i in program_obj.active_uniforms_count) {
 		if (t[i].name == name) {
 			return t[i].location;
 		}

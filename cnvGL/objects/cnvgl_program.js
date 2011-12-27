@@ -28,7 +28,6 @@ function cnvgl_program() {
 	this.link_status = null;
 	this.validate_status = null;
 	this.information_log = '';
-	this.information_log_length = 0;
 
 	//shaders
 	this.attached_shaders_count = 0;
@@ -36,17 +35,25 @@ function cnvgl_program() {
 
 	//uniforms
 	this.active_uniforms_count = 0;
-	this.active_uniforms = [];
+	this.active_uniforms = {};
 	this.active_uniforms_values = [];
 
 	//attributes
 	this.attributes = {};
 	this.active_attributes_count = 0;
-	this.active_attributes = [];
+	this.active_attributes = {};
 	this.active_attributes_values = [];
 
 	//programs
 	this.fragment_program = null;
 	this.vertex_program = null;
+}
+
+
+function cnvgl_program_var(name, location, size) {
+	this.name = name;
+	this.location = location;
+	this.size = size;
+	this.type = GL_FLOAT;
 }
 

@@ -20,17 +20,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-function cnvgl_shader() {
+function cnvgl_shader(name, type) {
 
+	this.name = name;
+	this.type = type;
+	
 	//state
-	this.name = 0;
-	this.type = 0;
 	this.delete_status = GL_FALSE;
 	this.compile_status = GL_FALSE;
 	this.information_log = '';
-	this.information_log_length = 0;
 	this.shader_string = '';
-	this.shader_string_length = 0;
 
 	//custom state
 	this.object_code = null;

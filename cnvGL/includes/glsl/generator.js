@@ -37,8 +37,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Generate output header lines
 	 */
 	function gen_header() {
-		output += sprintf("!!ARB%sp1.0\n", (state.target == glsl.mode.vertex ? 'v' : 'f'));
-		output += "#program main\n";
+		output.push(sprintf("!!ARB%sp1.0\n", (state.target == glsl.mode.vertex ? 'v' : 'f')));
+		output.push("#program main\n");
 	}
 
 	/**
@@ -63,7 +63,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		var params, len, symbol;
 
 		params = [];
-		
+
 		symbol = {
 			out : "c",
 			entries : []
@@ -71,11 +71,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		symbols[symbol.out] = symbol;
 
 		len = 0;
-		//len += param_constants(params, symbol);
+		len += param_constants(params, symbol);
 		len += param_program(params, symbol);
 
 		if (len > 0) {
-			output += sprintf("PARAM %s[%s] = {%s};\n", "c", len, params.join(","));
+			output.push(sprintf("PARAM %s[%s] = {%s};\n", "c", len, params.join(",")));
 		}
 	}
 
@@ -151,7 +151,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	function gen_temps() {
 		var i;
 		for (i = 0; i < registers.length; i++) {
-			output += sprintf("TEMP %s;\n", registers[i].out);	
+			output.push(sprintf("TEMP %s;\n", registers[i].out));
 		}
 	}
 
@@ -163,7 +163,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 		for (i = 0; i < irs.code.length; i++) {
 			ir = irs.code[i];
-			output += ir;
+			output.push(ir);
 		}
 	}
 
@@ -367,10 +367,18 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	}
 
 	function gen_object() {
+
 		output = {
-			target : state.target,
+
+			//used for linking
 			program : program,
 			vertex : vertex,
+
+			//symbols
+			target : state.target,
+			constants : constants,
+			temps : registers,
+
 			body : output
 		};
 	}
@@ -388,7 +396,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		irs = new_irs;
 		state = new_state;
 		symbols = {};
-		output = "";
+		output = [];
 		
 		//symbol caches
 		constants = [];

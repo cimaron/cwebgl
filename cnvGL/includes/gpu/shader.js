@@ -25,7 +25,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	var shader = {};
 
 	shader.MAX_UNIFORMS = 128;
-	shader.MAX_ATTRIBUTES = 128;
+	shader.MAX_VERTEX_ATTRIBS = 16;
 	shader.MAX_VARYING = 12;
 	shader.MAX_TEMPORARIES = 12;
 
@@ -47,12 +47,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		uniforms : GPU.malloc(shader.MAX_UNIFORMS * 4, 4),
 		attributes : GPU.malloc(shader.MAX_UNIFORMS * 4, 4),
 		varying : GPU.malloc(shader.MAX_VARYING * 4, 4),
+		result : GPU.malloc(1, 4)
 	};
 
 	//Pointers
 	result = {
-		position : []
+		position : [0,0,0,0]
 	};
+	result = memory.result.data;
 	temp = memory.temp.data;
 	vertex = {
 		attrib : memory.attributes.data
@@ -67,16 +69,23 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	};
 
 	GPU.uploadVertexShader = function(source) {
-		console.log(source);
 		eval(source);
-		GPU.executeVertex = main;
+		this.executeVertex = main;
 	};
 
 	GPU.uploadFragmentShader = function(source) {
 		eval(source);
-		GPU.executeVertex = main;
+		this.executeFragment = main;
 	};
-	
+
+	GPU.uploadShader = function(source, target) {
+		if (target == glsl.mode.vertex) {
+			this.uploadVertexShader(source);	
+		} else {
+			this.uploadFragmentShader(source);	
+		}
+	}
+
 	GPU.shader = shader;
 	GPU.shader.result = result;
 	GPU.memory.shader = memory;

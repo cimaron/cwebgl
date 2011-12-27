@@ -30,7 +30,20 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	/**
 	 * Global
 	 */
-	var ast, symbols, line;
+	var irs, symbols, line;
+
+	/**
+	 * Symbol Table entry
+	 */
+	function symbol(name, init, value, size) {
+		this.name = name;
+		this.init = init;
+		this.value = value;
+		this.size = size;
+		this.read = [];
+		this.write = [];
+		this.rw = [];
+	}
 
 	/**
 	 * Parses PARAM initializer
@@ -41,7 +54,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * @return  object    Object containing name and used fields
 	 */
 	function parseParam(str) {
-		var parts, name, size, init, part, i, j;
+		var parts, name, size, init, part, i, j, tname;
 		parts = str.match(/^PARAM ([a-z]+)\[([0-9]+)\] = \{(.*)\}/);
 		name = parts[1];
 		size = parseInt(parts[2]);
@@ -50,12 +63,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		init = init.replace(/\s+/g, '');
 		i = 0;
 		
-		symbols[name] = {
-			size : size
-		};
+		symbols[name] = new symbol(name, true, null, size);
 
 		while (init.length > 0) {
-			
+
 			//constant initializer
 			if (part = init.match(/^\{[^\}]+\}/)) {
 				init = init.substr(part[0].length);
@@ -68,7 +79,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				init = init.substr(part[0].length);
 				parts = part[2].split('..');
 				for (j = parts[0]; j <= parts[1]; j++) {	
-					symbols[sprintf("%s[%s]", name, i++)] = sprintf("%s[%s]", part[1], j);
+					tname = sprintf("%s[%s]", name, i++);
+					symbols[tname] = new symbol(tname, true, sprintf("%s[%s]", part[1], j));
 				}
 				continue;
 			}
@@ -87,7 +99,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 *
 	 * @param   string    Source line
 	 */
-	var buffer = '', temps = 0;
+	var buffer = '', temp = 0;
 	function parseLine(str) {
 		var i, ins;
 
@@ -96,12 +108,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		buffer = '';
 
 		//set vertex mode
-		if (line == '!!ARBvp1.0') {
+		if (str == '!!ARBvp1.0') {
+			ARB.output_target = ARB.mode.vertex;
 			return;
 		}
 
 		//set fragment mode
-		if (line == '!!ARBfp1.0') {
+		if (str == '!!ARBfp1.0') {
+			ARB.output_target = ARB.mode.fragment;
 			return;
 		}
 
@@ -121,10 +135,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				parseParam(str);
 			} else {
 				ins = new Instruction(str.slice(0, i), line);
+				ins.parse(symbols);
 				if (str.match(/^TEMP/)) {
-					symbols[ins.dest] = sprintf("temp[%s]", temp++);
+					symbols[ins.dest] = new symbol(ins.dest, true, sprintf("temp[%s]", temp++));
 				} else {
-					ast.push(ins);	
+					irs.push(ins);	
 				}
 			}
 			str = str.substr(i + 1);
@@ -137,14 +152,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Parses a source string
 	 *
 	 * @param   string    Source string
-	 * @param   string    Source string
-	 * @param   string    Source string
+	 * @param   array     Destination for instructions
+	 * @param   string    Destination for symbol table
 	 */
-	function parse(str, tree, sym) {
+	function parse(str, new_irs, new_symbols) {
 
 		//set up in local scope
-		ast = tree;
-		symbols = sym;
+		irs = new_irs;
+		symbols = new_symbols;
+
+		symbols['result.position'] = new symbol('result.position', false, 'result[0]');
 
 		str = str.split("\n");
 		for (line = 0; line < str.length; line++) {

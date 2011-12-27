@@ -21,6 +21,58 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 (function(ARB) {
 
+
+
+
+/*
+
+		Instruction.toString = function() {
+			var out, src1, src2, src3, dest;
+
+			out = '';
+
+			dest = this.dest || "";
+
+			src1 = this.src1;
+			if (src1 && typeof src1 == 'object') {
+				out += src1.toString();
+				src1 = src1.dest;
+			}
+
+			src2 = this.src2;
+			if (src2 && typeof src2 == 'object') {
+				out += src2.toString();
+				src2 = src2.dest;
+			}
+
+			src3 = this.src3;
+			if (src3 && typeof src3 == 'object') {
+				out += src3.toString();
+				src3 = src3.dest;
+			}
+
+			if (!dest) {
+				out += glsl.sprintf("%s;\n", this.opcode);
+			}
+			if (!src1) {
+				out += glsl.sprintf("%s %s;\n", this.opcode, dest);
+			}
+			if (!src2) {
+				out += glsl.sprintf("%s %s, %s;\n", this.opcode, dest, src1);
+			}
+			if (!src3) {
+				out += glsl.sprintf("%s %s, %s, %s;\n", this.opcode, dest, src1, src2);
+			} else {
+				out += glsl.sprintf("%s %s, %s, %s, %s;\n", this.opcode, dest, src1, src2, src3);				
+			}
+
+			return out;
+		};
+
+*/
+
+
+
 	/**
 	 * Import into local scope
 	 */
@@ -30,7 +82,41 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	/**
 	 * Global
 	 */
-	var ast, symbols, header, body;
+	var irs, symbols, header, body;
+
+
+	function buildComponents(oper) {
+		var i, swz;
+		
+		if (!oper) {
+			return "";	
+		}
+
+		//generate array representation of swizzle components, expanding if necessary
+		swz = oper.swizzle || "xyzw";
+		swz = swz.split("");
+		oper.count = swz.length;
+
+		oper.comp = [];
+		for (i = 0; i < 4; i++) {
+			//exact swizzle specified and less than 4 components, grab last one
+			if (swz.length <= i) {
+				//repeat last one
+				oper.comp.push(oper.comp[i - 1]);	
+			} else {
+				//push the location of the current component
+				oper.comp.push("[" + "xyzw".indexOf(swz[i]) + "]");			
+			}
+		}
+		
+		if (typeof oper.offset == "number") {
+			oper.out = sprintf("%s[%s]", oper.name, oper.offset);
+		} else {
+			oper.out = oper.name;	
+		}
+
+		return oper;
+	}
 
 	/**
 	 * Translates ASM instruction into output format
@@ -40,61 +126,55 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	function translateInstruction(ins) {
 		var dest, src1, src2, src3, i, c, d, s1, s2, s3, trans;
 
-		//add original instruction in comment for debugging
-		/*
-		var comment = new node('//', op.replace(";", ""));
-		if (ins.opcode == 'TEMP') {
-			header.push(comment);
-		} else {
-			body.push(comment);
+		if (typeof ins == "string") {
+			return;	
 		}
-		*/
 
 		//variables
-		src3 = Instruction.parseVar(ins.src3 || "");
-		src2 = Instruction.parseVar(ins.src2 || "");
-		src1 = Instruction.parseVar(ins.src1 || "");
-		dest = Instruction.parseVar(ins.dest || "");
+		dest = buildComponents(ins.d);
+		src1 = buildComponents(ins.s1);
+		src2 = buildComponents(ins.s2);
+		src3 = buildComponents(ins.s3);
 
 		//if vector operation, we need to loop over each vector and grab the appropriate element
-		for (i = 0; i < dest.comp.length; i++) {
+		for (i = 0; i < dest.count; i++) {
 			c = dest.comp[i];
-			d = dest.name + c;
-			s1 = src1.name + (src1.swz ? src1.comp[i] : c);
-			s2 = src2.name + (src2.swz ? src2.comp[i] : c);
-			s3 = src3.name + (src3.swz ? src3.comp[i] : c);
 
-			if (!(trans = translation_table[ins.opcode])) {
+			d = dest.out + c;
+			s1 = src1.out + (src1.swizzle ? src1.comp[i] : c);
+			s2 = src2.out + (src2.swizzle ? src2.comp[i] : c);
+			s3 = src3.out + (src3.swizzle ? src3.comp[i] : c);
+
+			if (!(trans = translation_table[ins.op])) {
 				throw new error("Could not translate opcode");
 			}
 
-			s1 = symbols[s1] || s1;
-			s2 = symbols[s2] || s2;
-			s3 = symbols[s3] || s3;
+			//s1 = symbols[s1] || s1;
+			//s2 = symbols[s2] || s2;
+			//s3 = symbols[s3] || s3;
 
-			//console.log(ins);
 			trans = trans.replace('%1', d);
 			trans = trans.replace('%2', s1);
 			trans = trans.replace('%3', s2);
 			trans = trans.replace('%4', s3);
-			
-			symbols[d] = trans;
 
-			if (d.indexOf('result') != -1) {
+			//if (d.indexOf('result') != -1) {
+				//d = (symbols[dest.name].value || dest.name) + c;
 				body.push(sprintf("%s = %s;", d, trans));
-			}
+			//} else {
+			//	symbols[d] = trans;				
+			//}
 		}
 	}
 
 	var constants = {
-		MAX_VERTEX_ATTRIBUTES : 9999,
-		MAX_VERTEX_CONSTANTS : 9999,
-		MAX_FRAGMENT_CONSTANTS : 9999,
-		MAX_TEMP_VECTORS : 9999,
-		MAX_TEMP_FLOATS : 9999,
-		MAX_VERTEX_VARYING : 9999,
-		MAX_FRAGMENT_VARYING : 9999,
-		MAX_FRAGMENT_SAMPLER : 9999,
+		MAX_VERTEX_ATTRIBUTES : 16,
+		MAX_VERTEX_CONSTANTS : 128,
+		MAX_FRAGMENT_CONSTANTS : 128,
+		MAX_TEMP_VECTORS : 128,
+		MAX_VERTEX_VARYING : 12,
+		MAX_FRAGMENT_VARYING : 12,
+		MAX_FRAGMENT_SAMPLER : 8,
 		FRAGMENT_OUTPUT : '',
 		VERTEX_OUTPUT : 'vertex.result'		
 	};
@@ -114,6 +194,40 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		'MAD' : '((%2) * (%3) + (%4))'
 	};
 
+	function processSymbols(object_code) {
+		var n, i, c, ci, symbol, size;
+
+		n = "c"
+		c = 0;
+		ci = 0;
+
+		//@todo: replace c with computed value
+		header.push(sprintf("var %s = new Array();", n));
+
+		//enter constants in symbol table for swapping out later
+		for (i in object_code.constants) {
+			symbol = object_code.constants[i];
+			header.push(sprintf("%s[%s][%s] = %s;", n, c, ci, symbol.value)); 
+			ci++;
+			if (ci == 4) {
+				ci = 0;
+				c++;
+			}
+		}
+		if (ci > 0) {
+			c++;	
+		}
+
+		//uniforms
+		for (i in object_code.program.local) {
+			symbol = object_code.program.local[i];
+			for (ci = 0; ci < symbol.size; ci++) {
+				header.push(sprintf("%s[%s] = %s[%s];", n, c, "program.local", c));
+				c++;
+			}
+		}
+	}
+
 	/**
 	 * Translates an ARB assembly syntax tree into a javascript representation
 	 *
@@ -123,33 +237,23 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 *
 	 * @return  bool      true if there were no errors
 	 */
-	function translate(a, sym) {
+	function translate(object_code) {
 		var i, errors;
 
-		ast = a;
-		symbols = sym;
+		symbols = {};
+		irs = object_code.body;
+		
 		errors = 0;
 
 		header = [];
-		body = ["function main(){"];
+		body = ["function main() {"];
 
-		for (i in symbols) {
-			if (typeof symbols[i] == 'object') {
-				if (symbols[i].size) {
-					header.push(sprintf("var %s = new Array(%s);", i, symbols[i].size));
-				} else {
-					header.push(sprintf("var %s = [0,0,0,0];", i));
-				}
-			} else {
-				header.push(sprintf("%s = %s;", i, symbols[i]));
-			}
-		}
+		processSymbols(object_code);
+		//optimize(irs, symbols);
 
-		//optimize(ast, symbols);
-
-		for (i = 0; i < ast.length; i++) {
+		for (i = 0; i < irs.length; i++) {
 			try {
-				translateInstruction(ast[i]);
+				translateInstruction(irs[i]);
 			} catch (e) {
 				errors++;
 				ARB.errors.push(e);

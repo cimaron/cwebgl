@@ -25,7 +25,7 @@ function glDrawArrays(mode, first, count) {
 
 	ctx = cnvgl_context.getCurrentContext();
 	renderer = ctx.renderer;
-	program = ctx.current_program;
+	program = ctx.shader.activeProgram;
 
 	renderer.setMode(mode);
 
@@ -78,7 +78,7 @@ function glDrawElements(mode, count, type, indices) {
 
 	ctx = cnvgl_context.getCurrentContext();
 	renderer = ctx.renderer;
-	program = ctx.current_program;
+	program = ctx.shader.activeProgram;
 
 	renderer.setMode(mode);
 

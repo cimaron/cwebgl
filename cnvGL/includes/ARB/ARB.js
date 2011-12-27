@@ -25,22 +25,17 @@ var ARB = {
 	output : "",
 	errors : [],
 
-	mode : { vertex : 0, fragment : 1},
+	translate : function(object_code, lang) {
+		var irs, symbols, engine;
 
-	translate : function(str, lang) {
-		var ast, symbols, engine;
-
-		ast = [];
-		symbols = {};
-
-		this.parse(str, ast, symbols);
+		//this.parse(object_code);
 
 		if (this.errors.count > 0) {
 			return false;	
 		}
 
 		engine = this.language[lang];
-		engine.translate(ast, symbols);
+		engine.translate(object_code);
 
 		return (this.errors.length == 0);			
 	}

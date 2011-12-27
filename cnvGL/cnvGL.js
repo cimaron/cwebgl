@@ -24,7 +24,6 @@ include('cnvGL/defines.js');
 include('cnvGL/constants.js');
 
 include('cnvGL/objects/cnvgl_attrib_array.js');
-include('cnvGL/objects/cnvgl_attribute.js');
 include('cnvGL/objects/buffer.js');
 include('cnvGL/objects/cnvgl_context.js');
 include('cnvGL/objects/context_shared.js');
@@ -35,11 +34,11 @@ include('cnvGL/objects/cnvgl_shader.js');
 include('cnvGL/objects/texture_image.js');
 include('cnvGL/objects/texture_object.js');
 include('cnvGL/objects/texture_unit.js');
-include('cnvGL/objects/cnvgl_uniform.js');
 include('cnvGL/objects/cnvgl_vertex.js');
 
 //Compiler
 include('cnvGL/includes/ARB/ARB.js');
+include('cnvGL/includes/ARB/instruction.js');
 include('cnvGL/includes/glsl/glsl.js');
 include('cnvGL/includes/linker/linker.js');
 
