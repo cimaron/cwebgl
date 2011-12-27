@@ -30,12 +30,12 @@ var glsl = (function(ARB) {
 	/**
 	 * parse_state object
 	 */
-	function parse_state(mode) {
+	function parse_state(target) {
 		this.es_shader = true;
 		this.language_version = 110;
 		this.translation_unit = [];
 		this.symbols = new glsl.symbol_table();
-		this.mode = mode;
+		this.target = target;
 		this.scanner = glsl.lexer;
 	};
 
@@ -118,7 +118,7 @@ var glsl = (function(ARB) {
 			this.token = this.parser.yytokentype;
 		},
  
-		compile : function(source, mode) {
+		compile : function(source, target) {
 			var status, irs;
 
 			if (!initialized) {
@@ -129,7 +129,7 @@ var glsl = (function(ARB) {
 			//reset output
 			this.output = null;
 			this.errors = [];
-			this.state = new parse_state(mode);
+			this.state = new parse_state(target);
 
 			//preprocess
 			source = this.preprocess(source, this.state);
@@ -164,7 +164,6 @@ var glsl = (function(ARB) {
 	return glsl;
 }(ARB));
 
-
 include('cnvGL/includes/glsl/symbol.js');
 include('cnvGL/includes/glsl/preprocessor.js');
 include('cnvGL/includes/glsl/lexer.js');
@@ -176,5 +175,6 @@ include('cnvGL/includes/glsl/ast.js');
 include('cnvGL/includes/glsl/type.js');
 include('cnvGL/includes/glsl/ir.js');
 include('cnvGL/includes/glsl/ir_generator.js');
+include('cnvGL/includes/glsl/ir_generator_tables.php');
 include('cnvGL/includes/glsl/generator.js');
 

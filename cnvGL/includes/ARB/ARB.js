@@ -25,11 +25,14 @@ var ARB = {
 	output : "",
 	errors : [],
 
+	mode : { vertex : 0, fragment : 1},
+
 	translate : function(str, lang) {
 		var ast, symbols, engine;
 
 		ast = [];
 		symbols = {};
+
 		this.parse(str, ast, symbols);
 
 		if (this.errors.count > 0) {

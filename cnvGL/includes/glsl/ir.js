@@ -22,7 +22,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 /**
  * IR class
  */
-(function(glsl, StdIO) {
+(function(glsl, StdIO, ARB) {
 
 	/**
 	 * IR Class
@@ -33,76 +33,18 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 		//Internal Constructor
 		function Initializer() {
-			//public:
-			this.d = null;
-			this.op = null;
-			this.s1 = null;
-			this.s2 = null;
+			ARB.Instruction.Initializer.apply(this);
 		}
 	
-		var IR = jClass('IR', Initializer);
+		var IR = jClass('IR', Initializer, ARB.Instruction);
 	
-		//private:
-
-		function parseOperand(name) {
-			var n, obj, i, c;
-			
-			if (!name) {
-				return;	
-			}
-
-			obj = {
-				name : name,
-				swizzle : "",
-				comp : [0,1,2,3]
-			};
-
-			if (n = name.match(/(.*)(\.([xyzw]+))/)) {
-				obj.name = n[1];
-				obj.swizzle = n[3];
-				obj.comp = obj.swizzle.split("");
-				for (i = 0; i < obj.comp.length; i++) {
-					obj.comp[i] = "xyzw".indexOf(obj.comp[i]);
-				}
-			}
-
-			return obj;
-		};
-
 		//public:
 	
 		IR.IR = function(op, d, s1, s2, gen) {
-			this.op = op;
-			this.s1 = s1;
-			this.s2 = s2;
-			if (d) {
-				this.d = d;
-			} else if (gen) {
-				this.d = IRS.getTemp(gen);				
+			if (gen) {
+				d = IRS.getTemp(gen);
 			}
-		};
-
-		IR.getDest = function(obj) {
-			return obj ? parseOperand.call(this, this.d) : this.d;
-		};
-
-		IR.getSrc1 = function(obj) {
-			return obj ? parseOperand.call(this, this.s1) : this.s1;
-		};
-
-		IR.getSrc2 = function(obj) {
-			return obj ? parseOperand.call(this, this.s2) : this.s2;
-		};
-
-		IR.toString = function() {
-			var out;
-			out = StdIO.sprintf("%s%s%s%s",
-				this.op,
-				this.d  ? ' '  + this.d  : '',
-				this.s1 ? ', ' + this.s1 : '',
-				this.s2 ? ', ' + this.s2 : ''
-				);
-			return out;
+			this.Instruction(op, d, s1, s2);
 		};
 
 		return IR.Constructor;
@@ -126,8 +68,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		var IRS = jClass('IRS', Initializer);
 
 		//static:
-		var count = 1;
-		IRS.getTemp = function(n) {
+		var count = 0;
+		IRS.Constructor.getTemp = function(n) {
 			return n + count++;
 		}
 
@@ -144,9 +86,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			this.code.push(ir);
 			this.last = ir;
 		};
-	
+
+		IRS.getTemp = IRS.Constructor.getTemp;
+
 		IRS.toString = function() {
-			return this.code.join("\n");
+			return this.code.join("");
 		};
 
 		return IRS.Constructor;
@@ -158,5 +102,5 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	glsl.IR = IR;
 	glsl.IRS = IRS;
 
-}(glsl, StdIO));
+}(glsl, StdIO, ARB));
 

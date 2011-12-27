@@ -32,7 +32,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	glsl.parser.initialize_types = function(state) {
 		var i, vars, funcs, types, v, entry;
 
-		vars = state.mode == glsl.mode.vertex ? vertex_vars : fragment_vars;
+		vars = state.target == glsl.mode.vertex ? vertex_vars : fragment_vars;
 		for (i = 0; i < vars.length; i++) {
 			v = vars[i];
 			entry = state.symbols.add_variable(v[3]);

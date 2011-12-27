@@ -19,7 +19,95 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(ARB) {
+(function(ARB, StdIO) {
+
+	ARB.Operand = (function() {
+	
+		//Internal Constructor
+		function Initializer() {
+			this.name = "";
+			this.offset = "";
+			this.swizzle = "";
+		}
+
+		var Operand = jClass('Operand', Initializer);
+
+		//public:
+
+		/**
+		 * Constructor
+		 */
+		Operand.Operand = function(str) {
+			this.parse(str);
+		}
+
+		/**
+		 * Parses operand string
+		 *
+		 * @param   string    string that represents a single variable
+		 */
+		Operand.parse = function(str) {
+			var parts, swz;
+	
+			if (!str) {
+				return;
+			}
+			
+			//extract and check for swizzle at end
+			parts = str.split('.');
+			swz = parts.pop();
+			if (!swz.match(/^([xyzw]+|[rgba]+)$/)) {
+				parts.push(swz);
+				swz = "";
+			}
+			swz = swz.replace(/r/g, 'x');
+			swz = swz.replace(/g/g, 'y');
+			swz = swz.replace(/b/g, 'z');
+			swz = swz.replace(/a/g, 'w');
+			this.swizzle = swz;
+
+			//now split the rest
+			parts = parts.join(".");
+			parts = parts.match(/([a-zA-Z0-9\$_\.]+)(?:(?:\[([0-9]+)\])*)$/);
+
+			if (!parts) {
+				throw new Error(StdIO.sprintf("Could not parse operand %s", str));
+			}
+
+			this.name = parts[1];
+			this.offset = parts[2] ? parseInt(parts[2]) : "";
+		};
+
+		/**
+		 * Adds an offset
+		 *
+		 * @param   integer    Offset to add
+		 */
+		Operand.addOffset = function(offset) {
+			if (offset === 0 && this.offset === "") {
+				this.offset = 0;
+			}
+			if (!offset) {
+				return;
+			}
+			this.offset = this.offset ? this.offset + offset : offset;	
+		}
+
+		/**
+		 * toString method
+		 *
+		 * @return  string
+		 */
+		Operand.toString = function() {
+			var off, swz;
+			off = (this.offset || this.offset === 0) ? StdIO.sprintf("[%s]", this.offset) : ""
+			swz = this.swizzle ? "." + this.swizzle : "";
+			return StdIO.sprintf("%s%s%s", this.name, off, swz);
+		};
+
+		return Operand.Constructor;
+
+	}());
 
 	/**
 	 * ARB::Instruction Class
@@ -34,14 +122,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			this.str = null;
 			this.line = null;
 
-			this.opcode = null;
-			this.dest = null;
-			this.src1 = null;
-			this.src2 = null;
-			this.src3 = null;
-
-			this.left = null;
-			this.right = null;
+			this.op = null;
+			this.d = null;
+			this.s1 = null;
+			this.s2 = null;
+			this.s3 = null;
 		}
 
 		var Instruction = jClass('Instruction', Initializer);
@@ -51,115 +136,38 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		/**
 		 * Constructor
 		 */
-		Instruction.Instruction = function(str, line) {
-			this.str = str;
-			this.line = line;
-			this.parse();
-		};
-
-		/**
-		 * Parses an Instruction string
-		 *
-		 * @param   string    string that represents a single instruction
-		 */
-		Instruction.parse = function() {
-			var parts;
-			parts = this.str.split(/ *[ ,] */);
-			this.opcode = parts[0];
-			this.dest = parts[1] || "";
-			this.src1 = parts[2] || "";
-			this.src2 = parts[3] || "";
-			this.src3 = parts[4] || "";
-		};
-
-		/**
-		 * Parses variable string and returns info
-		 *
-		 * @param   string    string that represents a single variable
-		 *
-		 * @return  object    Object containing name and used fields
-		 */
-		Instruction.Constructor.parseVar = function(reg) {
-			var info, comp, hs, swz, i;
-	
-			//match and set default swizzle if not present
-			comp = reg.match(/(.*)\.([xyzw]+|[rgba]+)$/);
-			swz = comp ? comp[2] : 'xyzw';
-	
-			swz = swz.replace(/r/g, 'x');
-			swz = swz.replace(/g/g, 'y');
-			swz = swz.replace(/b/g, 'z');
-			swz = swz.replace(/a/g, 'w');
-	
-			swz = swz.split("");
-	
-			info = {
-				name : comp ? comp[1] : reg,
-				size : swz.length,
-				swz : !!comp,
-				comp : []
-			};
-
-			for (i = 0; i < 4; i++) {
-	
-				//exact swizzle specified and less than 4 components, grab last one
-				if (info.size <= i) {
-					//repeat last one
-					info.comp.push(info.comp[i - 1]);	
-				} else {
-					//push the location of the current component
-					info.comp.push("[" + "xyzw".indexOf(swz[i]) + "]");			
-				}
+		Instruction.Instruction = function() {
+			if (arguments.length == 1) {
+				arguments = str.split(/ *[ ,] */);
 			}
-	
-			return info;
+			this.op = arguments[0];
+			this.d = this.operand(arguments[1]);
+			this.s1 = this.operand(arguments[2]);
+			this.s2 = this.operand(arguments[3]);
+			this.s3 = this.operand(arguments[4]);
 		};
-		
+
+		/**
+		 * Constructor
+		 */
+		Instruction.operand = function(opr) {
+			return opr ? new ARB.Operand(opr) : null;
+		};
+
 		/**
 		 * toString method
 		 *
 		 * @return  string
 		 */
 		Instruction.toString = function() {
-			var out, src1, src2, src3, dest;
-
-			out = '';
-
-			dest = this.dest || "";
-
-			src1 = this.src1;
-			if (src1 && typeof src1 == 'object') {
-				out += src1.toString();
-				src1 = src1.dest;
-			}
-			
-			src2 = this.src2;
-			if (src2 && typeof src2 == 'object') {
-				out += src2.toString();
-				src2 = src2.dest;
-			}
-
-			src3 = this.src3;
-			if (src3 && typeof src3 == 'object') {
-				out += src3.toString();
-				src3 = src3.dest;
-			}
-
-			if (!dest) {
-				out += glsl.sprintf("%s;\n", this.opcode);
-			}
-			if (!src1) {
-				out += glsl.sprintf("%s %s;\n", this.opcode, dest);
-			}
-			if (!src2) {
-				out += glsl.sprintf("%s %s, %s;\n", this.opcode, dest, src1);
-			}
-			if (!src3) {
-				out += glsl.sprintf("%s %s, %s, %s;\n", this.opcode, dest, src1, src2);
-			} else {
-				out += glsl.sprintf("%s %s, %s, %s, %s;\n", this.opcode, dest, src1, src2, src3);				
-			}
-
+			var out;
+			out = StdIO.sprintf("%s%s%s%s%s;\n",
+				this.op,
+				this.d  ? ' '  + this.d  : '',
+				this.s1 ? ', ' + this.s1 : '',
+				this.s2 ? ', ' + this.s2 : '',
+				this.s3 ? ', ' + this.s3 : ''
+				);
 			return out;
 		};
 
@@ -167,5 +175,5 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	}());
 
- }(ARB));
+ }(ARB, StdIO));
 

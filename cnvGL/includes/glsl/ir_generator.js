@@ -39,7 +39,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	function compound_statement(cs) {
 		var i, stmt;
 
-		glsl.state.symbols.push_scope();
+		state.symbols.push_scope();
 
 		for (i = 0; i < cs.statements.length; i++) {
 
@@ -64,7 +64,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			}
 		}
 
-		glsl.state.symbols.pop_scope();
+		state.symbols.pop_scope();
 	}
 
 
@@ -89,7 +89,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 		e.Type = op.type_specifier;
 		e.Dest = [];
-		
+
 		e.Dest = irs.getTemp(size == 1 ? '$tempf' : '$tempv');
 
 		for (di = 0; di < size; di++) {
@@ -145,7 +145,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			name = decl.identifier;
 
 			//add symbol table entry
-			entry = glsl.state.symbols.add_variable(name);
+			entry = state.symbols.add_variable(name);
 			entry.type = type.specifier.type_specifier;
 			entry.qualifier_name = qualifier;
 
@@ -155,8 +155,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 					throw_error(sprintf("Could not assign value of type %s to %s", glsl.type.names[decl.initializer.Type], glsl.type.names[entry.type]), dl);
 				}
 			} else {
-				ir = new IR('CLR', name, size);
-				irs.push(ir);
+				//ir = new IR('CLR', name, size);
+				//irs.push(ir);
 			}
 		}
 	}
@@ -201,30 +201,54 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 * @param   ast_node    subexpression 2
 	 */
 	function expression_bin(e, se1, se2) {
-		var t, error, ir;
-		
-		error = glsl.sprintf("Could not apply operation %s to %s and %s", e.oper, glsl.type.names[se1.Type], glsl.type.names[se2.Type]);
-		
-		//if (!(t = glsl.ir_generator.tables.opcodes[e.oper])) {
-			throw_error(error, e);
-			return;
-		//}
+		var table, error, ir, code, i, parts, repl;
 
-		if (!(t = table[se1.Type])) {
+		error = sprintf("Could not apply operation %s to %s and %s", glsl.ast.op_names[e.oper], glsl.type.names[se1.Type], glsl.type.names[se2.Type]);
+
+		if (!(table = glsl.ir_operation_table[e.oper])) {
 			throw_error(error, e);
 			return;
 		}
 
-		if (!(t = table[se2.Type])) {
+		if (!(table = table[se1.Type])) {
 			throw_error(error, e);
 			return;
 		}
 
-		ir = new IR(t.opcode, null, se1.Dest, se2.Dest, null, glsl.type.size[t.type] == 1 ? 'tf_' : 'tv_');
-		irs.push(ir);
+		if (!(table = table[se2.Type])) {
+			throw_error(error, e);
+			return;
+		}
+		
+		e.Type = table.type;
+		e.Dest = IRS.getTemp('$tempv');
 
-		e.Type = t.type;
-		e.Dest = ir.d;		
+		//replacements
+		repl = [
+			{s : /%1/g, d:e.Dest},
+			{s : /%2/g, d:se1.Dest},
+			{s : /%3/g, d:se2.Dest}
+		];
+
+		for (i = 0; i < table.code.length; i++) {
+			parts = table.code[i];
+
+			if (parts.substring(0, 4) == 'TEMP') {
+				repl.push({
+					s : new RegExp(parts.substring(5), 'g'),
+					d : IRS.getTemp('$tempv')
+				});
+				continue;
+			}
+
+			for (j = 0; j < repl.length; j++) {
+				parts = parts.replace(repl[j].s, repl[j].d);
+			}
+
+			parts = parts.split(" ");
+			irs.push(new IR(parts[0], parts[1], parts[2], parts[3]));
+
+		}
 	}
 
 	/**
@@ -235,25 +259,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 * @return  IRS
 	 */
 	function expression_op(e) {
-		var se, se1, se2, se3, i, entry, se_types, se_type_names, op_name;
+		var se, i, entry, se_types, se_type_names, op_name;
 
 		if (se = e.subexpressions) {
-
-			if (se[0]) {
-				expression(se[0]);
-				se1 = last_ir(true);
-			}
-			
-			if (se[1]) {
-				expression(se[1]);
-				se2 = last_ir(true);
-			}
-			
-			if (se[2]) {
-				expression(se[2]);
-				se3 = last_ir(true);
-			}
-				
+			expression(se[0]);
+			expression(se[1]);
+			expression(se[2]);
 		}
 
 		op_name = glsl.ast.op_names[e.oper];
@@ -318,7 +329,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 			//lookup identifier in symbol table
 			name = e.primary_expression.identifier;
-			entry = glsl.state.symbols.get_variable(name);
+			entry = state.symbols.get_variable(name);
 
 			if (!entry || !entry.type) {
 				throw_error(sprintf("Variable %s is undefined", name), e);
@@ -357,10 +368,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 		//generate
 		name = f.identifier;
-		entry = glsl.state.symbols.get_function(name);
-
-		//ir = new IR("#FUNC", sprintf("%s:", entry.name));
-		//irs.push(ir);
+		entry = state.symbols.get_function(name);
 
 		//generate param list
 		for (i = 0; i < f.parameters.length; i++) {
@@ -368,8 +376,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			if (param.is_void || !param.identifier) {
 				break;
 			}
-			//ir = new IR('#param', param.identifier);
-			//irs.push(ir);
 		}
 	}
 
@@ -381,8 +387,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	function function_definition(fd) {
 
 		if (fd.is_definition) {
-			//ir = new IR("#", sprintf("function %s", fd.proto_type.identifier));
-			//irs.push(ir);
+			//enter definition into symbol table?
 			return;
 		}
 
@@ -449,17 +454,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	function makeFloat(n) {
 		n += (n.toString().indexOf('.') == -1) ? ".0" : "";
 		return n;
-	}
-
-	/**
-	 * Get last IR or IR destination register
-	 *
-	 * @param   bool      Return register
-	 *
-	 * @return  IR
-	 */
-	function last_ir(r) {
-		return r && irs.last ? irs.last.d : irs.last;		
 	}
 
 	/**
