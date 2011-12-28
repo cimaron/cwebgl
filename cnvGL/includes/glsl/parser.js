@@ -2455,10 +2455,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						}
 						yyval = {};
 						yyval.node = (yyvsa[yyvsp - 1].node);
-						debugger;
 						//note that we should insert before yyval.node, but it should
 						//always be the case that yyval.node is at the beginning anyway
-						yyval.node.link.splice(0, 0, yyvsa[yyvsp].node.link);
+						yyval.node.splice(0, 0, yyvsa[yyvsp].node);
 						break;
 
 					case 265:

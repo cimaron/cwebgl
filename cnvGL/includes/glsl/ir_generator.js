@@ -75,53 +75,55 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 * @param   ast_node    ast_node that represents the constructor components
 	 */
 	function constructor(e, op, se) {
-		var size, di, si, sei, ses, d, s, swz, dest;
+		var ds, di, si, sei, ses, d, s, swz;
 
-		size = glsl.type.size[op.type_specifier];
-		si = -1;
-		ses = -1;
+		ds = glsl.type.size[op.type_specifier];
+		si = 0;
 		sei = 0;
 		swz = ['x', 'y', 'z', 'w'];
-
-		//get our temporary register
-		//ir = new IR('TEMP', null, size, null, (size == 1 ? 'tf_' : 'tv_'));
-		//irs.push(ir);
 
 		e.Type = op.type_specifier;
 		e.Dest = [];
 
-		e.Dest = irs.getTemp(size == 1 ? '$tempf' : '$tempv');
+		e.Dest = irs.getTemp(ds == 1 ? '$tempf' : '$tempv');
+		
+		for (di = 0; di < ds; di++) {
 
-		for (di = 0; di < size; di++) {
+			//build next subexpression
+			if (si == 0) {
 
-			if (ses <= sei) {
-
-				//build next subexpression
-				si++;
-				if (!se[si]) {
+				if (!se[sei]) {
 					throw_error("Not enough parameters to constructor", e);				
 				}
 
-				expression(se[si]);
-				sec = 0;
-				ses = glsl.type.size[se[si].Type];
+				expression(se[sei]);
+				ses = glsl.type.size[se[sei].Type];
 			}
-			sei++;
 
 			//compute destination
 			d = e.Dest;
-			if (size > 1) {
+			if (ds > 1) {
+				//need to add support for > vec4
 				d = sprintf("%s.%s", d, swz[di]);
 			}
 
 			//compute source
-			s = se[si].Dest;
+			s = se[sei].Dest;
 			if (ses > 1) {
-				s = sprintf("%s.%s", s, swz[sei])
+				//need to add support for > vec4
+				s = sprintf("%s.%s", s, swz[si])
 			}
 
 			ir = new IR('MOV', d, s);
 			irs.push(ir);
+			
+			//used up all components in current expression, move on to the next one
+			si++;
+			if (si >= ses) {
+				si = 0;
+				sei++;
+			}
+
 		}
 	}
 
@@ -154,9 +156,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 				if (decl.initializer.Type != entry.type) {
 					throw_error(sprintf("Could not assign value of type %s to %s", glsl.type.names[decl.initializer.Type], glsl.type.names[entry.type]), dl);
 				}
-			} else {
-				//ir = new IR('CLR', name, size);
-				//irs.push(ir);
 			}
 		}
 	}
@@ -246,7 +245,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			}
 
 			parts = parts.split(" ");
-			irs.push(new IR(parts[0], parts[1], parts[2], parts[3]));
+			irs.push(new IR(parts[0], parts[1], parts[2], parts[3], parts[4]));
 
 		}
 	}
@@ -429,8 +428,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	function type_specifier(ts) {
 		if (ts.is_precision_statement) {
-			//ir = new IR('#', sprintf("precision %s %s", ts.type_specifier, ts.type_name));
-			//irs.push(ir);
 			return;
 		}
 		throw_error("Cannot generate type specifier", ts);

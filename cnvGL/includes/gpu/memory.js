@@ -27,8 +27,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Allocate a block of memory
 	 *
 	 * @param   integer   size to create
-	 * @param   array     source data
-	 * @param   integer   source length to copy
+	 * @param   integer   stride
 	 */
 	GPU.malloc = function(size, stride) {
 		var data, i;
@@ -40,7 +39,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			stride : stride,
 			data : new Array(size)
 		};
-		
+
 		//create sub-arrays
 		if (stride > 1) {
 			for (i = 0; i < size; i++) {
@@ -61,22 +60,26 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * @param   integer   dest start pointer
 	 * @param   array     source data
 	 * @param   integer   source length to copy
+v	 * @param   integer   source start
 	 */
-	GPU.memcpy = function(dest, di, source, size) {
-		var srci, dc, stride, mem;
+	GPU.memcpy = function(dest, di, source, size, si) {
+		var srci, dc, stride;
 
-		mem = dest.data;
 		stride = dest.stride;
+		if (!(dest instanceof Array)) {
+			dest = dest.data;
+		}
 
+		si = si || 0;
 		dc = di % stride;
 		di = (di - dc) / stride;
 
-		for (srci = 0; srci < size; srci++) {
+		for (srci = si; srci < si + size; srci++) {
 
 			if (stride == 1) {
-				mem[di++] = source[srci];
+				dest[di++] = source[srci];
 			} else {
-				mem[di][dc++] = source[srci];
+				dest[di][dc++] = source[srci];
 				if (dc == stride) {
 					dc = 0;
 					di++;

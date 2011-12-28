@@ -21,24 +21,24 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 function glUniform1i(location, v0) {
 	v0 = v0|0; //floor(v0);
-	__glUniform(location, v0, [glsl.type.bool, glsl.type.int, glsl.type.sampler2D], true);
+	__glUniform(location, v0, 1, true);
 }
 
 function glUniform1f(location, v0) {
 	v0 = v0 * 1.0; //force bool to float
-	__glUniform(location, v0, [glsl.type.bool, glsl.type.float], true);
+	__glUniform(location, v0, 1, true);
 }
 
 function glUniform3f(location, v0, v1, v2) {
 	//GL_INVALID_OPERATION is generated if a sampler is loaded using a command other than glUniform1i and glUniform1iv.
-	__glUniform(location, [v0, v1, v2], [glsl.type.vec3]);
+	__glUniform(location, [v0, v1, v2], 3);
 }
 
 function glUniform3fv(location, count, value) {
 	var i, v;
 	for (i = 0; i < count; i++) {
 		v = 3 * i;
-		__glUniform(i + location, [value[v], value[v + 1], value[v + 2]], [glsl.type.vec3]);
+		__glUniform(i + location, [value[v], value[v + 1], value[v + 2]], 3);
 	}
 }
 
@@ -53,7 +53,7 @@ function glUniformMatrix3fv(location, count, transpose, value) {
 		throw new Error('glUniformMatrix3fv with array not implemented yet');
 	}
 
-	__glUniform(location, value, [glsl.type.mat3]);
+	__glUniform(location, value, 9);
 }
 
 function glUniformMatrix4fv(location, count, transpose, value) {
@@ -66,11 +66,11 @@ function glUniformMatrix4fv(location, count, transpose, value) {
 	if (count > 1) {
 		throw new Error('glUniformMatrix4fv with array not implemented yet');
 	}
-	
-	__glUniform(location, value, [glsl.type.mat4]);
+
+	__glUniform(location, value, 16);
 }
 
-function __glUniform(location, value, types) {
+function __glUniform(location, value, size) {
 	var ctx, program_obj, uniform_obj;
 
 	ctx = cnvgl_context.getCurrentContext();
@@ -81,23 +81,28 @@ function __glUniform(location, value, types) {
 		return;
 	}
 
-	if (location != -1 && location < 0 && location >= program_obj.active_uniforms_count) {
-		cnvgl_throw_error(GL_INVALID_OPERATION);
-		return;
-	}
-
 	if (location == -1) {
 		return;
 	}
 
-	uniform_obj = program_obj.active_uniforms[location];
+	//may want to set a uniform location cache in program_obj to avoid this lookup
+	for (i = 0; i < program_obj.active_uniforms.length; i++) {
+		if (program_obj.active_uniforms[i].location == location) {
+			uniform_obj = program_obj.active_uniforms[i];
+		}
+	}
 
-	if (types.indexOf(uniform_obj.definition.type) == -1) {
+	if (!uniform_obj) {
+		cnvgl_throw_error(GL_INVALID_OPERATION);
+		return;		
+	}
+
+	if (size != uniform_obj.size) {
 		cnvgl_throw_error(GL_INVALID_OPERATION);
 		return;
 	}
 
-	program_obj.active_uniforms_values[location] = value;
+	GPU.memcpy(GPU.memory.shader.uniforms, location * 4, value, uniform_obj.size);
 }
 
 function glGetUniformLocation(program, name) {
@@ -125,7 +130,7 @@ function glGetUniformLocation(program, name) {
 	}
 
 	t = program_obj.active_uniforms;
-	for (i in program_obj.active_uniforms_count) {
+	for (i in program_obj.active_uniforms) {
 		if (t[i].name == name) {
 			return t[i].location;
 		}

@@ -53,6 +53,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			enter_symbol(ir.d, i);
 			enter_symbol(ir.s1, i);
 			enter_symbol(ir.s2, i);
+			enter_symbol(ir.s3, i);
 		}
 	}
 
@@ -211,7 +212,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			name : oper.name,
 			out : entry.out,
 			entry : entry,
-			size : Math.ceil(size / 4)
+			size : Math.ceil(size / 4),
+			type_size : glsl.type.size[entry.type]
 		};
 
 		symbols[oper.name] = symbol;
@@ -220,6 +222,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			//for (i = 0; i < symbol.size; i++) {
 				program.local.push(symbol);
 			//}
+			return;
 		}
 
 		if (entry.qualifier_name == 'attribute') {
@@ -231,6 +234,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			delete symbol.entry;
 			delete symbols[oper.name];
 			symbols[symbol.out] = symbol;
+			return;
+		}
+
+		if (symbol.out != oper.name) {
+			replace_name(i, oper.name, symbol.out);	
 		}
 	}
 
@@ -244,40 +252,26 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 * @param   boolean     True if replacing with a completely new operand
 	 */
 	function replace_name(start, old, nw, index, repl) {
-		var i, ir;
+		var i, j, ir, fs, f;
+
+		fs = ['d', 's1', 's2', 's3'];
 
 		for (i = start; i < irs.code.length; i++) {
 			ir = irs.code[i];
 
-			//replace dest
-			if (ir.d && ir.d.name == old) {
-				if (repl) {
-					ir.d = new ARB.Operand(nw);
-				} else {
-					ir.d.name = nw;
-					ir.d.addOffset(index);
-				}
+			//foreach each operand field
+			for (j = 0; j < fs.length; j++) {
+				f = fs[j];
+				if (ir[f] && ir[f].name == old) {
+					if (repl) {
+						ir[f] = new ARB.Operand(nw);
+					} else {
+						ir[f].name = nw;
+						ir[f].addOffset(index);
+					}
+				}	
 			}
-
-			//replace src1
-			if (ir.s1 && ir.s1.name == old) {
-				if (repl) {
-					ir.s1 = new ARB.Operand(nw);
-				} else {
-					ir.s1.name = nw;
-					ir.s1.addOffset(index);
-				}
-			}
-
-			//replace src2
-			if (ir.s2 && ir.s2.name == old) {
-				if (repl) {
-					ir.s2 = new ARB.Operand(nw);
-				} else {
-					ir.s2.name = nw;
-					ir.s2.addOffset(index);
-				}
-			}
+			
 		}
 	}
 
@@ -312,6 +306,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 				ir.s2.name = nw;
 				ir.s2.offset = "";
 			}
+
+			//replace src2
+			if (ir.s3 && ir.s3.name == old && ir.s3.offset == index) {
+				ir.s3.name = nw;
+				ir.s3.offset = "";
+			}
+
 		}
 	}
 
@@ -359,7 +360,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			ir = irs.code[i];
 
 			//if one of the operands matches, set this line number
-			if ((ir.s1 && ir.s1.name == reg.out) || (ir.s2 && ir.s2.name == reg.out)) {
+			if ((ir.s1 && ir.s1.name == reg.out) || (ir.s2 && ir.s2.name == reg.out) || (ir.s3 && ir.s3.name == reg.out)) {
 				reg.life = i;
 				return;
 			}

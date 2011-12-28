@@ -52,9 +52,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	//Pointers
 	result = {
-		position : [0,0,0,0]
+		position : [0,0,0,0],
+		color : {
+			primary : [0,0,0,0]	
+		}
 	};
-	result = memory.result.data;
+	//result = memory.result.data;
 	temp = memory.temp.data;
 	vertex = {
 		attrib : memory.attributes.data
@@ -87,8 +90,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	}
 
 	GPU.shader = shader;
-	GPU.shader.result = result;
 	GPU.memory.shader = memory;
+
+	GPU.shader.result = result;
+	GPU.shader.vertex = vertex;
 
 }(GPU));
 

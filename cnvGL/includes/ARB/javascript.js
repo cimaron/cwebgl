@@ -21,58 +21,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 (function(ARB) {
 
-
-
-
-/*
-
-		Instruction.toString = function() {
-			var out, src1, src2, src3, dest;
-
-			out = '';
-
-			dest = this.dest || "";
-
-			src1 = this.src1;
-			if (src1 && typeof src1 == 'object') {
-				out += src1.toString();
-				src1 = src1.dest;
-			}
-
-			src2 = this.src2;
-			if (src2 && typeof src2 == 'object') {
-				out += src2.toString();
-				src2 = src2.dest;
-			}
-
-			src3 = this.src3;
-			if (src3 && typeof src3 == 'object') {
-				out += src3.toString();
-				src3 = src3.dest;
-			}
-
-			if (!dest) {
-				out += glsl.sprintf("%s;\n", this.opcode);
-			}
-			if (!src1) {
-				out += glsl.sprintf("%s %s;\n", this.opcode, dest);
-			}
-			if (!src2) {
-				out += glsl.sprintf("%s %s, %s;\n", this.opcode, dest, src1);
-			}
-			if (!src3) {
-				out += glsl.sprintf("%s %s, %s, %s;\n", this.opcode, dest, src1, src2);
-			} else {
-				out += glsl.sprintf("%s %s, %s, %s, %s;\n", this.opcode, dest, src1, src2, src3);				
-			}
-
-			return out;
-		};
-
-*/
-
-
-
 	/**
 	 * Import into local scope
 	 */
@@ -191,7 +139,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		//'DPH' : '%1.* = (%2.x * %3.x + %2.y * %3.y + %2.z + %3.z + %3.w)',
 		//'DST' : '%1.* = [1, %2.y * %3.y, %2.z, %3.w]',
 		'MUL' : '(%2) * (%3)',
-		'MAD' : '((%2) * (%3) + (%4))'
+		'MAD' : '((%2) * (%3)) + (%4)'
 	};
 
 	function processSymbols(object_code) {
@@ -207,6 +155,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		//enter constants in symbol table for swapping out later
 		for (i in object_code.constants) {
 			symbol = object_code.constants[i];
+			if (ci == 0) {
+				header.push(sprintf("%s[%s] = %s[%s];", n, c, "program.local", c));
+			}
 			header.push(sprintf("%s[%s][%s] = %s;", n, c, ci, symbol.value)); 
 			ci++;
 			if (ci == 4) {
@@ -215,7 +166,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			}
 		}
 		if (ci > 0) {
-			c++;	
+			c++;
 		}
 
 		//uniforms
@@ -225,6 +176,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				header.push(sprintf("%s[%s] = %s[%s];", n, c, "program.local", c));
 				c++;
 			}
+		}
+		
+		//temps
+		for (i = 0; i < object_code.temps.length; i++) {
+			symbol = object_code.temps[i];
+			header.push(sprintf("var %s = temp[%s];", symbol.out, i));
 		}
 	}
 

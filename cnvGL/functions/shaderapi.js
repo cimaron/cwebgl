@@ -158,11 +158,13 @@ function glGetAttribLocation(program, name) {
 		return;
 	}
 
-	if (name.indexOf('gl_') == 0 || !program_obj.active_attributes[name]) {
-		return -1;
+	for (i = 0; i < program_obj.active_attributes.length; i++) {
+		if (program_obj.active_attributes[i].name == name) {
+			return program_obj.active_attributes[i].location;
+		}
 	}
-	
-	return program_obj.active_attributes[name].location;
+
+	return -1;
 }
 
 
@@ -363,7 +365,7 @@ function glLinkProgram(program) {
 
 function glShaderSource(shader, count, string, length) {
 	var ctx, shader_obj;
-	
+
 	ctx = cnvgl_context.getCurrentContext();
 	shader_obj = ctx.shared.shaderObjects[shader];
 
@@ -418,12 +420,12 @@ function glUseProgram(program) {
 	ctx.shader.activeProgram = program_obj;
 
 	//set active shaders in GPU
-	for (i = 0; i < program_obj.attached_shaders; i++) {
+	for (i = 0; i < program_obj.attached_shaders.length; i++) {
 		shader_obj = program_obj.attached_shaders[i];
 		if (shader_obj.type == GL_VERTEX_SHADER) {
-			GPU.setActiveVertexShader(shader_obj.exec);
+			GPU.uploadVertexShader(shader_obj.exec);
 		} else {
-			GPU.setActiveFragmentShader(shader_obj.exec);	
+			GPU.uploadFragmentShader(shader_obj.exec);	
 		}
 	}
 }

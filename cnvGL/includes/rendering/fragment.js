@@ -26,9 +26,6 @@ cnvgl_rendering_fragment = (function() {
 		//public:
 		this.ctx = null;
 		this.renderer = null;
-
-		this.program = null;
-		this.data = null;
 	}
 
 	var cnvgl_rendering_fragment = jClass('cnvgl_rendering_fragment', Initializer);
@@ -37,30 +34,18 @@ cnvgl_rendering_fragment = (function() {
 
 	cnvgl_rendering_fragment.cnvgl_rendering_fragment = function(ctx, renderer) {
 		this.ctx = ctx;
-		this.renderer = renderer;
-		
-		//build environment for fragment executable
-		this.data = new cnvgl_rendering_program(ctx, renderer);
-		this.setProgram(null);
-	};
-
-	cnvgl_rendering_fragment.setProgram = function(program) {
-		if (program) {
-			this.program = this.data.setProgram(program.fragment_program);
-			this.data._uniforms = program.active_uniforms_values;
-		} else {
-			this.program = this.defaultProgram;	
-		}
-	};
-
-	cnvgl_rendering_fragment.defaultProgram = function() {
+		this.renderer = renderer;		
 	};
 
 	cnvgl_rendering_fragment.process = function(fragment) {
-
-		this.data.fragment = fragment;
-		this.program.apply(this.data);
-
+		fragment.r = 1;
+		fragment.g = 1;
+		fragment.b = 1;
+		fragment.a = 1;
+		return;
+		debugger;
+		GPU.executeFragment();
+		
 		fragment.r = fragment.gl_FragColor[0];
 		fragment.g = fragment.gl_FragColor[1];
 		fragment.b = fragment.gl_FragColor[2];

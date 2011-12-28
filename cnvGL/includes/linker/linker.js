@@ -29,31 +29,35 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		for (i = 0; i < attribs.length; i++) {
 			attrib = attribs[i];
-
-			attrib_obj = new cnvgl_program_var(attrib.name, current, attrib.size);
+			attrib_obj = new cnvgl_program_var(attrib.name, current, attrib.type_size);
 			current += attrib.size;
 
-			program_obj.active_attributes[attrib.name] = attrib_obj;
-			program_obj.active_attributes_values[attrib_obj.location] = null;
-			program_obj.active_attributes_count++;
+			program_obj.active_attributes.push(attrib_obj);
 		}
 	}
 
 	function addUniforms(program_obj, shader_obj) {
 		var uniforms, i, j, uniform, current;
 
+		constants = shader_obj.object_code.constants;
 		uniforms = shader_obj.object_code.program.local;
 		current = 0;
-		
+
+		for (i = 0; i < constants.length; i++) {
+			uniform = constants[i];
+			uniform_obj = new cnvgl_program_var("", current, 1);
+			current++;
+
+			program_obj.active_uniforms.push(uniform_obj);
+		}
+
 		for (i = 0; i < uniforms.length; i++) {
 			uniform = uniforms[i];
 
-			uniform_obj = new cnvgl_program_var(uniform.name, current, uniform.size);
+			uniform_obj = new cnvgl_program_var(uniform.name, current, uniform.type_size);
 			current += uniform.size;
 
-			program_obj.active_uniforms[uniform.name] = uniform_obj;
-			program_obj.active_uniforms_values[uniform_obj.location] = null;
-			program_obj.active_uniforms_count++;
+			program_obj.active_uniforms.push(uniform_obj);
 		}
 	}
 

@@ -40,11 +40,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		//public:
 	
-		IR.IR = function(op, d, s1, s2, gen) {
+		IR.IR = function(op, d, s1, s2, s3, gen) {
 			if (gen) {
 				d = IRS.getTemp(gen);
 			}
-			this.Instruction(op, d, s1, s2);
+			this.Instruction(op, d, s1, s2, s3);
 		};
 
 		return IR.Constructor;

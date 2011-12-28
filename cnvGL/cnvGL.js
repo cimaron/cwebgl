@@ -52,7 +52,6 @@ include('cnvGL/includes/rendering/culling.js');
 include('cnvGL/includes/rendering/fragment.js');
 include('cnvGL/includes/rendering/interpolate.js');
 include('cnvGL/includes/rendering/primitive.js');
-include('cnvGL/includes/rendering/program.js');
 include('cnvGL/includes/rendering/renderer.js');
 include('cnvGL/includes/rendering/texture.js');
 include('cnvGL/includes/rendering/vertex.js');

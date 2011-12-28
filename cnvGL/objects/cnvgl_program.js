@@ -34,15 +34,11 @@ function cnvgl_program() {
 	this.attached_shaders = [];
 
 	//uniforms
-	this.active_uniforms_count = 0;
-	this.active_uniforms = {};
-	this.active_uniforms_values = [];
+	this.active_uniforms = [];
 
 	//attributes
 	this.attributes = {};
-	this.active_attributes_count = 0;
-	this.active_attributes = {};
-	this.active_attributes_values = [];
+	this.active_attributes = [];
 
 	//programs
 	this.fragment_program = null;
@@ -54,6 +50,7 @@ function cnvgl_program_var(name, location, size) {
 	this.name = name;
 	this.location = location;
 	this.size = size;
+	this.slots = Math.ceil(size / 4);
 	this.type = GL_FLOAT;
 }
 
