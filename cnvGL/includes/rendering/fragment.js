@@ -35,21 +35,20 @@ cnvgl_rendering_fragment = (function() {
 	cnvgl_rendering_fragment.cnvgl_rendering_fragment = function(ctx, renderer) {
 		this.ctx = ctx;
 		this.renderer = renderer;		
+
+		this.result = GPU.shader.result;
 	};
 
 	cnvgl_rendering_fragment.process = function(fragment) {
-		fragment.r = 1;
-		fragment.g = 1;
-		fragment.b = 1;
-		fragment.a = 1;
-		return;
-		debugger;
-		GPU.executeFragment();
 		
-		fragment.r = fragment.gl_FragColor[0];
-		fragment.g = fragment.gl_FragColor[1];
-		fragment.b = fragment.gl_FragColor[2];
-		fragment.a = fragment.gl_FragColor[3];
+		GPU.executeFragment();
+
+		color = this.result.color.primary;
+
+		fragment.r = color[0];
+		fragment.g = color[1];
+		fragment.b = color[2];
+		fragment.a = color[3];
 	};
 
 	cnvgl_rendering_fragment.write = function(i, frag) {

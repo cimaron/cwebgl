@@ -71,7 +71,7 @@ function glBindAttribLocation(program, index, name) {
 
 
 function glCompileShader(shader) {
-	var ctx, shader_obj, source, target;
+	var ctx, shader_obj, target, status;
 
 	ctx = cnvgl_context.getCurrentContext();
 	shader_obj = ctx.shared.shaderObjects[shader];
@@ -91,11 +91,9 @@ function glCompileShader(shader) {
 	shader_obj.compile_status = GL_FALSE;
 	shader_obj.information_log = '';
 
-	//get source
-	source = shader_obj.shader_string;
 	target = (shader_obj.type == GL_FRAGMENT_SHADER) ? glsl.mode.fragment : glsl.mode.vertex;
 
-	status = glsl.compile(source, target);
+	status = glsl.compile(shader_obj.shader_string, target);
 
 	if (status) {
 		shader_obj.compile_status = GL_TRUE;
