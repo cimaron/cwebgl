@@ -30,7 +30,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Local Scope
 	 */
 	var output, irs, state, symbols;
-	var constants, program, vertex, registers;
+	var constants, program, vertex, registers, fragment;
 
 
 	/**
@@ -237,6 +237,22 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			return;
 		}
 
+		if (entry.qualifier_name == 'varying') {
+			if (state.target == glsl.mode.vertex) {
+				symbol.out = 'vertex.varying';	
+			} else {
+				symbol.out = 'fragment.attrib';
+			}
+			replace_name(i, oper.name, symbol.out, fragment.attrib.length);
+			for (j = 0; j < symbol.size; j++) {
+				fragment.attrib.push(symbol);
+			}
+			delete symbol.entry;
+			delete symbols[oper.name];
+			symbols[symbol.out] = symbol;
+			return;
+		}
+
 		if (symbol.out != oper.name) {
 			replace_name(i, oper.name, symbol.out);	
 		}
@@ -374,6 +390,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			//used for linking
 			program : program,
 			vertex : vertex,
+			fragment : fragment,
 
 			//symbols
 			target : state.target,
@@ -402,7 +419,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		//symbol caches
 		constants = [];
 		program = {local : []};
-		vertex = {attrib : []};
+		vertex = {attrib : [], varying : []};
+		fragment = {attrib : []};
 		registers = [];
 
 		//generate

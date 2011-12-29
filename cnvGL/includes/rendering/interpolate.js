@@ -135,16 +135,20 @@ cnvgl_rendering_interpolate = (function() {
 	};
 
 	cnvgl_rendering_interpolate.interpolateTriangle = function(f1, f2, f3) {
-		var i, v;
+		var v;
+		v = ((this.a * f1) + (this.b * f2) + (this.c * f3)) * this.t.p;		
+		return v;
+	};
 
+	cnvgl_rendering_interpolate.interpolateTriangleVector = function(f1, f2, f3, size) {
+		var i, v;
 		//todo: do a check that we need to interpolate at all
-		if (typeof f1 == 'object') {
-			v = [];
-			for (i = 0; i < f1.length; i++) {
-				v[i] = ((this.a * f1[i]) + (this.b * f2[i]) + (this.c * f3[i])) * this.t.p;
-			}
-		} else {
-			v = ((this.a * f1) + (this.b * f2) + (this.c * f3)) * this.t.p;
+		v = [0, 0, 0, 0];
+		if (size > 4) {
+			size = 4;	
+		}
+		for (i = 0; i < size; i++) {
+			v[i] = ((this.a * f1[i]) + (this.b * f2[i]) + (this.c * f3[i])) * this.t.p;
 		}
 		return v;
 	};

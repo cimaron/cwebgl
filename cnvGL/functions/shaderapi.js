@@ -41,7 +41,6 @@ function glAttachShader(program, shader) {
 	}
 
 	program_obj.attached_shaders.push(shader_obj);	
-	program_obj.attached_shaders_count++;
 }
 
 
@@ -139,7 +138,7 @@ function glCreateProgram() {
 
 
 function glGetAttribLocation(program, name) {
-	var ctx, program_obj, i;
+	var ctx, program_obj, attr_obj;
 
 	//get program
 	ctx = cnvgl_context.getCurrentContext();
@@ -156,10 +155,8 @@ function glGetAttribLocation(program, name) {
 		return;
 	}
 
-	for (i = 0; i < program_obj.active_attributes.length; i++) {
-		if (program_obj.active_attributes[i].name == name) {
-			return program_obj.active_attributes[i].location;
-		}
+	if (attrib_obj = program_obj.getActiveAttribute(name)) {
+		return attrib_obj.location;	
 	}
 
 	return -1;
@@ -204,35 +201,28 @@ function glGetProgramiv(program, pname, params) {
 			break;
 
 		case GL_ATTACHED_SHADERS:
-			params[0] = program_obj.attached_shaders_count;
+			params[0] = program_obj.attached_shaders.length;
 			break;
 		
 		case GL_ACTIVE_ATTRIBUTES:
-			params[0] = 0;
-			params[0] = program_obj.active_attributes_count;
+			params[0] = program_obj.attributes.active.length;
 			break;
 
 		case GL_ACTIVE_ATTRIBUTE_MAX_LENGTH:
 			params[0] = 0;
-			t = program_obj.active_attributes;
-			for (i = 0; i < program_obj.active_attributes_count; i++) {
-				if (params[0] < t[i].name.length) {
-					params[0] = t[i].name.length;	
-				}
+			for (i in program_obj.attributes.names) {
+				params[0] = Math.max(params[0], i.length);
 			}
 			break;
-		
+
 		case GL_ACTIVE_UNIFORMS:
-			params[0] = program_obj.active_uniforms_count;
+			params[0] = program_obj.uniforms.active.length;
 			break;
 
 		case GL_ACTIVE_UNIFORM_MAX_LENGTH:
 			params[0] = 0;
-			t = program_obj.active_uniforms;
-			for (i = 0; i < program_obj.active_uniforms_count; i++) {
-				if (params[0] < t[i].name.length) {
-					params[0] = t[i].name.length;	
-				}
+			for (i in program_obj.uniforms.names) {
+				params[0] = Math.max(params[0], i.length);					
 			}
 			break;
 
@@ -339,25 +329,11 @@ function glLinkProgram(program) {
 		return;
 	}
 
-	//link error conditions:
-	//The number of active attribute variables supported by the implementation has been exceeded.
-
-	//reset
-	program_obj.link_status = false;
-	program_obj.fragment_program = null;
-	program_obj.vertex_program = null;
-
-	program_obj.active_uniforms_count = 0;
-	program_obj.active_uniforms = [];
-	program_obj.active_uniforms_values = [];
-
-	program_obj.active_attributes_count = 0;
-	program_obj.active_attributes = [];
-	program_obj.active_attributes_values = [];
-
 	if (glsl.link(program_obj)) {
 		program_obj.link_status = true;
 	}
+	
+	//add linker errors here
 }
 
 

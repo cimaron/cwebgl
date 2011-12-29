@@ -22,12 +22,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 (function(GPU) {
 	var result, vertex, temp, program, memory;
 
-	var shader = {};
-
-	shader.MAX_UNIFORMS = 128;
-	shader.MAX_VERTEX_ATTRIBS = 16;
-	shader.MAX_VARYING = 12;
-	shader.MAX_TEMPORARIES = 12;
+	var shader = {
+		MAX_UNIFORMS : 128,
+		MAX_FRAGMENT_UNIFORM_COMPONENTS : 128,
+		MAX_VERTEX_ATTRIBS : 16,
+		MAX_VARYING_VECTORS : 12,
+		MAX_TEMPORARIES : 12
+	};
 
 	GPU.executeVertex = function(){};
 	GPU.executeFragment = function(){};
@@ -45,8 +46,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	memory = {
 		temp : GPU.malloc(shader.MAX_TEMPORARIES * 4, 4),
 		uniforms : GPU.malloc(shader.MAX_UNIFORMS * 4, 4),
-		attributes : GPU.malloc(shader.MAX_UNIFORMS * 4, 4),
-		varying : GPU.malloc(shader.MAX_VARYING * 4, 4),
+		attributes : GPU.malloc(shader.MAX_VERTEX_ATTRIBS * 4, 4),
+		varying : GPU.malloc(shader.MAX_VARYING_VECTORS * 4, 4),
 		result : GPU.malloc(1, 4)
 	};
 
@@ -57,13 +58,21 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			primary : [0,0,0,0]	
 		}
 	};
+
 	//result = memory.result.data;
 	temp = memory.temp.data;
-	vertex = {
-		attrib : memory.attributes.data
-	};
+
 	program = {
 		local : memory.uniforms.data
+	};
+
+	vertex = {
+		attrib : memory.attributes.data,
+		varying : memory.varying.data
+	};
+
+	fragment = {
+		attrib : memory.varying.data
 	};
 
 	GPU.setAttribPtr = function(attributes) {
@@ -94,6 +103,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	GPU.shader.result = result;
 	GPU.shader.vertex = vertex;
+	GPU.shader.fragment = fragment;
 
 }(GPU));
 

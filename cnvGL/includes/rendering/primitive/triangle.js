@@ -162,16 +162,22 @@ cnvgl_rendering_primitive_triangle = (function() {
 			//Need to add check for shader writing to depth value.
 			//If so, this needs to run after processing the fragment
 			if (this.ctx.depth.test == GL_TRUE) {
-				this.frag.gl_FragDepth = int.interpolateTriangle(this.v1.zw, this.v2.zw, this.v3.zw);
+				this.frag.gl_FragDepth = int.interpolateTriangle(this.v1.zw, this.v2.zw, this.v3.zw, 0);
 				if (!this.renderer.checkDepth(i, this.frag.gl_FragDepth)) {
 					i++;
 					continue;
 				}
 			}
 
-			//interpolate varying
-			for (v in this.v1.varying) {
-				this.frag.varying[v] = int.interpolateTriangle(this.v1.varying[v], this.v2.varying[v], this.v3.varying[v]);
+			var varying, vi, vl, vs;
+			for (v in this.ctx.shader.activeProgram.varying.names) {
+				varying = this.ctx.shader.activeProgram.varying.names[v];
+				vl = varying.location;
+				vs = varying.size;
+				for (vi = 0; vi < varying.slots; vi++) {
+					this.frag.attributes.data[vl] = int.interpolateTriangleVector(this.v1.varying.data[vl], this.v2.varying.data[vl], this.v3.varying.data[vl], vs);
+					vs -= 4;
+				}
 			}
 
 			this.renderer.fragment.process(this.frag);

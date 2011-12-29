@@ -86,9 +86,10 @@ function __glUniform(location, value, size) {
 	}
 
 	//may want to set a uniform location cache in program_obj to avoid this lookup
-	for (i = 0; i < program_obj.active_uniforms.length; i++) {
-		if (program_obj.active_uniforms[i].location == location) {
-			uniform_obj = program_obj.active_uniforms[i];
+	for (i = 0; i < program_obj.uniforms.active.length; i++) {
+		if (program_obj.uniforms.active[i].location == location) {
+			uniform_obj = program_obj.uniforms.active[i];
+			break;
 		}
 	}
 
@@ -106,7 +107,7 @@ function __glUniform(location, value, size) {
 }
 
 function glGetUniformLocation(program, name) {
-	var ctx, program_obj, t, i;
+	var ctx, program_obj, u;
 
 	//get program
 	ctx = cnvgl_context.getCurrentContext();
@@ -129,11 +130,8 @@ function glGetUniformLocation(program, name) {
 		return;
 	}
 
-	t = program_obj.active_uniforms;
-	for (i in program_obj.active_uniforms) {
-		if (t[i].name == name) {
-			return t[i].location;
-		}
+	if (u = program_obj.uniforms.names[name]) {
+		return u.location;
 	}
 
 	return -1;

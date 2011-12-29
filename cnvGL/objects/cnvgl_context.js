@@ -122,7 +122,7 @@ var cnvgl_context = (function() {
 		this.errorValue = GL_NO_ERROR;
 
 		//Vertex attribute arrays
-		for (i = 0; i < cnvgl_const.GL_MAX_VERTEX_ATTRIBS; i++) {
+		for (i = 0; i < GPU.shader.MAX_VERTEX_ATTRIBS; i++) {
 			this.vertex_attrib_arrays[i] = new cnvgl_attrib_array_object();
 		}
 

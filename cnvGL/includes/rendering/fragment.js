@@ -39,16 +39,19 @@ cnvgl_rendering_fragment = (function() {
 		this.result = GPU.shader.result;
 	};
 
-	cnvgl_rendering_fragment.process = function(fragment) {
-		
+	cnvgl_rendering_fragment.process = function(f) {
+		var color;
+//debugger;
+		//set pointers to fragment data
+		GPU.shader.fragment.attrib = f.attributes.data;
 		GPU.executeFragment();
 
 		color = this.result.color.primary;
 
-		fragment.r = color[0];
-		fragment.g = color[1];
-		fragment.b = color[2];
-		fragment.a = color[3];
+		f.r = color[0];
+		f.g = color[1];
+		f.b = color[2];
+		f.a = color[3];
 	};
 
 	cnvgl_rendering_fragment.write = function(i, frag) {

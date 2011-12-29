@@ -39,10 +39,9 @@ function cnvgl_vertex() {
 	this.yc = 0;
 	this.zc = 0;
 
-	//allocate shader memory
+	//allocate memory
 	this.result = GPU.malloc(2, 4);
-	this.attributes = GPU.malloc(cnvgl_const.GL_MAX_VERTEX_ATTRIBS * 4, 4);
-
-	this.varying = {};
+	this.attributes = GPU.malloc(GPU.shader.MAX_VERTEX_ATTRIBS * 4, 4);
+	this.varying = GPU.malloc(GPU.shader.MAX_VARYING_VECTORS * 4, 4);
 }
 

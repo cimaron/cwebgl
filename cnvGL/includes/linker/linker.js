@@ -19,52 +19,102 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(glsl, ARB) {
+(function(glsl, ARB, StdIO) {
+		  
+	var sprintf;
 
-	function addAttributes(program_obj, shader_obj) {
-		var attribs, i, j, attrib, current;
+	sprint = StdIO.sprintf;
 
-		attribs = shader_obj.object_code.vertex.attrib;
-		current = 0;
+	function addVarying(program_obj, shader_obj) {
+		var attribs, i, j, attrib, location;
+
+		attribs = shader_obj.object_code.fragment.attrib;
 
 		for (i = 0; i < attribs.length; i++) {
 			attrib = attribs[i];
-			attrib_obj = new cnvgl_program_var(attrib.name, current, attrib.type_size);
-			current += attrib.size;
 
-			program_obj.active_attributes.push(attrib_obj);
+			//check if already declared
+			if (attrib_obj = program_obj.getActiveVarying(attrib.name)) {
+				if (attrib_obj.size != attrib.type_size) {
+					throw new Error(sprintf("Varying '%s' redeclared with different type", attrib.name));
+				}
+				continue;
+			}
+
+			location = program_obj.getOpenSlot(program_obj.varying);
+			attrib_obj = new cnvgl_program_var(attrib.name, location, attrib.type_size);
+
+			program_obj.addActiveVarying(attrib_obj);
+		}
+	}
+
+	function addAttributes(program_obj, shader_obj) {
+		var attribs, i, j, attrib, location;
+
+		attribs = shader_obj.object_code.vertex.attrib;
+
+		for (i = 0; i < attribs.length; i++) {
+			attrib = attribs[i];
+
+			//check if already declared
+			if (attrib_obj = program_obj.getActiveAttribute(attrib.name)) {
+				if (attrib_obj.size != attrib.type_size) {
+					throw new Error(sprintf("Attribute '%s' redeclared with different type", attrib.name));
+				}
+				continue;
+			}
+
+			location = program_obj.getOpenSlot(program_obj.attributes);
+			attrib_obj = new cnvgl_program_var(attrib.name, location, attrib.type_size);
+			
+			program_obj.addActiveAttribute(attrib_obj);
 		}
 	}
 
 	function addUniforms(program_obj, shader_obj) {
-		var uniforms, i, j, uniform, current;
+		var uniforms, i, j, uniform, uniform_obj, location;
 
 		constants = shader_obj.object_code.constants;
 		uniforms = shader_obj.object_code.program.local;
-		current = 0;
 
 		for (i = 0; i < constants.length; i++) {
 			uniform = constants[i];
-			uniform_obj = new cnvgl_program_var("", current, 1);
-			current++;
 
-			program_obj.active_uniforms.push(uniform_obj);
+			location = program_obj.getOpenSlot(program_obj.uniforms);
+			uniform_obj = new cnvgl_program_var("", location, 1);
+
+			program_obj.addActiveUniform(uniform_obj);
 		}
 
 		for (i = 0; i < uniforms.length; i++) {
 			uniform = uniforms[i];
 
-			uniform_obj = new cnvgl_program_var(uniform.name, current, uniform.type_size);
-			current += uniform.size;
+			//check if already declared
+			if (uniform_obj = program_obj.getActiveUniform(uniform.name)) {
+				if (uniform_obj.size != uniform.type_size) {
+					throw new Error(sprintf("Uniform '%s' redeclared with different type", uniform.name));
+				}
+				continue;
+			}
 
-			program_obj.active_uniforms.push(uniform_obj);
+			location = program_obj.getOpenSlot(program_obj.uniforms);
+			uniform_obj = new cnvgl_program_var(uniform.name, location, uniform.type_size);
+
+			program_obj.addActiveUniform(uniform_obj);
 		}
 	}
 
 	function linkObject(program_obj, shader_obj) {
 		var result, output;
-		addAttributes(program_obj, shader_obj);
-		addUniforms(program_obj, shader_obj);
+
+		try {
+			addAttributes(program_obj, shader_obj);
+			addUniforms(program_obj, shader_obj);
+			addVarying(program_obj, shader_obj);
+		} catch (e) {
+			glsl.errors.push(e);
+			return false;
+		}
 
 		//do translation into native javascript
 		result = ARB.translate(shader_obj.object_code, 'javascript');
@@ -76,11 +126,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	function link(program_obj) {
 		var i, status;
 		status = 1;
-		for (i = 0; i < program_obj.attached_shaders_count; i++) {
+
+		//reset
+		program_obj.reset();
+
+		for (i = 0; i < program_obj.attached_shaders.length; i++) {
 			shader_obj = program_obj.attached_shaders[i];
 			shader_obj.exec = linkObject(program_obj, shader_obj);
 			status &= !!shader_obj.exec;
 		}
+
 		return status;
 	}
 
@@ -89,5 +144,5 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	glsl.link = link;
 
-}(glsl, ARB));
+}(glsl, ARB, StdIO));
 
