@@ -59,7 +59,7 @@ cnvgl_renderer = (function() {
 		this.mode = mode;
 		this.primitive.setMode(mode);
 	};
-
+	
 	cnvgl_renderer.send = function(vertex) {
 		this.vertex.process(vertex);
 		this.primitive.send(vertex);

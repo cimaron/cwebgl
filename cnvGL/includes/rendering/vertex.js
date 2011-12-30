@@ -45,7 +45,7 @@ cnvgl_rendering_vertex = (function() {
 		GPU.shader.vertex.attrib = v.attributes.data;
 		GPU.shader.vertex.varying = v.varying.data;
 		GPU.executeVertex();
-		
+
 		position = this.result.position;
 
 		v.x = position[0];
