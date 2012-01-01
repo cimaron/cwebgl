@@ -23,4 +23,5 @@ var GPU = {};
 
 include('cnvGL/includes/gpu/memory.js');
 include('cnvGL/includes/gpu/shader.js');
+include('cnvGL/includes/gpu/texture.js');
 

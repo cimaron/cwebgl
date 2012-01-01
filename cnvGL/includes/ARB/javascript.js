@@ -33,88 +33,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	var irs, symbols, header, body;
 
 
-	function buildComponents(oper) {
-		var i, swz;
-		
-		if (!oper) {
-			return "";	
-		}
-
-		//generate array representation of swizzle components, expanding if necessary
-		swz = oper.swizzle || "xyzw";
-		swz = swz.split("");
-		oper.count = swz.length;
-
-		oper.comp = [];
-		for (i = 0; i < 4; i++) {
-			//exact swizzle specified and less than 4 components, grab last one
-			if (swz.length <= i) {
-				//repeat last one
-				oper.comp.push(oper.comp[i - 1]);	
-			} else {
-				//push the location of the current component
-				oper.comp.push("[" + "xyzw".indexOf(swz[i]) + "]");			
-			}
-		}
-		
-		if (typeof oper.offset == "number") {
-			oper.out = sprintf("%s[%s]", oper.name, oper.offset);
-		} else {
-			oper.out = oper.name;	
-		}
-
-		return oper;
-	}
-
-	/**
-	 * Translates ASM instruction into output format
-	 *
-	 * @param   string    string that represents a single instruction
-	 */
-	function translateInstruction(ins) {
-		var dest, src1, src2, src3, i, c, d, s1, s2, s3, trans;
-
-		if (typeof ins == "string") {
-			return;	
-		}
-
-		//variables
-		dest = buildComponents(ins.d);
-		src1 = buildComponents(ins.s1);
-		src2 = buildComponents(ins.s2);
-		src3 = buildComponents(ins.s3);
-
-		//if vector operation, we need to loop over each vector and grab the appropriate element
-		for (i = 0; i < dest.count; i++) {
-			c = dest.comp[i];
-
-			d = dest.out + c;
-			s1 = src1.out + (src1.swizzle ? src1.comp[i] : c);
-			s2 = src2.out + (src2.swizzle ? src2.comp[i] : c);
-			s3 = src3.out + (src3.swizzle ? src3.comp[i] : c);
-
-			if (!(trans = translation_table[ins.op])) {
-				throw new error("Could not translate opcode");
-			}
-
-			//s1 = symbols[s1] || s1;
-			//s2 = symbols[s2] || s2;
-			//s3 = symbols[s3] || s3;
-
-			trans = trans.replace('%1', d);
-			trans = trans.replace('%2', s1);
-			trans = trans.replace('%3', s2);
-			trans = trans.replace('%4', s3);
-
-			//if (d.indexOf('result') != -1) {
-				//d = (symbols[dest.name].value || dest.name) + c;
-				body.push(sprintf("%s = %s;", d, trans));
-			//} else {
-			//	symbols[d] = trans;				
-			//}
-		}
-	}
-
 	var constants = {
 		MAX_VERTEX_ATTRIBUTES : 16,
 		MAX_VERTEX_CONSTANTS : 128,
@@ -129,19 +47,129 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	var translation_table = {
 		//'ABS' : 'Math.abs(%2)',
-		'ADD' : '(%2) + (%3)',
+		'ADD' : '%1* = (%2*) + (%3*)',
 		//'ARL' : false,
-		'MOV' : '(%2)',
 		//'CMP' : false,
 		//'COS' : 'Math.cos(%2)',
 		//'DP3' : '%1.* = (%2.x * %3.x + %2.y * %3.y + %2.z + %3.z)',
 		//'DP4' : '%1.* = (%2.x * %3.x + %2.y * %3.y + %2.z + %3.z + %2.w * %3.w)',
 		//'DPH' : '%1.* = (%2.x * %3.x + %2.y * %3.y + %2.z + %3.z + %3.w)',
 		//'DST' : '%1.* = [1, %2.y * %3.y, %2.z, %3.w]',
-		'MUL' : '(%2) * (%3)',
-		'MAD' : '((%2) * (%3)) + (%4)'
-	};
+		'MAD' : '%1* = ((%2*) * (%3*)) + (%4*)',
+		'MOV' : '%1* = (%2*)',
+		'MUL' : '%1* = (%2*) * (%3*)',
+		'RET' : 'return',
+		'TEX' : ['tex(jstemp, (%3[0]), (%2[0]), (%2[1]), 0)',
+				 '%1* = jstemp[%i]']
+	}; 
 
+
+	/**
+	 * Set up individual vector components
+	 *
+	 * @param   object    Operand
+	 */
+	function buildComponents(oprd) {
+		var i, swz;
+		
+		if (!oprd) {
+			return "";	
+		}
+
+		//generate array representation of swizzle components, expanding if necessary
+		swz = oprd.swizzle || "xyzw";
+		swz = swz.split("");
+		oprd.count = swz.length;
+
+		oprd.comp = [];
+		for (i = 0; i < 4; i++) {
+			//exact swizzle specified and less than 4 components, grab last one
+			if (swz.length <= i) {
+				//repeat last one
+				oprd.comp.push(oprd.comp[i - 1]);	
+			} else {
+				//push the location of the current component
+				oprd.comp.push("[" + "xyzw".indexOf(swz[i]) + "]");			
+			}
+		}
+
+		if (typeof oprd.offset == "number") {
+			oprd.out = sprintf("%s[%s]", oprd.name, oprd.offset);
+		} else {
+			oprd.out = oprd.name;	
+		}
+
+		return oprd;
+	}
+
+	/**
+	 * Translates ASM instruction into output format
+	 *
+	 * @param   string    string that represents a single instruction
+	 */
+	function translateInstruction(ins) {
+		var dest, src1, src2, src3, i, j, c, d, s1, s2, s3, code, trans;
+
+		if (typeof ins == "string") {
+			return;	
+		}
+
+		if (!(code = translation_table[ins.op])) {
+			throw new Error("Could not translate opcode");
+		}
+
+		if (!(code instanceof Array)) {
+			code = [code];
+		}
+
+		//variables
+		dest = buildComponents(ins.d);
+		src1 = buildComponents(ins.s1);
+		src2 = buildComponents(ins.s2);
+		src3 = buildComponents(ins.s3);
+
+		for (j = 0; j < code.length; j++) {	
+
+			//if vector operation, we need to loop over each vector and grab the appropriate element
+			for (i = 0; i < dest.count; i++) {
+				trans = code[j];
+				c = dest.comp[i];
+
+				d = dest.out + c;
+				s1 = src1.out + (src1.swizzle ? src1.comp[i] : c);
+				s2 = src2.out + (src2.swizzle ? src2.comp[i] : c);
+				s3 = src3.out + (src3.swizzle ? src3.comp[i] : c);
+	
+				//vector with component
+				trans = trans.replace(/%1\*/g, d);
+				trans = trans.replace(/%2\*/g, s1);
+				trans = trans.replace(/%3\*/g, s2);
+				trans = trans.replace(/%4\*/g, s3);
+	
+				//vector without component
+				trans = trans.replace(/%1/g, dest.out);
+				trans = trans.replace(/%2/g, src1.out);
+				trans = trans.replace(/%3/g, src2.out);
+				trans = trans.replace(/%4/g, src3.out);
+	
+				//index of current component
+				trans = trans.replace('%i', i);
+
+				body.push(sprintf("%s;", trans));
+				
+				if (code[j].indexOf('*') == -1) {
+					//break 1
+					i = dest.count;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Build variable initializations
+	 *
+	 * @param   object    Object code
+	 */
 	function processSymbols(object_code) {
 		var n, i, c, ci, symbol, size;
 
@@ -177,12 +205,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				c++;
 			}
 		}
-		
+
 		//temps
 		for (i = 0; i < object_code.temps.length; i++) {
 			symbol = object_code.temps[i];
 			header.push(sprintf("var %s = temp[%s];", symbol.out, i));
 		}
+
+		//special temp register for js compatibility
+		header.push("var jstemp = [0,0,0,0];");
 	}
 
 	/**
@@ -199,7 +230,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		symbols = {};
 		irs = object_code.body;
-		
+
 		errors = 0;
 
 		header = [];

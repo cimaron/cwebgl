@@ -37,18 +37,37 @@ $operations = array(
 );
 
 $types = array(
-	"'void'", "float", "int", "uint", "bool",
-	"vec2", "vec3", "vec4", "bvec2", "bvec3",
-	"bvec4", "ivec2", "ivec3", "ivec4", "uvec2",
-	"uvec3", "uvec4", "mat2", "mat2x3", "mat2x4",
-	"mat3x2", "mat3", "mat3x4", "mat4x2", "mat4x3",
-	"mat4", "sampler1D", "sampler2D", "sampler2Drect", "sampler3D",
-	"samplercube", "sampler1Dshadow", "sampler2Dshadow", "sampler2Drectshadow", "samplercubeshadow",
-	"sampler1Darray", "sampler2Darray", "sampler1Darrayshadow", "sampler2Darrayshadow", "isampler1D",
-	"isampler2D", "isampler3D", "isamplercube", "isampler1Darray", "isampler2Darray",
-	"usampler1D", "usampler2D", "usampler3D", "usamplercube", "usampler1Darray",
-	"usampler2Darray", "struct", "type_name"
+	"'void'",
+	"float", "int", "uint", "bool",
+	"vec2", "vec3", "vec4",
+	"bvec2", "bvec3", "bvec4",
+	"ivec2", "ivec3", "ivec4",
+	"uvec2", "uvec3", "uvec4",
+	"mat2", "mat2x3", "mat2x4",
+	"mat3x2", "mat3", "mat3x4",
+	"mat4x2", "mat4x3",	"mat4",
+	"sampler1D", "sampler2D", "sampler2Drect", "sampler3D", "samplercube",
+	"sampler1Dshadow", "sampler2Dshadow", "sampler2Drectshadow", "samplercubeshadow",
+	"sampler1Darray", "sampler2Darray", "sampler1Darrayshadow", "sampler2Darrayshadow",
+	"isampler1D", "isampler2D", "isampler3D", "isamplercube", "isampler1Darray", "isampler2Darray",
+	"usampler1D", "usampler2D", "usampler3D", "usamplercube", "usampler1Darray", "usampler2Darray",
+	"struct", "type_name"
 );
+
+$base_types = array(
+	NULL,
+	"float", "int", "uint", "bool",
+	"float", "float", "float",
+	"bool", "bool", "bool",
+	"int", "int", "int",
+	"uint", "uint", "uint",
+	"float", "float", "float",
+	"float", "float", "float",
+	"float", "float", "float",
+);
+foreach ($base_types as $i => $base_name) {
+	$base_types[$i] = array_search($base_name, $types);
+}
 
 
 $operation_table = array();
@@ -67,6 +86,36 @@ function addOperation($op_name, $type1_name, $type2_name, $obj) {
 
 	$obj['type'] = array_search($obj['type'], $types);
 	$operation_table[$op][$type1][$type2] = $obj;
+}
+
+function addFunction($func_name, $def_in, $obj) {
+	global $operation_table, $operations, $types;
+	$op = array_search('function_call', $operations);
+
+	//get function_call operation entries
+	if (!isset($operation_table[$op])) {
+		$operation_table[$op] = array();
+	}
+	$t = &$operation_table[$op];
+
+	//get function entries
+	if (!isset($t[$func_name])) {
+		$t[$func_name] = array();
+	}
+	$t = &$t[$func_name];
+
+	//get entry by definition
+	foreach ($def_in as $type_name) {
+		$type = array_search($type_name, $types);
+		if (!isset($t[$type])) {
+			$t[$type] = array();
+		}
+		$t = &$t[$type];
+	}
+
+	$obj['type'] = array_search($obj['type'], $types);
+
+	$t[0] = $obj;
 }
 
 
@@ -106,8 +155,42 @@ addOperation('mul', 'mat4', 'mat4', array(
 	)
 ));
 
+addFunction('texture2D', array('sampler2D', 'vec2'), array(
+	'type' => 'vec4',
+	'code' => array(
+		'TEX %1 %3 %2 2D'
+	)
+));
+
+
 
 ?>
 (function(glsl) {
+	
 	glsl.ir_operation_table = <? echo json_encode($operation_table); ?>;
+	glsl.type.base = <? echo json_encode($base_types); ?>;
+	
+	function function_by_path(state, func, table, path) {
+		var t, entry;
+		for (t in table) {
+			t = parseInt(t);
+			if (t == 0) {
+				entry = state.symbols.add_function(func, table[t].type, path.slice(0));
+				entry.code = table[t].code;
+			} else {
+				path.push(parseInt(t));
+				function_by_path(state, func, table[t], path);
+				path.pop();
+			}
+		}
+	}
+
+	glsl.parser.initialize_functions = function(state) {
+		var table, f, path, t;
+		table = glsl.ir_operation_table[glsl.ast.operators.function_call];
+		for (f in table) {
+			function_by_path(state, f, table[f], []);
+		}
+	};
+
 }(glsl));

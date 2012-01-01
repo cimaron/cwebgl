@@ -31,6 +31,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 	var irs, ir;
 
+	//constants
+	var swizzles = ["xyzw", "rgba", "stpq"];
+
 	/**
 	 * Constructs a compound statement code block
 	 *
@@ -200,7 +203,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 * @param   ast_node    subexpression 2
 	 */
 	function expression_bin(e, se1, se2) {
-		var table, error, ir, code, i, parts, repl;
+		var table, error, dest;
 
 		error = sprintf("Could not apply operation %s to %s and %s", glsl.ast.op_names[e.oper], glsl.type.names[se1.Type], glsl.type.names[se2.Type]);
 
@@ -218,61 +221,107 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			throw_error(error, e);
 			return;
 		}
-		
+
 		e.Type = table.type;
 		e.Dest = IRS.getTemp('$tempv');
+		
+		dest = [e.Dest, se1.Dest, se2.Dest];
 
-		//replacements
-		repl = [
-			{s : /%1/g, d:e.Dest},
-			{s : /%2/g, d:se1.Dest},
-			{s : /%3/g, d:se2.Dest}
-		];
+		parseCode(table.code, dest);
+	}
 
-		for (i = 0; i < table.code.length; i++) {
-			parts = table.code[i];
+	/**
+	 * Constructs a field selection code block
+	 *
+	 * @param   ast_node    ast_node that represents a field selection
+	 */
+	function expression_field(e, se) {
+		var field, i, s, swz, new_swz, base;
 
-			if (parts.substring(0, 4) == 'TEMP') {
-				repl.push({
-					s : new RegExp(parts.substring(5), 'g'),
-					d : IRS.getTemp('$tempv')
-				});
-				continue;
+		//pick swizzle set
+		field = e.primary_expression.identifier;
+		for (i = 0; i < swizzles.length; i++) {
+			if (swizzles[i].indexOf(field[0]) != -1) {
+				swz = swizzles[i];
+				break;
 			}
-
-			for (j = 0; j < repl.length; j++) {
-				parts = parts.replace(repl[j].s, repl[j].d);
-			}
-
-			parts = parts.split(" ");
-			irs.push(new IR(parts[0], parts[1], parts[2], parts[3], parts[4]));
-
 		}
+
+		//check that all fields are in same swizzle set
+		if (swz) {
+			new_swz = "";
+			for (i = 0; i < field.length; i++) {
+				s = swz.indexOf(field[i])
+				if (s == -1) {
+					swz = false;
+					break;
+				}
+				//use corresponding "standard" fields (xyzw)
+				new_swz += swizzles[0][s];
+			}
+		}
+
+		if (swz) {
+			e.Dest = sprintf("%s.%s", se[0].Dest, new_swz);
+			e.Type = baseType(se[0].Type);
+			if (new_swz.length > 4 || !e.Type) {
+				throw_error(sprintf("Invalid field selection %s.%s", se[0], e.primary_expression.identifier), e);
+			}
+			e.Type = makeType(e.Type, new_swz.length);
+		}
+	}
+
+	/**
+	 * Constructs a function call expression code block
+	 *
+	 * @param   ast_node    ast_node that represents a function call
+	 */
+	function expression_function(e) {
+		var i, func, se, def, dest, entry;
+		
+		func = e.subexpressions[0].primary_expression.identifier
+		def = [];
+		dest = [];
+
+		for (i = 0; i < e.expressions.length; i++) {
+			se = e.expressions[i];
+			expression(se);
+			def.push(se.Type);
+			dest.push(se.Dest);
+		}
+
+		entry = glsl.state.symbols.get_function(func, null, def);
+		if (!entry) {
+			throw_error(sprintf("Function %s(%s) is not defined", func, se_type_names.join(",")), e);
+		}
+
+		e.Type = entry.type;
+		e.Dest = IRS.getTemp('$tempv');
+		dest.unshift(e.Dest);
+
+		parseCode(entry.code, dest);
 	}
 
 	/**
 	 * Constructs an operator expression code block
 	 *
 	 * @param   ast_node    ast_node that represents an operator expression
-	 *
-	 * @return  IRS
 	 */
 	function expression_op(e) {
-		var se, i, entry, se_types, se_type_names, op_name;
+		var se, temp, ops;
 
 		if (se = e.subexpressions) {
 			expression(se[0]);
 			expression(se[1]);
 			expression(se[2]);
 		}
-
-		op_name = glsl.ast.op_names[e.oper];
+		
+		ops = glsl.ast.operators;
 
 		switch (e.oper) {
 
 			//assignment operator
-			case glsl.ast.operators.assign:
-
+			case ops.assign:
 				if (se[0].Type != se[1].Type) {
 					throw_error(sprintf("Could not assign value of type %s to %s", se[1].type_name, se[0].type_name), e);
 				}
@@ -286,30 +335,34 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 				break;
 
 			//binary expression
-			case glsl.ast.operators.add:
-			case glsl.ast.operators.sub:
-			case glsl.ast.operators.mul:
-			case glsl.ast.operators.div:
+			case ops.add:
+			case ops.sub:
+			case ops.mul:
+			case ops.div:
 				expression_bin(e, se[0], se[1]);
 				break;
 
 			//simple expression
-			case glsl.ast.operators.int_constant:
-			case glsl.ast.operators.float_constant:
-			case glsl.ast.operators.identifier:
-				expression_simple(e);
+			case ops.int_constant:
+			case ops.float_constant:
+			case ops.identifier:
+				expression_simple(e, se);
 				break;
 
 			//function call
-			case glsl.ast.operators.function_call:
-
+			case ops.function_call:
 				if (e.cons) {
 					constructor(e, se[0], e.expressions);
-					break;
+				} else {
+					expression_function(e);	
 				}
+				break;
 
+			case ops.field_selection:
+				expression_field(e, se);
+				break;
+				
 			default:
-				debugger;
 				throw_error(sprintf("Could not translate unknown expression %s (%s)", e.typeOf(), e.oper), e);
 		}
 	}
@@ -328,7 +381,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 			//lookup identifier in symbol table
 			name = e.primary_expression.identifier;
-			entry = state.symbols.get_variable(name);
+			entry = state.symbols.get_variable(name) || state.symbols.get_function(name);
 
 			if (!entry || !entry.type) {
 				throw_error(sprintf("Variable %s is undefined", name), e);
@@ -448,9 +501,83 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		throw new Error(msg);
 	}
 
+	/**
+	 * Makes number a float representation
+	 *
+	 * @param   string      The string representation of a number
+	 *
+	 * @return  string
+	 */
 	function makeFloat(n) {
 		n += (n.toString().indexOf('.') == -1) ? ".0" : "";
 		return n;
+	}
+	
+	/**
+	 * Returns the base type of the type
+	 *
+	 * @param   integer     The base type (float, int...)
+	 * @param   size        The size to construct
+	 *
+	 * @return  string
+	 */
+	function makeType(base, size) {
+		var name;
+
+		if (size == 1) {
+			return base;
+		}
+
+		if (size <= 4) {
+			if (base == glsl.type.float) {
+				return glsl.type.vec2 + (size - 2);
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns a new type using base type and size
+	 *
+	 * @param   integer     The base type (float, int...)
+	 * @param   size        The size to construct
+	 *
+	 * @return  string
+	 */
+	function baseType(type) {
+		return glsl.type.base[type];
+	}
+
+	function parseCode(code, oprds) {
+		var repl, parts, i, j;
+
+		repl = [];
+		for (i = oprds.length - 1; i >= 0; i--) {
+			repl.push({
+				s : new RegExp('%' + (i + 1), 'g'),
+				d : oprds[i]
+			});
+		}
+
+		for (i = 0; i < code.length; i++) {
+			parts = code[i];
+
+			if (parts.substring(0, 4) == 'TEMP') {
+				repl.unshift({
+					s : new RegExp(parts.substring(5), 'g'),
+					d : IRS.getTemp('$tempv')
+				});
+				continue;
+			}
+
+			for (j = 0; j < repl.length; j++) {
+				parts = parts.replace(repl[j].s, repl[j].d);
+			}
+
+			parts = parts.split(" ");
+			irs.push(new IR(parts[0], parts[1], parts[2], parts[3], parts[4]));
+		}
 	}
 
 	/**
@@ -477,6 +604,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 * @return  string
 	 */
 	function generate_ir(new_state) {
+		var i;
 
 		state = new_state;
 		irs = new IRS();

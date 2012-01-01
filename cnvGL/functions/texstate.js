@@ -26,7 +26,7 @@ function glActiveTexture(unit) {
 	ctx = cnvgl_context.getCurrentContext();
 	i = unit - GL_TEXTURE0;
 
-	if (i < 0 || i > Math.max(cnvgl_const.GL_MAX_TEXTURE_COORDS, cnvgl_const.GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS) - 1) {
+	if (i < 0 || i > Math.max(GPU.texture.MAX_TEXTURE_COORDS, GPU.texture.MAX_COMBINED_TEXTURE_IMAGE_UNITS) - 1) {
 		cnvgl_throw_error(GL_INVALID_ENUM);
 		return;
 	}

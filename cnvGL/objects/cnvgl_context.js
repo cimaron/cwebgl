@@ -133,11 +133,12 @@ var cnvgl_context = (function() {
 		var units, i, unit;
 		this.texture.currentUnit = GL_TEXTURE0;
 		this.texture.unit = [];
-		for (i = 0; i < cnvgl_const.GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS; i++) {
-			unit = new cnvgl_texture_unit(this, GL_TEXTURE0 + i);
+		for (i = 0; i < GPU.texture.MAX_COMBINED_TEXTURE_IMAGE_UNITS; i++) {
+			unit = new cnvgl_texture_unit(this, i);
 			unit.current_texture[GL_TEXTURE_2D] = this.shared.default_texture_objects[GL_TEXTURE_2D];
 			this.texture.unit[i] = unit;
 		}
+		GPU.setTextureUnit(this.texture.unit);
 	};
 
 	//static:

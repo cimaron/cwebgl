@@ -25,8 +25,42 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	sprint = StdIO.sprintf;
 
+	function relocate(shader_obj, name, old_index, new_index, size) {
+		var i, j, ins, code, oi;
+
+		if (old_index == new_index) {
+			return;	
+		}
+		
+		code = shader_obj.object_code.body;
+		for (i = 0; i < code.length; i++) {
+			ins = code[i];
+			
+			//not an instruction object
+			if (!ins.d) {
+				continue;
+			}
+			
+			//update for each slot
+			for (j = 0; j < size; j++) {
+				if (ins.d && ins.d.offset == old_index + j) {
+					ins.d.addOffset(new_index - old_index + j);
+				}
+				if (ins.s1 && ins.s1.offset == old_index + j) {
+					ins.s1.addOffset(new_index - old_index + j);
+				}
+				if (ins.s2 && ins.s2.offset == old_index + j) {
+					ins.s2.addOffset(new_index - old_index + j);
+				}
+				if (ins.s3 && ins.s3.offset == old_index + j) {
+					ins.s3.addOffset(new_index - old_index + j);
+				}				
+			}
+		}
+	}
+
 	function addVarying(program_obj, shader_obj) {
-		var attribs, i, j, attrib, location;
+		var attribs, i, attrib, location;
 
 		attribs = shader_obj.object_code.fragment.attrib;
 
@@ -35,14 +69,21 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 			//check if already declared
 			if (attrib_obj = program_obj.getActiveVarying(attrib.name)) {
+
+				//already exists as different type
 				if (attrib_obj.size != attrib.type_size) {
 					throw new Error(sprintf("Varying '%s' redeclared with different type", attrib.name));
 				}
+
+				//adjust addresses
+				relocate(shader_obj, attrib.name, attrib.location, attrib_obj.location, attrib.size);
 				continue;
 			}
 
 			location = program_obj.getOpenSlot(program_obj.varying);
 			attrib_obj = new cnvgl_program_var(attrib.name, location, attrib.type_size);
+
+			relocate(shader_obj, attrib.name, attrib.location, location, attrib.size);
 
 			program_obj.addActiveVarying(attrib_obj);
 		}
@@ -61,6 +102,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				if (attrib_obj.size != attrib.type_size) {
 					throw new Error(sprintf("Attribute '%s' redeclared with different type", attrib.name));
 				}
+				//
+				
 				continue;
 			}
 
@@ -124,7 +167,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	}
 
 	function link(program_obj) {
-		var i, status;
+		var i, status, shader_obj;
 		status = 1;
 
 		//reset

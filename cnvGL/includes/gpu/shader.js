@@ -105,5 +105,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	GPU.shader.vertex = vertex;
 	GPU.shader.fragment = fragment;
 
+	//
+	var tex;
+	shader.setTexFunc = function(f) { tex = f; };
+
 }(GPU));
 

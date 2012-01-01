@@ -41,7 +41,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			12, 16, 1, 1, 1, 1,  1, 1,
 			 1,  1, 1, 1, 1
 			],
-		
+
 		qualifiers : []
 
 	};

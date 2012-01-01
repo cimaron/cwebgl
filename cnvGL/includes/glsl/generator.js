@@ -132,6 +132,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 				symbol.entries.push(local);
 			}
 
+			local.location = start;
 			replace_name(0, local.out, symbol.out, start);
 			local.out = symbol.out;
 
@@ -201,9 +202,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 		//temporary variable
 		if (!entry) {
-			reg = get_register(i);
-			replace_temp(i, oper.name, oper.offset, reg.out);
-			update_register_life(reg, i + 1);
+
+			if (oper.name[0] == '$') {
+				reg = get_register(i);
+				replace_temp(i, oper.name, oper.offset, reg.out);
+				update_register_life(reg, i + 1);
+				return;
+			}
+
+			//probably something else important. Leave as-is
 			return;
 		}
 
@@ -227,7 +234,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 		if (entry.qualifier_name == 'attribute') {
 			symbol.out = 'vertex.attrib';
-			replace_name(i, oper.name, symbol.out, vertex.attrib.length);
+			symbol.location = vertex.attrib.length;
+			replace_name(i, oper.name, symbol.out, symbol.location);
 			for (j = 0; j < symbol.size; j++) {
 				vertex.attrib.push(symbol);
 			}
@@ -243,7 +251,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			} else {
 				symbol.out = 'fragment.attrib';
 			}
-			replace_name(i, oper.name, symbol.out, fragment.attrib.length);
+			symbol.location = fragment.attrib.length;
+			replace_name(i, oper.name, symbol.out, symbol.location);
 			for (j = 0; j < symbol.size; j++) {
 				fragment.attrib.push(symbol);
 			}

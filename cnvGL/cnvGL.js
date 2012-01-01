@@ -21,7 +21,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 include('cnvGL/defines.js');
-include('cnvGL/constants.js');
 
 include('cnvGL/objects/cnvgl_attrib_array.js');
 include('cnvGL/objects/buffer.js');
@@ -31,9 +30,7 @@ include('cnvGL/objects/cnvgl_fragment.js');
 include('cnvGL/objects/cnvgl_primitive.js');
 include('cnvGL/objects/cnvgl_program.js');
 include('cnvGL/objects/cnvgl_shader.js');
-include('cnvGL/objects/texture_image.js');
-include('cnvGL/objects/texture_object.js');
-include('cnvGL/objects/texture_unit.js');
+include('cnvGL/objects/texture.js');
 include('cnvGL/objects/cnvgl_vertex.js');
 
 //Compiler
@@ -53,7 +50,6 @@ include('cnvGL/includes/rendering/fragment.js');
 include('cnvGL/includes/rendering/interpolate.js');
 include('cnvGL/includes/rendering/primitive.js');
 include('cnvGL/includes/rendering/renderer.js');
-include('cnvGL/includes/rendering/texture.js');
 include('cnvGL/includes/rendering/vertex.js');
 
 

@@ -40,6 +40,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			entry.position = v[1];
 			entry.out = v[4];
 		}
+
+		//defined in ir_generator_tables.php
+		glsl.parser.initialize_functions(state);
 	};
 
 		  

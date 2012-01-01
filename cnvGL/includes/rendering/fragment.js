@@ -41,7 +41,7 @@ cnvgl_rendering_fragment = (function() {
 
 	cnvgl_rendering_fragment.process = function(f) {
 		var color;
-//debugger;
+
 		//set pointers to fragment data
 		GPU.shader.fragment.attrib = f.attributes.data;
 		GPU.executeFragment();
