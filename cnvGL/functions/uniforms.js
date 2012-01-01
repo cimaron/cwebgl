@@ -21,12 +21,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 function glUniform1i(location, v0) {
 	v0 = v0|0; //floor(v0);
-	__glUniform(location, v0, 1, true);
+	__glUniform(location, [v0], 1);
 }
 
 function glUniform1f(location, v0) {
 	v0 = v0 * 1.0; //force bool to float
-	__glUniform(location, v0, 1, true);
+	__glUniform(location, [v0], 1);
 }
 
 function glUniform3f(location, v0, v1, v2) {
