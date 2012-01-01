@@ -94,8 +94,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			delete symbols[constant.value];
 			symbols[symbol.out].entries.push(constant);
 
+			constant.name = symbol.out;
 			constant.out = sprintf("%s[%s].%s", symbol.out, params.length, "xyzw".substr(param.length, 1));
-			replace_name(0, constant.value, constant.out, false, true);
+			constant.location = i;
+			irs.replaceName(0, constant.value, constant.out, false, true);
 
 			param.push(constant.value);
 
@@ -133,7 +135,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			}
 
 			local.location = start;
-			replace_name(0, local.out, symbol.out, start);
+			irs.replaceName(0, local.out, symbol.out, start);
 			local.out = symbol.out;
 
 			start += local.size;
@@ -235,7 +237,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		if (entry.qualifier_name == 'attribute') {
 			symbol.out = 'vertex.attrib';
 			symbol.location = vertex.attrib.length;
-			replace_name(i, oper.name, symbol.out, symbol.location);
+			irs.replaceName(i, oper.name, symbol.out, symbol.location);
 			for (j = 0; j < symbol.size; j++) {
 				vertex.attrib.push(symbol);
 			}
@@ -252,7 +254,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 				symbol.out = 'fragment.attrib';
 			}
 			symbol.location = fragment.attrib.length;
-			replace_name(i, oper.name, symbol.out, symbol.location);
+			irs.replaceName(i, oper.name, symbol.out, symbol.location);
 			for (j = 0; j < symbol.size; j++) {
 				fragment.attrib.push(symbol);
 			}
@@ -263,40 +265,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 
 		if (symbol.out != oper.name) {
-			replace_name(i, oper.name, symbol.out);	
-		}
-	}
-
-	/**
-	 * Replaces all instances of an operand name and base index in all instructions after start
-	 *
-	 * @param   integer     Starting instruction number
-	 * @param   string      Old name to search for
-	 * @param   string      New name to replace with
-	 * @param   integer     Add offset
-	 * @param   boolean     True if replacing with a completely new operand
-	 */
-	function replace_name(start, old, nw, index, repl) {
-		var i, j, ir, fs, f;
-
-		fs = ['d', 's1', 's2', 's3'];
-
-		for (i = start; i < irs.code.length; i++) {
-			ir = irs.code[i];
-
-			//foreach each operand field
-			for (j = 0; j < fs.length; j++) {
-				f = fs[j];
-				if (ir[f] && ir[f].name == old) {
-					if (repl) {
-						ir[f] = new ARB.Operand(nw);
-					} else {
-						ir[f].name = nw;
-						ir[f].addOffset(index);
-					}
-				}	
-			}
-			
+			irs.replaceName(i, oper.name, symbol.out);	
 		}
 	}
 
@@ -309,35 +278,19 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 * @param   string      New name to replace with
 	 */
 	function replace_temp(start, old, index, nw) {
-		var i, ir;
+		var i, j, ir, f;
 
 		for (i = start; i < irs.code.length; i++) {
 			ir = irs.code[i];
 
-			//replace dest
-			if (ir.d && ir.d.name == old && ir.d.offset == index) {
-				ir.d.name = nw;
-				ir.d.offset = "";
+			for (j = 0; j < glsl.IR.operands.length; j++) {
+				f = glsl.IR.operands[j];
+	
+				if (ir[f] && ir[f].name == old && ir[f].offset == index) {
+					ir[f].name = nw;
+					ir[f].offset = "";
+				}
 			}
-
-			//replace src1
-			if (ir.s1 && ir.s1.name == old && ir.s1.offset == index) {
-				ir.s1.name = nw;
-				ir.s1.offset = "";
-			}
-
-			//replace src2
-			if (ir.s2 && ir.s2.name == old && ir.s2.offset == index) {
-				ir.s2.name = nw;
-				ir.s2.offset = "";
-			}
-
-			//replace src2
-			if (ir.s3 && ir.s3.name == old && ir.s3.offset == index) {
-				ir.s3.name = nw;
-				ir.s3.offset = "";
-			}
-
 		}
 	}
 

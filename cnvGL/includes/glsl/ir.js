@@ -38,6 +38,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		var IR = jClass('IR', Initializer, ARB.Instruction);
 	
+		//static:
+		IR.Constructor.operands = ['d', 's1', 's2', 's3'];
+
 		//public:
 	
 		IR.IR = function(op, d, s1, s2, s3, gen) {
@@ -89,6 +92,37 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 		IRS.getTemp = IRS.Constructor.getTemp;
 
+		/**
+		 * Replaces all instances of an operand name and base index in all instructions after start
+		 *
+		 * @param   integer     Starting instruction number
+		 * @param   string      Old name to search for
+		 * @param   string      New name to replace with
+		 * @param   integer     Add offset
+		 * @param   boolean     True if replacing with a completely new operand
+		 */
+		IRS.replaceName = function(start, old, nw, index, repl) {
+			var i, j, ir, f;
+	
+			for (i = start; i < this.code.length; i++) {
+				ir = this.code[i];
+
+				//foreach each operand field
+				for (j = 0; j < IR.operands.length; j++) {
+					f = IR.operands[j];
+					if (ir[f] && ir[f].name == old) {
+						if (repl) {
+							ir[f] = new ARB.Operand(nw);
+						} else {
+							ir[f].name = nw;
+							ir[f].addOffset(index);
+						}
+					}	
+				}
+				
+			}
+		};
+	
 		IRS.toString = function() {
 			return this.code.join("");
 		};

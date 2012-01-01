@@ -174,35 +174,24 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		var n, i, c, ci, symbol, size;
 
 		n = "c"
-		c = 0;
-		ci = 0;
 
 		//@todo: replace c with computed value
 		header.push(sprintf("var %s = new Array();", n));
 
 		//enter constants in symbol table for swapping out later
-		for (i in object_code.constants) {
+		for (i = 0; i < object_code.constants.length; i++) {
 			symbol = object_code.constants[i];
-			if (ci == 0) {
-				header.push(sprintf("%s[%s] = %s[%s];", n, c, "program.local", c));
-			}
-			header.push(sprintf("%s[%s][%s] = %s;", n, c, ci, symbol.value)); 
-			ci++;
-			if (ci == 4) {
-				ci = 0;
-				c++;
-			}
-		}
-		if (ci > 0) {
-			c++;
+			header.push(sprintf("%s[%s] = %s[%s];", n, symbol.location, "program.local", symbol.location));
+
+			//@todo: make this work for any size constants
+			header.push(sprintf("%s[%s][%s] = %s;", n, symbol.location, 0, symbol.value));
 		}
 
 		//uniforms
-		for (i in object_code.program.local) {
+		for (i = 0; i < object_code.program.local.length; i++) {
 			symbol = object_code.program.local[i];
 			for (ci = 0; ci < symbol.size; ci++) {
-				header.push(sprintf("%s[%s] = %s[%s];", n, c, "program.local", c));
-				c++;
+				header.push(sprintf("%s[%s] = %s[%s];", n, ci + symbol.location, "program.local", ci + symbol.location));
 			}
 		}
 

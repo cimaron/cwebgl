@@ -39,7 +39,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		var texture, mipmap_level, img, img_w, img_h, img_d, i, u, v, u1, v1, i1;
 		target = 0;
 		mipmap_level = 0;
-		sampler = 0;
 
 		texture = texUnit[sampler].current_texture[GL_TEXTURE_2D];
 		img = texture.images[mipmap_level];
