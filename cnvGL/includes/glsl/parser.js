@@ -2317,7 +2317,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 					case 181:
 						yyval = {};
-						yyval.n = glsl.ast['void'];
+						yyval.n = glsl.type['void'];
 						break;
 
 					case 182:
