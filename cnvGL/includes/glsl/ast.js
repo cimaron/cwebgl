@@ -495,7 +495,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		};
 
 		ast_declarator_list.toString = function() {
-			return sprintf("%s %s;", this.type ? this.type : "invariant ", this.declarations.join(""));
+			return sprintf("%s %s;\n", this.type ? this.type : "invariant ", this.declarations.join(""));
 		};
 
 		return ast_declarator_list.Constructor;
@@ -550,9 +550,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		ast_expression_statement.ast_expression_statement = function(ex) {
 			this.expression = ex;
 		};
-		
+
 		ast_expression_statement.toString = function() {
-			return sprintf("%s; ", this.expression ? this.expression : "");
+			return sprintf("%s;\n ", this.expression ? this.expression : "");
 		};
 
 		return ast_expression_statement.Constructor;

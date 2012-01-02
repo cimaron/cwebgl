@@ -155,6 +155,33 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		};
 
 		/**
+		 * Adds the offset to all operands
+		 *
+		 * @param   integer    The offset to set
+		 */
+		Instruction.addOffset = function(offset) {
+			if (!offset) {
+				return;
+			}
+			this.d ? this.d.addOffset(offset) : null;
+			this.s1 ? this.s1.addOffset(offset) : null;
+			this.s2 ? this.s2.addOffset(offset) : null;
+			this.s3 ? this.s3.addOffset(offset) : null;
+		};
+
+		/**
+		 * Set the swizzle components on all operands
+		 *
+		 * @param   string    The swizzle to set
+		 */
+		Instruction.setSwizzle = function(swz) {
+			this.d  && !this.d.swizzle  ? this.d.swizzle  = swz : null;
+			this.s1 && !this.s1.swizzle ? this.s1.swizzle = swz : null;
+			this.s2 && !this.s2.swizzle ? this.s2.swizzle = swz : null;
+			this.s3 && !this.s3.swizzle ? this.s3.swizzle = swz : null;
+		};
+
+		/**
 		 * toString method
 		 *
 		 * @return  string

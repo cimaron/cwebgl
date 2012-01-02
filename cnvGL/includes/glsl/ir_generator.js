@@ -29,10 +29,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	var sprintf = StdIO.sprintf;
 
 
-	var irs, ir;
+	var irs, ir, swizzles, conditional;
+
+	conditional = [];
 
 	//constants
-	var swizzles = ["xyzw", "rgba", "stpq"];
+	swizzles = ["xyzw", "rgba", "stpq"];
 
 	/**
 	 * Constructs a compound statement code block
@@ -136,10 +138,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 * @param   ast_node    ast_node that represents a declaration list
 	 */
 	function declarator_list(dl) {
-		var type, size, qualifier, i, decl, name, entry;
+		var type, qualifier, i, decl, name, entry;
 
 		type = dl.type;
-		size = glsl.type.size[type.specifier.type_specifier];
 		if (type.qualifier) {
 			qualifier = glsl.type.qualifiers[type.qualifier.flags.q];
 		}
@@ -155,14 +156,19 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			entry.qualifier_name = qualifier;
 
 			if (decl.initializer) {
+				
+				//destination node is not created in parser, so need to create it here to keep things clean
+				name = {
+					Dest : name,
+					Type : entry.type
+				};
+				
 				expression(decl.initializer);
-				if (decl.initializer.Type != entry.type) {
-					throw_error(sprintf("Could not assign value of type %s to %s", glsl.type.names[decl.initializer.Type], glsl.type.names[entry.type]), dl);
-				}
+				expression_assign(decl, [name, decl.initializer], true);
 			}
 		}
 	}
-	
+
 	/**
 	 * Constructs an expression code block
 	 *
@@ -196,38 +202,56 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	}
 
 	/**
-	 * Constructs a binary expression
+	 * Constructs an assignment expression
 	 *
-	 * @param   int		    operation code
-	 * @param   ast_node    subexpression 1
-	 * @param   ast_node    subexpression 2
+	 * @param   ast_node    ast_node that represents an assignment
 	 */
-	function expression_bin(e, se1, se2) {
-		var table, error, dest;
-
-		error = sprintf("Could not apply operation %s to %s and %s", glsl.ast.op_names[e.oper], glsl.type.names[se1.Type], glsl.type.names[se2.Type]);
-
-		if (!(table = glsl.ir_operation_table[e.oper])) {
-			throw_error(error, e);
-			return;
-		}
-
-		if (!(table = table[se1.Type])) {
-			throw_error(error, e);
-			return;
-		}
-
-		if (!(table = table[se2.Type])) {
-			throw_error(error, e);
-			return;
-		}
-
-		e.Type = table.type;
-		e.Dest = IRS.getTemp('$tempv');
+	function expression_assign(e, se, local) {
+		var cond, ir, temp, size, slots, swz, i;
 		
-		dest = [e.Dest, se1.Dest, se2.Dest];
+		if (conditional.length > 0) {
+			cond = conditional[conditional.length - 1];	
+		}
 
-		parseCode(table.code, dest);
+		if (se[0].Type != se[1].Type) {
+			throw_error(sprintf("Could not assign value of type %s to %s", se[1].type_name, se[0].type_name), e);
+		}
+		e.Type = se[0].Type;
+
+		size = glsl.type.size[e.Type];
+		slots = glsl.type.slots[e.Type];
+
+		//get the swizzle for each slot
+		swz = swizzles[0].substring(0, 4 - (((slots * 4) - size) / slots));
+
+		//all components are used up in all slots
+		if (swz == swizzles[0]) {
+			swz = "";
+		}
+
+		for (i = 0; i < slots; i++) {
+		
+			if (cond && !local) {
+				
+				temp = IRS.getTemp('$tempv');
+				
+				ir = new IR('SUB', temp, se[1].Dest, se[0].Dest);
+				ir.addOffset(i);
+				ir.setSwizzle(swz);
+				irs.push(ir);
+				
+				ir = new IR('MAD', se[0].Dest, cond, temp, se[0].Dest);
+				ir.addOffset(i);
+				ir.setSwizzle(swz);
+				irs.push(ir);
+				
+			} else {
+				ir = new IR('MOV', se[0].Dest, se[1].Dest);
+				ir.addOffset(i);
+				ir.setSwizzle(swz);
+				irs.push(ir);
+			}
+		}
 	}
 
 	/**
@@ -303,6 +327,43 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	}
 
 	/**
+	 * Constructs the code for an expression
+	 *
+	 * @param   int		    operation code
+	 * @param   array       list of subexpressions
+	 */
+	function expression_generate(e, se, len) {
+		var table, error, types, dest, i;
+
+		if (!(table = glsl.ir_operation_table[e.oper])) {
+			throw_error(sprintf("Could not generate operation %s", glsl.ast.op_names[e.oper]), e);
+			return;
+		}
+
+		e.Dest = IRS.getTemp('$tempv');
+		dest = [e.Dest];
+
+		types = [];
+		for (i = 0; i < len; i++) {
+			types.push(glsl.type.names[se[i].Type]);
+			if (!(table = table[se[i].Type])) {
+				debugger;
+				throw_error(sprintf("Could not apply operation %s to %s", glsl.ast.op_names[e.oper], types.join(", ")), e);
+				return;
+			}
+			dest.push(se[i].Dest);
+		}
+
+		e.Type = table.type;
+
+		if (len <= 4) {
+			//e.Dest += sprintf(".%s", swizzles[0].substring(0, glsl.type.size[e.Type]));
+		}
+
+		parseCode(table.code, dest);
+	}
+
+	/**
 	 * Constructs an operator expression code block
 	 *
 	 * @param   ast_node    ast_node that represents an operator expression
@@ -322,16 +383,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 			//assignment operator
 			case ops.assign:
-				if (se[0].Type != se[1].Type) {
-					throw_error(sprintf("Could not assign value of type %s to %s", se[1].type_name, se[0].type_name), e);
-				}
-				e.Type = se[1].Type;
+				expression_assign(e, se);
+				break;
 
-				//@todo:
-				//check that se1 is a valid type for assignment
-				//if se1 has a quantifier, generate that
-				ir = new IR('MOV', se[0].Dest, se[1].Dest);
-				irs.push(ir);
+			//unary operator
+			case ops.logic_not:
+				//expression_unary
+				expression_generate(e, se, 1);
 				break;
 
 			//binary expression
@@ -339,7 +397,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			case ops.sub:
 			case ops.mul:
 			case ops.div:
-				expression_bin(e, se[0], se[1]);
+				expression_generate(e, se, 2);
 				break;
 
 			//simple expression
@@ -451,6 +509,36 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 		ir = new IR("RET");
 		irs.push(ir);
+	}
+
+	/**
+	 * Constructs a selection statement
+	 *
+	 * @param   ast_node    Statement
+	 */
+	function selection_statement(stmt) {
+		var ir, cond;
+
+		expression(stmt.condition);
+		//@todo: add a check that condition is bool type?
+
+		cond = sprintf("%s.x", IRS.getTemp('$tempv'));
+
+		//set a flag based on the result
+		ir = new IR('SLT', cond, '0.0', sprintf("%s.x", stmt.condition.Dest));
+		irs.push(ir);
+
+		//if conditional is set, all subsequent output assignments will use the condition result to set using (MAD dest, cond, (new - old), old)
+		conditional.push(cond);
+		compound_statement(stmt.then_statement);
+
+		if (stmt.else_statement) {
+			ir = new IR('SGE', cond, "0.0", cond);
+			irs.push(ir);
+			compound_statement(stmt.else_statement);
+		}
+
+		conditional.pop();
 	}
 
 	/**

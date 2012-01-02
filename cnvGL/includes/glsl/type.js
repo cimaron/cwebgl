@@ -25,21 +25,59 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	type = {
 		
 		names : [
-			"void", "float", "int", "uint", "bool", "vec2", "vec3", "vec4", "bvec2", "bvec3", "bvec4", "ivec2",
-			"ivec3", "ivec4", "uvec2", "uvec3", "uvec4", "mat2", "mat2x3", "mat2x4", "mat3x2", "mat3", "mat3x4",
-			"mat4x2", "mat4x3", "mat4", "sampler1D", "sampler2D", "sampler2Drect", "sampler3D", "samplercube",
-			"sampler1Dshadow", "sampler2Dshadow", "sampler2Drectshadow", "samplercubeshadow", "sampler1Darray",
-			"sampler2Darray", "sampler1Darrayshadow", "sampler2Darrayshadow", "isampler1D", "isampler2D",
-			"isampler3D", "isamplercube", "isampler1Darray", "isampler2Darray", "usampler1D", "usampler2D",
-			"usampler3D", "usamplercube", "usampler1Darray", "usampler2Darray", "struct", "type_name"
+			"void", "float", "int", "uint", "bool",
+			"vec2", "vec3", "vec4",
+			"bvec2", "bvec3", "bvec4",
+			"ivec2", "ivec3", "ivec4", "uvec2", "uvec3", "uvec4",
+			"mat2", "mat2x3", "mat2x4",
+			"mat3x2", "mat3", "mat3x4",
+			"mat4x2", "mat4x3", "mat4",
+			"sampler1D", "sampler2D", "sampler2Drect", "sampler3D", "samplercube",
+			"sampler1Dshadow", "sampler2Dshadow", "sampler2Drectshadow", "samplercubeshadow",
+			"sampler1Darray", "sampler2Darray", "sampler1Darrayshadow", "sampler2Darrayshadow",
+			"isampler1D", "isampler2D", "isampler3D", "isamplercube",
+			"isampler1Darray", "isampler2Darray",
+			"usampler1D", "usampler2D", "usampler3D", "usamplercube",
+			"usampler1Darray", "usampler2Darray",
+			"struct", "type_name"
+			],
+
+		size : [
+			 1, 1, 1, 1, 1,
+			 2, 3, 4, 
+			 2, 3, 4,
+			 2, 3, 4,
+			 2, 3, 4,
+			 4, 6, 8,
+			 6, 9, 12,
+			 8, 12, 16,
+			 1, 1, 1, 1, 1,
+			 1, 1, 1, 1,
+			 null, null, null, null,
+			 1, 1, 1, 1,
+			 null, null,
+			 1, 1, 1, 1,
+			 null, null,
+			 null, null
 			],
 		
-		size : [
-			 1,  1, 1, 1, 1, 2,  3, 4,
-			 2,  3, 4, 2, 3, 4,  2, 3,
-			 4,  4, 6, 8, 6, 9, 12, 8,
-			12, 16, 1, 1, 1, 1,  1, 1,
-			 1,  1, 1, 1, 1
+		slots : [
+			 1, 1, 1, 1, 1,
+			 1, 1, 1, 
+			 1, 1, 1,
+			 1, 1, 1,
+			 1, 1, 1,
+			 2, 2, 2,
+			 3, 3, 3,
+			 4, 4, 4,
+			 1, 1, 1, 1, 1,
+			 1, 1, 1, 1,
+			 null, null, null, null,
+			 1, 1, 1, 1,
+			 null, null,
+			 1, 1, 1, 1,
+			 null, null,
+			 null, null
 			],
 
 		qualifiers : []

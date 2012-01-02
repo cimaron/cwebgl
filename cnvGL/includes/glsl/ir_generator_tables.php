@@ -71,21 +71,26 @@ foreach ($base_types as $i => $base_name) {
 
 
 $operation_table = array();
-function addOperation($op_name, $type1_name, $type2_name, $obj) {
+function addOperation($op_name, $type_names, $obj) {
 	global $operation_table, $operations, $types;
 	$op = array_search($op_name, $operations);
-	$type1 = array_search($type1_name, $types);
-	$type2 = array_search($type2_name, $types);
 
 	if (!isset($operation_table[$op])) {
 		$operation_table[$op] = array();
 	}
-	if (!isset($operation_table[$op][$type1])) {
-		$operation_table[$op][$type1] = array();
+	$t = &$operation_table[$op];
+
+	//get entry by definition
+	foreach ($type_names as $type_name) {
+		$type = array_search($type_name, $types);
+		if (!isset($t[$type])) {
+			$t[$type] = array();
+		}
+		$t = &$t[$type];
 	}
 
 	$obj['type'] = array_search($obj['type'], $types);
-	$operation_table[$op][$type1][$type2] = $obj;
+	$t = $obj;
 }
 
 function addFunction($func_name, $def_in, $obj) {
@@ -118,8 +123,45 @@ function addFunction($func_name, $def_in, $obj) {
 	$t[0] = $obj;
 }
 
+addOperation('logic_not', array('bool'), array(
+	'type' => 'bool',
+	'code' => array(
+		"ABS %1.x %2.x",
+		"SGE %1.x 0.0 %1.x"
+	)
+));
 
-addOperation('mul', 'mat4', 'vec4', array(
+addOperation('add', array('vec3', 'vec3'), array(
+	'type' => 'vec3',
+	'code' => array(
+		"ADD %1.xyz %2.xyz %3.xyz"
+	)
+));
+
+addOperation('mul', array('vec3', 'float'), array(
+	'type' => 'vec3',
+	'code' => array(
+		"MUL %1.xyz %2.xyz %3.x"		
+	)
+));
+
+addOperation('mul', array('vec3', 'vec3'), array(
+	'type' => 'vec3',
+	'code' => array(
+		"MUL %1.xyz %2.xyz %3.xyz"		
+	)
+));
+
+addOperation('mul', array('mat3', 'vec3'), array(
+	'type' => 'vec3',
+	'code' => array(
+		"MUL %1.xyz %2[0].xyz %3.x",
+		"MAD %1.xyz %2[1].xyz %3.y %1",
+		"MAD %1.xyz %2[2].xyz %3.z %1",
+	)
+));
+
+addOperation('mul', array('mat4', 'vec4'), array(
 	'type' => 'vec4',
 	'code' => array(
 		"MUL %1 %2[0] %3.x",
@@ -129,7 +171,7 @@ addOperation('mul', 'mat4', 'vec4', array(
 	)
 ));
 
-addOperation('mul', 'mat4', 'mat4', array(
+addOperation('mul', array('mat4', 'mat4'), array(
 	'type' => 'mat4',
 	'code' => array(
 		//Row 1
@@ -152,6 +194,20 @@ addOperation('mul', 'mat4', 'mat4', array(
 		"MAD %1[3] %2[1] %3[3].y %1[3]",
 		"MAD %1[3] %2[2] %3[3].z %1[3]",
 		"MAD %1[3] %2[3] %3[3].w %1[3]",
+	)
+));
+
+addFunction('dot', array('vec3', 'vec3'), array(
+	'type' => 'float',
+	'code' => array(
+		'DP3 %1 %2 %3'
+	)
+));
+
+addFunction('max', array('float', 'float'), array(
+	'type' => 'float',
+	'code' => array(
+		'MAX %1.x %2.x %3.x'
 	)
 ));
 
