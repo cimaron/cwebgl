@@ -2224,7 +2224,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						var decl = new glsl.ast.declaration(yyvsa[yyvsp].identifier, false, null, null);
 						yyval.declarator_list = new glsl.ast.declarator_list(yyvsa[yyvsp - 1].fully_specified_type);
 						yyval.declarator_list.set_location(yylloc);
-						yyval.declarator_list.declarations.push(decl);44
+						yyval.declarator_list.declarations.push(decl);
 						//var symbol = state.symbols.add_variable(yyvsa[yyvsp].identifier);
 						//symbol.definition = yyvsa[yyvsp - 1];
 						break;
@@ -2455,9 +2455,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						}
 						yyval = {};
 						yyval.node = (yyvsa[yyvsp - 1].node);
-						//note that we should insert before yyval.node, but it should
-						//always be the case that yyval.node is at the beginning anyway
-						yyval.node.splice(0, 0, yyvsa[yyvsp].node);
+						yyval.node.push(yyvsa[yyvsp].node);
 						break;
 
 					case 265:
