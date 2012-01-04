@@ -260,7 +260,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 * @param   ast_node    ast_node that represents a field selection
 	 */
 	function expression_field(e, se) {
-		var field, i, s, swz, new_swz, base;
+		var field, i, s, swz, new_swz, base, ir;
 
 		//pick swizzle set
 		field = e.primary_expression.identifier;
@@ -286,12 +286,23 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 
 		if (swz) {
-			e.Dest = sprintf("%s.%s", se[0].Dest, new_swz);
-			e.Type = baseType(se[0].Type);
+
+			e.Type = makeType(baseType(se[0].Type), new_swz.length);
+
+			//if it's an in-order swizzle, just return the identifier
+			if (swizzles[0].substring(0, new_swz.length) == new_swz) {
+				e.Dest = se[0].Dest;
+				return
+			}
+
+			//otherwise, create a new temp
 			if (new_swz.length > 4 || !e.Type) {
 				throw_error(sprintf("Invalid field selection %s.%s", se[0], e.primary_expression.identifier), e);
 			}
-			e.Type = makeType(e.Type, new_swz.length);
+
+			e.Dest = irs.getTemp('$tempv');
+			ir = new IR('MOV', sprintf("%s.%s", e.Dest, new_swz), sprintf("%s.%s", se[0].Dest, new_swz));
+			irs.push(ir);
 		}
 	}
 
@@ -347,7 +358,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		for (i = 0; i < len; i++) {
 			types.push(glsl.type.names[se[i].Type]);
 			if (!(table = table[se[i].Type])) {
-				debugger;
 				throw_error(sprintf("Could not apply operation %s to %s", glsl.ast.op_names[e.oper], types.join(", ")), e);
 				return;
 			}
@@ -664,6 +674,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			}
 
 			parts = parts.split(" ");
+
 			irs.push(new IR(parts[0], parts[1], parts[2], parts[3], parts[4]));
 		}
 	}
@@ -706,7 +717,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		} catch (e) {
 			glsl.errors.push(e);
 		}
-
+console.log(irs.toString());
 		if (glsl.errors.length > 0) {
 			return false;	
 		}

@@ -204,15 +204,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 		//temporary variable
 		if (!entry) {
-
-			if (oper.name[0] == '$') {
-				reg = get_register(i);
-				replace_temp(i, oper.name, oper.offset, reg.out);
-				update_register_life(reg, i + 1);
-				return;
-			}
-
-			//probably something else important. Leave as-is
+			reg = get_register(i);
+			replace_temp(i, oper.name, oper.offset, reg.out);
+			update_register_life(reg, i + 1);
 			return;
 		}
 
@@ -377,7 +371,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		state = new_state;
 		symbols = {};
 		output = [];
-		
+
+		symbols['2D'] = { name : '2D', out : '1' };
+
 		//symbol caches
 		constants = [];
 		program = {local : []};
