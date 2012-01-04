@@ -25,7 +25,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	sprint = StdIO.sprintf;
 
-	function reindex(shader_obj, name, old_index, new_index, symbol) {
+	function reindex(shader_obj, name, old_index, new_index, size, symbol) {
 		var i, j, f, ins, code, diff;
 
 		diff = new_index - old_index;
@@ -48,7 +48,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			//each operand
 			for (j = 0; j < glsl.IR.operands.length; j++) {
 				f = glsl.IR.operands[j];
-				if (ins[f] && ins[f].name == name && ins[f].offset >= old_index) {
+				if (ins[f] && ins[f].name == name
+					&& ins[f].offset >= old_index && ins[f].offset < old_index + size) {
 					ins[f].addOffset(diff);
 				}
 			}
@@ -71,17 +72,19 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					throw new Error(sprintf("Varying '%s' redeclared with different type", attrib.name));
 				}
 
-				//adjust addresses
-				reindex(shader_obj, attrib.out, attrib.location, attrib_obj.location, attrib);
 				continue;
 			}
 
-			//get new location and reindex
 			location = program_obj.getOpenSlot(program_obj.varying);
-			reindex(shader_obj, attrib.out, attrib.location, location, attrib);
-
 			attrib_obj = new cnvgl_program_var(attrib.name, location, attrib.type_size);
 			program_obj.addActiveVarying(attrib_obj);
+		}
+
+		//adjust addresses
+		for (i = attribs.length - 1; i >= 0; i--) {
+			attrib = attribs[i];
+			attrib_obj = program_obj.getActiveVarying(attrib.name);
+			reindex(shader_obj, attrib.name, attrib.location, attrib_obj.location, attrib.size, attrib);
 		}
 	}
 
@@ -99,22 +102,25 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					throw new Error(sprintf("Attribute '%s' redeclared with different type", attrib.name));
 				}
 			
-				//adjust addresses
-				reindex(shader_obj, attrib.out, attrib.location, attrib_obj.location, attrib);
 				continue;
 			}
 
 			//get new location and reindex
 			location = program_obj.getOpenSlot(program_obj.attributes);
-			reindex(shader_obj, attrib.out, attrib.location, location, attrib);
-
 			attrib_obj = new cnvgl_program_var(attrib.name, location, attrib.type_size);
 			program_obj.addActiveAttribute(attrib_obj);
+		}
+		
+		//adjust addresses
+		for (i = attribs.length - 1; i >= 0; i--) {
+			attrib = attribs[i];
+			attrib_obj = program_obj.getActiveAttribute(attrib.name);
+			reindex(shader_obj, attrib.name, attrib.location, attrib_obj.location, attrib.size, attrib);
 		}
 	}
 
 	function addUniforms(program_obj, shader_obj) {
-		var uniforms, i, j, uniform, uniform_obj, location;
+		var constants, uniforms, i, j, uniform, uniform_obj, location;
 
 		constants = shader_obj.object_code.constants;
 		uniforms = shader_obj.object_code.program.local;
@@ -122,11 +128,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		for (i = 0; i < constants.length; i++) {
 			uniform = constants[i];
 
+			//check if already declared
+			if (uniform_obj = program_obj.getActiveUniform(uniform.value)) {
+				continue;
+			}
+
 			//get new location and reindex
 			location = program_obj.getOpenSlot(program_obj.uniforms);
-			reindex(shader_obj, uniform.name, uniform.location, location, uniform);
-
-			uniform_obj = new cnvgl_program_var("", location, 1);
+			uniform_obj = new cnvgl_program_var(uniform.value, location, 1);
 			program_obj.addActiveUniform(uniform_obj);
 		}
 
@@ -140,18 +149,30 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					throw new Error(sprintf("Uniform '%s' redeclared with different type", uniform.name));
 				}
 
-				//adjust addresses
-				reindex(shader_obj, uniform.out, uniform.location, uniform_obj.location, uniform);
 				continue;
 			}
 
 			//get new location and reindex
 			location = program_obj.getOpenSlot(program_obj.uniforms);
-			reindex(shader_obj, uniform.out, uniform.location, location, uniform);
 
 			uniform_obj = new cnvgl_program_var(uniform.name, location, uniform.type_size);
 			program_obj.addActiveUniform(uniform_obj);
 		}
+
+		//adjust addresses
+		for (i = uniforms.length - 1; i >= 0; i--) {
+			uniform = uniforms[i];
+			uniform_obj = program_obj.getActiveUniform(uniform.name);
+			reindex(shader_obj, uniform.out, uniform.location, uniform_obj.location, uniform.size, uniform);
+		}
+
+		//adjust addresses
+		for (i = constants.length - 1; i >= 0; i--) {
+			uniform = constants[i];
+			uniform_obj = program_obj.getActiveUniform(uniform.value);
+			reindex(shader_obj, uniform.name, uniform.location, uniform_obj.location, uniform.size, uniform);
+		}
+
 	}
 
 	function linkObject(program_obj, shader_obj) {

@@ -95,7 +95,7 @@ cnvgl_program = (function() {
 	};
 
 	cnvgl_program.getActiveUniform = function(name) {
-		return this.attributes.names[name];
+		return this.uniforms.names[name];
 	};
 
 	cnvgl_program.getActiveVarying = function(name) {
