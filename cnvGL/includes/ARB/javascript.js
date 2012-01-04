@@ -51,7 +51,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		//'ARL' : false,
 		//'CMP' : false,
 		//'COS' : 'Math.cos(%2)',
-		'DP3' : '%1.* = ((%2.x) * (%3.x) + (%2.y) * (%3.y) + (%2.z) + (%3.z))',
+		'DP3' : '%1[0] = ((%2[0]) * (%3[0]) + (%2[1]) * (%3[1]) + (%2[3]) + (%3[3]))',
 		//'DP4' : '%1.* = (%2.x * %3.x + %2.y * %3.y + %2.z + %3.z + %2.w * %3.w)',
 		//'DPH' : '%1.* = (%2.x * %3.x + %2.y * %3.y + %2.z + %3.z + %3.w)',
 		//'DST' : '%1.* = [1, %2.y * %3.y, %2.z, %3.w]',
