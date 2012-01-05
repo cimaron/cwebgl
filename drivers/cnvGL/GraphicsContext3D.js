@@ -152,6 +152,10 @@ GraphicsContext3D = (function() {
 		glCullFace(mode);
 	};
 
+	GraphicsContext3D.depthFunc = function(func) {
+		glDepthFunc(func);
+	};
+
 	GraphicsContext3D.depthMask = function(flag) {
 		glDepthMask(flag);
 	};
@@ -269,7 +273,6 @@ GraphicsContext3D = (function() {
 	};
 
 	GraphicsContext3D.vertexAttribPointer = function(idx, size, type, normalized, stride, offset) {
-		var pointer = [];
 		glVertexAttribPointer(idx, size, type, normalized, stride, offset);
 	};
 
