@@ -21,11 +21,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 function glDrawArrays(mode, first, count) {
-	var ctx, renderer, program, i, vertex, name, buffer_obj, buffer_data, attr, data, vtx_data, start, k;
+	var ctx, renderer, program_obj, i, vertex, a, buffer_obj, buffer_data, attr, data, vtx_data, start, k;
 
 	ctx = cnvgl_context.getCurrentContext();
 	renderer = ctx.renderer;
-	program = ctx.current_program;
+	program_obj = ctx.shader.activeProgram;
 
 	renderer.setMode(mode);
 
@@ -35,35 +35,19 @@ function glDrawArrays(mode, first, count) {
 		vertex = new cnvgl_vertex();
 
 		//initialize attributes for vertex
-		for (name in program.active_attributes) {
-			
-			attr = program.active_attributes[name];
-
-			vtx_data = [];
-			vertex.attributes[attr.location] = vtx_data;
-			//initialize
+		for (a in program_obj.attributes.active) {
+			attr = program_obj.attributes.active[a];
 
 			data = ctx.vertex_attrib_arrays[attr.location];
-
 			//no buffer data was specified for this attribute
 			if (!(buffer_obj = data.buffer_obj)) {
 				continue;
 			}
-			
-			buffer_data = buffer_obj.getData();
 
+			buffer_data = buffer_obj.getData();
 			start = (data.pointer / buffer_data.BYTES_PER_ELEMENT) + (i * data.size + data.stride);
 
-			for (k = 0; k < attr.size; k++) {
-				if (k < data.size) {
-					vtx_data[k] = buffer_data[k + start];
-				} else {
-					vtx_data[k] = 0;	
-				}
-			}
-			if (attr.size == 1) {
-				vertex.attributes[attr.location] = vtx_data[0];
-			}
+			GPU.memcpy(vertex.attributes, attr.location * 4, buffer_data, attr.size, start);
 		}
 
 		renderer.send(vertex);
@@ -74,11 +58,11 @@ function glDrawArrays(mode, first, count) {
 
 
 function glDrawElements(mode, count, type, indices) {
-	var ctx, renderer, program, buffer_obj, elements, i, vertex, index, name, buffer, buffer_data, attr, data, vtx_data, start, k;
+	var ctx, renderer, program_obj, buffer_obj, elements, i, vertex, index, a, buffer, buffer_data, attr, data, vtx_data, start, k;
 
 	ctx = cnvgl_context.getCurrentContext();
 	renderer = ctx.renderer;
-	program = ctx.current_program;
+	program_obj = ctx.shader.activeProgram;
 
 	renderer.setMode(mode);
 
@@ -93,35 +77,20 @@ function glDrawElements(mode, count, type, indices) {
 		index = elements[i + indices];
 
 		//initialize attributes for vertex
-		for (name in program.active_attributes) {
-			
-			attr = program.active_attributes[name];
-
-			vtx_data = [];
-			vertex.attributes[attr.location] = vtx_data;
-			//initialize
+		for (a in program_obj.attributes.active) {
+			attr = program_obj.attributes.active[a];
 
 			data = ctx.vertex_attrib_arrays[attr.location];
-
 			//no buffer data was specified for this attribute
-			if (!(buffer = data.buffer_obj)) {
+			if (!(buffer_obj = data.buffer_obj)) {
 				continue;
 			}
-			
-			buffer_data = buffer.getData(Float32Array);
+
+			buffer_data = buffer_obj.getData(Float32Array);
 
 			start = (data.pointer / buffer_data.BYTES_PER_ELEMENT) + (index * data.size + data.stride);
 
-			for (k = 0; k < attr.size; k++) {
-				if (k < data.size) {
-					vtx_data[k] = buffer_data[k + start];
-				} else {
-					vtx_data[k] = 0;
-				}
-			}
-			if (attr.size == 1) {
-				vertex.attributes[attr.location] = vtx_data[0];
-			}
+			GPU.memcpy(vertex.attributes, attr.location * 4, buffer_data, attr.size, start);
 		}
 
 		renderer.send(vertex);

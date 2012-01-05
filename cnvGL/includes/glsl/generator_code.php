@@ -165,7 +165,7 @@ foreach ($operation_rules as $rule) {
 	if (!in_array($func, $operation_functions)) {
 		$operation_functions[] = $func;
 	}
-	
+
 	$path = preg_split("#\s+#", trim($rule[0]));
 	
 	$list = &$operation_table;

@@ -19,183 +19,201 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+(function(glsl, ARB, StdIO) {
+		  
+	var sprintf;
 
-GlslLinker = (function() {
+	sprint = StdIO.sprintf;
 
-	//Internal Constructor
-	function Initializer() {
-		//public:
-		this.status = false;
-		this.errors = [];
-		this.input = [];
-		this.program = null;
+	function reindex(shader_obj, name, old_index, new_index, size, symbol) {
+		var i, j, f, ins, code, diff;
 
-		this.fragment = null;
-		this.vertex = null;
-		this.external = {};
+		diff = new_index - old_index;
 
-		this.sizes = {};
-	}
-
-	var linker = jClass('linker', Initializer);
-
-	var func_table = {"@gl_Position@":"this.vertex['%s']","@gl_FragDepth@":"this.fragment['%s']","@gl_FragColor@":"this.fragment['%s']","@dot.6.6@":"vec3.%s","@max.1.1@":"Math.%s","@reflect.5.6@":"vec2.%s","@reflect.6.6@":"vec3.%s","@reflect.7.7@":"vec4.%s","@normalize.5@":"vec2.%s","@normalize.6@":"vec3.%s","@normalize.7@":"vec4.%s","@sqrt.1@":"Math.%s","@texture2D.27.5@":"this._%s"};
-
-	//public:
-
-	linker.linker = function() {
-		var i;
-		for (i in func_table) {
-			this.addExternalReference(i, func_table[i]);
-		}
-	};
-
-	linker.addExternalReference = function(object_name, output) {
-		if (!this.external[output]) {
-			this.external[output] = [];
-		}
-		this.external[output].push(object_name);
-	};
-
-	linker.link = function(program) {
-		var i;
-		this.program = program;
-		this.fragment = '';
-		this.vertex = '';
-
-		this.status = false;
-		this.errors = [];
-
-		for (i = 0; i < this.input.length; i++) {
-			this.processAttributes(this.input[i]);
-			this.merge(this.input[i]);
+		if (diff == 0) {
+			return;
 		}
 
-		this.program.fragment_program = this.fragment;
-		this.program.vertex_program = this.vertex;
+		symbol.location = new_index;
 
-		this.status = 1;
-	};
+		code = shader_obj.object_code.body;
+		for (i = 0; i < code.length; i++) {
+			ins = code[i];
 
-	linker.addObjectCode = function(object) {
-		this.input.push(object);
-	};
-
-	linker.merge = function(shader) {
-		var code = this.processSymbols(shader);
-		if (shader.mode == 1) {
-			code = code.replace(/@fragment.main@/g, 'main');
-			this.fragment += code;
-		} else {
-			code = code.replace(/@vertex.main@/g, 'main');
-			this.vertex += code;
-		}
-	};
-	
-	linker.processAttributes = function(shader) {
-		var symbol_table, name, entry;
-		symbol_table = shader.symbol_table.table.data;
-
-		//look for active attributes in symbol table and match them to bound attributes
-		for (name in symbol_table) {
-			entry = symbol_table[name];
-			if (entry.qualifier_name == 'attribute' && this.program.attributes[name]) {
-				attrib_obj = this.program.attributes[name];
-				this.addActiveAttribute(attrib_obj);
+			//not an instruction object
+			if (!ins.d) {
+				continue;
 			}
-		}
-	};
-	
-	linker.addActiveAttribute = function(attrib_obj) {
-		var i;
-		if (typeof attrib_obj.location != 'number') {
-			for (i = 0; i <= this.program.active_attributes_values.length; i++) {
-				if (typeof this.program.active_attributes_values[i] == 'undefined') {
-					break;
+
+			//each operand
+			for (j = 0; j < glsl.IR.operands.length; j++) {
+				f = glsl.IR.operands[j];
+				if (ins[f] && ins[f].name == name
+					&& ins[f].offset >= old_index && ins[f].offset < old_index + size) {
+					ins[f].addOffset(diff);
 				}
 			}
-			attrib_obj.location = i;
 		}
-		i = attrib_obj.location;
-		this.program.active_attributes[attrib_obj.name] = attrib_obj;
-		this.program.active_attributes_values[attrib_obj.location] = null;
-		this.program.active_attributes_count++;
-	};
+	}
 
-	linker.processSymbols = function(shader) {
-		var symbol_table, code, location, name, entry, uniform_obj, attrib_obj, i, e, f;
+	function addVarying(program_obj, shader_obj) {
+		var attribs, i, attrib, location;
 
-		symbol_table = shader.symbol_table.table.data;
-		code = shader.object_code;
-		location = 0;
+		attribs = shader_obj.object_code.fragment.attrib;
 
-		for (name in symbol_table) {
+		for (i = 0; i < attribs.length; i++) {
+			attrib = attribs[i];
 
-			entry = symbol_table[name];
+			//check if already declared
+			if (attrib_obj = program_obj.getActiveVarying(attrib.name)) {
 
-			switch (entry.qualifier_name) {
+				//already exists as different type
+				if (attrib_obj.size != attrib.type_size) {
+					throw new Error(sprintf("Varying '%s' redeclared with different type", attrib.name));
+				}
 
-				//external communication (special cases)
-				case 'uniform':
-					uniform_obj = new cnvgl_uniform(entry);
-					uniform_obj.location = this.program.active_uniforms_count;
-					this.program.active_uniforms.push(uniform_obj);
-					this.program.active_uniforms_count++;
-					code = this.replaceSymbol(code, entry.object_name, 'this._uniforms['+uniform_obj.location+']');						
-					break;
-
-				case 'attribute':
-					if (this.program.active_attributes[entry.name]) {
-						attrib_obj = this.program.active_attributes[entry.name];
-						attrib_obj.definition = entry;
-					} else {
-						attrib_obj = new cnvgl_attribute(entry.name, entry);
-						this.addActiveAttribute(attrib_obj);
-					}
-					attrib_obj.size = glsl.type.size[entry.type];
-					code = this.replaceSymbol(code, entry.object_name, 'this.vertex.attributes['+attrib_obj.location+']');
-					break;
-
-				case 'out':
-					code = this.replaceSymbol(code, entry.object_name, "this._out['"+entry.name+"']");
-					break;
-
-				case 'varying':
-					if (shader.mode == 1) {
-						code = this.replaceSymbol(code, entry.object_name, "this.fragment.varying['"+entry.name+"']");
-					} else {
-						code = this.replaceSymbol(code, entry.object_name, "this.vertex.varying['"+entry.name+"']");
-					}
-					break;
-
-				default:
-
-					f = false;
-					//search for external object references
-					for (i in this.external) {
-						f = this.external[i].indexOf(entry.object_name) != -1;
-						if (f) {
-							e = i.replace('%s', entry.name);
-							code = this.replaceSymbol(code, entry.object_name, e);
-							break;
-						}
-					}
-
-					//nothing found, just replace symbol
-					if (!f && entry.typedef == 0) {
-						code = this.replaceSymbol(code, entry.object_name, entry.name);
-					}
+				continue;
 			}
+
+			location = program_obj.getOpenSlot(program_obj.varying);
+			attrib_obj = new cnvgl_program_var(attrib.name, location, attrib.type_size);
+			program_obj.addActiveVarying(attrib_obj);
 		}
 
-		return code;
-	};
+		//adjust addresses
+		for (i = attribs.length - 1; i >= 0; i--) {
+			attrib = attribs[i];
+			attrib_obj = program_obj.getActiveVarying(attrib.name);
+			reindex(shader_obj, attrib.name, attrib.location, attrib_obj.location, attrib.size, attrib);
+		}
+	}
 
-	linker.replaceSymbol = function(code, object_name, repl) {
-		return code.replace(new RegExp(object_name, 'g'), repl);
-	};
+	function addAttributes(program_obj, shader_obj) {
+		var attribs, i, j, attrib, location;
 
-	return linker.Constructor;
+		attribs = shader_obj.object_code.vertex.attrib;
 
-}());
+		for (i = 0; i < attribs.length; i++) {
+			attrib = attribs[i];
+
+			//check if already declared
+			if (attrib_obj = program_obj.getActiveAttribute(attrib.name)) {
+				if (attrib_obj.size != attrib.type_size) {
+					throw new Error(sprintf("Attribute '%s' redeclared with different type", attrib.name));
+				}
+			
+				continue;
+			}
+
+			//get new location and reindex
+			location = program_obj.getOpenSlot(program_obj.attributes);
+			attrib_obj = new cnvgl_program_var(attrib.name, location, attrib.type_size);
+			program_obj.addActiveAttribute(attrib_obj);
+		}
+		
+		//adjust addresses
+		for (i = attribs.length - 1; i >= 0; i--) {
+			attrib = attribs[i];
+			attrib_obj = program_obj.getActiveAttribute(attrib.name);
+			reindex(shader_obj, attrib.name, attrib.location, attrib_obj.location, attrib.size, attrib);
+		}
+	}
+
+	function addUniforms(program_obj, shader_obj) {
+		var constants, uniforms, i, j, uniform, uniform_obj, location;
+
+		constants = shader_obj.object_code.constants;
+		uniforms = shader_obj.object_code.program.local;
+
+		for (i = 0; i < constants.length; i++) {
+			uniform = constants[i];
+
+			//check if already declared
+			if (uniform_obj = program_obj.getActiveUniform(uniform.value)) {
+				continue;
+			}
+
+			//get new location and reindex
+			location = program_obj.getOpenSlot(program_obj.uniforms);
+			uniform_obj = new cnvgl_program_var(uniform.value, location, 1);
+			program_obj.addActiveUniform(uniform_obj);
+		}
+
+		for (i = 0; i < uniforms.length; i++) {
+			uniform = uniforms[i];
+
+			//check if already declared
+			if (uniform_obj = program_obj.getActiveUniform(uniform.name)) {
+
+				if (uniform_obj.size != uniform.type_size) {
+					throw new Error(sprintf("Uniform '%s' redeclared with different type", uniform.name));
+				}
+
+				continue;
+			}
+
+			//get new location and reindex
+			location = program_obj.getOpenSlot(program_obj.uniforms);
+
+			uniform_obj = new cnvgl_program_var(uniform.name, location, uniform.type_size);
+			program_obj.addActiveUniform(uniform_obj);
+		}
+
+		//adjust addresses
+		for (i = uniforms.length - 1; i >= 0; i--) {
+			uniform = uniforms[i];
+			uniform_obj = program_obj.getActiveUniform(uniform.name);
+			reindex(shader_obj, uniform.out, uniform.location, uniform_obj.location, uniform.size, uniform);
+		}
+
+		//adjust addresses
+		for (i = constants.length - 1; i >= 0; i--) {
+			uniform = constants[i];
+			uniform_obj = program_obj.getActiveUniform(uniform.value);
+			reindex(shader_obj, uniform.name, uniform.location, uniform_obj.location, uniform.size, uniform);
+		}
+
+	}
+
+	function linkObject(program_obj, shader_obj) {
+		var result, output;
+
+		try {
+			addAttributes(program_obj, shader_obj);
+			addUniforms(program_obj, shader_obj);
+			addVarying(program_obj, shader_obj);
+		} catch (e) {
+			glsl.errors.push(e);
+			return false;
+		}
+
+		//do translation into native javascript
+		result = ARB.translate(shader_obj.object_code, 'javascript');
+		output = result ? ARB.output : null;
+
+		return output;
+	}
+
+	function link(program_obj) {
+		var i, status, shader_obj;
+		status = 1;
+
+		//reset
+		program_obj.reset();
+
+		for (i = 0; i < program_obj.attached_shaders.length; i++) {
+			shader_obj = program_obj.attached_shaders[i];
+			shader_obj.exec = linkObject(program_obj, shader_obj);
+			status &= !!shader_obj.exec;
+		}
+
+		return status;
+	}
+
+	/**
+	 * External interface
+	 */
+	glsl.link = link;
+
+}(glsl, ARB, StdIO));
 

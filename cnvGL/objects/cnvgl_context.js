@@ -29,6 +29,7 @@ var cnvgl_context = (function() {
 		this.depth = {};
 		this.pack = {};
 		this.polygon = {};
+		this.shader = {};
 		this.texture = {};
 		this.unpack = {};
 		this.viewport = {};
@@ -41,7 +42,6 @@ var cnvgl_context = (function() {
 		this.depth_buffer = null;
 
 		//Buffers
-		this.current_program = null;
 		this.vertex_attrib_arrays = [];
 
 		this.shared = null;
@@ -72,7 +72,9 @@ var cnvgl_context = (function() {
 			blendSrcRGB : GL_ONE,
 			blendSrcA : GL_ONE,
 			blendDestRGB : GL_ZERO,
-			blendDestA : GL_ZERO
+			blendDestA : GL_ZERO,
+			blendEquationRGB : GL_FUNC_ADD,
+			blendEquationA : GL_FUNC_ADD
 		};
 
 		//depth state
@@ -93,6 +95,11 @@ var cnvgl_context = (function() {
 			cullFaceMode : GL_BACK,
 			cullFlag : GL_FALSE,
 			frontFace : GL_CCW
+		};
+
+		//shader state
+		this.shader = {
+			activeProgram : null	
 		};
 
 		//texture state
@@ -117,7 +124,7 @@ var cnvgl_context = (function() {
 		this.errorValue = GL_NO_ERROR;
 
 		//Vertex attribute arrays
-		for (i = 0; i < cnvgl_const.GL_MAX_VERTEX_ATTRIBS; i++) {
+		for (i = 0; i < GPU.shader.MAX_VERTEX_ATTRIBS; i++) {
 			this.vertex_attrib_arrays[i] = new cnvgl_attrib_array_object();
 		}
 
@@ -128,11 +135,12 @@ var cnvgl_context = (function() {
 		var units, i, unit;
 		this.texture.currentUnit = GL_TEXTURE0;
 		this.texture.unit = [];
-		for (i = 0; i < cnvgl_const.GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS; i++) {
-			unit = new cnvgl_texture_unit(this, GL_TEXTURE0 + i);
+		for (i = 0; i < GPU.texture.MAX_COMBINED_TEXTURE_IMAGE_UNITS; i++) {
+			unit = new cnvgl_texture_unit(this, i);
 			unit.current_texture[GL_TEXTURE_2D] = this.shared.default_texture_objects[GL_TEXTURE_2D];
 			this.texture.unit[i] = unit;
 		}
+		GPU.setTextureUnit(this.texture.unit);
 	};
 
 	//static:

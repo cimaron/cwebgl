@@ -19,52 +19,43 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-cnvgl_rendering_texture = (function() {
+(function(GPU) {
+	var teture, i, j, texUnit;
 
-	//Internal Constructor
-	function Initializer() {
-
-		//public:
-		this.ctx = null;
-		this.renderer = null;
-	}
-
-	var cnvgl_rendering_texture = jClass('cnvgl_rendering_texture', Initializer);
-
-	//public:
-	cnvgl_rendering_texture.cnvgl_rendering_texture = function(ctx, renderer) {
-		this.ctx = ctx;
-		this.renderer = renderer;
+	texture = {
+		MAX_TEXTURE_COORDS : 4,
+		MAX_COMBINED_TEXTURE_IMAGE_UNITS : 2
 	};
 
-	//Note: all the following functions will be executed in the 'this' context of cnvgl_rendering_data
+	texUnit = [];
+	for (i = 0; i < texture.MAX_COMBINED_TEXTURE_IMAGE_UNITS; i++) {
+		texUnit[i] = [];
+		for (j = 0; j < 1; j++) {
+			texUnit[i][j] = [];	
+		}
+	}
 
-	cnvgl_rendering_texture.texture2D = function(sampler, coord, bias) {
-		var texture_obj, mipmap_level, img, u, v, u1, v1, s, t, c, i, i1, tao, img_w, img_h, img_d;
-
-		texture_obj = this._ctx.texture.unit[sampler].current_texture[GL_TEXTURE_2D];
-
-		//todo: mipmap 
+	function tex(c, sampler, s, t, target) {
+		var texture, mipmap_level, img, img_w, img_h, img_d, i, u, v, u1, v1, i1;
+		target = 0;
 		mipmap_level = 0;
-		img = texture_obj.images[mipmap_level];
 
-		s = coord[0];
-		t = coord[1];
-		c = [];
+		texture = texUnit[sampler].current_texture[GL_TEXTURE_2D];
+		img = texture.images[mipmap_level];
 
-		if (img) {
-			img_w = img.width;
-			img_h = img.height;
-			img_d = img.data;
-		} else {
-			img_w = 1;
-			img_h = 1;
-			img_d = [0,0,0,1];
+		if (!img) {
+			c[0] = 0;
+			c[1] = 0;
+			c[2] = 0;
+			c[3] = 1;
+			return;
 		}
 
-		//how to determine if using mag or min?
+		img_w = img.width;
+		img_h = img.height;
+		img_d = img.data;
 
-		switch (texture_obj.min_filter) {
+		switch (texture.min_filter) {
 			case GL_LINEAR:
 				u = (s * img_w - .5)|0; //floor(s * img.width - .5)
 				v = (t * img_h - .5)|0; //floor(t * img.height - .5)
@@ -88,7 +79,7 @@ cnvgl_rendering_texture = (function() {
 				c[2] = u0v0 * img_d[i + 2] + u1v0 * img_d[i + 6] + u0v1 * img_d[i1 + 2] + u1v1 * img_d[i1 + 6];
 				c[3] = u0v0 * img_d[i + 3] + u1v0 * img_d[i + 7] + u0v1 * img_d[i1 + 3] + u1v1 * img_d[i1 + 7];
 				break;
-				
+
 			case GL_NEAREST:
 			default:
 				u = (s * img_w)|0; //floor(s * img.width)
@@ -106,10 +97,14 @@ cnvgl_rendering_texture = (function() {
 				c[3] = img_d[i + 3];
 		}
 
-		return c;
+	}
+
+	GPU.texture = texture;
+	GPU.shader.setTexFunc(tex);
+
+	GPU.setTextureUnit = function(unit) {
+		texUnit = unit;
 	};
 
-	return cnvgl_rendering_texture.Constructor;
-
-}());
+}(GPU));
 

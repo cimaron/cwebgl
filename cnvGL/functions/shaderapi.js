@@ -21,13 +21,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 function glAttachShader(program, shader) {
-
 	var ctx, program_obj, shader_obj;
 
 	ctx = cnvgl_context.getCurrentContext();
 
-	program_obj = ctx.shared.program_objects[program];
-	shader_obj = cnvgl_objects[shader];
+	program_obj = ctx.shared.shaderObjects[program];
+	shader_obj = ctx.shared.shaderObjects[shader];
 
 	//program or shader does not exist
 	if (!program_obj || !shader_obj) {
@@ -41,8 +40,7 @@ function glAttachShader(program, shader) {
 		return;
 	}
 
-	program_obj.attached_shaders.push(shader);	
-	program_obj.attached_shaders_count++;
+	program_obj.attached_shaders.push(shader_obj);	
 }
 
 
@@ -50,7 +48,7 @@ function glBindAttribLocation(program, index, name) {
 	var ctx, program_obj, attr_obj;
 
 	ctx = cnvgl_context.getCurrentContext();
-	program_obj = ctx.shared.program_objects[program];
+	program_obj = ctx.shared.shaderObjects[program];
 	
 	//no program exists
 	if (!program_obj) {
@@ -72,9 +70,10 @@ function glBindAttribLocation(program, index, name) {
 
 
 function glCompileShader(shader) {
+	var ctx, shader_obj, target, status;
 
-	//get shader
-	var shader_obj = cnvgl_objects[shader];
+	ctx = cnvgl_context.getCurrentContext();
+	shader_obj = ctx.shared.shaderObjects[shader];
 
 	//no shader exists
 	if (!shader_obj) {
@@ -90,44 +89,36 @@ function glCompileShader(shader) {
 
 	shader_obj.compile_status = GL_FALSE;
 	shader_obj.information_log = '';
-	shader_obj.information_log_length = 0;
 
-	//get source
-	var shader_string = shader_obj.shader_string;
+	target = (shader_obj.type == GL_FRAGMENT_SHADER) ? glsl.mode.fragment : glsl.mode.vertex;
 
-	var glsl_mode = (shader_obj.type == GL_FRAGMENT_SHADER) ? 1 : 2;
+	status = glsl.compile(shader_obj.shader_string, target);
 
-	glsl.compile(shader_string, glsl_mode);
-
-	if (glsl.status) {
+	if (status) {
 		shader_obj.compile_status = GL_TRUE;
 		shader_obj.object_code = glsl.output;
 	} else {
 		shader_obj.information_log = glsl.errors.join("\n");
-		shader_obj.information_log_length = shader_obj.information_log.length;
 	}
 }
 
 
-function glCreateShader(/*GLenum*/ shaderType) {
+function glCreateShader(shaderType) {
+	var ctx, shader_obj, name;
+
+	ctx = cnvgl_context.getCurrentContext();
 
 	if (shaderType != GL_FRAGMENT_SHADER && shaderType != GL_VERTEX_SHADER) {
 		cnvgl_throw_error(GL_INVALID_ENUM);
 		return 0;
 	}
 
-	/*if (between glBegin and glEnd) {
-		throw GL_INVALID_OPERATION
-		return 0;
-	} */
-	
-	var shader = new cnvgl_shader();
-	shader.type = shaderType;
+	name = ctx.shared.shaderObjects.length;
 
-	cnvgl_objects.push(shader);
-	shader.name = cnvgl_objects.length - 1;
-	
-	return shader.name;
+	shader_obj = new cnvgl_shader(name, shaderType);	
+	ctx.shared.shaderObjects.push(shader_obj);
+
+	return shader_obj.name;
 }
 
 
@@ -135,23 +126,23 @@ function glCreateProgram() {
 	var ctx, program_obj, name;
 
 	ctx = cnvgl_context.getCurrentContext();
-	name = ctx.shared.program_objects.length;
+	name = ctx.shared.shaderObjects.length;
 
 	program_obj = new cnvgl_program();
 	program_obj.name = name;
 
-	ctx.shared.program_objects.push(program_obj);
+	ctx.shared.shaderObjects.push(program_obj);
 
 	return name;
 }
 
 
 function glGetAttribLocation(program, name) {
-	var ctx, program_obj, i;
+	var ctx, program_obj, attr_obj;
 
 	//get program
 	ctx = cnvgl_context.getCurrentContext();
-	program_obj = ctx.shared.program_objects[program];
+	program_obj = ctx.shared.shaderObjects[program];
 
 	//no program exists
 	if (!program_obj) {
@@ -164,11 +155,11 @@ function glGetAttribLocation(program, name) {
 		return;
 	}
 
-	if (name.indexOf('gl_') == 0 || !program_obj.active_attributes[name]) {
-		return -1;
+	if (attrib_obj = program_obj.getActiveAttribute(name)) {
+		return attrib_obj.location;	
 	}
-	
-	return program_obj.active_attributes[name].location;
+
+	return -1;
 }
 
 
@@ -177,7 +168,7 @@ function glGetProgramiv(program, pname, params) {
 
 	//get program
 	ctx = cnvgl_context.getCurrentContext();
-	program_obj = ctx.shared.program_objects[program];
+	program_obj = ctx.shared.shaderObjects[program];
 
 	//no shader exists
 	if (!program_obj) {
@@ -206,39 +197,32 @@ function glGetProgramiv(program, pname, params) {
 			break;
 		
 		case GL_INFO_LOG_LENGTH:
-			params[0] = program_obj.information_log_length;
+			params[0] = program_obj.information_log.length;
 			break;
 
 		case GL_ATTACHED_SHADERS:
-			params[0] = program_obj.attached_shaders_count;
+			params[0] = program_obj.attached_shaders.length;
 			break;
 		
 		case GL_ACTIVE_ATTRIBUTES:
-			params[0] = 0;
-			params[0] = program_obj.active_attributes_count;
+			params[0] = program_obj.attributes.active.length;
 			break;
 
 		case GL_ACTIVE_ATTRIBUTE_MAX_LENGTH:
 			params[0] = 0;
-			t = program_obj.active_attributes;
-			for (i = 0; i < program_obj.active_attributes_count; i++) {
-				if (params[0] < t[i].name.length) {
-					params[0] = t[i].name.length;	
-				}
+			for (i in program_obj.attributes.names) {
+				params[0] = Math.max(params[0], i.length);
 			}
 			break;
-		
+
 		case GL_ACTIVE_UNIFORMS:
-			params[0] = program_obj.active_uniforms_count;
+			params[0] = program_obj.uniforms.active.length;
 			break;
 
 		case GL_ACTIVE_UNIFORM_MAX_LENGTH:
 			params[0] = 0;
-			t = program_obj.active_uniforms;
-			for (i = 0; i < program_obj.active_uniforms_count; i++) {
-				if (params[0] < t[i].name.length) {
-					params[0] = t[i].name.length;	
-				}
+			for (i in program_obj.uniforms.names) {
+				params[0] = Math.max(params[0], i.length);					
 			}
 			break;
 
@@ -250,9 +234,11 @@ function glGetProgramiv(program, pname, params) {
 
 
 function glGetShaderiv(shader, pname, params) {
-
+	var ctx, shader_obj;
+	
 	//get shader
-	var shader_obj = cnvgl_objects[shader];
+	ctx = cnvgl_context.getCurrentContext();
+	shader_obj = ctx.shared.shaderObjects[shader];
 
 	//no shader exists
 	if (!shader_obj) {
@@ -277,10 +263,10 @@ function glGetShaderiv(shader, pname, params) {
 			params[0] = shader_obj.compile_status ? GL_TRUE : GL_FALSE;
 			break;
 		case GL_INFO_LOG_LENGTH:
-			params[0] = shader_obj.information_log_length;
+			params[0] = shader_obj.information_log.length;
 			break;
 		case GL_SHADER_SOURCE_LENGTH:
-			params[0] = shader_obj.shader_string_length;
+			params[0] = shader_obj.shader_string.length;
 			break;
 		default:
 			cnvgl_throw_error(GL_INVALID_ENUM);
@@ -290,10 +276,12 @@ function glGetShaderiv(shader, pname, params) {
 
 
 function glGetShaderInfoLog(shader, maxLength, length, infoLog) {
+	var ctx, shader_obj;
 
 	//get shader
-	var shader_obj = cnvgl_objects[shader];
-
+	ctx = cnvgl_context.getCurrentContext();
+	shader_obj = ctx.shared.shaderObjects[shader];
+	
 	//no shader exists
 	if (!shader_obj) {
 		cnvgl_throw_error(GL_INVALID_VALUE);
@@ -305,16 +293,11 @@ function glGetShaderInfoLog(shader, maxLength, length, infoLog) {
 		cnvgl_throw_error(GL_INVALID_OPERATION);
 		return;
 	}
-	
+
 	if (maxLength < 0) {
 		cnvgl_throw_error(GL_INVALID_VALUE);
 		return;
 	}
-
-	/*if (between glBegin and glEnd) {
-		cnvgl_throw_error(GL_INVALID_OPERATION);
-		return 0;
-	} */
 
 	var log = shader_obj.information_log;
 	
@@ -328,11 +311,11 @@ function glGetShaderInfoLog(shader, maxLength, length, infoLog) {
 
 
 function glLinkProgram(program) {
-	var ctx, program_obj, linker, i, attrib_obj;
+	var ctx, program_obj, i, attrib_obj, location, shader_obj, code;
 
 	//get program
 	ctx = cnvgl_context.getCurrentContext();
-	program_obj = ctx.shared.program_objects[program];
+	program_obj = ctx.shared.shaderObjects[program];
 
 	//no program exists
 	if (!program_obj) {
@@ -346,48 +329,19 @@ function glLinkProgram(program) {
 		return;
 	}
 
-	//link error conditions:
-	//The number of active attribute variables supported by the implementation has been exceeded.
-
-	//reset
-	program_obj.link_status = false;
-	program_obj.fragment_program = null;
-	program_obj.vertex_program = null;
-
-	program_obj.active_uniforms_count = 0;
-	program_obj.active_uniforms = [];
-	program_obj.active_uniforms_values = [];
-
-	program_obj.active_attributes_count = 0;
-	program_obj.active_attributes = [];
-	program_obj.active_attributes_values = [];	
-
-	linker = ctx.shared.linker;
-
-	//may want to move this into the linker itself
-	for (i = 0; i < program_obj.attached_shaders_count; i++) {
-		var location = program_obj.attached_shaders[i];
-		var shader_obj = cnvgl_objects[location];
-		linker.addObjectCode(shader_obj.object_code);
-	}
-
-	linker.link(program_obj);
-
-	if (linker.status) {
+	if (glsl.link(program_obj)) {
 		program_obj.link_status = true;
-		program_obj.program = linker.output;
 	}
+	
+	//add linker errors here
 }
 
 
 function glShaderSource(shader, count, string, length) {
+	var ctx, shader_obj;
 
-	//if (shader compiler not supported) then
-	//	cnvgl_throw_error(GL_INVALID_OPERATION);
-	//endif
-
-	//get shader
-	var shader_obj = cnvgl_objects[shader];
+	ctx = cnvgl_context.getCurrentContext();
+	shader_obj = ctx.shared.shaderObjects[shader];
 
 	//no shader exists
 	if (!shader_obj) {
@@ -401,33 +355,24 @@ function glShaderSource(shader, count, string, length) {
 		return;
 	}
 
-	/*
-	if (string.length < 0) {
-		cnvgl_throw_error(GL_INVALID_VALUE);
-	}
-	*/
-
-	//if between glbegin and glend
-	//cnvgl_throw_error(GL_INVALID_OPERATION);
-
 	shader_obj.shader_string = string.join();
-	shader_obj.shader_string_length = shader_obj.shader_string.length;
 }
 
 
 function glUseProgram(program) {
-	var ctx, program_obj;
+	var ctx, program_obj, i, shader_obj;
 
 	ctx = cnvgl_context.getCurrentContext();
 
 	if (program == 0) {
-		ctx.vertex_executable = null;
-		ctx.fragment_executable = null;
+		ctx.shader.activeProgram = null;
+		GPU.setVertexProgram(null);
+		GPU.setFragmentProgram(null);
 		return;
 	}
 
 	//get program
-	program_obj = ctx.shared.program_objects[program];
+	program_obj = ctx.shared.shaderObjects[program];
 
 	//no program exists
 	if (!program_obj) {
@@ -446,8 +391,16 @@ function glUseProgram(program) {
 		return;
 	}
 
-	ctx.current_program = program_obj;
+	ctx.shader.activeProgram = program_obj;
 
-	ctx.renderer.setProgram(program_obj);
+	//set active shaders in GPU
+	for (i = 0; i < program_obj.attached_shaders.length; i++) {
+		shader_obj = program_obj.attached_shaders[i];
+		if (shader_obj.type == GL_VERTEX_SHADER) {
+			GPU.uploadVertexShader(shader_obj.exec);
+		} else {
+			GPU.uploadFragmentShader(shader_obj.exec);	
+		}
+	}
 }
 

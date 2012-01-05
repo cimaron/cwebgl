@@ -1,3 +1,4 @@
+<?php
 /*
 Copyright (c) 2011 Cimaron Shanahan
 
@@ -19,15 +20,11 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+require_once 'include.php';
 
-function cnvgl_texture_image(texture_object) {
-
-	this.texture_object = texture_object;
-
-	this.width = 0;
-	this.height = 0;
-
-	this.data = null;
-	this.internalFormat = null;
-}
+$include('library/jClass/jClass.js');
+$include('library/TypedArray/TypedArray.js');
+$include('library/stdio/stdio.js');
+$include('cnvGL/includes/gpu/gpu.js');
+$include('cnvGL/includes/glsl/glsl.js');
 

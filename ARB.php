@@ -1,3 +1,4 @@
+<?php
 /*
 Copyright (c) 2011 Cimaron Shanahan
 
@@ -19,15 +20,11 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+require_once 'include.php';
 
-function cnvgl_uniform(definition) {
+$include('library/jClass/jClass.js');
+$include('library/TypedArray/TypedArray.js');
+$include('library/stdio/stdio.js');
+$include('cnvGL/includes/ARB/ARB.js');
+$include('cnvGL/includes/gpu/gpu.js');
 
-	//state
-	this.location = null;
-	this.size = null;
-	this.type = null;
-	this.name = definition.name;
-	
-	//custom state
-	this.definition = definition;
-}

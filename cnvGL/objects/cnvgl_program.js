@@ -19,34 +19,100 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+cnvgl_program = (function() {
 
-function cnvgl_program() {
+	function var_set() {
+		this.bound = {};
+		this.active = [];
+		this.names = {};
+	}
 
-	//state
-	this.name = 0;
-	this.delete_status = GL_FALSE;
-	this.link_status = null;
-	this.validate_status = null;
-	this.information_log = '';
-	this.information_log_length = 0;
+	function Initializer() {
+		this.name = 0;
+		this.attached_shaders = [];
 
-	//shaders
-	this.attached_shaders_count = 0;
-	this.attached_shaders = [];
+		//link status
+		this.delete_status = 0;
+		this.link_status = 0;
+		this.validate_status = 0;
+		this.information_log = "";
 
-	//uniforms
-	this.active_uniforms_count = 0;
-	this.active_uniforms = [];
-	this.active_uniforms_values = [];
+		//variable information
+		this.uniforms = null;
+		this.attributes = null;
+		this.varying = null;
+	}
 
-	//attributes
-	this.attributes = {};
-	this.active_attributes_count = 0;
-	this.active_attributes = [];
-	this.active_attributes_values = [];
+	var cnvgl_program = jClass('cnvgl_program', Initializer);
 
-	//programs
-	this.fragment_program = null;
-	this.vertex_program = null;
+	cnvgl_program.cnvgl_program = function() {
+		this.reset();
+	};
+
+	cnvgl_program.reset = function() {
+		var bound_attr;
+
+		this.delete_status = 0;
+		this.link_status = 0;
+		this.validate_status = 0;
+		this.information_log = "";
+
+		bound_attr = this.attributes ? this.attributes.bound : {};
+
+		this.uniforms = new var_set();
+		this.attributes = new var_set();
+		this.varying = new var_set();
+
+		this.attributes.bound = bound_attr;
+	};
+
+	cnvgl_program.getOpenSlot = function(set) {
+		//active should be in order
+		if (set.active.length == 0) {
+			return 0;	
+		}
+		last = set.active[set.active.length - 1];
+		return last.location + last.slots;
+	};
+	
+	cnvgl_program.addActiveAttribute = function(attr) {
+		this.attributes.active.push(attr);
+		this.attributes.names[attr.name] = attr;
+	};
+
+	cnvgl_program.addActiveUniform = function(uniform) {
+		this.uniforms.active.push(uniform);
+		this.uniforms.names[uniform.name] = uniform;
+	};
+
+	cnvgl_program.addActiveVarying = function(varying) {
+		this.varying.active.push(varying);
+		this.varying.names[varying.name] = varying;
+	};
+
+	cnvgl_program.getActiveAttribute = function(name) {
+		return this.attributes.names[name];
+	};
+
+	cnvgl_program.getActiveUniform = function(name) {
+		return this.uniforms.names[name];
+	};
+
+	cnvgl_program.getActiveVarying = function(name) {
+		return this.varying.names[name];
+	};
+
+	return cnvgl_program.Constructor;
+
+}());
+
+
+
+function cnvgl_program_var(name, location, size) {
+	this.name = name;
+	this.location = location;
+	this.size = size;
+	this.slots = Math.ceil(size / 4);
+	this.type = GL_FLOAT;
 }
 

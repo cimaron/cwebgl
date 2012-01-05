@@ -21,10 +21,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 include('cnvGL/defines.js');
-include('cnvGL/constants.js');
 
 include('cnvGL/objects/cnvgl_attrib_array.js');
-include('cnvGL/objects/cnvgl_attribute.js');
 include('cnvGL/objects/buffer.js');
 include('cnvGL/objects/cnvgl_context.js');
 include('cnvGL/objects/context_shared.js');
@@ -32,17 +30,17 @@ include('cnvGL/objects/cnvgl_fragment.js');
 include('cnvGL/objects/cnvgl_primitive.js');
 include('cnvGL/objects/cnvgl_program.js');
 include('cnvGL/objects/cnvgl_shader.js');
-include('cnvGL/objects/texture_image.js');
-include('cnvGL/objects/texture_object.js');
-include('cnvGL/objects/texture_unit.js');
-include('cnvGL/objects/cnvgl_uniform.js');
+include('cnvGL/objects/texture.js');
 include('cnvGL/objects/cnvgl_vertex.js');
 
 //Compiler
+include('cnvGL/includes/ARB/ARB.js');
+include('cnvGL/includes/ARB/instruction.js');
 include('cnvGL/includes/glsl/glsl.js');
 include('cnvGL/includes/linker/linker.js');
 
 //Rendering Pipeline
+include('cnvGL/includes/gpu/gpu.js');
 include('cnvGL/includes/rendering/primitive/line.js');
 include('cnvGL/includes/rendering/primitive/point.js');
 include('cnvGL/includes/rendering/primitive/triangle.js');
@@ -51,9 +49,7 @@ include('cnvGL/includes/rendering/culling.js');
 include('cnvGL/includes/rendering/fragment.js');
 include('cnvGL/includes/rendering/interpolate.js');
 include('cnvGL/includes/rendering/primitive.js');
-include('cnvGL/includes/rendering/program.js');
 include('cnvGL/includes/rendering/renderer.js');
-include('cnvGL/includes/rendering/texture.js');
 include('cnvGL/includes/rendering/vertex.js');
 
 

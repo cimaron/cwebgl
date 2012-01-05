@@ -54,7 +54,7 @@ cnvgl_rendering_primitive_triangle = (function() {
 		//clipping may split triangle into multiple triangles
 		clipped = [];
 		num = this.renderer.clipping.clipTriangle(prim, clipped);
-
+ 
 		for (i = 0; i < num; i++) {
 			this.renderClipped(clipped[i]);
 		}
@@ -134,12 +134,13 @@ cnvgl_rendering_primitive_triangle = (function() {
 		}
 	};
 
+	var p = [0, 0, 0, 1];
 	cnvgl_rendering_primitive_triangle.rasterizeScanline = function(yi, x_start, x_end) {
-		var vw, int, p, xi_start, xi_end, xi, i, v;
+		var vw, int, xi_start, xi_end, xi, i, v;
 
 		vw = this.ctx.viewport.w;
 		int = this.renderer.interpolate;
-		p = [0, yi, 0, 1];
+		p[1] = yi;
 
 		//left and right bounds
 		xi_start = (x_start|0) + .5; //floor(x_start) + .5
@@ -169,10 +170,7 @@ cnvgl_rendering_primitive_triangle = (function() {
 				}
 			}
 
-			//interpolate varying
-			for (v in this.v1.varying) {
-				this.frag.varying[v] = int.interpolateTriangle(this.v1.varying[v], this.v2.varying[v], this.v3.varying[v]);
-			}
+			this.renderer.interpolate.interpolateVarying(this.v1, this.v2, this.v3, this.frag.attributes.data);
 
 			this.renderer.fragment.process(this.frag);
 			this.renderer.fragment.write(i, this.frag);

@@ -59,10 +59,10 @@ function glGetIntegerv(pname, params) {
 function __glGet(pname, params) {
 	switch (pname) {
 		case GL_MAX_VERTEX_ATTRIBS:
-			params[0] = cnvgl_const.GL_MAX_VERTEX_ATTRIBS;
+			params[0] = GPU.shader.MAX_VERTEX_ATTRIBS;
 			return;
 		case GL_MAX_FRAGMENT_UNIFORM_COMPONENTS:
-			params[0] = cnvgl_const.GL_MAX_FRAGMENT_UNIFORM_COMPONENTS;
+			params[0] = GPU.shader.MAX_FRAGMENT_UNIFORM_COMPONENTS;
 			return;
 		default:
 			console.log('todo: __glGet', pname);

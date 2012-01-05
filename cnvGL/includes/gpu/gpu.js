@@ -19,15 +19,9 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+var GPU = {};
 
-function cnvgl_texture_object(name, target) {
-
-	this.name = name;
-	this.target = target;
-
-	this.min_filter = GL_NEAREST_MIPMAP_LINEAR;
-	this.mag_filter = GL_LINEAR;
-	
-	this.images = [];
-}
+include('cnvGL/includes/gpu/memory.js');
+include('cnvGL/includes/gpu/shader.js');
+include('cnvGL/includes/gpu/texture.js');
 

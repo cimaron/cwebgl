@@ -26,7 +26,7 @@ function glEnableVertexAttribArray(index) {
 	ctx = cnvgl_context.getCurrentContext();
 
 	//out of bounds
-	if (index >= cnvgl_const.GL_MAX_VERTEX_ATTRIBS || index < 0) {
+	if (index >= GPU.shader.MAX_VERTEX_ATTRIBS || index < 0) {
 		cnvgl_throw_error(GL_INVALID_VALUE);
 		return;
 	}
@@ -41,7 +41,7 @@ function glDisableVertexAttribArray(index) {
 	ctx = cnvgl_context.getCurrentContext();
 
 	//out of bounds
-	if (index >= cnvgl_const.GL_MAX_VERTEX_ATTRIBS || index < 0) {
+	if (index >= GPU.shader.MAX_VERTEX_ATTRIBS || index < 0) {
 		cnvgl_throw_error(GL_INVALID_VALUE);
 		return;
 	}

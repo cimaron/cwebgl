@@ -2022,11 +2022,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						break;
 
 					case 3:
-						/*
-						delete state.symbols;
-						state.symbols = new this.yy.symbol_table();						
-						*/
-						initialize_types(state);
+						//state.symbols = new this.yy.symbol_table();
+						//initialize_types(state);
 					    break;
 
 					case 17:
@@ -2211,6 +2208,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						yyval.type_qualifier = new glsl.ast.type_qualifier();
 						break;
 
+					case 137:
+						if (yyvsa[yyvsp].fully_specified_type.specifier.type_specifier != glsl.type.struct) {
+							//need to use parser error instead
+							throw new Error("Empty declaration list");
+						} else {
+							yyval = {};
+							yyval.declarator_list = new glsl.ast.declarator_list(yyvsa[yyvsp].fully_specified_type);
+							yyval.declarator_list.set_location(yylloc);
+						}
+						break;
+
 					case 138:
 						yyval = {};
 						var decl = new glsl.ast.declaration(yyvsa[yyvsp].identifier, false, null, null);
@@ -2219,6 +2227,22 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						yyval.declarator_list.declarations.push(decl);
 						//var symbol = state.symbols.add_variable(yyvsa[yyvsp].identifier);
 						//symbol.definition = yyvsa[yyvsp - 1];
+						break;
+					
+					case 139:
+						var decl = new glsl.ast.declaration(yyvsa[yyvsp - 2].identifier, true, null, null);
+						yval = {};
+						yyval.declarator_list = new glsl.ast.declarator_list(yyvsa[yyvsp - 3].fully_specified_type);
+						yyval.declarator_list.set_location(yylloc);
+						yyval.declarator_list.declarations.push(decl);
+						break;
+
+					case 140:
+						yyval = {};
+						var decl = new glsl.ast.declaration(yyvsa[yyvsp - 3].identifier, true, yyvsa[yyvsp - 1].expression, null);
+						yyval.declarator_list = new glsl.ast.declarator_list(yyvsa[yyvsp - 4].fully_specified_type);
+						yyval.declarator_list.set_location(yylloc);
+						yyval.declarator_list.declarations.push(decl);
 						break;
 
 					case 143:
@@ -2243,6 +2267,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						yyval.fully_specified_type.qualifier = yyvsa[yyvsp - 1].type_qualifier;
 						yyval.fully_specified_type.specifier = yyvsa[yyvsp].type_specifier;
 					    break;
+
+					case 164:
+						yyval = {};
+						yyval.type_qualifier = new glsl.ast.type_qualifier();
+						yyval.type_qualifier.flags.q = glsl.ast.type_qualifier.flags.constant;
+						break;
 
 					case 165:
 						yyval = {};
@@ -2272,16 +2302,33 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						yyval.type_specifier = new glsl.ast.type_specifier(yyvsa[yyvsp].n);
 						yyval.type_specifier.set_location(yylloc);
 					    break;
-					
+
+					case 179:
+						yyval = {};
+						yyval.type_specifier = new glsl.ast.type_specifier(yyvsa[yyvsp].struct_specifier);
+						yyval.type_specifier.set_location(yylloc);
+						break;
+
+					case 180:
+						yyval = {};
+						yyval.type_specifier = new glsl.ast.type_specifier(yyvsa[yyvsp].identifier);
+						yyval.type_specifier.set_location(yylloc);
+						break;
+
 					case 181:
 						yyval = {};
-						yyval.n = glsl.ast['void'];
+						yyval.n = glsl.type['void'];
 						break;
 
 					case 182:
 						yyval = {};
 						yyval.n = glsl.type.float;
 					    break;
+
+					case 183:
+						yyval = {};
+						yyval.n = glsl.type.int;
+						break;
 
 					case 185:
 						yyval = {};
@@ -2319,21 +2366,58 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						break;
 
 					case 232:
-						if (!state.es_shader && state.language_version < 130) {
+						/*if (!state.es_shader && state.language_version < 130) {
 							yyerror(yylsa[yylsp], state, "precision qualifier forbidden in %s (1.30 or later required)\n", state.version_string);
-						}
+						}*/
 						yyval = {};
 						yyval.n = glsl.ast.precision.high;
 						break;
 
 					case 233:
+						/*
 						if (!state.es_shader && state.language_version < 130) {
 							yyerror(yylsa[yylsp], state, "precision qualifier forbidden in %s (1.30 or later required)\n", state.version_string);
 						}
+						*/
 						yyval = {};
 						yyval.n = glsl.ast.precision.medium;
 						break;
-					
+
+					case 235:
+						yyval = {};
+						yyval.struct_specifier = new glsl.ast.struct_specifier(yyvsa[yyvsp - 3].identifier, yyvsa[yyvsp - 1].declarator_list);
+						yyval.struct_specifier.set_location(yylloc);
+						state.symbols.add_type(yyvsa[yyvsp - 3].identifier, glsl.type.void_type);
+						break;
+
+					case 238:
+						yyval = {};
+						yyval.declarator_list = yyvsa[yyvsp - 1].declarator_list;
+						yyval.declarator_list.declarations.splice(1, 0, yyvsa[yyvsp].declarator_list.declarations);
+						break;
+
+					case 239:
+						var type = new glsl.ast.fully_specified_type();
+						type.set_location(yylloc);
+						type.specifier = yyvsa[yyvsp - 2].type_specifier;
+						yyval = {};
+						yyval.declarator_list = new glsl.ast.declarator_list(type);
+						yyval.declarator_list.set_location(yylloc);
+						yyval.declarator_list.declarations.unshift(yyvsa[yyvsp - 1].declaration);
+						break;
+
+					case 240:
+						yyval = {};
+						yyval.declaration = yyvsa[yyvsp].declaration;
+						break;
+
+					case 242:
+						yyval = {};
+						yyval.declaration = new glsl.ast.declaration(yyvsa[yyvsp].identifier, false, null, null);
+						yyval.declaration.set_location(yylloc);
+						state.symbols.add_variable(yyvsa[yyvsp].identifier);
+						break;
+
 					case 246:
 						yyval = {};
 						//cast to node
@@ -2362,8 +2446,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 							//_mesa_glsl_error(yylsa[yylsp], state, "<nil> statement\n");
 						}
 						yyval = {};
-						yyval.node = yyvsa[yyvsp].node;
-						yyval.node.link.self_link();
+						yyval.node = [yyvsa[yyvsp].node];
 						break;
 
 					case 263:
@@ -2372,7 +2455,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						}
 						yyval = {};
 						yyval.node = (yyvsa[yyvsp - 1].node);
-						yyval.node.link.insert_before(yyvsa[yyvsp].node.link);
+						yyval.node.push(yyvsa[yyvsp].node);
 						break;
 
 					case 265:
@@ -2480,9 +2563,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					case 134:
 					case 135:
 					case 136:
-					case 137:
-					case 139:
-					case 140:
 					case 141:
 					case 142:
 					case 144:
@@ -2499,7 +2579,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					case 161:
 					case 162:
 					case 163:
-					case 164:
 					case 167:
 					case 168:
 					case 169:
@@ -2508,9 +2587,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					case 174:
 					case 176:
 					case 177:
-					case 179:
-					case 180:
-					case 183:
 					case 184:
 					case 187:
 					case 189:
@@ -2554,13 +2630,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					case 230:
 					case 231:
 					case 234:
-					case 235:
 					case 236:
-					case 238:
-					case 239:
-					case 240:
 					case 241:
-					case 242:
 					case 243:
 					case 251:
 					case 252:
@@ -2604,9 +2675,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				/* Now `shift' the result of the reduction.  Determine what state
 				 that goes to, based on the state we popped back to and the rule
 				 number reduced by.  */
-				
+
 				yyn = yyr1[yyn];
-				
+
 				yystate = yypgoto[yyn - YYNTOKENS] + yyssa[yyssp];
 				if (0 <= yystate && yystate <= YYLAST && yycheck[yystate] == yyssa[yyssp]) {
 					yystate = yytable[yystate];

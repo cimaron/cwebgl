@@ -116,15 +116,9 @@ cnvgl_rendering_clipping = (function() {
 
 		vr.w = v1.w * namt + v2.w * amt;
 
-		//interpolate attributes
-		for (v in this.v1.attributes) {
-			vr.attributes[v] = int.interpolateTriangle(this.v1.attributes[v], this.v2.attributes[v], this.v3.attributes[v]);
-		}
-
-		//interpolate varying
-		for (v in this.v1.varying) {
-			vr.varying[v] = int.interpolateTriangle(this.v1.varying[v], this.v2.varying[v], this.v3.varying[v]);
-		}
+		//interpolate
+		//int.interpolateAttributes(this.v1, this.v2, this.v3, vr);
+		int.interpolateVarying(this.v1, this.v2, this.v3, vr.varying.data);
 
 		return vr;
 	};

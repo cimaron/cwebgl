@@ -32,7 +32,6 @@ cnvgl_renderer = (function() {
 		this.fragment = null;
 		this.interpolate = null;
 		this.primitive = null;
-		this.texture = null;
 		this.vertex = null;
 
 		this.mode = null;
@@ -49,22 +48,16 @@ cnvgl_renderer = (function() {
 		this.culling = new cnvgl_rendering_culling(ctx, this);
 		this.interpolate = new cnvgl_rendering_interpolate(ctx, this);
 		this.primitive = new cnvgl_rendering_primitive(ctx, this);
-		this.texture = new cnvgl_rendering_texture(ctx, this);
 
 		this.fragment = new cnvgl_rendering_fragment(ctx, this);
 		this.vertex = new cnvgl_rendering_vertex(ctx, this);
-	};
-
-	cnvgl_renderer.setProgram = function(program) {
-		this.vertex.setProgram(program);
-		this.fragment.setProgram(program);
 	};
 
 	cnvgl_renderer.setMode = function(mode) {
 		this.mode = mode;
 		this.primitive.setMode(mode);
 	};
-
+	
 	cnvgl_renderer.send = function(vertex) {
 		this.vertex.process(vertex);
 		this.primitive.send(vertex);

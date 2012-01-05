@@ -21,17 +21,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 (function(glsl) {
 
-	SymbolTableEntry = function(name, typedef) {
+	function SymbolTableEntry(name, typedef) {
 		this.name = name;
 		this.typedef = typedef;
 		this.type = null;
 		this.definition = null;
 		this.depth = null;
-
-		this.object_name = null;
 		this.qualifier = null;
-		this.next = null;
-	};
+		this.out = name;
+	}
 
 	SymbolTableEntry.typedef = {
 		variable : 0,
@@ -43,35 +41,40 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		//Internal Constructor
 		function Initializer() {
-			this.table = {
-				depth : 0,
-				parent : null,
-				data : {}
-			};
+			this.table = {};
+			this.depth = 0;
 		}
-		
+
 		var symbol_table = jClass('symbol_table', Initializer);
-	
-		//public:	
+
+		//public:
 		symbol_table.push_scope = function() {
-			this.table = {
-				depth : this.table.depth + 1,
-				parent : this.table,
-				data : {}
-			};
+			this.depth++;
 		};
 
 		symbol_table.pop_scope = function() {
-			this.table = this.table.parent;
+			var n, t;
+			for (n in this.table) {
+				t = this.table[n];
+				while (t[0] && t[0].depth == this.depth) {
+					t.splice(0, 1);	
+				}
+				if (t.length == 0) {
+					delete this.table[n];	
+				}
+
+			}
+			this.depth--;
 		};
 	
 		symbol_table.name_declared_this_scope = function(name) {
-			return (this.table.data[name] ? true : false);
+			var e = this.get_entry(name);
+			return e && e.depth == this.depth;
 		};
 
-		symbol_table.add_variable = function(name) {
+		symbol_table.add_variable = function(name, type) {
 			var entry = new SymbolTableEntry(name, SymbolTableEntry.typedef.variable);
-			entry.object_name = '@' + name + '@';
+			entry.type = type;
 			return this.add_entry(entry);
 		};
 	
@@ -83,7 +86,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		symbol_table.add_function = function(name, type, def) {
 			var entry;
-			
+
 			//don't readd the exact same function definition
 			if (entry = this.get_function(name, type, def)) {
 				return entry;
@@ -95,11 +98,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				entry.definition = def;
 			}
 
-			if (name != 'main') {
-				entry.object_name = '@' + name + (def ? "." + def.join('.') : '') + '@';
-			} else {
-				entry.object_name = (glsl.mode == 1) ? '@fragment.main@' : '@vertex.main@';
-			}
 			return this.add_entry(entry);
 		};
 
@@ -114,15 +112,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		};
 
 		symbol_table.get_function = function(name, type, def) {
-			var i;
-			var entry = this.get_entry(name, SymbolTableEntry.typedef.func);	
-			while (def && entry) {
-				if (!this.match_definition(def, entry.definition)) {
-					entry = entry.next;	
-					continue;
-				}
-				break;
-			}
+			var entry = this.get_entry(name, SymbolTableEntry.typedef.func, def);
 			return entry;
 		};
 
@@ -130,6 +120,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		symbol_table.match_definition = function(def, entry) {
 			var i;
+			if (!def) {
+				return true;	
+			}
 			if (def.length != entry.length) {
 				return false;	
 			}
@@ -142,22 +135,22 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		};
 
 		symbol_table.add_entry = function(entry) {
-			//insert to head of linked list if same name
-			if (this.table.data[entry.name]) {
-				entry.next = this.table.data[entry.name];	
+			if (!this.table[entry.name]) {
+				this.table[entry.name] = [];	
 			}
-			this.table.data[entry.name] = entry;
-			entry.depth = this.table.depth;
+			this.table[entry.name].splice(0, 0, entry);
+			entry.depth = this.depth;
 			return entry;
 		};
 
-		symbol_table.get_entry = function(name, typedef) {
-			var table = this.table;
-			while (table != null) {
-				if (table.data[name]) {
-					return table.data[name];
+		symbol_table.get_entry = function(name, typedef, def) {
+			var t, i, entry;
+			t = this.table[name] || [];
+			for (i = 0; i < t.length; i++) {
+				entry = t[i];
+				if (entry.typedef == typedef && (typedef != SymbolTableEntry.typedef.func || this.match_definition(def, entry.definition))) {
+					return entry;
 				}
-				table = table.parent;
 			}
 			return null;
 		};

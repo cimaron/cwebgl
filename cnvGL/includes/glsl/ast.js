@@ -19,65 +19,12 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(glsl) {
+(function(glsl, StdIO) {
 
-	var exec_node = (function() {
-		
-		function Initializer() {
-			this.prev = null;
-			this.next = null;
-			this.data = null;
-		}
-		
-		var exec_node = jClass('exec_node', Initializer);
-		
-		exec_node.exec_node = function(data) {
-			this.data = data;
-		};
-		
-		exec_node.self_link = function(el) {
-			this.prev = this;
-			this.next = this;
-		};
-		
-		exec_node.insert_before = function(before) {
-			before.next = this;
-			before.prev = this.prev;
-			this.prev.next = before;
-			this.prev = before;
-		};
-
-		return exec_node.Constructor;
-
-	}());
-
-	var exec_list = (function() {
-		
-		function Initializer() {
-			this.head = null;
-			this.tail = null;
-			this.tail_pred = null;
-		}
-		
-		var exec_list = jClass('exec_list', Initializer);
-		
-		exec_list.exec_list = function() {
-		};
-
-		exec_list.push_degenerate_list_at_head = function(n) {
-			//assert(n.prev.next == n);
-			//n.prev.next = this.head;
-			//this.head.prev = n.prev;
-			//n.prev = this.head;
-			//this.head = n;
-			//n.prev = (exec_node *) &this.head;
-			//this.head = n;
-			this.head = n;
-		};
-
-		return exec_list.Constructor;
-
-	}());
+	/**
+	 * Import into local scope
+	 */
+	var sprintf = StdIO.sprintf;
 
 	/**
 	 * Base class of all abstract syntax tree nodes
@@ -92,7 +39,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				line : 0,
 				column : 0
 			};
-			this.link = new exec_node(this);
+			this.link = null;
 		}
 
 		var ast_node = jClass('ast_node', Initializer);
@@ -102,7 +49,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		ast_node.ast_node = function() {
 			this.location.source = 0;
 			this.location.line = 0;
-			this.location.column = 0;	
+			this.location.column = 0;
+			this.link = [this];
 		};
 
 		ast_node.get_location = function() {
@@ -121,8 +69,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			this.location.column = locp.first_column;
 		};
 
-		ast_node.print = function() {
-			printf("unhandled node");
+		ast_node.toString = function() {
+			return this.typeOf();	
 		};
 
 		return ast_node.Constructor;
@@ -195,6 +143,49 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		op_names[operators[i]] = i;
 	}
 
+	var op_strings = [
+		"=",
+		"+",
+		"-",
+		"+",
+		"-",
+		"*",
+		"/",
+		"%",
+		"<<",
+		">>",
+		"<",
+		">",
+		"<=",
+		">=",
+		"==",
+		"!=",
+		"&",
+		"^",
+		"|",
+		"~",
+		"&&",
+		"^^",
+		"||",
+		"!",		
+		"*=",
+		"/=",
+		"%=",
+		"+=",
+		"-=",
+		"<<=",
+		">>=",
+		"&=",
+		"^=",
+		"|=",
+		"?:",
+		"++",
+		"--",
+		"++",
+		"--",
+		"."
+	];
+
 	var ast_precision = {
 		none : 0,
 		high : 1,
@@ -234,15 +225,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		};
 
 		ast_type_specifier.ast_type_specifier.string = function(name) {
-			this.type_specifier = ast_types.type_name;
+			this.type_specifier = glsl.type.type_name;
 			this.type_name = name;
 			this.is_array = false;
 			this.precision = ast_precision.none;
 			this.is_precision_statement = false;
 		};
 		
-		ast_type_specifier.ast_type_specifier.object = function(specifier) {
-			this.type_specifier = ast_types.struct;
+		ast_type_specifier.ast_type_specifier.object = function(s) {
+			this.type_specifier = glsl.type.struct;
 			this.type_name = s.name;
 			this.structure = s;
 			this.is_array = false;
@@ -250,19 +241,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			this.is_precision_statement = false;			
 		};
 
-		ast_type_specifier.print = function() {
-			if (this.type_specifier == ast_types.struct) {
-				this.structure.print();
-			} else {
-				printf("%s ", this.type_name);	
-			}
-			if (this.is_array) {
-				printf("[ ");
-				if (this.array_size) {
-					array_size.print();	
-				}
-				printf(" ]");
-			}
+		ast_type_specifier.toString = function() {
+			return sprintf("%s %s",
+						  	this.type_specifier == glsl.type.struct ? this.structure : this.type_name,
+							this.is_array ? sprintf("[ %s] ", this.array_size ? this.array_size : "") : ""
+							);
 		};
 
 		return ast_type_specifier.Constructor;
@@ -288,18 +271,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		ast_function.ast_function = function() {
 			this.is_definition = false;
 		};
-		
-		ast_function.print = function() {
-			var i;
-			this.return_type.print();
-			printf(" %s (", this.identifier);
-			/*
-			for (i = 0; i < this.parameters.length; i++) {
-				var ast = exec_node_data(ast_node, n, link);
-				ast.print();
-			}
-			*/
-			printf(")");
+
+		ast_function.toString = function() {
+			return sprintf("%s %s(%s)", this.return_type, this.identifier, this.parameters);			
 		};
 
 		return ast_function.Constructor;
@@ -333,7 +307,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		};
 
 		ast_expression.ast_expression.one = function(identifier) {
-			//this.oper = ast_identifier
+			this.oper = operators.identifier;
 			this.primary_expression.identifier = identifier;
 		};
 
@@ -343,9 +317,78 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			this.subexpressions[1] = ex1;
 			this.subexpressions[2] = ex2;
 		};
-		
-		ast_expression.print = function() {			
-		};
+
+		ast_expression.toString = function() {
+			switch (this.oper) {
+				case operators.assign:
+				case operators.mul_assign:
+				case operators.div_assign:
+				case operators.mod_assign:
+				case operators.add_assign:
+				case operators.sub_assign:
+				case operators.ls_assign:
+				case operators.rs_assign:
+				case operators.and_assign:
+				case operators.xor_assign:
+				case operators.or_assign:
+					return sprintf("(%s %s %s)", this.subexpressions[0], op_strings[this.oper], this.subexpressions[1]);
+					break;
+
+				case operators.field_selection:
+					return sprintf("(%s. %s)", this.subexpressions[0], this.primary_expression.identifier);
+					break;
+
+				case operators.plus:
+				case operators.neg:
+				case operators.bit_not:
+				case operators.logic_not:
+				case operators.pre_inc:
+				case operators.pre_dec:
+					return sprintf("(%s %s)", op_strings[this.oper], this.subexpressions[0]);
+					break;
+				
+				case operators.post_inc:
+				case operators.post_dec:
+					return sprintf("(%s %s)", this.subexpressions[0], op_strings[this.oper]);
+					break;
+
+				case operators.conditional:
+					return sprintf("(%s ? %s : %s)", this.subexpressions[0], this.subexpressions[1], this.subexpressions[2]);				
+					break;
+
+				case operators.array_index:
+					return sprintf("(%s [ %s ])", this.subexpressions[0], this.subexpressions[1]);				
+					break;
+
+				case operators.function_call:
+					return sprintf("(%s ( %s ))", this.subexpressions[0], this.expressions.join(", "));
+					break;
+
+				case operators.identifier:
+					return sprintf("%s", this.primary_expression.identifier);
+					break;
+				
+				case operators.int_constant:
+					return sprintf("%s", this.primary_expression.int_constant);
+					break;
+				
+				case operators.uint_constant:
+					return sprintf("%s", this.primary_expression.uint_constant);
+					break;
+				
+				case operators.float_constant:
+					return sprintf("%s", this.primary_expression.float_constant);
+					break;
+				
+				case operators.bool_constant:
+					return sprintf("%s", this.primary_expression.bool_constant ? 'true' : 'false');
+					break;
+
+				case operators.sequence:
+					return sprintf("(%s))", this.expressions.join(", "));
+					break;
+			}
+		}
 
 		return ast_expression.Constructor;
 
@@ -392,9 +435,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			return this.qualifier.flags.i != 0;
 		};
 
-		ast_fully_specified_type.print = function() {
-			//ast_Type_qualifier_print(qualifier);
-			this.specifier.print();	
+		ast_fully_specified_type.toString = function() {
+			return sprintf("... %s", this.specifier);
 		};
 
 		return ast_fully_specified_type.Constructor;
@@ -424,15 +466,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			this.initializer = initializer;
 		};
 		
-		ast_declaration.print = function() {
-			printf("%s ", identifier);
-			ast_opt_array_size_print(is_array, array_size);
-			if (initializer) {
-				printf("= ");
-				initializer.print();
-			}
+		ast_declaration.toString = function() {
+			return sprintf("%s %s %s", this.identifier, "...", this.initializer ? sprintf("= %s", this.initializer) : "");
 		};
-
+		
 		return ast_declaration.Constructor;		
 	
 	}());
@@ -457,26 +494,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			this.invariant = 0;
 		};
 
-		ast_declarator_list.print = function() {
-			var i;
-
-			if (type) {
-				type.print();
-			} else {
-				printf("invariant ");	
-			}
-			
-			for (i = 0; i < this.declarations.length; i++) {
-				if (i != 0) {
-					printf(", ");
-				}
-				var ast = exec_node_data(this.ast_node, i, this.link);
-				ast.print();
-			}
-			printf("; ");
+		ast_declarator_list.toString = function() {
+			return sprintf("%s %s;\n", this.type ? this.type : "invariant ", this.declarations.join(""));
 		};
 
-		return ast_declarator_list.Constructor;		
+		return ast_declarator_list.Constructor;
 
 	}());
 
@@ -504,7 +526,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			this.array_size = 0;
 		};
 
-		ast_parameter_declarator.print = function() {
+		ast_parameter_declarator.toString = function() {
+			return sprintf("%s%s %s", this.type, this.identifier ? this.identifier : "", this.is_array ? sprintf("[%s]", this.array_size) : "");
 		};
 
 		return ast_parameter_declarator.Constructor;
@@ -528,7 +551,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			this.expression = ex;
 		};
 
-		ast_expression_statement.print = function() {			
+		ast_expression_statement.toString = function() {
+			return sprintf("%s;\n ", this.expression ? this.expression : "");
 		};
 
 		return ast_expression_statement.Constructor;
@@ -542,7 +566,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		function Initializer() {
 			ast_node.Initializer.apply(this);
 			this.new_scope = null;
-			this.statements = new exec_list();
+			this.statements = [];
 		}
 
 		var ast_compound_statement = jClass('ast_compound_statement', Initializer, ast_node);
@@ -552,11 +576,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		ast_compound_statement.ast_compound_statement = function(new_scope, statements) {
 			this.new_scope = new_scope;
 			if (statements) {
-				this.statements.push_degenerate_list_at_head(statements.link);
+				this.statements = statements;
 			}
 		};
-
-		ast_compound_statement.print = function() {			
+		
+		ast_compound_statement.toString = function() {
+			return sprintf("{\n%s}\n", this.statements.join(""));
 		};
 
 		return ast_compound_statement.Constructor;
@@ -579,8 +604,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		ast_function_definition.ast_function_definition = function() {
 		};
-
-		ast_function_definition.print = function() {			
+		
+		ast_function_definition.toString = function() {
+			return sprintf("%s%s", this.proto_type, this.body);
 		};
 
 		return ast_function_definition.Constructor;
@@ -603,7 +629,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			//assert(oper >= ast.operators.plus && oper <= ast.operators.logic_not);
 		};
 
-		ast_expression_bin.print = function() {	
+		ast_expression_bin.toString = function() {
+			return sprintf("(%s %s %s)", this.subexpressions[0], op_strings[this.oper], this.subexpressions[1]);
 		};
 
 		return ast_expression_bin.Constructor;
@@ -640,10 +667,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			this.cons = true;			
 		};
 
-
-		ast_function_expression.print = function() {
-		};
-
 		ast_function_expression.is_constructor = function() {
 			return this.cons;
 		};
@@ -671,11 +694,40 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			this.then_statement = then_statement;
 			this.else_statement = else_statement;
 		};
-
-		ast_selection_statement.print = function() {	
+		
+		ast_selection_statement.toString = function() {
+			return sprintf("if ( %s) %s %s", this.condition, this.then_statement, this.else_statement ? sprintf("else %s", this.else_statement) : "");
 		};
 
 		return ast_selection_statement.Constructor;
+
+	}());
+
+
+	var ast_struct_specifier = (function() {
+
+		//Internal Constructor
+		function Initializer() {
+			ast_node.Initializer.apply(this);
+			this.name = null;
+			this.declarations = [];
+		}
+
+		var ast_struct_specifier = jClass('ast_struct_specifier', Initializer, ast_node);
+
+		var anon_count = 1;
+
+		//public:
+		ast_struct_specifier.ast_struct_specifier = function(identifier, declarator_list) {
+			if (identifier == null) {
+				identifier = glsl.sprintf("#anon_struct%d", anon_count);
+				anon_count++;
+			}
+			this.name = identifier;
+			this.declarations = declarator_list.declarations;
+		};
+
+		return ast_struct_specifier.Constructor;
 
 	}());
 
@@ -700,8 +752,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		function_definition : ast_function_definition,
 		expression_bin : ast_expression_bin,
 		function_expression : ast_function_expression,
-		selection_statement : ast_selection_statement
+		selection_statement : ast_selection_statement,
+		struct_specifier : ast_struct_specifier
 	};
 
-}(glsl));
+}(glsl, StdIO));
 

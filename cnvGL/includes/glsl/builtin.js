@@ -16,19 +16,34 @@ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+(function(glsl) {
 
-function cnvgl_attribute(name, definition) {
+	var vertex_vars = [
+		['out', 0, 'vec4', 'gl_Position', 'result.position']
+	];
 
-	//state
-	this.location = null;
-	this.size = 0;
-	this.type = GL_FLOAT;
-	this.name = name;
+	var fragment_vars = [
+		['out', 1, 'vec4', 'gl_FragColor', 'result.color.primary']
+	];
 
-	//custom state
-	this.definition = definition;
-}
+	glsl.parser.initialize_types = function(state) {
+		var i, vars, funcs, types, v, entry;
 
+		vars = state.target == glsl.mode.vertex ? vertex_vars : fragment_vars;
+		for (i = 0; i < vars.length; i++) {
+			v = vars[i];
+			entry = state.symbols.add_variable(v[3]);
+			entry.type = glsl.type[v[2]];
+			entry.position = v[1];
+			entry.out = v[4];
+		}
+
+		//defined in ir_generator_tables.php
+		glsl.parser.initialize_functions(state);
+	};
+
+		  
+}(glsl));

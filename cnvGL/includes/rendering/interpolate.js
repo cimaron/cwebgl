@@ -22,6 +22,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 cnvgl_rendering_interpolate = (function() {
 
 	function Initializer() {
+
+		this.ctx = null;
+		this.renderer = null;		
+		
 		this.v1 = null;
 		this.v2 = null;
 		this.v3 = null;
@@ -33,16 +37,24 @@ cnvgl_rendering_interpolate = (function() {
 		this.wb = null;
 		this.wc = null;
 		this.t = {};
+
+		this.attributes = null;
+		this.varying = null;
 	}
 
 	var cnvgl_rendering_interpolate = jClass('cnvgl_rendering_interpolate', Initializer);	
 
 	//public:
 
-	cnvgl_rendering_interpolate.cnvgl_rendering_interpolate = function() {
+	cnvgl_rendering_interpolate.cnvgl_rendering_interpolate = function(ctx, renderer) {
+		this.ctx = ctx;
+		this.renderer = renderer;
 	};
-	
+
 	cnvgl_rendering_interpolate.setVertices = function(v1, v2, v3) {
+		
+		this.varying = this.ctx.shader.activeProgram.varying.names;
+		this.attributes = this.ctx.shader.activeProgram.attributes.names;
 
 		this.v1 = [v1.xw, v1.yw, v1.zw, v1.w];
 		this.v2 = [v2.xw, v2.yw, v2.zw, v2.w];
@@ -52,6 +64,32 @@ cnvgl_rendering_interpolate = (function() {
 			this.v3 = null;	
 		}
 		this.precompute();
+	};
+
+	cnvgl_rendering_interpolate.interpolateAttributes = function(v1, v2, v3, dest) {
+		var attribute, vi, vl, vs;
+		for (v in this.attribute) {
+			attribute = this.attribute[v];
+			vl = attribute.location;
+			vs = attribute.size;
+			for (vi = 0; vi < attribute.slots; vi++) {
+				this.interpolateTriangleVector(v1.attributes.data[vl], v2.attributes.data[vl], v3.attributes.data[vl], dest[vl], vs);
+				vs -= 4;
+			}
+		}
+	};
+
+	cnvgl_rendering_interpolate.interpolateVarying = function(v1, v2, v3, dest) {
+		var varying, vi, vl, vs;
+		for (v in this.varying) {
+			varying = this.varying[v];
+			vl = varying.location;
+			vs = varying.size;
+			for (vi = 0; vi < varying.slots; vi++) {
+				this.interpolateTriangleVector(v1.varying.data[vl], v2.varying.data[vl], v3.varying.data[vl], dest[vl], vs);
+				vs -= 4;
+			}
+		}
 	};
 
 	cnvgl_rendering_interpolate.precompute = function() {
@@ -135,18 +173,20 @@ cnvgl_rendering_interpolate = (function() {
 	};
 
 	cnvgl_rendering_interpolate.interpolateTriangle = function(f1, f2, f3) {
-		var i, v;
-
-		//todo: do a check that we need to interpolate at all
-		if (typeof f1 == 'object') {
-			v = [];
-			for (i = 0; i < f1.length; i++) {
-				v[i] = ((this.a * f1[i]) + (this.b * f2[i]) + (this.c * f3[i])) * this.t.p;
-			}
-		} else {
-			v = ((this.a * f1) + (this.b * f2) + (this.c * f3)) * this.t.p;
-		}
+		var v;
+		v = ((this.a * f1) + (this.b * f2) + (this.c * f3)) * this.t.p;
 		return v;
+	};
+
+	cnvgl_rendering_interpolate.interpolateTriangleVector = function(f1, f2, f3, dest, size) {
+		var i;
+		//todo: do a check that we need to interpolate at all
+		if (size > 4) {
+			size = 4;
+		}
+		for (i = 0; i < size; i++) {
+			dest[i] = ((this.a * f1[i]) + (this.b * f2[i]) + (this.c * f3[i])) * this.t.p;
+		}
 	};
 
 	return cnvgl_rendering_interpolate.Constructor;

@@ -19,17 +19,29 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+var ARB = {
 
-var cnvgl_const = {
-	GL_MAX_FRAGMENT_UNIFORM_COMPONENTS : 64,
+	language : {},
+	output : "",
+	errors : [],
 
-	//texture
-	GL_MAX_TEXTURE_COORDS : 32,
-	GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS : 32,
+	translate : function(object_code, lang) {
+		var irs, symbols, engine;
 
-	//vertex
-	GL_MAX_VERTEX_ATTRIBS : 16,
-	GL_MAX_VERTEX_UNIFORM_COMPONENTS : 512
+		//this.parse(object_code);
 
+		if (this.errors.count > 0) {
+			return false;	
+		}
+
+		engine = this.language[lang];
+		engine.translate(object_code);
+
+		return (this.errors.length == 0);			
+	}
 };
+
+include('cnvGL/includes/ARB/instruction.js');
+include('cnvGL/includes/ARB/parse.js');
+include('cnvGL/includes/ARB/javascript.js');
 
