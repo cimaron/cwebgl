@@ -21,24 +21,24 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 function glUniform1i(location, v0) {
 	v0 = v0|0; //floor(v0);
-	__glUniform(location, [v0], 1);
+	__glUniform(location, [v0], 1, 1);
 }
 
 function glUniform1f(location, v0) {
 	v0 = v0 * 1.0; //force bool to float
-	__glUniform(location, [v0], 1);
+	__glUniform(location, [v0], 1, 1);
 }
 
 function glUniform3f(location, v0, v1, v2) {
 	//GL_INVALID_OPERATION is generated if a sampler is loaded using a command other than glUniform1i and glUniform1iv.
-	__glUniform(location, [v0, v1, v2], 3);
+	__glUniform(location, [v0, v1, v2], 1, 3);
 }
 
 function glUniform3fv(location, count, value) {
 	var i, v;
 	for (i = 0; i < count; i++) {
 		v = 3 * i;
-		__glUniform(i + location, [value[v], value[v + 1], value[v + 2]], 3);
+		__glUniform(i + location, [value[v], value[v + 1], value[v + 2]], 1, 3);
 	}
 }
 
@@ -53,7 +53,7 @@ function glUniformMatrix3fv(location, count, transpose, value) {
 		throw new Error('glUniformMatrix3fv with array not implemented yet');
 	}
 
-	__glUniform(location, value, 9);
+	__glUniform(location, value, 3, 3);
 }
 
 function glUniformMatrix4fv(location, count, transpose, value) {
@@ -67,11 +67,11 @@ function glUniformMatrix4fv(location, count, transpose, value) {
 		throw new Error('glUniformMatrix4fv with array not implemented yet');
 	}
 
-	__glUniform(location, value, 16);
+	__glUniform(location, value, 4, 4);
 }
 
-function __glUniform(location, value, size) {
-	var ctx, program_obj, uniform_obj;
+function __glUniform(location, value, slots, components) {
+	var ctx, program_obj, uniform_obj, i;
 
 	ctx = cnvgl_context.getCurrentContext();
 	program_obj = ctx.shader.activeProgram;
@@ -98,12 +98,14 @@ function __glUniform(location, value, size) {
 		return;		
 	}
 
-	if (size != uniform_obj.size) {
+	if (slots != uniform_obj.slots || slots * components != uniform_obj.size) {
 		cnvgl_throw_error(GL_INVALID_OPERATION);
-		return;
+		return;		
 	}
 
-	GPU.memcpy(GPU.memory.shader.uniforms, location * 4, value, uniform_obj.size);
+	for (i = 0; i < slots; i++) {
+		GPU.memcpy(GPU.memory.shader.uniforms, (location + i) * 4, value, components, (components * i));
+	}
 }
 
 function glGetUniformLocation(program, name) {
