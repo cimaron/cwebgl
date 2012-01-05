@@ -23,10 +23,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 function cnvgl_fragment() {
 
 	//used by renderer
-	this.r = 0;
-	this.g = 0;
-	this.b = 0;
-	this.a = 1;
+	this.color = null;
 
 	this.x = 0;
 	this.y = 0;

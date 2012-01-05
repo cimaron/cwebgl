@@ -187,7 +187,6 @@ cnvgl_rendering_interpolate = (function() {
 		for (i = 0; i < size; i++) {
 			dest[i] = ((this.a * f1[i]) + (this.b * f2[i]) + (this.c * f3[i])) * this.t.p;
 		}
-		return v;
 	};
 
 	return cnvgl_rendering_interpolate.Constructor;

@@ -46,12 +46,7 @@ cnvgl_rendering_fragment = (function() {
 		GPU.shader.fragment.attrib = f.attributes.data;
 		GPU.executeFragment();
 
-		color = this.result.color.primary;
-
-		f.r = color[0];
-		f.g = color[1];
-		f.b = color[2];
-		f.a = color[3];
+		f.color = this.result.color.primary;
 	};
 
 	cnvgl_rendering_fragment.write = function(i, frag) {
@@ -60,7 +55,7 @@ cnvgl_rendering_fragment = (function() {
 		c_buffer = this.ctx.color_buffer;
 		d_buffer = this.ctx.depth_buffer;
 
-		c = [frag.r, frag.g, frag.b, frag.a];
+		c = frag.color;
 		c_mask = this.ctx.color.colorMask;
 
 		if (this.ctx.depth.mask) {
@@ -69,17 +64,17 @@ cnvgl_rendering_fragment = (function() {
 
 		i <<= 2;
 		if (this.ctx.color.blendEnabled == GL_TRUE) {
-			c = this.blend(c[0], c[1], c[2], c[3], c_buffer[i] / 255, c_buffer[i + 1] / 255, c_buffer[i + 2] / 255, c_buffer[i + 3] / 255);
+			this.blend(c, c[0], c[1], c[2], c[3], c_buffer[i] / 255, c_buffer[i + 1] / 255, c_buffer[i + 2] / 255, c_buffer[i + 3] / 255);
 		}
 
 		c_buffer[i    ] = c_mask[0] & (c[0] * 255 + .5)|0; //round(frag.r * 255)
 		c_buffer[i + 1] = c_mask[1] & (c[1] * 255 + .5)|0; //round(frag.g * 255)
 		c_buffer[i + 2] = c_mask[2] & (c[2] * 255 + .5)|0; //round(frag.b * 255)
-		c_buffer[i + 3] = c_mask[3] & (c[3] * 255 + .5)|0; //round(frag.a * 255)
+		c_buffer[i + 3] = c_mask[3] & (c[3] * 255 + .5)|0; //round(frag.a * 255)		
 	};
 	
-	cnvgl_rendering_fragment.blend = function(rs, gs, bs, as, rd, gd, bd, ad) {
-		var state, sr, sg, sb, sa, dr, dg, db, da, f, c;
+	cnvgl_rendering_fragment.blend = function(color, rs, gs, bs, as, rd, gd, bd, ad) {
+		var state, sr, sg, sb, sa, f;
 		
 		state = this.ctx.color;
 
@@ -130,14 +125,10 @@ cnvgl_rendering_fragment = (function() {
 		}
 
 		f = sr + dr;
-		rd = (sr * rs) + (dr * rd) / f;
-		gd = (sg * gs) + (dg * gd) / f;
-		bd = (sb * bs) + (db * bd) / f;
-		ad = (sa * as) + (da * ad) / f;
-		
-		c = [rd, gd, bd, ad];
-
-		return c;
+		color[0] = (sr * rs) + (dr * rd) / f;
+		color[1] = (sg * gs) + (dg * gd) / f;
+		color[2] = (sb * bs) + (db * bd) / f;
+		color[3] = (sa * as) + (da * ad) / f;
 	};
 
 	return cnvgl_rendering_fragment.Constructor;
