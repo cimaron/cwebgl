@@ -717,7 +717,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		} catch (e) {
 			glsl.errors.push(e);
 		}
-console.log(irs.toString());
+
 		if (glsl.errors.length > 0) {
 			return false;	
 		}

@@ -18,6 +18,52 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
+/*
+
+		Instruction.toString = function() {
+			var out, src1, src2, src3, dest;
+
+			out = '';
+
+			dest = this.dest || "";
+
+			src1 = this.src1;
+			if (src1 && typeof src1 == 'object') {
+				out += src1.toString();
+				src1 = src1.dest;
+			}
+
+			src2 = this.src2;
+			if (src2 && typeof src2 == 'object') {
+				out += src2.toString();
+				src2 = src2.dest;
+			}
+
+			src3 = this.src3;
+			if (src3 && typeof src3 == 'object') {
+				out += src3.toString();
+				src3 = src3.dest;
+			}
+
+			if (!dest) {
+				out += glsl.sprintf("%s;\n", this.opcode);
+			}
+			if (!src1) {
+				out += glsl.sprintf("%s %s;\n", this.opcode, dest);
+			}
+			if (!src2) {
+				out += glsl.sprintf("%s %s, %s;\n", this.opcode, dest, src1);
+			}
+			if (!src3) {
+				out += glsl.sprintf("%s %s, %s, %s;\n", this.opcode, dest, src1, src2);
+			} else {
+				out += glsl.sprintf("%s %s, %s, %s, %s;\n", this.opcode, dest, src1, src2, src3);				
+			}
+
+			return out;
+		};
+
+*/
 
 (function(ARB) {
 
@@ -51,7 +97,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		//'ARL' : false,
 		//'CMP' : false,
 		//'COS' : 'Math.cos(%2)',
-		'DP3' : '%1[0] = ((%2[0]) * (%3[0]) + (%2[1]) * (%3[1]) + (%2[3]) + (%3[3]))',
+		'DP3' : '%1[0] = ((%2[0]) * (%3[0]) + (%2[1]) * (%3[1]) + (%2[2]) * (%3[2]))',
 		//'DP4' : '%1.* = (%2.x * %3.x + %2.y * %3.y + %2.z + %3.z + %2.w * %3.w)',
 		//'DPH' : '%1.* = (%2.x * %3.x + %2.y * %3.y + %2.z + %3.z + %3.w)',
 		//'DST' : '%1.* = [1, %2.y * %3.y, %2.z, %3.w]',
@@ -107,12 +153,48 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	}
 
 	/**
+	 * Fixes cases where atomic operations translated to non-atomic may cause
+	 * incorrect results
+	 *
+	 * @param   object    Operand
+	 * @param   object    Operand
+	 * @param   array     List of components that need temps
+	 */
+	function checkNeedTemp(dest, src, temps) {
+		var written, i, wi, s;
+
+		if (!src) {
+			return;	
+		}
+
+		written = [];
+		written.push(dest.out + dest.comp[0]);
+
+		//we can skip the first one
+		for (i = 1; i < dest.count; i++) {
+			s = src.out + src.comp[i];
+			wi = written.indexOf(s);
+
+			//already written
+			if (wi != -1) {
+				src.comp[i] = sprintf('jstemp[%s]', wi);				
+				if (temps.indexOf(s) == -1) {
+					temps.push(s);
+					body.push(sprintf("%s = %s;", src.comp[i], s));
+				}
+			}
+
+			written.push(dest.out + dest.comp[i]);
+		}
+	}
+
+	/**
 	 * Translates ASM instruction into output format
 	 *
 	 * @param   string    string that represents a single instruction
 	 */
 	function translateInstruction(ins) {
-		var dest, src1, src2, src3, i, j, c, d, s1, s2, s3, code, trans;
+		var dest, src1, src2, src3, i, j, c, d, s1, s2, s3, code, trans, temps;
 
 		if (typeof ins == "string") {
 			return;	
@@ -132,10 +214,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		src2 = buildComponents(ins.s2);
 		src3 = buildComponents(ins.s3);
 
+		//fix atomic => non-atomic operations causing incorrect result
+		temps = [];
+		checkNeedTemp(dest, src1, temps);
+		checkNeedTemp(dest, src2, temps);
+		checkNeedTemp(dest, src3, temps);
+		
 		for (j = 0; j < code.length; j++) {	
 
 			//if vector operation, we need to loop over each vector and grab the appropriate element
 			for (i = 0; i < dest.count; i++) {
+				
 				trans = code[j];
 				c = dest.comp[i];
 
@@ -143,7 +232,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				s1 = src1.out + (src1.swizzle ? src1.comp[i] : c);
 				s2 = src2.out + (src2.swizzle ? src2.comp[i] : c);
 				s3 = src3.out + (src3.swizzle ? src3.comp[i] : c);
-	
+
+				if (src1 && src1.comp[i].indexOf('jstemp') != -1) {
+					s1 = src1.comp[i];
+				}
+				if (src2 && src2.comp[i].indexOf('jstemp') != -1) {
+					s2 = src2.comp[i];
+				}
+				if (src3 && src3.comp[i].indexOf('jstemp') != -1) {
+					s3 = src3.comp[i];
+				}
+
 				//vector with component
 				trans = trans.replace(/%1\*/g, d);
 				trans = trans.replace(/%2\*/g, s1);
@@ -155,13 +254,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				trans = trans.replace(/%2/g, src1.out);
 				trans = trans.replace(/%3/g, src2.out);
 				trans = trans.replace(/%4/g, src3.out);
-	
+
 				//index of current component
 				trans = trans.replace('%i', i);
-
+	
 				body.push(sprintf("%s;", trans));
-				
-				if (code[j].indexOf('*') == -1) {
+
+				if (!code[j].match(/%[0-9]+\*/)) {
 					//break 1
 					i = dest.count;
 				}
