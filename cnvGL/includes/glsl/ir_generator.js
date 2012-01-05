@@ -80,18 +80,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 * @param   ast_node    ast_node that represents the constructor components
 	 */
 	function constructor(e, op, se) {
-		var ds, di, si, sei, ses, d, s, swz;
+		var ds, di, si, sei, ses, d, s;
 
 		ds = glsl.type.size[op.type_specifier];
 		si = 0;
 		sei = 0;
-		swz = ['x', 'y', 'z', 'w'];
 
 		e.Type = op.type_specifier;
 		e.Dest = [];
 
-		e.Dest = irs.getTemp(ds == 1 ? '$tempf' : '$tempv');
-		
+		e.Dest = irs.getTemp('$tempv');
+
 		for (di = 0; di < ds; di++) {
 
 			//build next subexpression
@@ -105,18 +104,21 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 				ses = glsl.type.size[se[sei].Type];
 			}
 
+			//need to add support for > vec4
+
 			//compute destination
 			d = e.Dest;
-			if (ds > 1) {
-				//need to add support for > vec4
-				d = sprintf("%s.%s", d, swz[di]);
-			}
+			d = sprintf("%s.%s", d, swizzles[0][di]);
 
 			//compute source
-			s = se[sei].Dest;
-			if (ses > 1) {
-				//need to add support for > vec4
-				s = sprintf("%s.%s", s, swz[si])
+			s = splitOperand(se[sei].Dest);
+
+			//expression was to just get the identifier, so add the appropriate swizzle,
+			//else, correct swizzle should have already been set
+			if (s[1]) {
+				s = s.join(".");
+			} else {
+				s = sprintf("%s.%s", s, swizzles[0][si])				
 			}
 
 			ir = new IR('MOV', d, s);
@@ -260,7 +262,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 * @param   ast_node    ast_node that represents a field selection
 	 */
 	function expression_field(e, se) {
-		var field, i, s, swz, new_swz, base, ir;
+		var field, i, s, swz, new_swz, base, ir, dest, src;
 
 		//pick swizzle set
 		field = e.primary_expression.identifier;
@@ -288,21 +290,18 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		if (swz) {
 
 			e.Type = makeType(baseType(se[0].Type), new_swz.length);
+			e.Dest = se[0].Dest;
 
-			//if it's an in-order swizzle, just return the identifier
-			if (swizzles[0].substring(0, new_swz.length) == new_swz) {
-				e.Dest = se[0].Dest;
-				return
-			}
-
-			//otherwise, create a new temp
 			if (new_swz.length > 4 || !e.Type) {
 				throw_error(sprintf("Invalid field selection %s.%s", se[0], e.primary_expression.identifier), e);
 			}
 
-			e.Dest = irs.getTemp('$tempv');
-			ir = new IR('MOV', sprintf("%s.%s", e.Dest, new_swz), sprintf("%s.%s", se[0].Dest, new_swz));
-			irs.push(ir);
+			//if it's an in-order swizzle, just use the identifier
+			if (swizzles[0].substring(0, new_swz.length) == new_swz) {
+				return;
+			}
+
+			e.Dest = sprintf("%s.%s", e.Dest, new_swz)
 		}
 	}
 
@@ -647,8 +646,46 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		return glsl.type.base[type];
 	}
 
+	/**
+	 * Splits an operand into name and swizzle parts
+	 *
+	 * @param   string      The operand
+	 *
+	 * @return  array       [name, swizzle]
+	 */
+	function splitOperand(oprd) {
+		oprd = oprd.split(".");
+		if (!oprd[1] || oprd[1].match(/[xyzw]+/)) {
+			
+		} else {
+			oprd = [oprd.join(".")];
+		}
+		return oprd;
+	}
+
+	/**
+	 * Builds instructions from code table record
+	 *
+	 * @param   array       List of instruction strings
+	 * @param   array       List of operands
+	 */
 	function parseCode(code, oprds) {
-		var repl, parts, i, j;
+		var repl, dest, parts, i, j, oprd, ir, new_swz;
+
+		for (i = 0; i < oprds.length; i++) {
+			oprd = splitOperand(oprds[i]);
+			if (oprd[1]) {
+				//need a new temp to move the swizzle so our code pattern works
+				new_swz = swizzles[0].substring(0, oprd[1].length);
+				if (oprd[1] != new_swz) {
+					dest = irs.getTemp('$tempv');
+					ir = new IR('MOV', sprintf("%s.%s", dest, new_swz), oprd.join("."));
+					irs.push(ir);
+					oprd[0] = dest;
+				}
+			}
+			oprds[i] = oprd[0];	
+		}
 
 		repl = [];
 		for (i = oprds.length - 1; i >= 0; i--) {
