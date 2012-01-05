@@ -18,52 +18,6 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-/*
-
-		Instruction.toString = function() {
-			var out, src1, src2, src3, dest;
-
-			out = '';
-
-			dest = this.dest || "";
-
-			src1 = this.src1;
-			if (src1 && typeof src1 == 'object') {
-				out += src1.toString();
-				src1 = src1.dest;
-			}
-
-			src2 = this.src2;
-			if (src2 && typeof src2 == 'object') {
-				out += src2.toString();
-				src2 = src2.dest;
-			}
-
-			src3 = this.src3;
-			if (src3 && typeof src3 == 'object') {
-				out += src3.toString();
-				src3 = src3.dest;
-			}
-
-			if (!dest) {
-				out += glsl.sprintf("%s;\n", this.opcode);
-			}
-			if (!src1) {
-				out += glsl.sprintf("%s %s;\n", this.opcode, dest);
-			}
-			if (!src2) {
-				out += glsl.sprintf("%s %s, %s;\n", this.opcode, dest, src1);
-			}
-			if (!src3) {
-				out += glsl.sprintf("%s %s, %s, %s;\n", this.opcode, dest, src1, src2);
-			} else {
-				out += glsl.sprintf("%s %s, %s, %s, %s;\n", this.opcode, dest, src1, src2, src3);				
-			}
-
-			return out;
-		};
-
-*/
 
 (function(ARB) {
 
@@ -98,7 +52,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		//'CMP' : false,
 		//'COS' : 'Math.cos(%2)',
 		'DP3' : '%1[0] = ((%2[0]) * (%3[0]) + (%2[1]) * (%3[1]) + (%2[2]) * (%3[2]))',
-		//'DP4' : '%1.* = (%2.x * %3.x + %2.y * %3.y + %2.z + %3.z + %2.w * %3.w)',
+		'DP4' : '%1[0] = ((%2[0]) * (%3[0]) + (%2[1]) * (%3[1]) + (%2[2]) * (%3[2]) + (%2[3]) * (%3[3]))',
 		//'DPH' : '%1.* = (%2.x * %3.x + %2.y * %3.y + %2.z + %3.z + %3.w)',
 		//'DST' : '%1.* = [1, %2.y * %3.y, %2.z, %3.w]',
 		'MAD' : '%1* = ((%2*) * (%3*)) + (%4*)',
@@ -106,6 +60,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		'MOV' : '%1* = (%2*)',
 		'MUL' : '%1* = (%2*) * (%3*)',
 		'RET' : 'return',
+		'RSQ' : '%1* = (1.0 / Math.sqrt(%2*))',
 		'SGE' : '%1* = (%2* >= %3*) ? (1.0) : (0.0)',
 		'SLT' : '%1* = (%2* <  %3*) ? (1.0) : (0.0)',
 		'SUB' : '%1* = (%2*) - (%3*)',

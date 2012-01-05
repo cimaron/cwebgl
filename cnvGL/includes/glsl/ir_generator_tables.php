@@ -20,7 +20,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-global $debug;
+global $debug, $operations, $types, $base_types, $operation_table;
 if (!$_SERVER['argv'] && $debug) {
 	header('Content-Type: text/javascript');
 }
@@ -138,6 +138,20 @@ addOperation('add', array('vec3', 'vec3'), array(
 	)
 ));
 
+addOperation('add', array('vec4', 'vec4'), array(
+	'type' => 'vec4',
+	'code' => array(
+		"ADD %1 %2 %3"
+	)
+));
+
+addOperation('mul', array('float', 'float'), array(
+	'type' => 'float',
+	'code' => array(
+		"MUL %1.x %2.x %3.x"
+	)
+));
+
 addOperation('mul', array('vec3', 'float'), array(
 	'type' => 'vec3',
 	'code' => array(
@@ -149,6 +163,13 @@ addOperation('mul', array('vec3', 'vec3'), array(
 	'type' => 'vec3',
 	'code' => array(
 		"MUL %1.xyz %2.xyz %3.xyz"		
+	)
+));
+
+addOperation('mul', array('vec4', 'vec4'), array(
+	'type' => 'vec4',
+	'code' => array(
+		"MUL %1 %2 %3"
 	)
 ));
 
@@ -197,6 +218,13 @@ addOperation('mul', array('mat4', 'mat4'), array(
 	)
 ));
 
+addOperation('sub', array('vec4', 'vec4'), array(
+	'type' => 'vec4',
+	'code' => array(
+		"SUB %1 %2 %3"
+	)
+));
+
 addFunction('dot', array('vec3', 'vec3'), array(
 	'type' => 'float',
 	'code' => array(
@@ -204,10 +232,35 @@ addFunction('dot', array('vec3', 'vec3'), array(
 	)
 ));
 
+addFunction('dot', array('vec4', 'vec4'), array(
+	'type' => 'float',
+	'code' => array(
+		'DP4 %1 %2 %3'
+	)
+));
+
 addFunction('max', array('float', 'float'), array(
 	'type' => 'float',
 	'code' => array(
 		'MAX %1.x %2.x %3.x'
+	)
+));
+
+addFunction('normalize', array('vec3', 'vec3'), array(
+	'type' => 'vec3',
+	'code' => array(
+		'DP3 %1.x %2 %2',
+		'RSQ %1.x %1.x',
+		'MUL %1.xyz %2.xyz %1.x'
+	)
+));
+
+addFunction('normalize', array('vec4', 'vec4'), array(
+	'type' => 'vec4',
+	'code' => array(
+		'DP4 %1.x %2 %2',
+		'RSQ %1.x %1.x',
+		'MUL %1 %2 %1.x'
 	)
 ));
 
