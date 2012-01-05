@@ -63,39 +63,45 @@ cnvgl_rendering_fragment = (function() {
 		}
 
 		i <<= 2;
+		
+		c[0] *= 255;
+		c[1] *= 255;
+		c[2] *= 255;
+		c[3] *= 255;
+
 		if (this.ctx.color.blendEnabled == GL_TRUE) {
-			this.blend(c, c[0], c[1], c[2], c[3], c_buffer[i] / 255, c_buffer[i + 1] / 255, c_buffer[i + 2] / 255, c_buffer[i + 3] / 255);
+			this.blend(c, c[0], c[1], c[2], c[3], c_buffer[i], c_buffer[i + 1], c_buffer[i + 2], c_buffer[i + 3]);
 		}
 
-		c_buffer[i    ] = c_mask[0] & (c[0] * 255 + .5)|0; //round(frag.r * 255)
-		c_buffer[i + 1] = c_mask[1] & (c[1] * 255 + .5)|0; //round(frag.g * 255)
-		c_buffer[i + 2] = c_mask[2] & (c[2] * 255 + .5)|0; //round(frag.b * 255)
-		c_buffer[i + 3] = c_mask[3] & (c[3] * 255 + .5)|0; //round(frag.a * 255)		
+		c_buffer[i    ] = c_mask[0] & (c[0] + .5)|0; //round(frag.r)
+		c_buffer[i + 1] = c_mask[1] & (c[1] + .5)|0; //round(frag.g)
+		c_buffer[i + 2] = c_mask[2] & (c[2] + .5)|0; //round(frag.b)
+		c_buffer[i + 3] = c_mask[3] & (c[3] + .5)|0; //round(frag.a)		
 	};
 	
-	cnvgl_rendering_fragment.blend = function(color, rs, gs, bs, as, rd, gd, bd, ad) {
-		var state, sr, sg, sb, sa, f;
+	cnvgl_rendering_fragment.blend = function(color, sr, sg, sb, sa, dr, dg, db, da) {
+		var state, a_sr, a_sg, a_sb, a_sa, a_dr, a_dg, a_db, a_da;
 		
 		state = this.ctx.color;
 
 		switch (state.blendSrcA) {
 			case GL_ONE:
-				sr = sg = sb = sa = 1;
+				a_sr = a_sg = a_sb = a_sa = (1);
 				break;
 			case GL_ZERO:
-				sr = sg = sb = sa = 0;
+				a_sr = a_sg = a_sb = a_sa = (0);
 				break;
 			case GL_SRC_ALPHA:
-				sr = sg = sb = sa = as;
+				a_sr = a_sg = a_sb = a_sa = (sa / 255);
 				break;
 			case GL_ONE_MINUS_SRC_ALPHA:
-				sr = sg = sb = sa = 1 - as;
+				a_sr = a_sg = a_sb = a_sa = (1 - (sa / 255));
 				break;
 			case GL_DST_ALPHA:
-				sr = sg = sb = sa = ad;
+				a_sr = a_sg = a_sb = a_sa = (da / 255);
 				break;
 			case GL_ONE_MINUS_DST_ALPHA:
-				sr = sg = sb = sa = 1 - ad;
+				a_sr = a_sg = a_sb = a_sa = (1 - (da / 255));
 				break;
 			default:
 				throw new Error('Blend source ' + state.blendSrcA + ' not implemented');
@@ -103,32 +109,50 @@ cnvgl_rendering_fragment = (function() {
 
 		switch (state.blendDestA) {
 			case GL_ONE:
-				dr = dg = db = da = 1;
+				a_dr = a_dg = a_db = a_da = (1);
 				break;
 			case GL_ZERO:
-				dr = dg = db = da = 0;
+				a_dr = a_dg = a_db = a_da = (0);
 				break;
 			case GL_SRC_ALPHA:
-				dr = dg = db = da = as;
+				a_dr = a_dg = a_db = a_da = (sa / 255);
 				break;
 			case GL_ONE_MINUS_SRC_ALPHA:
-				dr = dg = db = da = 1 - as;
+				a_dr = a_dg = a_db = a_da = (1 - (sa / 255));
 				break;
 			case GL_DST_ALPHA:
-				dr = dg = db = da = ad;
+				a_dr = a_dg = a_db = a_da = (da / 255);
 				break;
 			case GL_ONE_MINUS_DST_ALPHA:
-				dr = dg = db = da = 1 - ad;
+				a_dr = a_dg = a_db = a_da = (1 - (da / 255));
 				break;
 			default:
 				throw new Error('Blend source ' + state.blendSrcD + ' not implemented');					
 		}
 
-		f = sr + dr;
-		color[0] = (sr * rs) + (dr * rd) / f;
-		color[1] = (sg * gs) + (dg * gd) / f;
-		color[2] = (sb * bs) + (db * bd) / f;
-		color[3] = (sa * as) + (da * ad) / f;
+		switch (state.blendEquationRGB) {
+			case GL_FUNC_ADD:
+				color[0] = (a_sr * sr) + (a_dr * dr);
+				color[1] = (a_sg * sg) + (a_dg * dg);
+				color[2] = (a_sb * sb) + (a_db * db);
+				break;
+			default:
+				throw new Error('Blend function ' + state.blendEquationRGB + ' not implemented');									
+		}
+
+		switch (state.blendEquationA) {
+			case GL_FUNC_ADD:
+				color[3] = (a_sa * sa) + (a_da * da);
+				break;
+			default:
+				throw new Error('Blend function ' + state.blendEquationRGB + ' not implemented');									
+		}
+		
+		if (color[0] > 255) { color[0] = 255; }
+		if (color[1] > 255) { color[1] = 255; }
+		if (color[2] > 255) { color[2] = 255; }
+		if (color[3] > 255) { color[3] = 255; }
+		
 	};
 
 	return cnvgl_rendering_fragment.Constructor;

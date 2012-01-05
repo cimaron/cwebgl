@@ -72,7 +72,9 @@ var cnvgl_context = (function() {
 			blendSrcRGB : GL_ONE,
 			blendSrcA : GL_ONE,
 			blendDestRGB : GL_ZERO,
-			blendDestA : GL_ZERO
+			blendDestA : GL_ZERO,
+			blendEquationRGB : GL_FUNC_ADD,
+			blendEquationA : GL_FUNC_ADD
 		};
 
 		//depth state
