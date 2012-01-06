@@ -34,7 +34,7 @@ function glBindTexture(target, texture) {
 
 	ctx = cnvgl_context.getCurrentContext();
 	unit = ctx.texture.currentUnit;
-	texture_unit = ctx.texture.unit[unit - GL_TEXTURE0];
+	texture_unit = ctx.texture.unit[unit];
 
 	if (texture == 0) {
 		texture_obj = ctx.shared.default_texture_objects[GL_TEXTURE_2D];
@@ -45,8 +45,9 @@ function glBindTexture(target, texture) {
 				cnvgl_throw_error(GL_INVALID_OPERATION);	
 				return;
 			}
+			texture_obj.target = target;
 		} else {
-			texture_obj = new cnvgl_texture_object(texture);
+			texture_obj = new cnvgl_texture_object(texture, target);
 			ctx.shared.texture_objects[texture] = texture_obj;
 		}
 	}

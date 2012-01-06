@@ -33,7 +33,7 @@ function glTexParameteri(target, pname, param) {
 
 	ctx = cnvgl_context.getCurrentContext();
 	unit = ctx.texture.currentUnit;
-	texture_unit = ctx.texture.unit[unit - GL_TEXTURE0];
+	texture_unit = ctx.texture.unit[unit];
 	texture_obj = texture_unit.current_texture[target];
 
 	switch (pname) {

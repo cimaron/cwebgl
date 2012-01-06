@@ -33,7 +33,7 @@ function glTexImage2D(target, level, internalFormat, width, height, border, form
 
 	ctx = cnvgl_context.getCurrentContext();
 	unit = ctx.texture.currentUnit;
-	texture_unit = ctx.texture.unit[unit - GL_TEXTURE0];
+	texture_unit = ctx.texture.unit[unit];
 	texture_obj = texture_unit.current_texture[target];
 
 	texture_img = new cnvgl_texture_image(texture_obj);

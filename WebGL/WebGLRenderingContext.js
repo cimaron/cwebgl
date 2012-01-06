@@ -525,7 +525,7 @@ cWebGLRenderingContext = (function() {
 	
 	cWebGLRenderingContext.bindTexture = function(target, texture) {
 		//@validation	
-		var _texture = (texture && texture.object) ? texture.object() : texture;
+		var _texture = (texture && texture.object) ? texture.object() : texture || 0;
 	
 		this._context.bindTexture(target, _texture);
 	};

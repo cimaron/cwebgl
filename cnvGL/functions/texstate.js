@@ -31,7 +31,7 @@ function glActiveTexture(unit) {
 		return;
 	}
 
-	ctx.texture.currentUnit = unit;
+	ctx.texture.currentUnit = i;
 	if (!ctx.texture.unit[i]) {
 		ctx.texture.unit[i] = new cnvgl_texture_unit(ctx, unit);	
 	}

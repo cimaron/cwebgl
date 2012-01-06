@@ -133,7 +133,7 @@ var cnvgl_context = (function() {
 
 	cnvgl_context.initTextures = function() {
 		var units, i, unit;
-		this.texture.currentUnit = GL_TEXTURE0;
+		this.texture.currentUnit = 0;
 		this.texture.unit = [];
 		for (i = 0; i < GPU.texture.MAX_COMBINED_TEXTURE_IMAGE_UNITS; i++) {
 			unit = new cnvgl_texture_unit(this, i);
