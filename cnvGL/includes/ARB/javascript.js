@@ -127,12 +127,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		//we can skip the first one
 		for (i = 1; i < dest.count; i++) {
-			s = src.out + src.comp[i];
+			s = src.neg + src.out + src.comp[i];
 			wi = written.indexOf(s);
 
 			//already written
 			if (wi != -1) {
-				src.comp[i] = sprintf('jstemp[%s]', wi);				
+				src.comp[i] = sprintf('jstemp[%s]', wi);		
 				if (temps.indexOf(s) == -1) {
 					temps.push(s);
 					body.push(sprintf("%s = %s;", src.comp[i], s));
@@ -184,9 +184,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				c = dest.comp[i];
 
 				d = dest.out + c;
-				s1 = src1.out + (src1.swizzle ? src1.comp[i] : c);
-				s2 = src2.out + (src2.swizzle ? src2.comp[i] : c);
-				s3 = src3.out + (src3.swizzle ? src3.comp[i] : c);
+				s1 = src1.neg + src1.out + (src1.swizzle ? src1.comp[i] : c);
+				s2 = src1.neg + src2.out + (src2.swizzle ? src2.comp[i] : c);
+				s3 = src1.neg + src3.out + (src3.swizzle ? src3.comp[i] : c);
 
 				if (src1 && src1.comp[i].indexOf('jstemp') != -1) {
 					s1 = src1.comp[i];

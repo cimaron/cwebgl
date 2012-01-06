@@ -326,7 +326,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 		entry = glsl.state.symbols.get_function(func, null, def);
 		if (!entry) {
-			throw_error(sprintf("Function %s(%s) is not defined", func, se_type_names.join(",")), e);
+			 throw_error(sprintf("Function %s(%s) is not defined", func, se_type_names.join(",")), e);
 		}
 
 		e.Type = entry.type;
@@ -395,9 +395,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 				expression_assign(e, se);
 				break;
 
+			case ops.neg:
+				if (se[0].Dest[0] != '-') {
+					e.Dest = "-" + se[0].Dest;	
+				} else {
+					e.Dest = se[0].Dest.substring(1);	
+				}
+				e.Type = se[0].Type;
+				break;
+
 			//unary operator
 			case ops.logic_not:
-				//expression_unary
 				expression_generate(e, se, 1);
 				break;
 
@@ -430,7 +438,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 				break;
 				
 			default:
-				throw_error(sprintf("Could not translate unknown expression %s (%s)", e.typeOf(), e.oper), e);
+				 throw_error(sprintf("Could not translate unknown expression %s (%s)", e.typeOf(), e.oper), e);
 		}
 	}
 
@@ -593,7 +601,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	function throw_error(msg, n) {
 		if (n && n.location) {
-			msg += " at line " + n.location.line + ", column " + n.location.column;	
+			msg += " at line " + n.location.line + ", column " + n.location.column;
 		}
 		throw new Error(msg);
 	}

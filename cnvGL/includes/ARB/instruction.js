@@ -26,6 +26,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		//Internal Constructor
 		function Initializer() {
 			this.name = "";
+			this.neg = "";
 			this.offset = "";
 			this.swizzle = "";
 		}
@@ -68,14 +69,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 			//now split the rest
 			parts = parts.join(".");
-			parts = parts.match(/([a-zA-Z0-9\$_\.]+)(?:(?:\[([0-9]+)\])*)$/);
+			parts = parts.match(/(\-?)([a-zA-Z0-9\$_\.]+)(?:(?:\[([0-9]+)\])*)$/);
 
 			if (!parts) {
 				throw new Error(StdIO.sprintf("Could not parse operand %s", str));
 			}
 
-			this.name = parts[1];
-			this.offset = parts[2] ? parseInt(parts[2]) : "";
+			this.neg = parts[1];
+			this.name = parts[2];
+			this.offset = parts[3] ? parseInt(parts[3]) : "";
 		};
 
 		/**
@@ -102,7 +104,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			var off, swz;
 			off = (this.offset || this.offset === 0) ? StdIO.sprintf("[%s]", this.offset) : ""
 			swz = this.swizzle ? "." + this.swizzle : "";
-			return StdIO.sprintf("%s%s%s", this.name, off, swz);
+			return StdIO.sprintf("%s%s%s%s", this.neg, this.name, off, swz);
 		};
 
 		return Operand.Constructor;

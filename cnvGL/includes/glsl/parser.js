@@ -2122,6 +2122,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						yyval.expression.set_location(yylloc);
 						break;
 
+					case 59:
+						yyval = {};
+						yyval.n = glsl.ast.operators.neg;
+						break;
+
 					case 60:
 						yyval = {};
 						yyval.n = glsl.ast.operators.logic_not;
@@ -2517,7 +2522,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					case 55:
 					case 56:
 					case 58:
-					case 59:
 					case 60:
 					case 61:
 					case 65:
