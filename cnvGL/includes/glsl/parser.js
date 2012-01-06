@@ -2112,6 +2112,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					case 45:
 						yyval = {};
 						var callee = new glsl.ast.expression(yyvsa[yyvsp].identifier);
+						callee.set_location(yylloc);
 						yyval.expression = new glsl.ast.function_expression(callee);
 						yyval.expression.set_location(yylloc);
 						break;
@@ -2484,6 +2485,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						yyval.selection_rest_statement.else_statement = yyvsa[yyvsp].node;						
 						break;
 
+					case 268:
+						yyval = {};
+						yyval.selection_rest_statement = {};
+						yyval.selection_rest_statement.then_statement = yyvsa[yyvsp].node;
+						yyval.selection_rest_statement.else_statement = null;
+						break;
+
 					case 288:
 						yyval = {};
 						yyval.node = yyvsa[yyvsp].function_definition;
@@ -2643,7 +2651,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					case 258:
 					case 260:
 					case 264:
-					case 268:
 					case 269:
 					case 270:
 					case 274:

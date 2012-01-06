@@ -311,22 +311,24 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 * @param   ast_node    ast_node that represents a function call
 	 */
 	function expression_function(e) {
-		var i, func, se, def, dest, entry;
+		var i, func, se, def, def_names, dest, entry;
 		
 		func = e.subexpressions[0].primary_expression.identifier
 		def = [];
+		def_names = [];
 		dest = [];
 
 		for (i = 0; i < e.expressions.length; i++) {
 			se = e.expressions[i];
 			expression(se);
 			def.push(se.Type);
+			def_names.push(glsl.type.names[se.Type]);
 			dest.push(se.Dest);
 		}
 
 		entry = glsl.state.symbols.get_function(func, null, def);
 		if (!entry) {
-			 throw_error(sprintf("Function %s(%s) is not defined", func, se_type_names.join(",")), e);
+			throw_error(sprintf("Function %s(%s) is not defined", func, def_names.join(",")), e);
 		}
 
 		e.Type = entry.type;
@@ -438,7 +440,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 				break;
 				
 			default:
-				 throw_error(sprintf("Could not translate unknown expression %s (%s)", e.typeOf(), e.oper), e);
+				throw_error(sprintf("Could not translate unknown expression %s (%s)", e.typeOf(), glsl.ast.op_names[e.oper]), e);
 		}
 	}
 
@@ -459,7 +461,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			entry = state.symbols.get_variable(name) || state.symbols.get_function(name);
 
 			if (!entry || !entry.type) {
-				throw_error(sprintf("Variable %s is undefined", name), e);
+				throw_error(sprintf("%s is undefined", name), e);
 			}
 
 			e.Type = entry.type;
@@ -601,7 +603,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	function throw_error(msg, n) {
 		if (n && n.location) {
-			msg += " at line " + n.location.line + ", column " + n.location.column;
+			msg = sprintf("%s at line %s, column %s", msg, n.location.line, n.location.column);
 		}
 		throw new Error(msg);
 	}

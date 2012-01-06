@@ -225,6 +225,13 @@ addOperation('sub', array('vec4', 'vec4'), array(
 	)
 ));
 
+addOperation('sub', array('vec3', 'vec3'), array(
+	'type' => 'vec3',
+	'code' => array(
+		"SUB %1.xyz %2.xyz %3.xyz"
+	)
+));
+
 addFunction('dot', array('vec3', 'vec3'), array(
 	'type' => 'float',
 	'code' => array(
@@ -246,7 +253,7 @@ addFunction('max', array('float', 'float'), array(
 	)
 ));
 
-addFunction('normalize', array('vec3', 'vec3'), array(
+addFunction('normalize', array('vec3'), array(
 	'type' => 'vec3',
 	'code' => array(
 		'DP3 %1.x %2 %2',
@@ -255,12 +262,28 @@ addFunction('normalize', array('vec3', 'vec3'), array(
 	)
 ));
 
-addFunction('normalize', array('vec4', 'vec4'), array(
+addFunction('normalize', array('vec4'), array(
 	'type' => 'vec4',
 	'code' => array(
 		'DP4 %1.x %2 %2',
 		'RSQ %1.x %1.x',
 		'MUL %1 %2 %1.x'
+	)
+));
+
+addFunction('pow', array('float', 'float'), array(
+	'type' => 'float',
+	'code' => array(
+		'POW %1.x %2.x %3.x'
+	)
+));
+
+addFunction('reflect', array('vec3', 'vec3'), array(
+	'type' => 'vec3',
+	'code' => array(
+		'DP3 %1.x %3 %2',
+		'MUL %1.xyz %3 %1.x',
+		'MAD %1.xyz -%1 2.0 %2'
 	)
 ));
 

@@ -59,6 +59,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		'MAX' : '%1* = Math.max((%2*), (%3*))',
 		'MOV' : '%1* = (%2*)',
 		'MUL' : '%1* = (%2*) * (%3*)',
+		'POW' : '%1[0] = Math.pow(%2[0], %3[0])',
 		'RET' : 'return',
 		'RSQ' : '%1* = (1.0 / Math.sqrt(%2*))',
 		'SGE' : '%1* = (%2* >= %3*) ? (1.0) : (0.0)',
