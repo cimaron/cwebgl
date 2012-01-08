@@ -22,7 +22,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 include('cnvGL/defines.js');
 
-include('cnvGL/objects/cnvgl_attrib_array.js');
+include('cnvGL/objects/attrib_array_object.js');
 include('cnvGL/objects/buffer.js');
 include('cnvGL/objects/cnvgl_context.js');
 include('cnvGL/objects/context_shared.js');
