@@ -19,50 +19,39 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-var cnvgl_context_shared = (function() {
-							  
-	function Initializer() {
-		//public:
-		this.texture_objects = [];
-		this.default_texture_objects = {};
+function cnvgl_framebuffer(name) {
 
-		this.shaderObjects = [0];
-		this.frameBuffers = [0];
-	}
+	this.name = name;
+	this.refCount = 0;
+	this.deletePending = false;
 
-	var cnvgl_context_shared = jClass('cnvgl_context_shared', Initializer);
+	this.visual = null; //??
+	this.initialized = null;
+
+	this.width = 0;
+	this.height = 0;
+
+	this.xmin = 0;
+	this.xmax = 0;
+	this.ymin = 0;
+	this.ymax = 0;
 	
-	//static:
-	var instance = null;
-	cnvgl_context_shared.Constructor.getInstance = function() {
-		if (instance) {
-			return instance;	
-		}
-		return new cnvgl_context_shared.Constructor();
-	};
-
-	//public:
-
-	cnvgl_context_shared.cnvgl_context_shared = function() {
-		this.initTextures();
-	};
+	this.depthMax = 0;
+	this.depthMaxF = 0;
+	this.MRD = 0;
 	
-	cnvgl_context_shared.initTextures = function() {
-		var tex2d, tex2di;
-		this.texture_objects[0] = 0;
+	this.status = null;
+	this.integerColor = null;
 
-		//default texture objects
-		tex2d = new cnvgl_texture_object(0, GL_TEXTURE_2D);
-		this.default_texture_objects[GL_TEXTURE_2D] = tex2d;
-		tex2di = new cnvgl_texture_object(tex2d);
-		tex2di.data = new Uint8Array([0,0,0,255]);
-		tex2di.width = 1;
-		tex2di.height = 1;
-		tex2di.internalFormat = GL_RGBA;
-		tex2d.images[0] = tex2di;
-	};
+	this.attachment = [];
 
-	return cnvgl_context_shared.Constructor;
+	this.colorDrawBuffers = [];   
+	this.colorReadBuffer = null;
 
-}());
+	this.numColorDrawBuffers = 0;
+	this.colorDrawBufferIndexes = [];
+	this.colorReadBufferIndex = -1;
 
+	this.depthBuffer = null;
+	this.stencilBuffer = null;
+};

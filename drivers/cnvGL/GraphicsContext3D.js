@@ -133,7 +133,7 @@ GraphicsContext3D = (function() {
 		glGenBuffers(1, buffers);
 		return buffers[0][0];
 	};
-	
+
 	GraphicsContext3D.createProgram = function() {
 		return glCreateProgram();
 	};
@@ -316,6 +316,8 @@ GraphicsContext3D = (function() {
 		width = this.canvas.width;
 		height = this.canvas.height;
 
+		ctx.drawBuffer = new cnvgl_framebuffer(0);
+
 		if (this._quality.factor > 1) {
 
 			width = Math.round(width / this._quality.factor);
@@ -332,13 +334,16 @@ GraphicsContext3D = (function() {
 			this.context.mozImageSmoothingEnabled = false;
 
 			this._quality.buffer = this.context.createImageData(width, height);
-			ctx.color_buffer = this._quality.buffer.data;
 
+			ctx.drawBuffer.colorDrawBuffers.push(this._quality.buffer.data);
 		} else {
-			ctx.color_buffer = this.buffer.data;
+			ctx.drawBuffer.colorDrawBuffers.push(this.buffer.data);
 		}
 
-		ctx.depth_buffer = new Float32Array(width * height);
+		ctx.drawBuffer.width = width;
+		ctx.drawBuffer.height = height;
+
+		ctx.drawBuffer.depthBuffer = new Float32Array(width * height);
 	};
 
 	GraphicsContext3D._updateFrame = function() {

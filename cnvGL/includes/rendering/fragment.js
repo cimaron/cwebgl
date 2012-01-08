@@ -26,6 +26,11 @@ cnvgl_rendering_fragment = (function() {
 		//public:
 		this.ctx = null;
 		this.renderer = null;
+		
+		//current state
+		this.colorBuffer = null;
+		this.depthBuffer = null;
+		this.colorMask = null;
 	}
 
 	var cnvgl_rendering_fragment = jClass('cnvgl_rendering_fragment', Initializer);
@@ -34,9 +39,15 @@ cnvgl_rendering_fragment = (function() {
 
 	cnvgl_rendering_fragment.cnvgl_rendering_fragment = function(ctx, renderer) {
 		this.ctx = ctx;
-		this.renderer = renderer;		
-
+		this.renderer = renderer;
 		this.result = GPU.shader.result;
+	};
+
+	cnvgl_rendering_fragment.setCurrentState = function() {
+		this.colorBuffer = this.ctx.drawBuffer.colorDrawBuffers[0];
+		this.depthBuffer = this.ctx.drawBuffer.depthBuffer;
+		this.colorMask = this.ctx.color.colorMask;
+		this.depthMask = this.ctx.depth.mask;
 	};
 
 	cnvgl_rendering_fragment.process = function(f) {
@@ -52,13 +63,13 @@ cnvgl_rendering_fragment = (function() {
 	cnvgl_rendering_fragment.write = function(i, frag) {
 		var c_buffer, d_buffer, c, c_mask;
 
-		c_buffer = this.ctx.color_buffer;
-		d_buffer = this.ctx.depth_buffer;
+		c_buffer = this.colorBuffer;
+		d_buffer = this.depthBuffer;
 
 		c = frag.color;
-		c_mask = this.ctx.color.colorMask;
+		c_mask = this.colorMask;
 
-		if (this.ctx.depth.mask) {
+		if (this.depthMask) {
 			d_buffer[i] = frag.gl_FragDepth;
 		}
 

@@ -35,6 +35,8 @@ cnvgl_renderer = (function() {
 		this.vertex = null;
 
 		this.mode = null;
+		this.depthBuffer = null;
+		this.depthFunc = null;
 	}
 
 	var cnvgl_renderer = jClass('cnvgl_renderer', Initializer);
@@ -58,7 +60,17 @@ cnvgl_renderer = (function() {
 		this.primitive.setMode(mode);
 	};
 	
+	cnvgl_renderer.setCurrentState = function() {
+		
+		this.depthBuffer = this.ctx.drawBuffer.depthBuffer;
+		this.depthFunc = this.ctx.depth.func;
+
+		//set current state in sub-renderers
+		this.fragment.setCurrentState();
+	};
+	
 	cnvgl_renderer.send = function(vertex) {
+		this.setCurrentState();
 		this.vertex.process(vertex);
 		this.primitive.send(vertex);
 	};
@@ -68,10 +80,11 @@ cnvgl_renderer = (function() {
 	};
 
 	cnvgl_renderer.checkDepth = function(i, z) {
-		var mode, depth, pass;
-		mode = this.ctx.depth.func;
-		depth = this.ctx.depth_buffer[i];
-		switch (mode) {
+		var depth, pass;
+
+		depth = this.depthBuffer[i];
+
+		switch (this.depthFunc) {
 			case GL_NEVER:
 				pass = false;
 				break;

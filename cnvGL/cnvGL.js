@@ -27,6 +27,7 @@ include('cnvGL/objects/buffer.js');
 include('cnvGL/objects/cnvgl_context.js');
 include('cnvGL/objects/context_shared.js');
 include('cnvGL/objects/cnvgl_fragment.js');
+include('cnvGL/objects/framebuffer.js');
 include('cnvGL/objects/cnvgl_primitive.js');
 include('cnvGL/objects/cnvgl_program.js');
 include('cnvGL/objects/cnvgl_shader.js');

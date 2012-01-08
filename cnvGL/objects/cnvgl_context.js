@@ -36,10 +36,10 @@ var cnvgl_context = (function() {
 
 		//direct
 		this.errorValue = 0;
-	
+
 		//Frame Buffers
-		this.color_buffer = null;
-		this.depth_buffer = null;
+		this.drawBuffer = null;
+		this.readBuffer = null;
 
 		//Buffers
 		this.vertex_attrib_arrays = [];
