@@ -365,24 +365,27 @@ GraphicsContext3D = (function() {
 		ctx.drawBuffer = frameBuffer;
 
 		//set up color buffer
-		colorBuffer = this.createRenderbuffer();
-		this.bindRenderbuffer(GL_RENDERBUFFER, colorBuffer);
-		this.renderbufferStorage(GL_RENDERBUFFER, GL_RGBA, width, height);
-		frameBuffer.colorDrawBuffers[0] = ctx.shared.renderBuffers[colorBuffer];
+		colorBuffer = new cnvgl_renderbuffer(0);
+		colorBuffer.internalFormat = GL_RGBA;
+		colorBuffer.width = width;
+		colorBuffer.height = height;
+		frameBuffer.colorDrawBuffers[0] = colorBuffer;
 
 		if (this._quality.factor > 1) {
-			this._quality.buffer = frameBuffer.colorDrawBuffers[0];
+			this._quality.buffer = this.context.createImageData(width, height);
+			colorBuffer.data = this._quality.buffer.data;
 		} else {
-			this.buffer = frameBuffer.colorDrawBuffers[0];
+			this.buffer = this.context.createImageData(width, height);
+			colorBuffer.data = this.buffer.data;
 		}
-
+		
 		//set up depth buffer
-		depthBuffer = this.createRenderbuffer();
-		this.bindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
-		this.renderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height);
-		frameBuffer.depthBuffer = ctx.shared.renderBuffers[depthBuffer];
-
-		this.bindRenderbuffer(GL_RENDERBUFFER, null);
+		depthBuffer = new cnvgl_renderbuffer(0);
+		depthBuffer.internalFormat = GL_DEPTH_COMPONENT16;
+		depthBuffer.width = width;
+		depthBuffer.height = height;
+		depthBuffer.data = cnvgl_malloc(GL_DEPTH_COMPONENT16, width * height);
+		frameBuffer.depthBuffer = depthBuffer;
 	};
 
 	GraphicsContext3D._updateFrame = function() {
