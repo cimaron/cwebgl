@@ -452,3 +452,4 @@ var GL_TEXTURE_3D					= 0x806F;
 
 var GL_READ_WRITE					= 0x88BA;
 
+var DEPTH_COMPONENT16				= 0x81A5;

@@ -20,23 +20,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-cWebGLRenderbuffer = (function() {
+cnvgl_constants = {
 
-	function Initializer() {
-		cWebGLObject.Initializer.apply(this);
-		//public:
-	}
+	maxRenderbufferSize : 512
 
-	var cWebGLRenderbuffer = jClass('cWebGLRenderbuffer', Initializer, cWebGLObject);
-
-	//public:
-
-	cWebGLRenderbuffer.cWebGLRenderbuffer = function(context) {
-		this.cWebGLObject(context);
-		this.setObject(this.context().graphicsContext3D().createRenderbuffer());
-	};
-
-	return cWebGLRenderbuffer.Constructor;
-
-}());
-
+};
+	

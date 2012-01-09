@@ -91,6 +91,14 @@ GraphicsContext3D = (function() {
 		glBindBuffer(target, buffer);
 	};
 
+	GraphicsContext3D.bindFramebuffer = function(target, framebuffer) {
+		glBindFramebuffer(target, framebuffer);
+	};
+
+	GraphicsContext3D.bindRenderbuffer = function(target, renderbuffer) {
+		glBindRenderbuffer(target, renderbuffer);
+	};
+
 	GraphicsContext3D.bindTexture = function(target, texture) {
 		glBindTexture(target, texture);
 	};
@@ -134,10 +142,22 @@ GraphicsContext3D = (function() {
 		return buffers[0][0];
 	};
 
+	GraphicsContext3D.createFramebuffer = function() {
+		var framebuffers = [];
+		glGenFramebuffers(1, framebuffers);
+		return framebuffers[0][0];
+	};
+
 	GraphicsContext3D.createProgram = function() {
 		return glCreateProgram();
 	};
 	
+	GraphicsContext3D.createRenderbuffer = function() {
+		var renderbuffers = [];
+		glGenRenderbuffers(1, renderbuffers);
+		return renderbuffers[0][0];
+	};
+
 	GraphicsContext3D.createShader = function(type) {
 		return glCreateShader(type);
 	};
@@ -219,7 +239,7 @@ GraphicsContext3D = (function() {
 		glGetShaderiv(shader, pname, params);
 		return params[0];
 	};
-	
+
 	GraphicsContext3D.getUniformLocation = function(program, name) {
 		return glGetUniformLocation(program, name);
 	};
@@ -230,6 +250,10 @@ GraphicsContext3D = (function() {
 	
 	GraphicsContext3D.pixelStorei = function(pname, param) {
 		glPixelStorei(pname, param);
+	};
+
+	GraphicsContext3D.renderbufferStorage = function(target, internalformat, width, height) {
+		glRenderbufferStorage(target, internalformat, width, height);
 	};
 
 	GraphicsContext3D.shaderSource = function(shader, source) {
@@ -302,7 +326,7 @@ GraphicsContext3D = (function() {
 	//private:
 
 	GraphicsContext3D._createBuffer = function() {
-		var ctx, width, height;
+		var ctx, width, height, data, frameBuffer, depthBuffer, colorBuffer;
 
 		ctx = cnvgl_context.getCurrentContext();
 
@@ -315,8 +339,6 @@ GraphicsContext3D = (function() {
 
 		width = this.canvas.width;
 		height = this.canvas.height;
-
-		ctx.drawBuffer = new cnvgl_framebuffer(0);
 
 		if (this._quality.factor > 1) {
 
@@ -332,18 +354,35 @@ GraphicsContext3D = (function() {
 			this._quality.cnv.height = height;
 			this._quality.ctx = this._quality.cnv.getContext('2d');
 			this.context.mozImageSmoothingEnabled = false;
-
-			this._quality.buffer = this.context.createImageData(width, height);
-
-			ctx.drawBuffer.colorDrawBuffers.push(this._quality.buffer.data);
-		} else {
-			ctx.drawBuffer.colorDrawBuffers.push(this.buffer.data);
 		}
 
-		ctx.drawBuffer.width = width;
-		ctx.drawBuffer.height = height;
+		//set up framebuffer
+		frameBuffer = new cnvgl_framebuffer(0);
+		frameBuffer.width = width;
+		frameBuffer.height = height;
 
-		ctx.drawBuffer.depthBuffer = new Float32Array(width * height);
+		ctx.winDrawBuffer = frameBuffer;
+		ctx.drawBuffer = frameBuffer;
+
+		//set up color buffer
+		colorBuffer = this.createRenderbuffer();
+		this.bindRenderbuffer(GL_RENDERBUFFER, colorBuffer);
+		this.renderbufferStorage(GL_RENDERBUFFER, GL_RGBA, width, height);
+		frameBuffer.colorDrawBuffers[0] = ctx.shared.renderBuffers[colorBuffer];
+
+		if (this._quality.factor > 1) {
+			this._quality.buffer = frameBuffer.colorDrawBuffers[0];
+		} else {
+			this.buffer = frameBuffer.colorDrawBuffers[0];
+		}
+
+		//set up depth buffer
+		depthBuffer = this.createRenderbuffer();
+		this.bindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
+		this.renderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height);
+		frameBuffer.depthBuffer = ctx.shared.renderBuffers[depthBuffer];
+
+		this.bindRenderbuffer(GL_RENDERBUFFER, null);
 	};
 
 	GraphicsContext3D._updateFrame = function() {
@@ -399,6 +438,10 @@ GraphicsContext3D = (function() {
 				this._quality.ctx.putImageData(this._quality.buffer, 0, 0);
 				this.context.drawImage(this._quality.cnv, 0, 0, this.canvas.width, this.canvas.height);
 			} else {
+				this.context.strokeStyle = "#FFFFFF";
+				if (this._frame.fps != Infinity) {
+					this.context.strokeText(Math.round(this._frame.fps * 100) / 100, 20, 20);
+				}
 				this.context.putImageData(this.buffer, 0, 0);
 			}
 		}

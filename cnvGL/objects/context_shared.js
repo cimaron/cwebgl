@@ -28,6 +28,7 @@ var cnvgl_context_shared = (function() {
 
 		this.shaderObjects = [0];
 		this.frameBuffers = [0];
+		this.renderBuffers = [0];
 	}
 
 	var cnvgl_context_shared = jClass('cnvgl_context_shared', Initializer);

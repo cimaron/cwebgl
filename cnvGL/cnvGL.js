@@ -24,6 +24,7 @@ include('cnvGL/defines.js');
 
 include('cnvGL/objects/attrib_array_object.js');
 include('cnvGL/objects/buffer.js');
+include('cnvGL/objects/constants.js');
 include('cnvGL/objects/cnvgl_context.js');
 include('cnvGL/objects/context_shared.js');
 include('cnvGL/objects/cnvgl_fragment.js');
@@ -31,6 +32,7 @@ include('cnvGL/objects/framebuffer.js');
 include('cnvGL/objects/cnvgl_primitive.js');
 include('cnvGL/objects/cnvgl_program.js');
 include('cnvGL/objects/cnvgl_shader.js');
+include('cnvGL/objects/renderbuffer.js');
 include('cnvGL/objects/texture.js');
 include('cnvGL/objects/cnvgl_vertex.js');
 
@@ -60,6 +62,7 @@ include('cnvGL/functions/clear.js');
 include('cnvGL/functions/depth.js');
 include('cnvGL/functions/draw.js');
 include('cnvGL/functions/enable.js');
+include('cnvGL/functions/fbobject.js');
 include('cnvGL/functions/get.js');
 include('cnvGL/functions/pixelstore.js');
 include('cnvGL/functions/polygon.js');
@@ -81,6 +84,31 @@ function cnvgl_throw_error(error) {
 	}
 }
 
+function cnvgl_malloc(format, size) {
+	var data, zero, i;
+	switch (format) {
+		case GL_RGBA:
+			data = new Uint8Array(size * 4);
+			break;
+		case GL_DEPTH_COMPONENT16:
+		case GL_DEPTH_COMPONENT32:
+			if (Float32Array.native) {
+				data = new Float32Array(size);
+			} else {
+				data = new Array(size);
+				zero = true;
+			}
+			break;
+		default:
+			throw new Error('format not implemented');
+	}
+	if (zero) {
+		for (i = 0; i < data.length; i++) {
+			data[i] = 0;	
+		}
+	}
+	return data;
+}
+
 cnvgl_objects = [0];
-cnvgl_textures = [0];
 

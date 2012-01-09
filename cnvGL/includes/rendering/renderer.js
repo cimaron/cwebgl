@@ -62,7 +62,7 @@ cnvgl_renderer = (function() {
 	
 	cnvgl_renderer.setCurrentState = function() {
 		
-		this.depthBuffer = this.ctx.drawBuffer.depthBuffer;
+		this.depthBuffer = this.ctx.drawBuffer.depthBuffer.data;
 		this.depthFunc = this.ctx.depth.func;
 
 		//set current state in sub-renderers

@@ -54,4 +54,4 @@ function cnvgl_framebuffer(name) {
 
 	this.depthBuffer = null;
 	this.stencilBuffer = null;
-};
+}

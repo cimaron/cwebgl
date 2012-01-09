@@ -37,16 +37,19 @@ var cnvgl_context = (function() {
 		//direct
 		this.errorValue = 0;
 
-		//Frame Buffers
+		//bound framebuffer
 		this.drawBuffer = null;
-		this.readBuffer = null;
+
+		//window framebuffer
+		this.winDrawBuffer = null;
 
 		//Buffers
 		this.vertex_attrib_arrays = [];
 
-		this.shared = null;
+		this.currentRenderbuffer = null;
 
-		//Shaders
+		this.shared = null;
+		this.const = {};
 	}
 
 	var cnvgl_context = jClass('cnvgl_context', Initializer);
@@ -128,6 +131,8 @@ var cnvgl_context = (function() {
 			this.vertex_attrib_arrays[i] = new cnvgl_attrib_array_object();
 		}
 
+		this.const = cnvgl_constants;
+
 		this.renderer = new cnvgl_renderer(this);
 	};
 
@@ -152,6 +157,14 @@ var cnvgl_context = (function() {
 			context = new cnvgl_context.Constructor();
 		}
 		return context;
+	};
+
+	cnvgl_context.Constructor.findFreeName = function(list, start) {
+		start = start || 1;
+		while (list[start]) {
+			start++;
+		}
+		return start;
 	};
 
 	return cnvgl_context.Constructor;

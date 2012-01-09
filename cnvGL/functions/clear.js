@@ -46,7 +46,7 @@ function glClear(mask) {
 
 	//Color Buffer
 	if (mask & GL_COLOR_BUFFER_BIT) {
-		buffer = ctx.drawBuffer.colorDrawBuffers[0];
+		buffer = ctx.drawBuffer.colorDrawBuffers[0].data;
 
 		clear = [];
 		for (i = 0; i < 4; i++) {
@@ -63,7 +63,7 @@ function glClear(mask) {
 
 	//Depth Buffer
 	if (mask & GL_DEPTH_BUFFER_BIT) {
-		buffer = ctx.drawBuffer.depthBuffer;
+		buffer = ctx.drawBuffer.depthBuffer.data;
 		clear = ctx.depth.clear;
 		l = buffer.length;
 		for (i = 0; i < l; i++) {

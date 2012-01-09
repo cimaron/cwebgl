@@ -44,8 +44,8 @@ cnvgl_rendering_fragment = (function() {
 	};
 
 	cnvgl_rendering_fragment.setCurrentState = function() {
-		this.colorBuffer = this.ctx.drawBuffer.colorDrawBuffers[0];
-		this.depthBuffer = this.ctx.drawBuffer.depthBuffer;
+		this.colorBuffer = this.ctx.drawBuffer.colorDrawBuffers[0].data;
+		this.depthBuffer = this.ctx.drawBuffer.depthBuffer.data;
 		this.colorMask = this.ctx.color.colorMask;
 		this.depthMask = this.ctx.depth.mask;
 	};

@@ -514,7 +514,7 @@ cWebGLRenderingContext = (function() {
 	
 		this._context.bindFramebuffer(target, _framebuffer);
 	};
-	
+
 	cWebGLRenderingContext.bindRenderbuffer = function(target, renderbuffer) {
 		
 		//@validation

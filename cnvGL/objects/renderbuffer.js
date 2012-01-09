@@ -19,24 +19,21 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+function cnvgl_renderbuffer(name) {
+	this.name = name;
 
-cWebGLRenderbuffer = (function() {
+	this.width = 0;
+	this.height = 0;
 
-	function Initializer() {
-		cWebGLObject.Initializer.apply(this);
-		//public:
-	}
+	this.internalFormat = null;
+	this.baseFormat = null;
 
-	var cWebGLRenderbuffer = jClass('cWebGLRenderbuffer', Initializer, cWebGLObject);
+	this.format = 0;
 
-	//public:
+	this.numSamples = null;
 
-	cWebGLRenderbuffer.cWebGLRenderbuffer = function(context) {
-		this.cWebGLObject(context);
-		this.setObject(this.context().graphicsContext3D().createRenderbuffer());
-	};
-
-	return cWebGLRenderbuffer.Constructor;
-
-}());
-
+	this.dataType = null;
+	this.data = null;
+	
+	this.wrapped = null;	
+}
