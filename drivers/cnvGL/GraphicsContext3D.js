@@ -35,6 +35,7 @@ GraphicsContext3D = (function() {
 		
 		this._frame = {};
 		this._quality = {};
+		this.options = {};
 	}
 
 	var GraphicsContext3D = new jClass('GraphicsContext3D', Initializer);
@@ -60,6 +61,7 @@ GraphicsContext3D = (function() {
 		*/
 		this._quality.factor = 1;
 		this.setTargetFps(0);
+		this.options.showFps = true;
 
 		this._createBuffer();
 
@@ -441,11 +443,13 @@ GraphicsContext3D = (function() {
 				this._quality.ctx.putImageData(this._quality.buffer, 0, 0);
 				this.context.drawImage(this._quality.cnv, 0, 0, this.canvas.width, this.canvas.height);
 			} else {
-				this.context.strokeStyle = "#FFFFFF";
-				if (this._frame.fps != Infinity) {
-					this.context.strokeText(Math.round(this._frame.fps * 100) / 100, 20, 20);
-				}
 				this.context.putImageData(this.buffer, 0, 0);
+				if (this.options.showFps) {
+					this.context.strokeStyle = "#FFFFFF";
+					if (this._frame.fps != Infinity) {
+						this.context.strokeText(Math.round(this._frame.fps * 100) / 100, 20, 20);
+					}
+				}
 			}
 		}
 
