@@ -64,8 +64,15 @@ var cnvgl_context = (function() {
 		//array state
 		this.array = {
 			arrayBufferObj : null,
-			elementArrayBufferObj : null
+			elementArrayBufferObj : null,
+			arrayObj : {
+				vertexAttrib : []	
+			}
 		};
+
+		for (i = 0; i < GPU.shader.MAX_VERTEX_ATTRIBS; i++) {
+			this.array.arrayObj.vertexAttrib[i] = new cnvgl_attrib_array_object();
+		}
 
 		//color state
 		this.color = {
@@ -125,11 +132,6 @@ var cnvgl_context = (function() {
 
 		//direct
 		this.errorValue = GL_NO_ERROR;
-
-		//Vertex attribute arrays
-		for (i = 0; i < GPU.shader.MAX_VERTEX_ATTRIBS; i++) {
-			this.vertex_attrib_arrays[i] = new cnvgl_attrib_array_object();
-		}
 
 		this.const = cnvgl_constants;
 

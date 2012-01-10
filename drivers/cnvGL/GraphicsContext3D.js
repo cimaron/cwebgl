@@ -298,8 +298,24 @@ GraphicsContext3D = (function() {
 		glTexParameteri(target, pname, param);
 	};
 
-	GraphicsContext3D.vertexAttribPointer = function(idx, size, type, normalized, stride, offset) {
-		glVertexAttribPointer(idx, size, type, normalized, stride, offset);
+	GraphicsContext3D.vertexAttrib1f = function(indx, x) {
+		glVertexAttrib1f(indx, x);
+	};
+
+	GraphicsContext3D.vertexAttrib2f = function(indx, x, y) {
+		glVertexAttrib2f(indx, x, y);
+	};
+
+	GraphicsContext3D.vertexAttrib3f = function(indx, x, y, z) {
+		glVertexAttrib3f(indx, x, y, z);
+	};
+
+	GraphicsContext3D.vertexAttrib4f = function(indx, x, y, z, w) {
+		glVertexAttrib4f(indx, x, y, z, w);
+	};
+
+	GraphicsContext3D.vertexAttribPointer = function(indx, size, type, normalized, stride, offset) {
+		glVertexAttribPointer(indx, size, type, normalized, stride, offset);
 	};
 
 	GraphicsContext3D.viewport = function(x, y, width, height) {

@@ -826,9 +826,25 @@ cWebGLRenderingContext = (function() {
 	cWebGLRenderingContext.useProgram = function(program) {
 		this._context.useProgram(program.object());
 	};
+
+	cWebGLRenderingContext.vertexAttrib1f = function(indx, x) {
+		this._context.vertexAttrib1f(indx, x);
+	};
 	
-	cWebGLRenderingContext.vertexAttribPointer = function(idx, size, type, normalized, stride, offset) {
-		this._context.vertexAttribPointer(idx, size, type, normalized, stride, offset);
+	cWebGLRenderingContext.vertexAttrib2f = function(indx, x, y) {
+		this._context.vertexAttrib2f(indx, x, y);
+	};
+	
+	cWebGLRenderingContext.vertexAttrib3f = function(indx, x, y, z) {
+		this._context.vertexAttrib3f(indx, x, y, z);
+	};
+	
+	cWebGLRenderingContext.vertexAttrib4f = function(indx, x, y, z, w) {
+		this._context.vertexAttrib4f(indx, x, y, z, w);
+	};
+
+	cWebGLRenderingContext.vertexAttribPointer = function(indx, size, type, normalized, stride, offset) {
+		this._context.vertexAttribPointer(indx, size, type, normalized, stride, offset);
 	};
 	
 	cWebGLRenderingContext.viewport = function(x, y, width, height) {

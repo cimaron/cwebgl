@@ -21,7 +21,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 function glDrawArrays(mode, first, count) {
-	var ctx, renderer, program_obj, i, vertex, a, buffer_obj, buffer_data, attr, data, vtx_data, start, k;
+	var ctx, renderer, program_obj, i, vertex;
 
 	ctx = cnvgl_context.getCurrentContext();
 	renderer = ctx.renderer;
@@ -31,25 +31,8 @@ function glDrawArrays(mode, first, count) {
 
 	//each vertex
 	for (i = first; i < count; i++) {
-
 		vertex = new cnvgl_vertex();
-
-		//initialize attributes for vertex
-		for (a in program_obj.attributes.active) {
-			attr = program_obj.attributes.active[a];
-
-			data = ctx.vertex_attrib_arrays[attr.location];
-			//no buffer data was specified for this attribute
-			if (!(buffer_obj = data.buffer_obj)) {
-				continue;
-			}
-
-			buffer_data = buffer_obj.getData();
-			start = (data.pointer / buffer_data.BYTES_PER_ELEMENT) + (i * data.size + data.stride);
-
-			GPU.memcpy(vertex.attributes, attr.location * 4, buffer_data, attr.size, start);
-		}
-
+		cnvgl_copy_initialize_attribute_data(ctx, program_obj, i, vertex);
 		renderer.send(vertex);
 	}
 
@@ -58,7 +41,7 @@ function glDrawArrays(mode, first, count) {
 
 
 function glDrawElements(mode, count, type, indices) {
-	var ctx, renderer, program_obj, buffer_obj, elements, i, vertex, index, a, buffer, buffer_data, attr, data, vtx_data, start, k;
+	var ctx, renderer, program_obj, buffer_obj, elements, i, vertex, index;
 
 	ctx = cnvgl_context.getCurrentContext();
 	renderer = ctx.renderer;
@@ -71,31 +54,39 @@ function glDrawElements(mode, count, type, indices) {
 
 	//each vertex
 	for (i = 0; i < count; i++) {
-
-		vertex = new cnvgl_vertex();
-
 		index = elements[i + indices];
-
-		//initialize attributes for vertex
-		for (a in program_obj.attributes.active) {
-			attr = program_obj.attributes.active[a];
-
-			data = ctx.vertex_attrib_arrays[attr.location];
-			//no buffer data was specified for this attribute
-			if (!(buffer_obj = data.buffer_obj)) {
-				continue;
-			}
-
-			buffer_data = buffer_obj.getData(Float32Array);
-
-			start = (data.pointer / buffer_data.BYTES_PER_ELEMENT) + (index * data.size + data.stride);
-
-			GPU.memcpy(vertex.attributes, attr.location * 4, buffer_data, attr.size, start);
-		}
-
+		vertex = new cnvgl_vertex();
+		cnvgl_copy_initialize_attribute_data(ctx, program_obj, index, vertex);
 		renderer.send(vertex);
 	}
 
 	renderer.end();
 }
 
+
+function cnvgl_copy_initialize_attribute_data(ctx, program_obj, index, vertex) {
+	var a, default_value, arrays, attrib_obj, data, buffer_obj, buffer_data, start;
+
+	arrays = ctx.array.arrayObj.vertexAttrib;
+	default_value = [0, 0, 0, 1];
+
+	//initialize attributes for vertex
+	for (a in program_obj.attributes.active) {
+		attrib_obj = program_obj.attributes.active[a];
+
+		data = arrays[attrib_obj.location];
+
+		if (buffer_obj = data.buffer_obj) {
+			buffer_data = buffer_obj.getData(Float32Array);
+			start = (data.pointer / buffer_data.BYTES_PER_ELEMENT) + (index * data.size + data.stride);
+		} else {
+			// but constant data was specified, so use that
+			buffer_data = data.value;
+			start = 0;
+		}
+
+		//@todo: add support for attributes using multiple slots
+		GPU.memcpy(vertex.attributes, attrib_obj.location * 4, buffer_data, data.size, start);
+		GPU.memcpy(vertex.attributes, attrib_obj.location * 4 + data.size, default_value, 4 - data.size, data.size);
+	}
+}

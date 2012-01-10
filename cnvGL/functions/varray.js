@@ -31,7 +31,7 @@ function glEnableVertexAttribArray(index) {
 		return;
 	}
 
-	ctx.vertex_attrib_arrays[index].enabled = GL_TRUE;	
+	ctx.array.arrayObj.vertexAttrib[index].enabled = GL_TRUE;	
 }
 
 
@@ -46,7 +46,44 @@ function glDisableVertexAttribArray(index) {
 		return;
 	}
 
-	ctx.vertex_attrib_arrays[index].enabled = GL_FALSE;
+	ctx.array.arrayObj.vertexAttrib[index].enabled = GL_FALSE;
+}
+
+function glVertexAttrib1f(index, v0) {
+	__glVertexAttrib(index, [v0]);
+}
+	
+
+function glVertexAttrib2f(index, v0, v1) {
+	__glVertexAttrib(index, [v0, v1]);
+}
+	
+function glVertexAttrib3f(index, v0, v1, v2) {
+	__glVertexAttrib(index, [v0, v1, v2]);
+}
+
+function glVertexAttrib4f(index, v0, v1, v2, v3) {
+	__glVertexAttrib(index, [v0, v1, v2, v3]);
+}
+
+function __glVertexAttrib(index, v) {
+	var ctx, buffer_obj, vtx_attrib_obj;
+
+	ctx = cnvgl_context.getCurrentContext();
+
+	if (index > GL_MAX_VERTEX_ATTRIBS) {
+		cnvgl_throw_error(GL_INVALID_VALUE);
+		return;			
+	}
+
+	vtx_attrib_obj = ctx.array.arrayObj.vertexAttrib[index];
+	vtx_attrib_obj.size = v.length;
+	vtx_attrib_obj.type = GL_FLOAT;
+	vtx_attrib_obj.normalized = false;
+	vtx_attrib_obj.stride = 0;
+	vtx_attrib_obj.pointer = 0;	
+	vtx_attrib_obj.buffer_obj = false;
+	vtx_attrib_obj.value = v;
 }
 
 
@@ -79,7 +116,7 @@ function glVertexAttribPointer(index, size, type, normalized, stride, pointer) {
 	//check for buffer
 	buffer_obj = ctx.array.arrayBufferObj;
 
-	vtx_attrib_obj = ctx.vertex_attrib_arrays[index];
+	vtx_attrib_obj = ctx.array.arrayObj.vertexAttrib[index];
 	vtx_attrib_obj.size = size;
 	vtx_attrib_obj.type = type;
 	vtx_attrib_obj.normalized = normalized;
