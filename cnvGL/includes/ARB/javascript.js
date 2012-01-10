@@ -49,7 +49,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		'ABS' : '%1* = Math.abs(%2*)',
 		'ADD' : '%1* = (%2*) + (%3*)',
 		//'ARL' : false,
-		//'CMP' : false,
+		'CMP' : '%1* = ((%2* < 0.0) ? (%3*) : (%4*))',
 		//'COS' : 'Math.cos(%2)',
 		'DP3' : '%1[0] = ((%2[0]) * (%3[0]) + (%2[1]) * (%3[1]) + (%2[2]) * (%3[2]))',
 		'DP4' : '%1[0] = ((%2[0]) * (%3[0]) + (%2[1]) * (%3[1]) + (%2[2]) * (%3[2]) + (%2[3]) * (%3[3]))',
@@ -186,8 +186,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 				d = dest.out + c;
 				s1 = src1.neg + src1.out + (src1.swizzle ? src1.comp[i] : c);
-				s2 = src1.neg + src2.out + (src2.swizzle ? src2.comp[i] : c);
-				s3 = src1.neg + src3.out + (src3.swizzle ? src3.comp[i] : c);
+				s2 = src2.neg + src2.out + (src2.swizzle ? src2.comp[i] : c);
+				s3 = src3.neg + src3.out + (src3.swizzle ? src3.comp[i] : c);
 
 				if (src1 && src1.comp[i].indexOf('jstemp') != -1) {
 					s1 = src1.comp[i];

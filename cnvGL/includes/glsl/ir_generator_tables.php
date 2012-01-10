@@ -145,6 +145,14 @@ addOperation('add', array('vec4', 'vec4'), array(
 	)
 ));
 
+addOperation('less', array('float', 'float'), array(
+	'type' => 'float',
+	'code' => array(
+		"SLT %1.x %2.x %3.x"
+	)
+));
+
+
 addOperation('mul', array('float', 'float'), array(
 	'type' => 'float',
 	'code' => array(

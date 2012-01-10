@@ -232,21 +232,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 
 		for (i = 0; i < slots; i++) {
-		
+
 			if (cond && !local) {
-				
-				temp = IRS.getTemp('$tempv');
-				
-				ir = new IR('SUB', temp, se[1].Dest, se[0].Dest);
+				ir = new IR('CMP', se[0].Dest, "-"+cond, se[1].Dest, se[0].Dest);
 				ir.addOffset(i);
 				ir.setSwizzle(swz);
 				irs.push(ir);
-				
-				ir = new IR('MAD', se[0].Dest, cond, temp, se[0].Dest);
-				ir.addOffset(i);
-				ir.setSwizzle(swz);
-				irs.push(ir);
-				
+
 			} else {
 				ir = new IR('MOV', se[0].Dest, se[1].Dest);
 				ir.addOffset(i);
@@ -416,6 +408,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			case ops.sub:
 			case ops.mul:
 			case ops.div:
+			case ops.less:
 				expression_generate(e, se, 2);
 				break;
 

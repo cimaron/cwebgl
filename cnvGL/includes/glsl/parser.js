@@ -2157,6 +2157,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						yyval.expression.set_location(yylloc);
 						break;
 
+					case 73:
+						yyval = {};
+						yyval.expression = new glsl.ast.expression_bin(glsl.ast.operators.less, yyvsa[yyvsp - 2].expression, yyvsa[yyvsp].expression);
+						yyval.expression.set_location(yylloc);
+						break;
+
 					case 95:
 						yyval = {};
 						yyval.expression = new glsl.ast.expression(yyvsa[yyvsp - 1].n, yyvsa[yyvsp - 2].expression, yyvsa[yyvsp].expression, null);
@@ -2535,7 +2541,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					case 65:
 					case 70:
 					case 71:
-					case 73:
 					case 74:
 					case 75:
 					case 76:
