@@ -131,6 +131,13 @@ addOperation('logic_not', array('bool'), array(
 	)
 ));
 
+addOperation('add', array('float', 'float'), array(
+	'type' => 'float',
+	'code' => array(
+		"ADD %1.x %2.x %3.x"
+	)
+));
+
 addOperation('add', array('vec3', 'vec3'), array(
 	'type' => 'vec3',
 	'code' => array(
@@ -157,6 +164,13 @@ addOperation('mul', array('float', 'float'), array(
 	'type' => 'float',
 	'code' => array(
 		"MUL %1.x %2.x %3.x"
+	)
+));
+
+addOperation('mul', array('float', 'vec3'), array(
+	'type' => 'vec3',
+	'code' => array(
+		"MUL %1.xyz %2.x %3.xyz"
 	)
 ));
 

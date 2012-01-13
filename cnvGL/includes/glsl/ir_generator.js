@@ -88,7 +88,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 		e.Type = op.type_specifier;
 		e.Dest = [];
-
+		
 		e.Dest = irs.getTemp('$tempv');
 
 		for (di = 0; di < ds; di++) {
@@ -114,11 +114,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			s = splitOperand(se[sei].Dest);
 
 			//expression was to just get the identifier, so add the appropriate swizzle,
-			//else, correct swizzle should have already been set
+			//else, either a number, or the correct swizzle already been set
 			if (s[1]) {
 				s = s.join(".");
 			} else {
-				s = sprintf("%s.%s", s, swizzles[0][si])				
+				//value
+				if (s[0].match(/[0-9]+(\.[0-9]+)?/)) {
+					s = s[0];	
+				} else {
+					s = sprintf("%s.%s", s[0], swizzles[0][si]);
+				}
 			}
 
 			ir = new IR('MOV', d, s);
@@ -140,11 +145,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 * @param   ast_node    ast_node that represents a declaration list
 	 */
 	function declarator_list(dl) {
-		var type, qualifier, i, decl, name, entry;
+		var type, qualifier, qualifier_name, i, decl, name, entry, constant;
 
 		type = dl.type;
 		if (type.qualifier) {
-			qualifier = glsl.type.qualifiers[type.qualifier.flags.q];
+			qualifier = type.qualifier.flags.q
+			qualifier_name = glsl.type.qualifiers[qualifier];
 		}
 
 		for (i = 0; i < dl.declarations.length; i++) {
@@ -155,18 +161,32 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			//add symbol table entry
 			entry = state.symbols.add_variable(name);
 			entry.type = type.specifier.type_specifier;
-			entry.qualifier_name = qualifier;
+			entry.qualifier = qualifier;
+			entry.qualifier_name = qualifier_name;
+
+			constant = (qualifier == glsl.ast.type_qualifier.flags.constant);
 
 			if (decl.initializer) {
-				
+
 				//destination node is not created in parser, so need to create it here to keep things clean
 				name = {
 					Dest : name,
 					Type : entry.type
 				};
-				
+
 				expression(decl.initializer);
-				expression_assign(decl, [name, decl.initializer], true);
+
+				//@todo: generate constants at compile time (this may be able to be taken care of in the generator)
+				if (constant) {
+					entry.constant = decl.initializer.Dest;
+				} else {
+					expression_assign(decl, [name, decl.initializer], true);
+				}
+
+			} else {
+				if (constant) {
+					throw_error("Declaring const without initialier", decl);
+				}
 			}
 		}
 	}
@@ -209,16 +229,26 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 * @param   ast_node    ast_node that represents an assignment
 	 */
 	function expression_assign(e, se, local) {
-		var cond, ir, temp, size, slots, swz, i;
-		
+		var cond, ir, temp, size, slots, swz, i, entry;
+
+		if (e.oper == glsl.ast.operators.add_assign) {
+			se[1].oper = glsl.ast.operators.add;
+			expression_generate(se[1], [se[0], se[1]], 2);
+		}
+
 		if (conditional.length > 0) {
 			cond = conditional[conditional.length - 1];	
 		}
 
 		if (se[0].Type != se[1].Type) {
-			throw_error(sprintf("Could not assign value of type %s to %s", se[1].type_name, se[0].type_name), e);
+			throw_error(sprintf("Could not assign value of type %s to %s", glsl.type.names[se[1].Type], glsl.type.names[se[0].Type]), e);
 		}
 		e.Type = se[0].Type;
+
+		entry = state.symbols.get_variable(se[0].Dest);
+		if (entry.constant) {
+			throw_error(sprintf("Cannot assign value to constant %s", se[0].Dest), e);	
+		}
 
 		size = glsl.type.size[e.Type];
 		slots = glsl.type.slots[e.Type];
@@ -385,6 +415,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		switch (e.oper) {
 
 			//assignment operator
+			case ops.add_assign:
 			case ops.assign:
 				expression_assign(e, se);
 				break;
@@ -458,7 +489,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			}
 
 			e.Type = entry.type;
-			e.Dest = entry.name;
+
+			if (entry.constant) {
+				e.Dest = entry.constant;
+			} else {
+				e.Dest = entry.name;
+			}
 
 			return;
 		}

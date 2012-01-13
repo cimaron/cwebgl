@@ -2173,7 +2173,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						yyval = {};
 						yyval.n = glsl.ast.operators.assign;
 						break;
-						
+
+					case 100:
+						yyval = {};
+						yyval.n = glsl.ast.operators.add_assign;
+						break;
+
 					case 107:
 						yyval = {};
 						yyval.expression = yyvsa[yyvsp].expression;
@@ -2556,7 +2561,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					case 97:
 					case 98:
 					case 99:
-					case 100:
 					case 101:
 					case 102:
 					case 103:

@@ -29,6 +29,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		this.depth = null;
 		this.qualifier = null;
 		this.out = name;
+		this.constant = null;		
 	}
 
 	SymbolTableEntry.typedef = {
