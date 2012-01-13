@@ -39,12 +39,15 @@ cnvgl_rendering_vertex = (function() {
 	};
 
 	cnvgl_rendering_vertex.process = function(v) {
-		var position;
+		var position, shader_mem;
+		shader_mem = GPU.memory.shader;
 
-		//set pointers to vertex data
-		GPU.shader.vertex.attrib = v.attributes.data;
-		GPU.shader.vertex.varying = v.varying.data;
-		GPU.executeVertex();
+		GPU.executeVertex(
+			shader_mem.temp.data,
+			shader_mem.uniforms.data,
+			v.attributes.data, 
+			v.varying.data,
+			this.result);
 
 		position = this.result.position;
 

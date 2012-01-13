@@ -51,11 +51,15 @@ cnvgl_rendering_fragment = (function() {
 	};
 
 	cnvgl_rendering_fragment.process = function(f) {
-		var color;
+		var color, shader_mem;
+		shader_mem = GPU.memory.shader;
 
-		//set pointers to fragment data
-		GPU.shader.fragment.attrib = f.attributes.data;
-		GPU.executeFragment();
+		GPU.executeFragment(
+			shader_mem.temp.data,
+			shader_mem.uniforms.data,
+			null, 
+			f.attributes.data,
+			this.result);
 
 		f.color = this.result.color.primary;
 	};

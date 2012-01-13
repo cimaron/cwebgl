@@ -76,36 +76,54 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * @param   object    Operand
 	 */
 	function buildComponents(oprd) {
-		var i, swz;
+		var i, swz, out;
 		
 		if (!oprd) {
 			return "";	
 		}
 
-		//generate array representation of swizzle components, expanding if necessary
-		swz = oprd.swizzle || "xyzw";
-		swz = swz.split("");
-		oprd.count = swz.length;
+		out = new ARB.Operand(oprd.toString());
 
-		oprd.comp = [];
+		if (i = out.name.match(/R([0-9]+)/)) {
+			out.name = sprintf("R[%s]", i[1]);
+		}
+		
+		if (out.name == 'vertex.attrib') {
+			out.name = 'attrib';	
+		}
+		
+		if (out.name == 'vertex.varying') {
+			out.name = 'varying';	
+		}
+
+		if (out.name == 'fragment.attrib') {
+			out.name = 'varying';	
+		}
+
+		//generate array representation of swizzle components, expanding if necessary
+		swz = out.swizzle || "xyzw";
+		swz = swz.split("");
+		out.count = swz.length;
+
+		out.comp = [];
 		for (i = 0; i < 4; i++) {
 			//exact swizzle specified and less than 4 components, grab last one
 			if (swz.length <= i) {
 				//repeat last one
-				oprd.comp.push(oprd.comp[i - 1]);	
+				out.comp.push(out.comp[i - 1]);	
 			} else {
 				//push the location of the current component
-				oprd.comp.push("[" + "xyzw".indexOf(swz[i]) + "]");			
+				out.comp.push("[" + "xyzw".indexOf(swz[i]) + "]");			
 			}
 		}
 
-		if (typeof oprd.offset == "number") {
-			oprd.out = sprintf("%s[%s]", oprd.name, oprd.offset);
+		if (typeof out.offset == "number") {
+			out.out = sprintf("%s[%s]", out.name, out.offset);
 		} else {
-			oprd.out = oprd.name;	
+			out.out = out.name;
 		}
 
-		return oprd;
+		return out;
 	}
 
 	/**
@@ -213,7 +231,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 				//index of current component
 				trans = trans.replace('%i', i);
-	
+				
 				body.push(sprintf("%s;", trans));
 
 				if (!code[j].match(/%[0-9]+\*/)) {
@@ -243,12 +261,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			header.push(sprintf("%s[%s][%s] = %s;", n, symbol.location, symbol.component, symbol.value));
 		}
 
-		//temps
-		for (i = 0; i < object_code.temps.length; i++) {
-			symbol = object_code.temps[i];
-			header.push(sprintf("var %s = temp[%s];", symbol.out, i));
-		}
-
 		//special temp register for js compatibility
 		header.push("var jstemp = [0,0,0,0];");
 	}
@@ -271,7 +283,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		errors = 0;
 
 		header = [];
-		body = ["function main() {"];
+		body = ["function main(R, c, attrib, varying, result) {"];
 
 		processSymbols(object_code);
 		//optimize(irs, symbols);
