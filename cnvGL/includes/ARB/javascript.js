@@ -235,23 +235,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		n = "c"
 
 		//@todo: replace c with computed value
-		header.push(sprintf("var %s = new Array();", n));
+		header.push(sprintf("var %s = program.local;", n));
 
 		//enter constants in symbol table for swapping out later
 		for (i = 0; i < object_code.constants.length; i++) {
 			symbol = object_code.constants[i];
-			header.push(sprintf("%s[%s] = %s[%s];", n, symbol.location, "program.local", symbol.location));
-
-			//@todo: make this work for any size constants
-			header.push(sprintf("%s[%s][%s] = %s;", n, symbol.location, 0, symbol.value));
-		}
-
-		//uniforms
-		for (i = 0; i < object_code.program.local.length; i++) {
-			symbol = object_code.program.local[i];
-			for (ci = 0; ci < symbol.size; ci++) {
-				header.push(sprintf("%s[%s] = %s[%s];", n, ci + symbol.location, "program.local", ci + symbol.location));
-			}
+			header.push(sprintf("%s[%s][%s] = %s;", n, symbol.location, symbol.component, symbol.value));
 		}
 
 		//temps

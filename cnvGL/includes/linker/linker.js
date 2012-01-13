@@ -106,7 +106,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			}
 
 			//get new location and reindex
-			location = program_obj.getOpenSlot(program_obj.attributes);
+			if ((location = program_obj.attributes.bound[attrib.name]) == undefined) {
+				location = program_obj.getOpenSlot(program_obj.attributes);			
+			}
+
 			attrib_obj = new cnvgl_program_var(attrib.name, location, attrib.type_size);
 			program_obj.addActiveAttribute(attrib_obj);
 		}
@@ -120,23 +123,29 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	}
 
 	function addUniforms(program_obj, shader_obj) {
-		var constants, uniforms, i, j, uniform, uniform_obj, location;
+		var constants, uniforms, i, c, uniform, uniform_obj, location;
 
 		constants = shader_obj.object_code.constants;
 		uniforms = shader_obj.object_code.program.local;
 
+		c = 0;
 		for (i = 0; i < constants.length; i++) {
 			uniform = constants[i];
 
 			//check if already declared
-			if (uniform_obj = program_obj.getActiveUniform(uniform.value)) {
+			if (program_obj.getActiveUniform(uniform.value)) {
 				continue;
 			}
 
 			//get new location and reindex
-			location = program_obj.getOpenSlot(program_obj.uniforms);
-			uniform_obj = new cnvgl_program_var(uniform.value, location, 1);
-			program_obj.addActiveUniform(uniform_obj);
+			if (i % 4 == 0) {
+				location = program_obj.getOpenSlot(program_obj.uniforms);
+				uniform_obj = new cnvgl_program_var('$constant'+c, location, 1);
+				program_obj.addActiveUniform(uniform_obj);
+				c++;
+			} else {
+				uniform_obj.slots++;
+			}
 		}
 
 		for (i = 0; i < uniforms.length; i++) {
@@ -167,9 +176,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 
 		//adjust addresses
-		for (i = constants.length - 1; i >= 0; i--) {
+		for (i = c - 1; i >= 0; i--) {
 			uniform = constants[i];
-			uniform_obj = program_obj.getActiveUniform(uniform.value);
+			uniform_obj = program_obj.getActiveUniform('$constant'+i);
 			reindex(shader_obj, uniform.name, uniform.location, uniform_obj.location, uniform.size, uniform);
 		}
 

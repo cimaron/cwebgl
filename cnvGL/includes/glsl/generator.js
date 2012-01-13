@@ -96,7 +96,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 
 			constant.name = symbol.out;
 			constant.out = sprintf("%s[%s].%s", symbol.out, params.length, "xyzw".substr(param.length, 1));
-			constant.location = i;
+			constant.location = params.length;
+			constant.component = param.length;
+
 			irs.replaceName(0, constant.value, constant.out, false, true);
 
 			param.push(constant.value);
