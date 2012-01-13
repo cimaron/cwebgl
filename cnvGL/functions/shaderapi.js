@@ -56,16 +56,10 @@ function glBindAttribLocation(program, index, name) {
 		return;
 	}
 
-	if (program_obj.attributes[name]) {
-		attr_obj = program_obj.attributes[name];	
-	} else {
-		attr_obj = new cnvgl_attribute(name);
+	if (!program_obj.attributes.bound[name]) {
+		//do check that index is valid
+		program_obj.attributes.bound[name] = index;
 	}
-
-	//do check that index is valid
-	attr_obj.location = index;
-
-	program_obj.attributes[name] = attr_obj;
 }
 
 
