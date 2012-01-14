@@ -42,14 +42,18 @@ cnvgl_rendering_primitive_point = (function() {
 	};
 
 	cnvgl_rendering_primitive_point.render = function(prim) {
-		if (!this.renderer.clipping.clipPoint(prim.vertices[0])) {
-			return;
+		var num;
+		
+		num = this.renderer.clipping.clipLine(prim);		
+
+		if (num) {
+			this.renderClipped(prim);
 		}
-		this.renderClipped(prim);
+
 	};
 
 	cnvgl_rendering_primitive_point.renderClipped = function(prim) {
-		var c_buffer, vw, v, x, y, frag, i;
+		var c_buffer, d_buffer, vw, v, x, y, frag, i;
 
 		this.prim = prim;
 
@@ -57,17 +61,16 @@ cnvgl_rendering_primitive_point = (function() {
 		x = Math.round(v.xw);
 		y = Math.round(v.yw);
 
-		c_buffer = this.ctx.color_buffer;
 		vw = this.ctx.viewport.w;
 
 		for (i in v.varying) {
 			this.frag.varying[i] = v.varying[i];	
 		}
 
-		ic = (vw * y + x) * 4;
+		i = (vw * y + x);
 
 		this.renderer.fragment.process(this.frag);
-		this.renderer.fragment.write(c_buffer, ic, this.frag);
+		this.renderer.fragment.write(i, this.frag);
 	};
 
 	return cnvgl_rendering_primitive_point.Constructor;

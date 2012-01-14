@@ -20,70 +20,18 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-$debug = isset($_GET['debug']) ? true : false;
-$base = dirname($_SERVER['SCRIPT_NAME']);
-$basepath = dirname(__FILE__);
+require_once dirname(__FILE__).'/include.php';
 
-function cWebGLInclude($file) {
-	static $included = array();
-	if (!isset($included[$file])) {
-		$included[$file] = true;
-		$output = cWebGLIncludeFile($file);
-		echo $output;
-	}
-}
-
-function cWebGLIncludeFile($file) {
-	global $basepath;
-	if (!file_exists($basepath.'/'.$file)) {
-		return "throw new Error('Could not load file \'$file\'');";
-	}
-
-	ob_start();
-	include $basepath.'/'.$file;
-	$output = ob_get_clean();
-	$output = preg_replace('#//.*\n#', "\n", $output);	
-	$output = preg_replace('#/\*(.|[\r\n])*?\*/#', '', $output);
-	$output = preg_replace('#\n\n+#', "\n", $output);
-
-	$output = preg_replace_callback('#include\(\'([^\']+)\'\);#', 'cWebGLIncludeCallback', $output);
-	return $output;
-}
-
-function cWebGLIncludeCallback($matches) {
-	$output = cWebGLIncludeFile($matches[1]);
-	return $output;
-}
-
-function cWebGLIncludeDebug($file) {
-	static $included = array();
-	if (!isset($included[$file])) {
-		$included[$file] = true;
-		echo "include('$file');\n";
-	}
-}
-
-$include = 'cWebGLInclude';
-
-if (!$_SERVER['argv']) {
-	header('Content-Type: text/javascript');
-}
-if ($debug) { ?>
-function include(file) {
-	document.write('<scr'+'ipt type="text/javascript" src="<? echo $base; ?>/'+file+'"></script>');
-}
-<?
-	$include .= 'Debug';
-}
-
+//Extra Libraries
 $include('library/jClass/jClass.js');
+$include('library/stdio/stdio.js');
+$include('library/TypedArray/TypedArray.js');
 
 //cnvGL Library
 $include('cnvGL/cnvGL.js');
 $include('drivers/cnvGL/GraphicsContext3D.js');
 
-//WebGLInclude('WebGLMath.js');
-$include('library/TypedArray/TypedArray.js');
+//WebGL Library
 $include('WebGL/WebGLObject.js');
 $include('WebGL/WebGLBuffer.js');
 $include('WebGL/WebGLContextAttributes.js');
@@ -94,5 +42,6 @@ $include('WebGL/WebGLTexture.js');
 $include('WebGL/WebGLRenderbuffer.js');
 $include('WebGL/WebGLRenderingContext.js');
 $include('WebGL/WebGLUniformLocation.js');
+
 $include('cWebGL.js');
 

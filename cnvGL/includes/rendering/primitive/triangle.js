@@ -45,13 +45,25 @@ cnvgl_rendering_primitive_triangle = (function() {
 	};
 
 	cnvgl_rendering_primitive_triangle.render = function(prim) {
-		var dir, t;
-
-		this.prim = prim;
+		var clipped, num, i;
 
 		if (this.renderer.culling.checkCull(prim)) {
 			return;
 		}
+
+		//clipping may split triangle into multiple triangles
+		clipped = [];
+		num = this.renderer.clipping.clipTriangle(prim, clipped);
+ 
+		for (i = 0; i < num; i++) {
+			this.renderClipped(clipped[i]);
+		}
+	};
+
+	cnvgl_rendering_primitive_triangle.renderClipped = function(prim) {
+		var dir, t;
+
+		this.prim = prim;
 
 		//prepare (sort) vertices
 		this.renderer.vertex.sortVertices(prim);
@@ -62,7 +74,7 @@ cnvgl_rendering_primitive_triangle = (function() {
 			prim.vertices[2] = prim.vertices[1];
 			prim.vertices[1] = t;
 		}
-		
+
 		this.rasterize(prim);
 	};
 
@@ -122,14 +134,13 @@ cnvgl_rendering_primitive_triangle = (function() {
 		}
 	};
 
+	var p = [0, 0, 0, 1];
 	cnvgl_rendering_primitive_triangle.rasterizeScanline = function(yi, x_start, x_end) {
-		var c_buffer, d_buffer, vw, int, p, xi_start, xi_end, xi, id, ib;
+		var vw, int, xi_start, xi_end, xi, i, v;
 
-		c_buffer = this.ctx.color_buffer;
-		d_buffer = this.ctx.depth_buffer;
 		vw = this.ctx.viewport.w;
 		int = this.renderer.interpolate;
-		p = [0, yi, 0, 1];
+		p[1] = yi;
 
 		//left and right bounds
 		xi_start = (x_start|0) + .5; //floor(x_start) + .5
@@ -138,11 +149,10 @@ cnvgl_rendering_primitive_triangle = (function() {
 		}
 		xi_end = /*ceil*/((x_end + 1-1e-10)|0) - .5;
 		if (xi_end >= x_end) {
-			xi_end--;	
+			xi_end--;
 		}
 
-		id = vw * (yi - .5) + (xi_start - .5);
-		ic = id * 4;
+		i = vw * (yi - .5) + (xi_start - .5);
 
 		for (xi = xi_start; xi <= xi_end; xi++) {
 
@@ -150,28 +160,22 @@ cnvgl_rendering_primitive_triangle = (function() {
 			int.setPoint(p);
 
 			//Early depth test
-			//Nneed to add check for if shader writes to depth value.
+			//Need to add check for shader writing to depth value.
 			//If so, this needs to run after processing the fragment
 			if (this.ctx.depth.test == GL_TRUE) {
 				this.frag.gl_FragDepth = int.interpolateTriangle(this.v1.zw, this.v2.zw, this.v3.zw);
-				if (!this.renderer.checkDepth(id, this.frag.gl_FragDepth)) {
-					id++;
-					ic += 4;
+				if (!this.renderer.checkDepth(i, this.frag.gl_FragDepth)) {
+					i++;
 					continue;
 				}
-				d_buffer[id] = this.frag.gl_FragDepth;
 			}
 
-			//interpolate varying
-			for (v in this.v1.varying) {
-				this.frag.varying[v] = int.interpolateTriangle(this.v1.varying[v], this.v2.varying[v], this.v3.varying[v]);
-			}
+			this.renderer.interpolate.interpolateVarying(this.v1, this.v2, this.v3, this.frag.attributes.data);
 
 			this.renderer.fragment.process(this.frag);
-			this.renderer.fragment.write(c_buffer, ic, this.frag);
+			this.renderer.fragment.write(i, this.frag);
 
-			id++;
-			ic += 4;
+			i++;
 		}		
 	};
 

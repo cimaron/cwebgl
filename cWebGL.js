@@ -22,7 +22,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 cWebGL = {
 
-	version : '0.0.6',
+	version : '0.2.0',
 
 	/**
 	 * List of WebGLRenderingContext contexts
@@ -61,7 +61,8 @@ cWebGL = {
 	extensions : {
 		native : true,
 		ready : true,
-		setTargetFps : function() {}
+		setTargetFps : function() {},
+		setQuality : function() {}
 	},
 
 	/**
@@ -132,7 +133,7 @@ cWebGL = {
 				ctx = _.getNativeContext.call(this, name, config);
 				_.extend(ctx);
 			} else {
-				ctx = WebGLRenderingContext.create(this, new cWebGLContextAttributes(config));
+				ctx = new WebGLRenderingContext(this, new cWebGLContextAttributes(config));
 			}
 
 			_.contexts[this] = ctx;

@@ -32,10 +32,11 @@ cnvgl_renderer = (function() {
 		this.fragment = null;
 		this.interpolate = null;
 		this.primitive = null;
-		this.texture = null;
 		this.vertex = null;
 
 		this.mode = null;
+		this.depthBuffer = null;
+		this.depthFunc = null;
 	}
 
 	var cnvgl_renderer = jClass('cnvgl_renderer', Initializer);
@@ -49,23 +50,27 @@ cnvgl_renderer = (function() {
 		this.culling = new cnvgl_rendering_culling(ctx, this);
 		this.interpolate = new cnvgl_rendering_interpolate(ctx, this);
 		this.primitive = new cnvgl_rendering_primitive(ctx, this);
-		this.texture = new cnvgl_rendering_texture(ctx, this);
 
 		this.fragment = new cnvgl_rendering_fragment(ctx, this);
 		this.vertex = new cnvgl_rendering_vertex(ctx, this);
-	};
-
-	cnvgl_renderer.setProgram = function(program) {
-		this.vertex.setProgram(program);
-		this.fragment.setProgram(program);
 	};
 
 	cnvgl_renderer.setMode = function(mode) {
 		this.mode = mode;
 		this.primitive.setMode(mode);
 	};
+	
+	cnvgl_renderer.setCurrentState = function() {
+		
+		this.depthBuffer = this.ctx.drawBuffer.depthBuffer.data;
+		this.depthFunc = this.ctx.depth.func;
 
+		//set current state in sub-renderers
+		this.fragment.setCurrentState();
+	};
+	
 	cnvgl_renderer.send = function(vertex) {
+		this.setCurrentState();
 		this.vertex.process(vertex);
 		this.primitive.send(vertex);
 	};
@@ -75,10 +80,11 @@ cnvgl_renderer = (function() {
 	};
 
 	cnvgl_renderer.checkDepth = function(i, z) {
-		var mode, depth_buffer, pass;
-		mode = this.ctx.depth.func;
-		depth_buffer = this.ctx.depth_buffer;
-		switch (mode) {
+		var depth, pass;
+
+		depth = this.depthBuffer[i];
+
+		switch (this.depthFunc) {
 			case GL_NEVER:
 				pass = false;
 				break;
@@ -86,22 +92,22 @@ cnvgl_renderer = (function() {
 				pass = true;
 				break;
 			case GL_LESS:
-				pass = z < depth_buffer[i];
+				pass = z < depth;
 				break;
 			case GL_LEQUAL:
-				pass = z < depth_buffer[i];
+				pass = z <= depth;
 				break;
 			case GL_EQUAL:
-				pass = z == depth_buffer[i];
+				pass = z == depth;
 				break;
 			case GL_GREATER:
-				pass = z > depth_buffer[i];
+				pass = z > depth;
 				break;
 			case GL_GEQUAL:
-				pass = z >= depth_buffer[i];
+				pass = z >= depth;
 				break;
 			case GL_NOTEQUAL:
-				pass = z != depth_buffer[i];
+				pass = z != depth;
 				break;
 			default:
 				pass = true;

@@ -1,0 +1,119 @@
+/*
+Copyright (c) 2011 Cimaron Shanahan
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+var StdIO = (function() {
+
+	/**
+	 * Standard I/O streams
+	 * (stdin, stdout, stderr)
+	 */
+	var output = [null, '', ''];
+	var log = [null, '', ''];
+
+	/**
+	 * Returns formatted string (simplified sprintf)
+	 *
+	 * @param   string    Input string
+	 *
+	 * @return  string
+	 */
+	function sprintf(str) {
+		if (!str) {
+			return "";
+		}
+		var i = 1, m, rest = str; str = '';
+		while (m = rest.match('%([l]?)([dus%])')) {
+			var d = m[0];
+			switch (m[2]) {
+				case 'u':
+				case 'd':
+					d = parseInt(arguments[i].toString(), 10);
+					break;
+				case 's':
+					d = arguments[i].toString();
+					break;
+				case '%':
+					d = '%';
+					break;
+				default:
+			}
+			i++;
+			str += rest.slice(0, m.index) + d;
+			rest = rest.slice(m.index + m[0].length);
+		}
+		str += rest;
+		return str;
+	}
+
+	/**
+	 * Writes formatted string to stdout
+	 *
+	 * @param   string    Input string
+	 */
+	function printf() {
+		var args = [].splice.call(arguments, 0);
+		args.unshift(1);
+		fprintf.apply(null, args);
+	}
+
+	/**
+	 * Writes formatted string to file stream
+	 *
+	 * @param   string    Input string
+	 */
+	function fprintf(file, str) {
+		var args = [].splice.call(arguments, 1);	
+		str = sprintf.apply(null, args);
+		output[file || 1] = str;
+		ob_stream(file, str);
+	}
+
+	/**
+	 * Writes string to file stream
+	 *
+	 * @param   file      Output file stream
+	 * @param   string    Input string
+	 */
+	function ob_stream(file, str) {
+		var i;
+		str = log[file] + str;
+		while ((i = str.indexOf("\n")) != -1) {
+			if (file == 1) {
+				console.log(str.slice(0, i));
+			} else {
+				console.info(str.slice(0, i));	
+			}
+			str = str.slice(i + 1);
+		}
+		log[file] = str;
+	}
+
+	/**
+	 * External Interface
+	 */
+	return {
+		sprintf : sprintf,
+		printf : printf,
+		fprintf : fprintf
+	};
+
+}());
+

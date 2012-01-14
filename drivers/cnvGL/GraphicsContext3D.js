@@ -35,6 +35,7 @@ GraphicsContext3D = (function() {
 		
 		this._frame = {};
 		this._quality = {};
+		this.options = {};
 	}
 
 	var GraphicsContext3D = new jClass('GraphicsContext3D', Initializer);
@@ -60,6 +61,7 @@ GraphicsContext3D = (function() {
 		*/
 		this._quality.factor = 1;
 		this.setTargetFps(0);
+		this.options.showFps = true;
 
 		this._createBuffer();
 
@@ -89,6 +91,14 @@ GraphicsContext3D = (function() {
 
 	GraphicsContext3D.bindBuffer = function(target, buffer) {
 		glBindBuffer(target, buffer);
+	};
+
+	GraphicsContext3D.bindFramebuffer = function(target, framebuffer) {
+		glBindFramebuffer(target, framebuffer);
+	};
+
+	GraphicsContext3D.bindRenderbuffer = function(target, renderbuffer) {
+		glBindRenderbuffer(target, renderbuffer);
 	};
 
 	GraphicsContext3D.bindTexture = function(target, texture) {
@@ -124,16 +134,32 @@ GraphicsContext3D = (function() {
 		glCompileShader(shader);
 	};
 
+	GraphicsContext3D.colorMask = function(red, green, blue, alpha) {
+		glColorMask(red, green, blue, alpha);
+	};
+
 	GraphicsContext3D.createBuffer = function() {
 		var buffers = [];
 		glGenBuffers(1, buffers);
 		return buffers[0][0];
 	};
-	
+
+	GraphicsContext3D.createFramebuffer = function() {
+		var framebuffers = [];
+		glGenFramebuffers(1, framebuffers);
+		return framebuffers[0][0];
+	};
+
 	GraphicsContext3D.createProgram = function() {
 		return glCreateProgram();
 	};
 	
+	GraphicsContext3D.createRenderbuffer = function() {
+		var renderbuffers = [];
+		glGenRenderbuffers(1, renderbuffers);
+		return renderbuffers[0][0];
+	};
+
 	GraphicsContext3D.createShader = function(type) {
 		return glCreateShader(type);
 	};
@@ -143,7 +169,19 @@ GraphicsContext3D = (function() {
 		glGenTextures(1, textures);
 		return textures[0][0];
 	};	
-	
+
+	GraphicsContext3D.cullFace = function(mode) {
+		glCullFace(mode);
+	};
+
+	GraphicsContext3D.depthFunc = function(func) {
+		glDepthFunc(func);
+	};
+
+	GraphicsContext3D.depthMask = function(flag) {
+		glDepthMask(flag);
+	};
+
 	GraphicsContext3D.drawArrays = function(mode, first, count) {
 		this._dirty = true;
 		glDrawArrays(mode, first, count);
@@ -158,6 +196,10 @@ GraphicsContext3D = (function() {
 		glDisable(cap);
 	};
 
+	GraphicsContext3D.disableVertexAttribArray = function(index) {
+		glDisableVertexAttribArray(index);
+	};
+
 	GraphicsContext3D.enable = function(cap) {
 		glEnable(cap);
 	};
@@ -165,7 +207,11 @@ GraphicsContext3D = (function() {
 	GraphicsContext3D.enableVertexAttribArray = function(index) {
 		glEnableVertexAttribArray(index);
 	};
-	
+
+	GraphicsContext3D.frontFace = function(mode) {
+		glFrontFace(mode);
+	};
+
 	GraphicsContext3D.generateMipmap = function(target) {
 		//glGenerateMipmap(target);
 	};
@@ -195,7 +241,7 @@ GraphicsContext3D = (function() {
 		glGetShaderiv(shader, pname, params);
 		return params[0];
 	};
-	
+
 	GraphicsContext3D.getUniformLocation = function(program, name) {
 		return glGetUniformLocation(program, name);
 	};
@@ -208,8 +254,12 @@ GraphicsContext3D = (function() {
 		glPixelStorei(pname, param);
 	};
 
-	GraphicsContext3D.shaderSource = function(shader, string) {
-		glShaderSource(shader, 1, [string], [string.length]);
+	GraphicsContext3D.renderbufferStorage = function(target, internalformat, width, height) {
+		glRenderbufferStorage(target, internalformat, width, height);
+	};
+
+	GraphicsContext3D.shaderSource = function(shader, source) {
+		glShaderSource(shader, 1, [source], [source.length]);
 	};
 	
 	GraphicsContext3D.uniform1i = function(location, v0) {
@@ -248,9 +298,24 @@ GraphicsContext3D = (function() {
 		glTexParameteri(target, pname, param);
 	};
 
-	GraphicsContext3D.vertexAttribPointer = function(idx, size, type, normalized, stride, offset) {
-		var pointer = [];
-		glVertexAttribPointer(idx, size, type, normalized, stride, offset);
+	GraphicsContext3D.vertexAttrib1f = function(indx, x) {
+		glVertexAttrib1f(indx, x);
+	};
+
+	GraphicsContext3D.vertexAttrib2f = function(indx, x, y) {
+		glVertexAttrib2f(indx, x, y);
+	};
+
+	GraphicsContext3D.vertexAttrib3f = function(indx, x, y, z) {
+		glVertexAttrib3f(indx, x, y, z);
+	};
+
+	GraphicsContext3D.vertexAttrib4f = function(indx, x, y, z, w) {
+		glVertexAttrib4f(indx, x, y, z, w);
+	};
+
+	GraphicsContext3D.vertexAttribPointer = function(indx, size, type, normalized, stride, offset) {
+		glVertexAttribPointer(indx, size, type, normalized, stride, offset);
 	};
 
 	GraphicsContext3D.viewport = function(x, y, width, height) {
@@ -266,15 +331,20 @@ GraphicsContext3D = (function() {
 		this._frame.fps = 0;
 		this._frame.last = [];
 		this._quality.fpsLow = low;
-		this._quality.fpsHigh = high ? high : 4 * low;
+		this._quality.fpsHigh = high ? high : 1.5 * low;
 		this._quality.fpsLowThreshold = 0;
 		this._quality.fpsHighThreshold = 0;
+	};
+
+	GraphicsContext3D.setQuality = function(q) {
+		this._quality.factor = 1 / q;
+		this._createBuffer();
 	};
 
 	//private:
 
 	GraphicsContext3D._createBuffer = function() {
-		var ctx, width, height;
+		var ctx, width, height, data, frameBuffer, depthBuffer, colorBuffer;
 
 		ctx = cnvgl_context.getCurrentContext();
 
@@ -302,15 +372,38 @@ GraphicsContext3D = (function() {
 			this._quality.cnv.height = height;
 			this._quality.ctx = this._quality.cnv.getContext('2d');
 			this.context.mozImageSmoothingEnabled = false;
-
-			this._quality.buffer = this.context.createImageData(width, height);
-			ctx.color_buffer = this._quality.buffer.data;
-
-		} else {
-			ctx.color_buffer = this.buffer.data;
 		}
 
-		ctx.depth_buffer = new Float32Array(width * height);
+		//set up framebuffer
+		frameBuffer = new cnvgl_framebuffer(0);
+		frameBuffer.width = width;
+		frameBuffer.height = height;
+
+		ctx.winDrawBuffer = frameBuffer;
+		ctx.drawBuffer = frameBuffer;
+
+		//set up color buffer
+		colorBuffer = new cnvgl_renderbuffer(0);
+		colorBuffer.internalFormat = GL_RGBA;
+		colorBuffer.width = width;
+		colorBuffer.height = height;
+		frameBuffer.colorDrawBuffers[0] = colorBuffer;
+
+		if (this._quality.factor > 1) {
+			this._quality.buffer = this.context.createImageData(width, height);
+			colorBuffer.data = this._quality.buffer.data;
+		} else {
+			this.buffer = this.context.createImageData(width, height);
+			colorBuffer.data = this.buffer.data;
+		}
+		
+		//set up depth buffer
+		depthBuffer = new cnvgl_renderbuffer(0);
+		depthBuffer.internalFormat = GL_DEPTH_COMPONENT16;
+		depthBuffer.width = width;
+		depthBuffer.height = height;
+		depthBuffer.data = cnvgl_malloc(GL_DEPTH_COMPONENT16, width * height);
+		frameBuffer.depthBuffer = depthBuffer;
 	};
 
 	GraphicsContext3D._updateFrame = function() {
@@ -367,11 +460,16 @@ GraphicsContext3D = (function() {
 				this.context.drawImage(this._quality.cnv, 0, 0, this.canvas.width, this.canvas.height);
 			} else {
 				this.context.putImageData(this.buffer, 0, 0);
+				if (this.options.showFps) {
+					this.context.strokeStyle = "#FFFFFF";
+					if (this._frame.fps != Infinity) {
+						this.context.strokeText(Math.round(this._frame.fps * 100) / 100, 20, 20);
+					}
+				}
 			}
 		}
 
 		this._checkFps();
-
 	};
 
 	return GraphicsContext3D.Constructor;

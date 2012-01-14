@@ -26,9 +26,6 @@ cnvgl_rendering_vertex = (function() {
 		//public:
 		this.ctx = null;
 		this.renderer = null;
-
-		this.program = null;
-		this.data = null;
 	}
 
 	var cnvgl_rendering_vertex = jClass('cnvgl_rendering_vertex', Initializer);
@@ -38,38 +35,29 @@ cnvgl_rendering_vertex = (function() {
 		this.ctx = ctx;
 		this.renderer = renderer;
 
-		//build environment for vertex executable
-		this.data = new cnvgl_rendering_program(ctx, renderer);
-		this.setProgram(null);
-	};
-
-	cnvgl_rendering_vertex.setProgram = function(program) {
-		if (program) {
-			this.program = this.data.setProgram(program.vertex_program);
-			this.data._uniforms = program.active_uniforms_values;
-		} else {
-			this.program = this.defaultProgram;	
-		}
-	};
-
-	cnvgl_rendering_vertex.setMode = function(mode) {
-		this.mode = mode;
+		this.result = GPU.shader.result;
 	};
 
 	cnvgl_rendering_vertex.process = function(v) {
-		this.data.vertex = v;
-		this.program.apply(this.data);
+		var position, shader_mem;
+		shader_mem = GPU.memory.shader;
 
-		v.x = v.gl_Position[0];
-		v.y = v.gl_Position[1];
-		v.z = v.gl_Position[2];
-		v.w = v.gl_Position[3];
+		GPU.executeVertex(
+			shader_mem.temp.data,
+			shader_mem.uniforms.data,
+			v.attributes.data, 
+			v.varying.data,
+			this.result);
+
+		position = this.result.position;
+
+		v.x = position[0];
+		v.y = position[1];
+		v.z = position[2];
+		v.w = position[3];
 
 		this.setNormalizedCoordinates(v);
 		this.setWindowCoordinates(v);
-	};
-
-	cnvgl_rendering_vertex.defaultProgram = function() {
 	};
 
 	cnvgl_rendering_vertex.setNormalizedCoordinates = function(v) {

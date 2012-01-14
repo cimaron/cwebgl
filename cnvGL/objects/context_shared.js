@@ -23,12 +23,12 @@ var cnvgl_context_shared = (function() {
 							  
 	function Initializer() {
 		//public:
-		this.linker = null;
-
-		this.program_objects = [];
 		this.texture_objects = [];
-
 		this.default_texture_objects = {};
+
+		this.shaderObjects = [0];
+		this.frameBuffers = [0];
+		this.renderBuffers = [0];
 	}
 
 	var cnvgl_context_shared = jClass('cnvgl_context_shared', Initializer);
@@ -45,10 +45,6 @@ var cnvgl_context_shared = (function() {
 	//public:
 
 	cnvgl_context_shared.cnvgl_context_shared = function() {
-
-		this.linker = new GlslLinker();
-		this.program_objects[0] = 0;
-
 		this.initTextures();
 	};
 	

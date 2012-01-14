@@ -20,21 +20,69 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 (function(glsl) {
+	var type;
+	
+	type = {
+		
+		names : [
+			"void", "float", "int", "uint", "bool",
+			"vec2", "vec3", "vec4",
+			"bvec2", "bvec3", "bvec4",
+			"ivec2", "ivec3", "ivec4", "uvec2", "uvec3", "uvec4",
+			"mat2", "mat2x3", "mat2x4",
+			"mat3x2", "mat3", "mat3x4",
+			"mat4x2", "mat4x3", "mat4",
+			"sampler1D", "sampler2D", "sampler2Drect", "sampler3D", "samplercube",
+			"sampler1Dshadow", "sampler2Dshadow", "sampler2Drectshadow", "samplercubeshadow",
+			"sampler1Darray", "sampler2Darray", "sampler1Darrayshadow", "sampler2Darrayshadow",
+			"isampler1D", "isampler2D", "isampler3D", "isamplercube",
+			"isampler1Darray", "isampler2Darray",
+			"usampler1D", "usampler2D", "usampler3D", "usamplercube",
+			"usampler1Darray", "usampler2Darray",
+			"struct", "type_name"
+			],
 
-	var type, i;
+		size : [
+			 1, 1, 1, 1, 1,
+			 2, 3, 4, 
+			 2, 3, 4,
+			 2, 3, 4,
+			 2, 3, 4,
+			 4, 6, 8,
+			 6, 9, 12,
+			 8, 12, 16,
+			 1, 1, 1, 1, 1,
+			 1, 1, 1, 1,
+			 null, null, null, null,
+			 1, 1, 1, 1,
+			 null, null,
+			 1, 1, 1, 1,
+			 null, null,
+			 null, null
+			],
+		
+		slots : [
+			 1, 1, 1, 1, 1,
+			 1, 1, 1, 
+			 1, 1, 1,
+			 1, 1, 1,
+			 1, 1, 1,
+			 2, 2, 2,
+			 3, 3, 3,
+			 4, 4, 4,
+			 1, 1, 1, 1, 1,
+			 1, 1, 1, 1,
+			 null, null, null, null,
+			 1, 1, 1, 1,
+			 null, null,
+			 1, 1, 1, 1,
+			 null, null,
+			 null, null
+			],
 
-	type = {};
+		qualifiers : []
 
-	type.names = [
-		"void", "float", "int", "uint", "bool", "vec2", "vec3", "vec4", "bvec2", "bvec3", "bvec4", "ivec2",
-		"ivec3", "ivec4", "uvec2", "uvec3", "uvec4", "mat2", "mat2x3", "mat2x4", "mat3x2", "mat3", "mat3x4",
-		"mat4x2", "mat4x3", "mat4", "sampler1D", "sampler2D", "sampler2Drect", "sampler3D", "samplercube",
-		"sampler1Dshadow", "sampler2Dshadow", "sampler2Drectshadow", "samplercubeshadow", "sampler1Darray",
-		"sampler2Darray", "sampler1Darrayshadow", "sampler2Darrayshadow", "isampler1D", "isampler2D",
-		"isampler3D", "isamplercube", "isampler1Darray", "isampler2Darray", "usampler1D", "usampler2D",
-		"usampler3D", "usamplercube", "usampler1Darray", "usampler2Darray", "struct", "type_name"
-		];
-
+	};
 	/*
 	void : 0,
 	float : 1,
@@ -90,28 +138,20 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	struct : 51,
 	type_name : 52
 	*/
+
+	//populate type names
 	for (i = 0; i < type.names.length; i++) {
 		type[type.names[i]] = i;
 	}
 
-	type.size = [
-		 1,  1, 1, 1, 1, 2,  3, 4,
-		 2,  3, 4, 2, 3, 4,  2, 3,
-		 4,  4, 6, 8, 6, 9, 12, 8,
-		12, 16, 1, 1, 1, 1,  1, 1,
-		 1,  1, 1, 1, 1
-		];
-
-	type.defaultValues = [
-		"null", "0.0", "0", "0", "0", "[0,0]", "[0,0,0]", "[0,0,0,0]",
-		"[0,0]", "[0,0,0]", "[0,0,0,0]", "[0,0]", "[0,0,0]", "[0,0,0,0]", "[0,0]", "[0,0,0]",
-		"[0,0,0,0]", "[0,0,0,0]", "[0,0,0,0,0,0,0,0]", "[0,0,0,0,0,0]",
-		"[0,0,0,0,0,0,0,0,0]", "[0,0,0,0,0,0,0,0,0,0,0,0]", "[0,0,0,0,0,0,0,0]",
-		"[0,0,0,0,0,0,0,0,0,0,0,0]", "[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]", "0", "0", "0", "0", "0", "0", 
-		"0", "0", "0", "0", "0"
-		];
+	//populate type qualifers
+	for (i in glsl.ast.type_qualifier.flags) {
+		type.qualifiers[glsl.ast.type_qualifier.flags[i]] = i;
+	}	
 
 	glsl.type = type;
 
 }(glsl));
+
+
 

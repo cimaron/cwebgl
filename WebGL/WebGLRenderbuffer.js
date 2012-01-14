@@ -35,8 +35,8 @@ cWebGLRenderbuffer = (function() {
 		this.cWebGLObject(context);
 		this.setObject(this.context().graphicsContext3D().createRenderbuffer());
 	};
-	
-	return cWebGLRenderbuffer.Cosntructor;
+
+	return cWebGLRenderbuffer.Constructor;
 
 }());
 

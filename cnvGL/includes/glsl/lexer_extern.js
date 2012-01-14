@@ -46,6 +46,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			this.yylval.identifier = this.yytext;
 			return this.classify_identifier(this.yy.extra, this.yytext);
 		}
+		return token;
 	}
 
 	function classify_identifier(state, name) {
