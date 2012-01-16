@@ -41,7 +41,7 @@ var ARB = {
 	}
 };
 
-include('cnvGL/includes/ARB/instruction.js');
-include('cnvGL/includes/ARB/parse.js');
-include('cnvGL/includes/ARB/javascript.js');
+include('glsl/ARB/instruction.js');
+include('glsl/ARB/parse.js');
+include('glsl/ARB/javascript.js');
 
