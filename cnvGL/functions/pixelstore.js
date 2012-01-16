@@ -33,7 +33,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			case GL_PACK_ALIGNMENT:
 				param = Math.round(param);
 				if ([1, 2, 4, 8].indexOf(param) == -1) {
-					cnvgl_throw_error(GL_INVALID_VALUE);
+					cnvgl.throw_error(GL_INVALID_VALUE, ctx);
 					return;
 				}
 				ctx.pack.alignment = param;
@@ -42,14 +42,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			case GL_UNPACK_ALIGNMENT:
 				param = Math.round(param);
 				if ([1, 2, 4, 8].indexOf(param) == -1) {
-					cnvgl_throw_error(GL_INVALID_VALUE);
+					cnvgl.throw_error(GL_INVALID_VALUE, ctx);
 					return;
 				}
 				ctx.unpack.alignment = param;
 				break;
 
 			default:
-				cnvgl_throw_error(GL_INVALID_ENUM);
+				cnvgl.throw_error(GL_INVALID_ENUM, ctx);
 				return;
 		}
 	}

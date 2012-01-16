@@ -58,7 +58,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			&& func != GL_NOTEQUAL
 			&& func != GL_GEQUAL
 			&& func != GL_ALWAYS) {
-			cnvgl_throw_error(GL_INVALID_ENUM);
+			cnvgl.throw_error(GL_INVALID_ENUM, ctx);
 			return;		
 		}
 	

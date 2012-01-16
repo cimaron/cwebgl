@@ -42,13 +42,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		
 			//buffer does not exist
 			if (!buffer_obj) {
-				cnvgl_throw_error(GL_INVALID_VALUE);
+				cnvgl.throw_error(GL_INVALID_VALUE, ctx);
 				return;
 			}
 
 			//not a buffer object
 			if (!buffer_obj instanceof cnvgl_buffer) {
-				cnvgl_throw_error(GL_INVALID_OPERATION);
+				cnvgl.throw_error(GL_INVALID_OPERATION, ctx);
 				return;
 			}
 
@@ -67,7 +67,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				ctx.array.elementArrayBufferObj = buffer_obj;
 				break;
 			default:
-				cnvgl_throw_error(GL_INVALID_ENUM);
+				cnvgl.throw_error(GL_INVALID_ENUM, ctx);
 		}
 	};
 
@@ -97,12 +97,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				usage != GL_DYNAMIC_READ && 
 				usage != GL_DYNAMIC_COPY) {
 	
-			cnvgl_throw_error(GL_INVALID_ENUM);
+			cnvgl.throw_error(GL_INVALID_ENUM, ctx);
 			return;
 		}
 	
 		if (size < 0) {
-			cnvgl_throw_error(GL_INVALID_VALUE);
+			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
 			return;
 		}
 	
@@ -114,12 +114,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				buffer_obj = ctx.array.elementArrayBufferObj;
 				break;
 			default:
-				cnvgl_throw_error(GL_INVALID_ENUM);
+				cnvgl.throw_error(GL_INVALID_ENUM, ctx);
 				return;
 		}
 		
 		if (!buffer_obj) {
-			cnvgl_throw_error(GL_INVALID_OPERATION);
+			cnvgl.throw_error(GL_INVALID_OPERATION, ctx);
 			return;
 		}
 	
@@ -171,17 +171,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				bufer_obj = ctx.array.elementArrayBufferObj;
 				break;
 			default:
-				cnvgl_throw_error(GL_INVALID_ENUM);
+				cnvgl.throw_error(GL_INVALID_ENUM, ctx);
 				return;
 		}
 		
 		if (!buffer_obj) {
-			cnvgl_throw_error(GL_INVALID_OPERATION);
+			cnvgl.throw_error(GL_INVALID_OPERATION, ctx);
 			return;
 		}
 	
 		if (offset < 0 || size < 0 || offset + size > buffer_obj.size) {
-			cnvgl_throw_error(GL_INVALID_VALUE);
+			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
 			return;
 		}
 		

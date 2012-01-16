@@ -30,7 +30,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		program_obj = ctx.shader.activeProgram;
 	
 		if (!program_obj) {
-			cnvgl_throw_error(GL_INVALID_OPERATION);
+			cnvgl.throw_error(GL_INVALID_OPERATION, ctx);
 			return;
 		}
 	
@@ -47,12 +47,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 	
 		if (!uniform_obj) {
-			cnvgl_throw_error(GL_INVALID_OPERATION);
+			cnvgl.throw_error(GL_INVALID_OPERATION, ctx);
 			return;		
 		}
 	
 		if (slots != uniform_obj.slots || slots * components != uniform_obj.size) {
-			cnvgl_throw_error(GL_INVALID_OPERATION);
+			cnvgl.throw_error(GL_INVALID_OPERATION, ctx);
 			return;		
 		}
 	
@@ -79,18 +79,18 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		//no program exists
 		if (!program_obj) {
-			cnvgl_throw_error(GL_INVALID_VALUE);
+			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
 			return;
 		}
 	
 		//object is not a program (BAD!)
 		if (!program_obj instanceof cnvgl_program) {
-			cnvgl_throw_error(GL_INVALID_OPERATION);
+			cnvgl.throw_error(GL_INVALID_OPERATION, ctx);
 			return;
 		}	
 	
 		if (!program_obj.link_status) {
-			cnvgl_throw_error(GL_INVALID_OPERATION);
+			cnvgl.throw_error(GL_INVALID_OPERATION, ctx);
 			return;
 		}
 	

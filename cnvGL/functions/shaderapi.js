@@ -41,13 +41,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		//program or shader does not exist
 		if (!program_obj || !shader_obj) {
-			cnvgl_throw_error(GL_INVALID_VALUE);
+			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
 			return;
 		}
 	
 		//objects are not what they should be
 		if (!program_obj instanceof cnvgl_program || !shader_obj instanceof cnvgl_shader) {
-			cnvgl_throw_error(GL_INVALID_OPERATION);
+			cnvgl.throw_error(GL_INVALID_OPERATION, ctx);
 			return;
 		}
 	
@@ -72,7 +72,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		//no program exists
 		if (!program_obj) {
-			cnvgl_throw_error(GL_INVALID_OPERATION);
+			cnvgl.throw_error(GL_INVALID_OPERATION, ctx);
 			return;
 		}
 	
@@ -100,12 +100,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		//no program exists
 		if (!program_obj) {
-			cnvgl_throw_error(GL_INVALID_OPERATION);
+			cnvgl.throw_error(GL_INVALID_OPERATION, ctx);
 			return;
 		}
 	
 		if (!program_obj.link_status) {
-			cnvgl_throw_error(GL_INVALID_OPERATION);
+			cnvgl.throw_error(GL_INVALID_OPERATION, ctx);
 			return;
 		}
 	
@@ -132,13 +132,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		//no shader exists
 		if (!shader_obj) {
-			cnvgl_throw_error(GL_INVALID_VALUE);
+			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
 			return;
 		}
 	
 		//object is not a shader (BAD!)
 		if (!shader_obj instanceof cnvgl_shader) {
-			cnvgl_throw_error(GL_INVALID_OPERATION);
+			cnvgl.throw_error(GL_INVALID_OPERATION, ctx);
 			return;
 		}
 
@@ -181,7 +181,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		ctx = cnvgl_context.getCurrentContext();
 
 		if (shaderType != GL_FRAGMENT_SHADER && shaderType != GL_VERTEX_SHADER) {
-			cnvgl_throw_error(GL_INVALID_ENUM);
+			cnvgl.throw_error(GL_INVALID_ENUM, ctx);
 			return 0;
 		}
 
@@ -212,13 +212,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		//no shader exists
 		if (!program_obj) {
-			cnvgl_throw_error(GL_INVALID_VALUE);
+			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
 			return;
 		}
 	
 		//object is not a program (BAD!)
 		if (!program_obj instanceof cnvgl_program) {
-			cnvgl_throw_error(GL_INVALID_OPERATION);
+			cnvgl.throw_error(GL_INVALID_OPERATION, ctx);
 			return;
 		}	
 	
@@ -267,7 +267,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				break;
 	
 			default:
-				cnvgl_throw_error(GL_INVALID_ENUM);
+				cnvgl.throw_error(GL_INVALID_ENUM, ctx);
 				return;
 		}
 	};
@@ -292,18 +292,18 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		
 		//no shader exists
 		if (!shader_obj) {
-			cnvgl_throw_error(GL_INVALID_VALUE);
+			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
 			return;
 		}
 	
 		//object is not a shader (BAD!)
 		if (!shader_obj instanceof cnvgl_shader) {
-			cnvgl_throw_error(GL_INVALID_OPERATION);
+			cnvgl.throw_error(GL_INVALID_OPERATION, ctx);
 			return;
 		}
 	
 		if (maxLength < 0) {
-			cnvgl_throw_error(GL_INVALID_VALUE);
+			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
 			return;
 		}
 	
@@ -336,13 +336,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		//no shader exists
 		if (!shader_obj) {
-			cnvgl_throw_error(GL_INVALID_VALUE);
+			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
 			return;
 		}
 	
 		//object is not a shader (BAD!)
 		if (!shader_obj instanceof cnvgl_shader) {
-			cnvgl_throw_error(GL_INVALID_OPERATION);
+			cnvgl.throw_error(GL_INVALID_OPERATION, ctx);
 			return;
 		}	
 	
@@ -363,7 +363,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				params[0] = shader_obj.shader_string.length;
 				break;
 			default:
-				cnvgl_throw_error(GL_INVALID_ENUM);
+				cnvgl.throw_error(GL_INVALID_ENUM, ctx);
 				return;
 		}
 	};
@@ -385,13 +385,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		//no program exists
 		if (!program_obj) {
-			cnvgl_throw_error(GL_INVALID_VALUE);
+			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
 			return;
 		}
 	
 		//object is not a program
 		if (!program_obj instanceof cnvgl_program) {
-			cnvgl_throw_error(GL_INVALID_OPERATION);
+			cnvgl.throw_error(GL_INVALID_OPERATION, ctx);
 			return;
 		}
 
@@ -425,13 +425,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		//no shader exists
 		if (!shader_obj) {
-			cnvgl_throw_error(GL_INVALID_VALUE);
+			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
 			return;
 		}
 	
 		//object is not a shader (BAD!)
 		if (!shader_obj instanceof cnvgl_shader) {
-			cnvgl_throw_error(GL_INVALID_OPERATION);
+			cnvgl.throw_error(GL_INVALID_OPERATION, ctx);
 			return;
 		}
 
@@ -463,18 +463,18 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		//no program exists
 		if (!program_obj) {
-			cnvgl_throw_error(GL_INVALID_OPERATION);
+			cnvgl.throw_error(GL_INVALID_OPERATION, ctx);
 			return;
 		}
 	
 		//object is not a program (BAD!)
 		if (!program_obj instanceof cnvgl_program) {
-			cnvgl_throw_error(GL_INVALID_OPERATION);
+			cnvgl.throw_error(GL_INVALID_OPERATION, ctx);
 			return;
 		}
 	
 		if (!program_obj.link_status) {
-			cnvgl_throw_error(GL_INVALID_OPERATION);
+			cnvgl.throw_error(GL_INVALID_OPERATION, ctx);
 			return;
 		}
 	

@@ -39,7 +39,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			target != GL_TEXTURE_3D &&
 			target != GL_TEXTURE_CUBE_MAP
 			) {
-			cnvgl_throw_error(GL_INVALID_ENUM);
+			cnvgl.throw_error(GL_INVALID_ENUM, ctx);
 			return;
 		}
 	
@@ -53,7 +53,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			texture_obj = ctx.shared.texture_objects[texture];
 			if (texture_obj) {
 				if (texture_obj.target != 0 && texture_obj.target != target) {
-					cnvgl_throw_error(GL_INVALID_OPERATION);	
+					cnvgl.throw_error(GL_INVALID_OPERATION, ctx);	
 					return;
 				}
 				texture_obj.target = target;
@@ -80,7 +80,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		var current, list, i, t, texture_obj;
 	
 		if (n < 0) {
-			cnvgl_throw_error(GL_INVALID_VALUE);
+			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
 			return;
 		}
 	

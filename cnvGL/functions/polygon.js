@@ -37,7 +37,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		if (mode != GL_FRONT_AND_BACK
 			&& mode != GL_FRONT
 			&& mode != GL_BACK) {
-			cnvgl_throw_error(GL_INVALID_ENUM);
+			cnvgl.throw_error(GL_INVALID_ENUM, ctx);
 			return;
 		}
 	
@@ -58,7 +58,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		if (mode != GL_CW
 			&& mode != GL_CCW) {
-			cnvgl_throw_error(GL_INVALID_ENUM);
+			cnvgl.throw_error(GL_INVALID_ENUM, ctx);
 			return;
 		}
 	

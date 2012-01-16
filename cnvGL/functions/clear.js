@@ -57,7 +57,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		ctx = cnvgl_context.getCurrentContext();
 	
 		if (mask & ~(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT)) {
-			cnvgl_throw_error(GL_INVALID_VALUE);
+			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
 			return;
 		}
 

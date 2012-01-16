@@ -45,7 +45,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			&& target != GL_TEXTURE_2D
 			&& target != GL_TEXTURE_3D
 			&& target != GL_TEXTURE_CUBE_MAP) {
-			cnvgl_throw_error(GL_INVALID_ENUM);
+			cnvgl.throw_error(GL_INVALID_ENUM, ctx);
 			return;
 		}
 	

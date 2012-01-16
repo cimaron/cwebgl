@@ -37,7 +37,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		ctx = cnvgl_context.getCurrentContext();
 	
 		if (target != GL_FRAMEBUFFER) {
-			cnvgl_throw_error(GL_INVALID_ENUM);
+			cnvgl.throw_error(GL_INVALID_ENUM, ctx);
 			return;
 		}
 	
@@ -48,7 +48,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 	
 		if (!framebuffer_obj) {
-			cnvgl_throw_error(GL_INVALID_OPERATION);
+			cnvgl.throw_error(GL_INVALID_OPERATION, ctx);
 			return;		
 		}
 	
@@ -76,7 +76,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		ctx = cnvgl_context.getCurrentContext();
 	
 		if (target != GL_RENDERBUFFER) {
-			cnvgl_throw_error(GL_INVALID_ENUM);
+			cnvgl.throw_error(GL_INVALID_ENUM, ctx);
 			return;
 		}
 	
@@ -85,7 +85,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 	
 		if (!renderbuffer_obj) {
-			cnvgl_throw_error(GL_INVALID_OPERATION);
+			cnvgl.throw_error(GL_INVALID_OPERATION, ctx);
 			return;		
 		}
 	
@@ -113,7 +113,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		list = [];
 	
 		if (n < 0) {
-			cnvgl_throw_error(GL_INVALID_VALUE);
+			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
 			return;
 		}
 	
@@ -142,7 +142,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		list = [];
 	
 		if (n < 0) {
-			cnvgl_throw_error(GL_INVALID_VALUE);
+			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
 			return;
 		}
 	
@@ -172,30 +172,30 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		ctx = cnvgl_context.getCurrentContext();
 	
 		if (target != GL_RENDERBUFFER) {
-			cnvgl_throw_error(GL_INVALID_ENUM);
+			cnvgl.throw_error(GL_INVALID_ENUM, ctx);
 			return;
 		}
 		
 		/*
 		if (internalformat is not an accepted format) {
-			cnvgl_throw_error(GL_INVALID_ENUM);
+			cnvgl.throw_error(GL_INVALID_ENUM, ctx);
 		}
 		*/
 		
 		if (width < 1 || width > ctx.const.maxRenderbufferSize) {
-			cnvgl_throw_error(GL_INVALID_VALUE);
+			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
 			return;
 		}
 	
 		if (height < 1 || height > ctx.const.maxRenderbufferSize) {
-			cnvgl_throw_error(GL_INVALID_VALUE);
+			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
 			return;
 		}
 	
 		renderbuffer_obj = ctx.currentRenderbuffer;
 	
 		if (!renderbuffer_obj) {
-			cnvgl_throw_error(GL_INVALID_OPERATION);
+			cnvgl.throw_error(GL_INVALID_OPERATION, ctx);
 			return;		
 		}
 	

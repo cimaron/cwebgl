@@ -37,7 +37,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		i = texture - GL_TEXTURE0;
 
 		if (i < 0 || i > (GPU.texture.MAX_COMBINED_TEXTURE_IMAGE_UNITS - 1)) {
-			cnvgl_throw_error(GL_INVALID_ENUM);
+			cnvgl.throw_error(GL_INVALID_ENUM, ctx);
 			return;
 		}
 

@@ -46,6 +46,13 @@ cnvgl = {
 	 */
 	setContext : function(context) {
 		cnvgl.currentContext = context;
+	},
+
+	throw_error : function(error, ctx) {
+		ctx = ctx || cnvgl_context.getCurrentContext();
+		if (error && ctx.errorValue == GL_NO_ERROR) {
+			ctx.errorValue = error;
+		}
 	}
 
 };
@@ -87,14 +94,6 @@ include('cnvGL/functions/uniforms.js');
 include('cnvGL/functions/varray.js');
 include('cnvGL/functions/viewport.js');
 
-//internal functions
-function cnvgl_throw_error(error) {
-	var ctx;
-	ctx = cnvgl_context.getCurrentContext();
-	if (error && ctx.errorValue == GL_NO_ERROR) {
-		ctx.errorValue = error;
-	}
-}
 
 cnvgl_objects = [0];
 
