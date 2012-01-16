@@ -24,7 +24,6 @@ cWebGLProgram = (function() {
 						  
 	function Initializer() {
 		cWebGLObject.Initializer.apply(this);
-		//public:
 	}
 
 	var cWebGLProgram = jClass('cWebGLProgram', Initializer, cWebGLObject);
@@ -33,9 +32,10 @@ cWebGLProgram = (function() {
 	
 	cWebGLProgram.cWebGLProgram = function(context) {
 		this.cWebGLObject(context);
-		this.setObject(this.context().graphicsContext3D().createProgram());
+		cnvgl.setContext(context._context);
+		this.setObject(cnvgl.createProgram());
 	};
-	
+
 	return cWebGLProgram.Constructor;
 
 }());

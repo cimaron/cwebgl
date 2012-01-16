@@ -23,18 +23,35 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 cWebGLUniformLocation = (function() {
 	
 	function Initializer() {
-		cWebGLObject.Initializer.apply(this);
-		//public	
+		this._program = null;
+		this._location = null;
+		this._linkCount = null;
 	}
 
-	var cWebGLUniformLocation = jClass('cWebGLUniformLocation', Initializer, cWebGLObject);
+	var cWebGLUniformLocation = jClass('cWebGLUniformLocation', Initializer);
 
 	//public:
 
-	cWebGLUniformLocation.cWebGLUniformLocation = function(context) {
-		this.cWebGLObject(context);
+	cWebGLUniformLocation.cWebGLUniformLocation = function(program, location) {
+		this._program = program;
+		this._location = location;
+		this._linkCount = this._program.getLinkCount();
 	};
-	
+
+	cWebGLUniformLocation.program = function() {
+		if (this._program.getLinkCount() != this._linkCount) {
+			return 0;
+		}
+		return this._program;
+	};
+
+	cWebGLUniformLocation.location = function() {
+		if (this._program.getLinkCount() != this._linkCount) {
+			throw new Error("Uniform no longer valid");	
+		}
+		return this._location;
+	};
+
 	return cWebGLUniformLocation.Constructor;
 
 }());

@@ -24,10 +24,11 @@ cWebGLRenderingContext = (function() {
 
 	function Initializer() {
 		//public:
-		this.native = true;
 		this.canvas = null;
+		this.driver = null;
 		this.attr = null;
 		this._context = null;
+		this._readyFunc = null;
 
 		this._state = {};
 		this.errors = [];
@@ -462,37 +463,29 @@ cWebGLRenderingContext = (function() {
 
 	//public
 
-	cWebGLRenderingContext.cWebGLRenderingContext = function(canvas, config) {
+	cWebGLRenderingContext.cWebGLRenderingContext = function(canvas, config, driver) {
 		this.canvas = canvas;
+		this.driver = driver;
 		this.attr = config;
-		this._context = new GraphicsContext3D(this);
-		this.ready = this._context.ready;
-	};
-
-	cWebGLRenderingContext.setTargetFps = function(low, high) {
-		this._context.setTargetFps(low, high);
-	};
-
-	cWebGLRenderingContext.setQuality = function(q) {
-		this._context.setQuality(q);
+		this._context = cnvgl.createContext(driver);
+		this.checkReady();
 	};
 
 	cWebGLRenderingContext.activeTexture = function(texture) {
-		//@validation
 		this._context.activeTexture(texture);
 	};
-	
+
 	cWebGLRenderingContext.attachShader = function(program, shader) {
-		//@validation
-		this._context.attachShader(program.object(), shader.object());
+		cnvgl.setContext(this._context);
+		cnvgl.attachShader(program.object(), shader.object());
 	};
-	
+
 	cWebGLRenderingContext.bindAttribLocation = function(program, index, name) {
-		//@validation
 		this._context.bindAttribLocation(program.object(), index, name);
 	};
 
 	cWebGLRenderingContext.bindBuffer = function(target, buffer) {
+		
 		if (buffer && buffer.target && buffer.target != target) {
 			this.errors.push(this.INVALID_OPERATION);
 			return;
@@ -501,39 +494,34 @@ cWebGLRenderingContext = (function() {
 			this.errors.push(this.INVALID_OPERATION);
 			return;
 		}
-		this._context.bindBuffer(target, buffer ? buffer.object() : 0);
+		
+		cnvgl.setContext(this._context);
+		cnvgl.bindBuffer(target, buffer ? buffer.object() : 0);
+
 		if (buffer) {
 			buffer.target = target;
 		}
 	};
 
 	cWebGLRenderingContext.bindFramebuffer = function(target, framebuffer) {
-	
-		//@validation
 		var _framebuffer = (framebuffer && framebuffer.object) ? framebuffer.object() : framebuffer;
-	
 		this._context.bindFramebuffer(target, _framebuffer);
 	};
-
-	cWebGLRenderingContext.bindRenderbuffer = function(target, renderbuffer) {
-		
-		//@validation
-		var _renderbuffer = (renderbuffer && renderbuffer.object) ? renderbuffer.object() : renderbuffer;
 	
+	cWebGLRenderingContext.bindRenderbuffer = function(target, renderbuffer) {
+		var _renderbuffer = (renderbuffer && renderbuffer.object) ? renderbuffer.object() : renderbuffer;	
 		this._context.bindRenderbuffer(target, _renderbuffer);
 	};
 	
 	cWebGLRenderingContext.bindTexture = function(target, texture) {
-		//@validation	
-		var _texture = (texture && texture.object) ? texture.object() : texture || 0;
-	
+		var _texture = (texture && texture.object) ? texture.object() : texture;	
 		this._context.bindTexture(target, _texture);
 	};
 	
 	cWebGLRenderingContext.blendFunc = function(sfactor, dfactor) {
 		this._context.blendFunc(sfactor, dfactor);
 	};
-	
+
 	cWebGLRenderingContext.bufferData = function(target, data, usage) {
 		var size;
 		if (typeof data == 'number') {
@@ -551,8 +539,9 @@ cWebGLRenderingContext = (function() {
 			this.errors.push(this.INVALID_VALUE);
 			return;
 		}
-
-		this._context.bufferData(target, size, data, usage);
+		
+		cnvgl.setContext(this._context);
+		cnvgl.bufferData(target, size, data, usage);
 	};
 
 	cWebGLRenderingContext.bufferSubData = function(target, offset, data) {
@@ -568,30 +557,35 @@ cWebGLRenderingContext = (function() {
 	};
 
 	cWebGLRenderingContext.clear = function(mask) {
-		this._context.clear(mask);
+		cnvgl.setContext(this._context);
+		cnvgl.clear(mask);
 	};
-	
+
 	cWebGLRenderingContext.clearColor = function(red, green, blue, alpha) {
-		this._context.clearColor(red, green, blue, alpha);
+		cnvgl.setContext(this._context);
+		cnvgl.clearColor(red, green, blue, alpha);
 	};
 
 	cWebGLRenderingContext.clearDepth = function(depth) {
 		this._context.clearDepth(depth);
 	};
 
-	cWebGLRenderingContext.colorMask = function(red, green, blue, alpha) {
-		this._context.colorMask(red, green, blue, alpha);
+	cWebGLRenderingContext.compileShader = function(shader) {
+		var shaderObj, shaderSrc;
+
+		shaderObj = shader.object();
+		shaderSrc = shader.getSource();
+
+		cnvgl.setContext(this._context);
+		cnvgl.shaderSource(shaderObj, 1, [shaderSrc], [shaderSrc.length]);
+		cnvgl.compileShader(shaderObj);
 	};
 
-	cWebGLRenderingContext.compileShader = function(shader) {
-		this._context.compileShader(shader.object());
-	};
-	
 	cWebGLRenderingContext.createBuffer = function() {
 		var o = new cWebGLBuffer(this);
 		return o;
 	};
-	
+
 	cWebGLRenderingContext.createFramebuffer = function() {
 		var o = new cWebGLFramebuffer(this);
 		return o;
@@ -601,81 +595,65 @@ cWebGLRenderingContext = (function() {
 		var o = new cWebGLProgram(this);
 		return o;
 	};
-	
+
 	cWebGLRenderingContext.createRenderbuffer = function() {
 		var o = new cWebGLRenderbuffer(this);
 		return o;
 	};
-	
+
 	cWebGLRenderingContext.createShader = function(type) {
-		
-		if (type != this.VERTEX_SHADER && type != this.FRAGMENT_SHADER) {
-			throw new Error('INVALID_ENUM');
-		}
-	
 		var o = new cWebGLShader(this, type);
 		return o;
 	};
-	
+
 	cWebGLRenderingContext.createTexture = function() {
 		var o = new cWebGLTexture(this);
 		return o;
 	};
-
-	cWebGLRenderingContext.cullFace = function(mode) {
-		this._context.cullFace(mode);
-	};
-
-	cWebGLRenderingContext.depthFunc = function(func) {
-		this._context.depthFunc(func);
-	};
-
-	cWebGLRenderingContext.depthMask = function(flag) {
-		this._context.depthMask(flag);
-	};
-
+	
 	cWebGLRenderingContext.disable = function(cap) {
-		this._context.disable(cap);
+		cnvgl.setContext(this._context);
+		cnvgl.disable(cap);
 	};
-
-	cWebGLRenderingContext.disableVertexAttribArray = function(index) {
-		this._context.disableVertexAttribArray(index);
-	};
-
+	
 	cWebGLRenderingContext.drawArrays = function(mode, first, count) {
+		//@validation	
 		this._context.drawArrays(mode, first, count);	
 	};
 	
 	cWebGLRenderingContext.drawElements = function(mode, count, type, offset) {
+		//@validation
 		this._context.drawElements(mode, count, type, offset);
 	};
 	
 	cWebGLRenderingContext.enable = function(cap) {
-		this._context.enable(cap);
+		cnvgl.setContext(this._context);
+		cnvgl.enable(cap);
 	};
 	
 	cWebGLRenderingContext.enableVertexAttribArray = function(index) {
-		this._context.enableVertexAttribArray(index);
+		cnvgl.setContext(this._context);
+		cnvgl.enableVertexAttribArray(index);
 	};
-	
+
 	cWebGLRenderingContext.framebufferRenderbuffer = function(target, attachment, renderbuffertarget, renderbuffer) {
+		//@validation
 		this._context.framebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer.object());
 	};
 	
 	cWebGLRenderingContext.framebufferTexture2D = function(target, attachment, textarget, texture, level) {
+		//@validation
 		this._context.framebufferTexture2D(target, attachment, textarget, texture.object(), level);
 	};
 
-	cWebGLRenderingContext.frontFace = function(mode) {
-		this._context.frontFace(mode);
-	};
-
 	cWebGLRenderingContext.generateMipmap = function(target) {
+		//@validation
 		this._context.generateMipmap(target);
 	};
-	
+
 	cWebGLRenderingContext.getAttribLocation = function(program, name) {
-		return this._context.getAttribLocation(program.object(), name);
+		cnvgl.setContext(this._context);
+		return cnvgl.getAttribLocation(program.object(), name);
 	};
 
 	cWebGLRenderingContext.getContextAttributes = function() {
@@ -694,31 +672,45 @@ cWebGLRenderingContext = (function() {
 	};
 
 	cWebGLRenderingContext.getProgramParameter = function(program, pname) {
-		return this._context.getProgramParameter(program.object(), pname);
+		var params = [];
+		cnvgl.setContext(this._context);
+		cnvgl.getProgramiv(program.object(), pname, params);
+		return params[0];
 	};
-	
+
 	cWebGLRenderingContext.getShaderParameter = function(shader, pname) {
-		return this._context.getShaderParameter(shader.object(), pname);
+		var params = [];
+		cnvgl.setContext(this._context);
+		cnvgl.getShaderiv(shader.object(), pname, params);
+		return params[0];
 	};
-	
+
 	cWebGLRenderingContext.getShaderInfoLog = function(shader) {
-		return this._context.getShaderInfoLog(shader.object());
+		var length = [], infoLog = [];
+		cnvgl.setContext(this._context);
+		cnvgl.getShaderInfoLog(shader.object(), null, length, infoLog);
+		return infoLog[0];
 	};
-	
+
 	cWebGLRenderingContext.getUniformLocation = function(program, name) {
-		var o = new cWebGLUniformLocation(this);
-		o.setObject(this._context.getUniformLocation(program.object(), name));
-		return o;
+		var location;
+		cnvgl.setContext(this._context);
+		location = cnvgl.getUniformLocation(program.object(), name);
+		if (location == -1) {
+			return 0;
+		}
+		return new cWebGLUniformLocation(program, location);
 	};
-	
-	cWebGLRenderingContext.graphicsContext3D = function() {
-		return this._context;	
-	};
-	
+
 	cWebGLRenderingContext.linkProgram = function(program) {
-		this._context.linkProgram(program.object());
+		cnvgl.setContext(this._context);
+		cnvgl.linkProgram(program.object());
 	};
-	
+
+	cWebGLRenderingContext.onReady = function(func) {
+		this._readyFunc = func;
+	};
+
 	cWebGLRenderingContext.pixelStorei = function(pname, param) {
 		switch (pname) {
 			case this.UNPACK_FLIP_Y_WEBGL:
@@ -733,9 +725,8 @@ cWebGLRenderingContext = (function() {
 		this._context.renderbufferStorage(target, internalformat, width, height);
 	};
 	
-	cWebGLRenderingContext.shaderSource = function(shader, source) {
-		shader.setSource(source);
-		this._context.shaderSource(shader.object(), source);
+	cWebGLRenderingContext.shaderSource = function(shader, string) {
+		shader.setSource(string);
 	};
 
 	cWebGLRenderingContext.texImage2D = function(target, level, internalformat, format, type, source) {
@@ -799,56 +790,81 @@ cWebGLRenderingContext = (function() {
 		this._context.texParameteri(target, pname, param);
 	};
 	
-	cWebGLRenderingContext.uniform1i = function(location, x) {
-		this._context.uniform1i(location.object(), x);
-	};
-	
 	cWebGLRenderingContext.uniform1f = function(location, x) {
 		this._context.uniform1f(location.object(), x);
 	};
 	
+	cWebGLRenderingContext.uniform1i = function(location, x) {
+		this._context.uniform1i(location.object(), x);
+	};
+	
+	cWebGLRenderingContext.uniform1u = function(location, x) {
+		this._context.uniform1u(location.object(), x);
+	};
+
+	cWebGLRenderingContext.uniform2f = function(location, x, y) {
+		this._context.uniform1f(location.object(), x);
+	};
+	
+	cWebGLRenderingContext.uniform2i = function(location, x, y) {
+		this._context.uniform1i(location.object(), x, y);
+	};
+	
+	cWebGLRenderingContext.uniform2u = function(location, x, y) {
+		this._context.uniform1u(location.object(), x);
+	};
+
 	cWebGLRenderingContext.uniform3f = function(location, x, y, z) {
 		this._context.uniform3f(location.object(), x, y, z);
 	};
-	
+
+	cWebGLRenderingContext.uniform3i = function(location, x, y, z) {
+		this._context.uniform3f(location.object(), x, y, z);
+	};
+
+	cWebGLRenderingContext.uniform3u = function(location, x, y, z) {
+		this._context.uniform3f(location.object(), x, y, z);
+	};
+
 	cWebGLRenderingContext.uniform3fv = function(location, v) {
 		this._context.uniform3fv(location.object(), v);
 	};
-	
+
 	cWebGLRenderingContext.uniformMatrix3fv = function(location, transpose, value) {
+		//@validation
 		this._context.uniformMatrix3fv(location.object(), transpose, value);
 	};
 	
 	cWebGLRenderingContext.uniformMatrix4fv = function(location, transpose, value) {
+		//@validation
 		this._context.uniformMatrix4fv(location.object(), transpose, value);
 	};
-	
+
 	cWebGLRenderingContext.useProgram = function(program) {
-		this._context.useProgram(program.object());
+		cnvgl.setContext(this._context);
+		cnvgl.useProgram(program.object());
 	};
 
-	cWebGLRenderingContext.vertexAttrib1f = function(indx, x) {
-		this._context.vertexAttrib1f(indx, x);
-	};
-	
-	cWebGLRenderingContext.vertexAttrib2f = function(indx, x, y) {
-		this._context.vertexAttrib2f(indx, x, y);
-	};
-	
-	cWebGLRenderingContext.vertexAttrib3f = function(indx, x, y, z) {
-		this._context.vertexAttrib3f(indx, x, y, z);
-	};
-	
-	cWebGLRenderingContext.vertexAttrib4f = function(indx, x, y, z, w) {
-		this._context.vertexAttrib4f(indx, x, y, z, w);
+	cWebGLRenderingContext.vertexAttribPointer = function(idx, size, type, normalized, stride, offset) {
+		cnvgl.setContext(this._context);
+		cnvgl.vertexAttribPointer(idx, size, type, normalized, stride, offset);
 	};
 
-	cWebGLRenderingContext.vertexAttribPointer = function(indx, size, type, normalized, stride, offset) {
-		this._context.vertexAttribPointer(indx, size, type, normalized, stride, offset);
-	};
-	
 	cWebGLRenderingContext.viewport = function(x, y, width, height) {
-		this._context.viewport(x, y, width, height);
+		cnvgl.setContext(this._context);
+		cnvgl.viewport(x, y, width, height);
+	};
+
+	//private:
+
+	cWebGLRenderingContext.checkReady = function() {
+		var This;
+		if (this.driver.ready && this._readyFunc) {
+			this._readyFunc(this);
+		} else {
+			This = this;
+			setTimeout(function() { This.checkReady(); }, 10);
+		}
 	};
 
 	return cWebGLRenderingContext.Constructor;
