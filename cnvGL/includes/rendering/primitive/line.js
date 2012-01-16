@@ -39,7 +39,7 @@ cnvgl_rendering_primitive_line = (function() {
 	cnvgl_rendering_primitive_line.cnvgl_rendering_primitive_line = function(ctx, renderer) {
 		this.ctx = ctx;
 		this.renderer = renderer;
-		this.frag = new cnvgl_fragment();
+		this.frag = new cnvgl.fragment();
 	};
 
 	cnvgl_rendering_primitive_line.render = function(prim) {

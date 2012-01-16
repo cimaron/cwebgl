@@ -46,7 +46,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 	
 		//objects are not what they should be
-		if (!program_obj instanceof cnvgl_program || !shader_obj instanceof cnvgl_shader) {
+		if (!program_obj instanceof cnvgl.program || !shader_obj instanceof cnvgl.shader) {
 			cnvgl.throw_error(cnvgl.INVALID_OPERATION, ctx);
 			return;
 		}
@@ -137,7 +137,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 	
 		//object is not a shader (BAD!)
-		if (!shader_obj instanceof cnvgl_shader) {
+		if (!shader_obj instanceof cnvgl.shader) {
 			cnvgl.throw_error(cnvgl.INVALID_OPERATION, ctx);
 			return;
 		}
@@ -159,7 +159,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		ctx = cnvgl.getCurrentContext();
 		name = ctx.shared.shaderObjects.length;
 	
-		program_obj = new cnvgl_program();
+		program_obj = new cnvgl.program();
 		program_obj.name = name;
 	
 		ctx.shared.shaderObjects.push(program_obj);
@@ -187,7 +187,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		name = ctx.shared.shaderObjects.length;
 	
-		shader_obj = new cnvgl_shader(name, shaderType);	
+		shader_obj = new cnvgl.shader(name, shaderType);	
 		ctx.shared.shaderObjects.push(shader_obj);
 	
 		return shader_obj.name;
@@ -217,7 +217,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 	
 		//object is not a program (BAD!)
-		if (!program_obj instanceof cnvgl_program) {
+		if (!program_obj instanceof cnvgl.program) {
 			cnvgl.throw_error(cnvgl.INVALID_OPERATION, ctx);
 			return;
 		}	
@@ -297,7 +297,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 	
 		//object is not a shader (BAD!)
-		if (!shader_obj instanceof cnvgl_shader) {
+		if (!shader_obj instanceof cnvgl.shader) {
 			cnvgl.throw_error(cnvgl.INVALID_OPERATION, ctx);
 			return;
 		}
@@ -341,7 +341,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 	
 		//object is not a shader (BAD!)
-		if (!shader_obj instanceof cnvgl_shader) {
+		if (!shader_obj instanceof cnvgl.shader) {
 			cnvgl.throw_error(cnvgl.INVALID_OPERATION, ctx);
 			return;
 		}	
@@ -390,7 +390,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 	
 		//object is not a program
-		if (!program_obj instanceof cnvgl_program) {
+		if (!program_obj instanceof cnvgl.program) {
 			cnvgl.throw_error(cnvgl.INVALID_OPERATION, ctx);
 			return;
 		}
@@ -430,7 +430,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 	
 		//object is not a shader (BAD!)
-		if (!shader_obj instanceof cnvgl_shader) {
+		if (!shader_obj instanceof cnvgl.shader) {
 			cnvgl.throw_error(cnvgl.INVALID_OPERATION, ctx);
 			return;
 		}
@@ -468,7 +468,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 	
 		//object is not a program (BAD!)
-		if (!program_obj instanceof cnvgl_program) {
+		if (!program_obj instanceof cnvgl.program) {
 			cnvgl.throw_error(cnvgl.INVALID_OPERATION, ctx);
 			return;
 		}

@@ -76,7 +76,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			}
 
 			location = program_obj.getOpenSlot(program_obj.varying);
-			attrib_obj = new cnvgl_program_var(attrib.name, location, attrib.type_size);
+			attrib_obj = new cnvgl.program_var(attrib.name, location, attrib.type_size);
 			program_obj.addActiveVarying(attrib_obj);
 		}
 
@@ -110,7 +110,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				location = program_obj.getOpenSlot(program_obj.attributes);			
 			}
 
-			attrib_obj = new cnvgl_program_var(attrib.name, location, attrib.type_size);
+			attrib_obj = new cnvgl.program_var(attrib.name, location, attrib.type_size);
 			program_obj.addActiveAttribute(attrib_obj);
 		}
 		
@@ -140,7 +140,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			//get new location and reindex
 			if (i % 4 == 0) {
 				location = program_obj.getOpenSlot(program_obj.uniforms);
-				uniform_obj = new cnvgl_program_var('$constant'+c, location, 1);
+				uniform_obj = new cnvgl.program_var('$constant'+c, location, 1);
 				program_obj.addActiveUniform(uniform_obj);
 				c++;
 			} else {
@@ -164,7 +164,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			//get new location and reindex
 			location = program_obj.getOpenSlot(program_obj.uniforms);
 
-			uniform_obj = new cnvgl_program_var(uniform.name, location, uniform.type_size);
+			uniform_obj = new cnvgl.program_var(uniform.name, location, uniform.type_size);
 			program_obj.addActiveUniform(uniform_obj);
 		}
 

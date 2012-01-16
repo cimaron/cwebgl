@@ -19,29 +19,34 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+(function(cnvgl) {
 
-function cnvgl_vertex() {
-
-	this.x = 0;
-	this.y = 0;
-	this.z = 0;
-	this.w = 0;
 	
-	this.xd = 0;
-	this.yd = 0;
-	this.zd = 0;
-
-	this.xw = 0;
-	this.yw = 0;
-	this.zw = 0;
+	cnvgl.vertex = function() {
 	
-	this.xc = 0;
-	this.yc = 0;
-	this.zc = 0;
+		this.x = 0;
+		this.y = 0;
+		this.z = 0;
+		this.w = 0;
+		
+		this.xd = 0;
+		this.yd = 0;
+		this.zd = 0;
+	
+		this.xw = 0;
+		this.yw = 0;
+		this.zw = 0;
+		
+		this.xc = 0;
+		this.yc = 0;
+		this.zc = 0;
+	
+		//allocate memory
+		this.result = GPU.malloc(2, 4);
+		this.attributes = GPU.malloc(GPU.shader.MAX_VERTEX_ATTRIBS * 4, 4);
+		this.varying = GPU.malloc(GPU.shader.MAX_VARYING_VECTORS * 4, 4);
+	};
 
-	//allocate memory
-	this.result = GPU.malloc(2, 4);
-	this.attributes = GPU.malloc(GPU.shader.MAX_VERTEX_ATTRIBS * 4, 4);
-	this.varying = GPU.malloc(GPU.shader.MAX_VARYING_VECTORS * 4, 4);
-}
+
+}(cnvgl));
 

@@ -58,7 +58,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				}
 				texture_obj.target = target;
 			} else {
-				texture_obj = new cnvgl_texture_object(texture, target);
+				texture_obj = new cnvgl.texture.object(texture, target);
 				ctx.shared.texture_objects[texture] = texture_obj;
 			}
 		}
@@ -92,7 +92,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			if (t == -1) {
 				t = current.length;
 			}
-			texture_obj = new cnvgl_texture_object(t, 0);
+			texture_obj = new cnvgl.texture_object(t, 0);
 			current[t] = texture_obj;
 			list[i] = t;
 		}

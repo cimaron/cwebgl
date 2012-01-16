@@ -90,7 +90,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 	
 		if (renderbuffer_obj == 1) {
-			renderbuffer_obj = new cnvgl_renderbuffer(renderbuffer);
+			renderbuffer_obj = new cnvgl.renderbuffer(renderbuffer);
 			ctx.shared.renderBuffers[renderbuffer] = renderbuffer_obj;
 		}
 	
@@ -118,7 +118,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 	
 		for (i = 0; i < n; i++) {
-			name = cnvgl_context.findFreeName(ctx.shared.frameBuffers, name);
+			name = cnvgl.context.findFreeName(ctx.shared.frameBuffers, name);
 			ctx.shared.frameBuffers[name] = 1;
 			list.push(name);
 		}
@@ -147,7 +147,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 	
 		for (i = 0; i < n; i++) {
-			name = cnvgl_context.findFreeName(ctx.shared.renderBuffers, name);
+			name = cnvgl.context.findFreeName(ctx.shared.renderBuffers, name);
 			ctx.shared.renderBuffers[name] = 1;
 			list.push(name);
 		}

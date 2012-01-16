@@ -35,7 +35,7 @@ cnvgl = {
 	 */
 	createContext : function(driver) {
 		var ctx;
-		ctx = new cnvgl_context(driver);
+		ctx = new cnvgl.context(driver);
 		return ctx;
 	},
 	

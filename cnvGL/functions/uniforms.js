@@ -84,7 +84,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 	
 		//object is not a program (BAD!)
-		if (!program_obj instanceof cnvgl_program) {
+		if (!program_obj instanceof cnvgl.program) {
 			cnvgl.throw_error(cnvgl.INVALID_OPERATION, ctx);
 			return;
 		}	

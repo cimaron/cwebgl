@@ -19,39 +19,46 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-function cnvgl_framebuffer(name) {
 
-	this.name = name;
-	this.refCount = 0;
-	this.deletePending = false;
+(function(cnvgl) {
 
-	this.visual = null; //??
-	this.initialized = null;
-
-	this.width = 0;
-	this.height = 0;
-
-	this.xmin = 0;
-	this.xmax = 0;
-	this.ymin = 0;
-	this.ymax = 0;
+	cnvgl.framebuffer = function(name) {
 	
-	this.depthMax = 0;
-	this.depthMaxF = 0;
-	this.MRD = 0;
+		this.name = name;
+		this.refCount = 0;
+		this.deletePending = false;
 	
-	this.status = null;
-	this.integerColor = null;
+		this.visual = null; //??
+		this.initialized = null;
+	
+		this.width = 0;
+		this.height = 0;
+	
+		this.xmin = 0;
+		this.xmax = 0;
+		this.ymin = 0;
+		this.ymax = 0;
+		
+		this.depthMax = 0;
+		this.depthMaxF = 0;
+		this.MRD = 0;
+		
+		this.status = null;
+		this.integerColor = null;
+	
+		this.attachment = [];
+	
+		this.colorDrawBuffers = [];   
+		this.colorReadBuffer = null;
+	
+		this.numColorDrawBuffers = 0;
+		this.colorDrawBufferIndexes = [];
+		this.colorReadBufferIndex = -1;
+	
+		this.depthBuffer = null;
+		this.stencilBuffer = null;
+	};
 
-	this.attachment = [];
 
-	this.colorDrawBuffers = [];   
-	this.colorReadBuffer = null;
+}(cnvgl));
 
-	this.numColorDrawBuffers = 0;
-	this.colorDrawBufferIndexes = [];
-	this.colorReadBufferIndex = -1;
-
-	this.depthBuffer = null;
-	this.stencilBuffer = null;
-}

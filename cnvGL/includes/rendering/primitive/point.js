@@ -38,7 +38,7 @@ cnvgl_rendering_primitive_point = (function() {
 	cnvgl_rendering_primitive_point.cnvgl_rendering_primitive_point = function(ctx, renderer) {
 		this.ctx = ctx;
 		this.renderer = renderer;
-		this.frag = new cnvgl_fragment();
+		this.frag = new cnvgl.fragment();
 	};
 
 	cnvgl_rendering_primitive_point.render = function(prim) {

@@ -47,7 +47,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			}
 
 			//not a buffer object
-			if (!buffer_obj instanceof cnvgl_buffer) {
+			if (!buffer_obj instanceof cnvgl.buffer) {
 				cnvgl.throw_error(cnvgl.INVALID_OPERATION, ctx);
 				return;
 			}
@@ -220,8 +220,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		list = [];
 
 		for (i = 0; i < n; i++) {
-			buffer_obj = new cnvgl_buffer();
-			name = cnvgl_context.findFreeName(ctx.shared.bufferObjects);
+			buffer_obj = new cnvgl.buffer();
+			name = cnvgl.context.findFreeName(ctx.shared.bufferObjects);
 			ctx.shared.bufferObjects[name] = buffer_obj;			
 			list.push(name);
 		}

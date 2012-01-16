@@ -107,7 +107,7 @@ cnvgl_rendering_clipping = (function() {
 
 		int.setPoint([xw, yw]);
 
-		vr = new cnvgl_vertex();
+		vr = new cnvgl.vertex();
 
 		//we don't need to interpolate all values, only those used in the rest of the rendering pipeline
 		vr.xw = v1.xw * namt + v2.xw * amt;

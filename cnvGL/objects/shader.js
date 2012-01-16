@@ -20,18 +20,24 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-function cnvgl_shader(name, type) {
+(function(cnvgl) {
 
-	this.name = name;
-	this.type = type;
 	
-	//state
-	this.delete_status = cnvgl.FALSE;
-	this.compile_status = cnvgl.FALSE;
-	this.information_log = '';
-	this.shader_string = '';
+	cnvgl.shader = function(name, type) {
+	
+		this.name = name;
+		this.type = type;
+		
+		//state
+		this.delete_status = cnvgl.FALSE;
+		this.compile_status = cnvgl.FALSE;
+		this.information_log = '';
+		this.shader_string = '';
+	
+		//custom state
+		this.object_code = null;
+	};
 
-	//custom state
-	this.object_code = null;
-}
+
+}(cnvgl));
 

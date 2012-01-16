@@ -19,21 +19,29 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-function cnvgl_renderbuffer(name) {
-	this.name = name;
 
-	this.width = 0;
-	this.height = 0;
+(function(cnvgl) {
 
-	this.internalFormat = null;
-	this.baseFormat = null;
 
-	this.format = 0;
-
-	this.numSamples = null;
-
-	this.dataType = null;
-	this.data = null;
+	cnvgl.renderbuffer = function(name) {
+		this.name = name;
 	
-	this.wrapped = null;	
-}
+		this.width = 0;
+		this.height = 0;
+	
+		this.internalFormat = null;
+		this.baseFormat = null;
+	
+		this.format = 0;
+	
+		this.numSamples = null;
+	
+		this.dataType = null;
+		this.data = null;
+		
+		this.wrapped = null;	
+	};
+	
+
+}(cnvgl));
+

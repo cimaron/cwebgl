@@ -41,7 +41,7 @@ cnvgl_rendering_primitive_triangle = (function() {
 	cnvgl_rendering_primitive_triangle.cnvgl_rendering_primitive_triangle = function(ctx, renderer) {
 		this.ctx = ctx;
 		this.renderer = renderer;
-		this.frag = new cnvgl_fragment();
+		this.frag = new cnvgl.fragment();
 	};
 
 	cnvgl_rendering_primitive_triangle.render = function(prim) {

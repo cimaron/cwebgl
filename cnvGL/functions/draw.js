@@ -43,7 +43,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		//each vertex
 		for (i = first; i < count; i++) {
-			vertex = new cnvgl_vertex();
+			vertex = new cnvgl.vertex();
 			cnvgl_copy_initialize_attribute_data(ctx, program_obj, i, vertex);
 			renderer.send(vertex);
 		}
@@ -77,7 +77,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		//each vertex
 		for (i = 0; i < count; i++) {
 			index = elements[i + indices];
-			vertex = new cnvgl_vertex();
+			vertex = new cnvgl.vertex();
 			cnvgl_copy_initialize_attribute_data(ctx, program_obj, index, vertex);
 			renderer.send(vertex);
 		}

@@ -54,7 +54,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		texture_unit = ctx.texture.unit[unit];
 		texture_obj = texture_unit.current_texture[target];
 	
-		texture_img = new cnvgl_texture_image(texture_obj);
+		texture_img = new cnvgl.texture_image(texture_obj);
 	
 		texture_img.width = width;
 		texture_img.height = height;

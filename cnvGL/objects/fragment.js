@@ -20,21 +20,27 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-function cnvgl_fragment() {
+(function(cnvgl) {
 
-	//used by renderer
-	this.color = null;
 
-	this.x = 0;
-	this.y = 0;
-	this.z = 0;
-	this.w = 1;
+	cnvgl.fragment = function() {
+	
+		//used by renderer
+		this.color = null;
+	
+		this.x = 0;
+		this.y = 0;
+		this.z = 0;
+		this.w = 1;
+	
+		this.gl_FragDepth = 0;
+	
+		//Allocate memory
+		this.result = GPU.malloc(2, 4);
+		//varying
+		this.attributes = GPU.malloc(GPU.shader.MAX_VARYING_VECTORS * 4, 4);
+	};
 
-	this.gl_FragDepth = 0;
 
-	//Allocate memory
-	this.result = GPU.malloc(2, 4);
-	//varying
-	this.attributes = GPU.malloc(GPU.shader.MAX_VARYING_VECTORS * 4, 4);
-}
+}(cnvgl));
 

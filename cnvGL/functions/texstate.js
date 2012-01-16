@@ -43,7 +43,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		ctx.texture.currentUnit = i;
 		if (!ctx.texture.unit[i]) {
-			ctx.texture.unit[i] = new cnvgl_texture_unit(ctx, texture);	
+			ctx.texture.unit[i] = new cnvgl.texture_unit(ctx, texture);	
 		}
 	}
 
