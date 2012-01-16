@@ -20,18 +20,34 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-function glViewport(x, y, width, height) {
+(function(cnvgl) {
 
-	var state = cnvgl_context.getCurrentContext();
+	
+	/**
+	 * glViewport — set the viewport
+	 *
+	 * @var GLint    x       Specify the lower left corner of the viewport rectangle, in pixels. The initial value is (0,0).
+	 * @var GLint    y
+	 * @var GLsizei  width   Specify the width and height of the viewport. When a GL context is first attached to a window, width and height are set to the dimensions of that window.
+	 * @var GLsizei  height
+	 *
+	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glViewport.xml
+	 */
+	cnvgl.viewport = function(x, y, width, height) {
+	
+		var state = cnvgl_context.getCurrentContext();
+	
+		if (width < 0 || height < 0) {
+			cnvgl_throw_error(GL_INVALID_VALUE);
+			return;
+		}
+	
+		state.viewport.x = x;
+		state.viewport.y = y;
+		state.viewport.w = width;
+		state.viewport.h = height;
+	};
 
-	if (width < 0 || height < 0) {
-		cnvgl_throw_error(GL_INVALID_VALUE);
-		return;
-	}
 
-	state.viewport.x = x;
-	state.viewport.y = y;
-	state.viewport.w = width;
-	state.viewport.h = height;
-}
+}(cnvgl));
 

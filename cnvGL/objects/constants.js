@@ -21,8 +21,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 cnvgl_constants = {
-
-	maxRenderbufferSize : 512
-
+	maxRenderbufferSize : 512,
+	maxTextureUnits : 6,
+	maxVertexAttribs : 16
 };
 	

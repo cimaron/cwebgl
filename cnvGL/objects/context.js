@@ -22,6 +22,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 var cnvgl_context = (function() {
 							  
 	function Initializer() {
+		
+		this.driver = null;
 
 		//states
 		this.array = {};
@@ -56,10 +58,10 @@ var cnvgl_context = (function() {
 
 	//public:
 
-	cnvgl_context.cnvgl_context = function() {
-		var i;
+	cnvgl_context.cnvgl_context = function(driver) {
 
 		this.shared = cnvgl_context_shared.getInstance();
+		this.driver = driver;
 
 		//array state
 		this.array = {
@@ -69,10 +71,6 @@ var cnvgl_context = (function() {
 				vertexAttrib : []	
 			}
 		};
-
-		for (i = 0; i < GPU.shader.MAX_VERTEX_ATTRIBS; i++) {
-			this.array.arrayObj.vertexAttrib[i] = new cnvgl_attrib_array_object();
-		}
 
 		//color state
 		this.color = {
@@ -112,9 +110,6 @@ var cnvgl_context = (function() {
 			activeProgram : null	
 		};
 
-		//texture state
-		this.initTextures();
-
 		//unpack state
 		this.unpack = {
 			alignment : 4
@@ -132,36 +127,67 @@ var cnvgl_context = (function() {
 
 		//direct
 		this.errorValue = GL_NO_ERROR;
-
 		this.const = cnvgl_constants;
 
-		this.renderer = new cnvgl_renderer(this);
+		//texture state
+		this.initFramebuffer();
+		this.initTextures();
+		this.initVertexAttribs();
+	};
+
+	cnvgl_context.initFramebuffer = function(width, height) {
+		var frameBuffer, colorBuffer, depthBuffer;
+
+		//set up framebuffer
+		frameBuffer = new cnvgl_framebuffer(0);
+		frameBuffer.width = width;
+		frameBuffer.height = height;
+
+		this.winDrawBuffer = frameBuffer;
+		this.drawBuffer = frameBuffer;
+
+		//set up color buffer
+		colorBuffer = new cnvgl_renderbuffer(0);
+		colorBuffer.internalFormat = GL_RGBA;
+		colorBuffer.width = width;
+		colorBuffer.height = height;
+		colorBuffer.data = this.driver.getColorBuffer(0, width, height);
+		frameBuffer.colorDrawBuffers[0] = colorBuffer;
+
+		//set up depth buffer
+		depthBuffer = new cnvgl_renderbuffer(0);
+		depthBuffer.internalFormat = GL_DEPTH_COMPONENT16;
+		depthBuffer.width = width;
+		depthBuffer.height = height;
+		depthBuffer.data = this.driver.getDepthBuffer(0, width, height);
+		frameBuffer.depthBuffer = depthBuffer;
 	};
 
 	cnvgl_context.initTextures = function() {
 		var units, i, unit;
 		this.texture.currentUnit = 0;
 		this.texture.unit = [];
-		for (i = 0; i < GPU.texture.MAX_COMBINED_TEXTURE_IMAGE_UNITS; i++) {
+		for (i = 0; i < this.const.maxTextureUnits; i++) {
 			unit = new cnvgl_texture_unit(this, i);
 			unit.current_texture[GL_TEXTURE_2D] = this.shared.default_texture_objects[GL_TEXTURE_2D];
 			this.texture.unit[i] = unit;
 		}
-		GPU.setTextureUnit(this.texture.unit);
+	};
+
+	cnvgl_context.initVertexAttribs = function() {
+		var i;
+		for (i = 0; i < this.const.maxVertexAttribs; i++) {
+			this.array.arrayObj.vertexAttrib[i] = new cnvgl_attrib_array_object();
+		}
 	};
 
 	//static:
 
-	var context;
-
-	cnvgl_context.Constructor.getCurrentContext = function() {
-		if (!context) {
-			context = new cnvgl_context.Constructor();
-		}
-		return context;
+	cnvgl_context.Static.getCurrentContext = function() {
+		return cnvgl.currentContext;
 	};
 
-	cnvgl_context.Constructor.findFreeName = function(list, start) {
+	cnvgl_context.Static.findFreeName = function(list, start) {
 		start = start || 1;
 		while (list[start]) {
 			start++;

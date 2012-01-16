@@ -19,30 +19,52 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-function glCullFace(mode) {
-	var ctx;
-	ctx = cnvgl_context.getCurrentContext();
+
+(function(cnvgl) {
+
+
+	/**
+	 * glCullFace — specify whether front- or back-facing facets can be culled
+	 *
+	 * @var GLenum  mode  Specifies whether front- or back-facing facets are candidates for culling.
+	 *
+	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glCullFace.xml
+	 */
+	cnvgl.cullFace = function(mode) {
+		var ctx;
+		ctx = cnvgl_context.getCurrentContext();
+		
+		if (mode != GL_FRONT_AND_BACK
+			&& mode != GL_FRONT
+			&& mode != GL_BACK) {
+			cnvgl_throw_error(GL_INVALID_ENUM);
+			return;
+		}
 	
-	if (mode != GL_FRONT_AND_BACK
-		&& mode != GL_FRONT
-		&& mode != GL_BACK) {
-		cnvgl_throw_error(GL_INVALID_ENUM);
-		return;
-	}
+		ctx.polygon.cullFaceMode = mode;
+	};
+	
 
-	ctx.polygon.cullFaceMode = mode;
-}
-
-function glFrontFace(mode) {
-	var ctx;
-	ctx = cnvgl_context.getCurrentContext();
-
-	if (mode != GL_CW
-		&& mode != GL_CCW) {
-		cnvgl_throw_error(GL_INVALID_ENUM);
-		return;
-	}
-
-	ctx.polygon.frontFace = mode;
-}
+	/**
+	 * glFrontFace — define front- and back-facing polygons
+	 *
+	 * @var GLenum  mode  Specifies the orientation of front-facing polygons.
+	 *
+	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glFrontFace.xml
+	 */
+	cnvgl.frontFace = function(mode) {
+		var ctx;
+		ctx = cnvgl_context.getCurrentContext();
+	
+		if (mode != GL_CW
+			&& mode != GL_CCW) {
+			cnvgl_throw_error(GL_INVALID_ENUM);
+			return;
+		}
+	
+		ctx.polygon.frontFace = mode;
+	};
+	
+	
+}(cnvgl));
 
