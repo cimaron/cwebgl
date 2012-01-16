@@ -76,21 +76,21 @@ var cnvgl_context = (function() {
 		this.color = {
 			clearColor : [0,0,0,0],
 			colorMask : [0xFF, 0xFF, 0xFF, 0xFF],
-			blendEnabled : GL_FALSE,
-			blendSrcRGB : GL_ONE,
-			blendSrcA : GL_ONE,
-			blendDestRGB : GL_ZERO,
-			blendDestA : GL_ZERO,
-			blendEquationRGB : GL_FUNC_ADD,
-			blendEquationA : GL_FUNC_ADD
+			blendEnabled : cnvgl.FALSE,
+			blendSrcRGB : cnvgl.ONE,
+			blendSrcA : cnvgl.ONE,
+			blendDestRGB : cnvgl.ZERO,
+			blendDestA : cnvgl.ZERO,
+			blendEquationRGB : cnvgl.FUNC_ADD,
+			blendEquationA : cnvgl.FUNC_ADD
 		};
 
 		//depth state
 		this.depth = {
 			clear : 1.0,
-			func : GL_LESS,
-			mask : GL_TRUE,
-			test : GL_FALSE
+			func : cnvgl.LESS,
+			mask : cnvgl.TRUE,
+			test : cnvgl.FALSE
 		};
 
 		//pack state
@@ -100,9 +100,9 @@ var cnvgl_context = (function() {
 
 		//polygon state
 		this.polygon = {
-			cullFaceMode : GL_BACK,
-			cullFlag : GL_FALSE,
-			frontFace : GL_CCW
+			cullFaceMode : cnvgl.BACK,
+			cullFlag : cnvgl.FALSE,
+			frontFace : cnvgl.CCW
 		};
 
 		//shader state
@@ -126,7 +126,7 @@ var cnvgl_context = (function() {
 		};
 
 		//direct
-		this.errorValue = GL_NO_ERROR;
+		this.errorValue = cnvgl.NO_ERROR;
 		this.const = cnvgl_constants;
 
 		//texture state
@@ -148,7 +148,7 @@ var cnvgl_context = (function() {
 
 		//set up color buffer
 		colorBuffer = new cnvgl_renderbuffer(0);
-		colorBuffer.internalFormat = GL_RGBA;
+		colorBuffer.internalFormat = cnvgl.RGBA;
 		colorBuffer.width = width;
 		colorBuffer.height = height;
 		colorBuffer.data = this.driver.getColorBuffer(0, width, height);
@@ -156,7 +156,7 @@ var cnvgl_context = (function() {
 
 		//set up depth buffer
 		depthBuffer = new cnvgl_renderbuffer(0);
-		depthBuffer.internalFormat = GL_DEPTH_COMPONENT16;
+		depthBuffer.internalFormat = cnvgl.DEPTH_COMPONENT16;
 		depthBuffer.width = width;
 		depthBuffer.height = height;
 		depthBuffer.data = this.driver.getDepthBuffer(0, width, height);
@@ -169,7 +169,7 @@ var cnvgl_context = (function() {
 		this.texture.unit = [];
 		for (i = 0; i < this.const.maxTextureUnits; i++) {
 			unit = new cnvgl_texture_unit(this, i);
-			unit.current_texture[GL_TEXTURE_2D] = this.shared.default_texture_objects[GL_TEXTURE_2D];
+			unit.current_texture[cnvgl.TEXTURE_2D] = this.shared.default_texture_objects[cnvgl.TEXTURE_2D];
 			this.texture.unit[i] = unit;
 		}
 	};

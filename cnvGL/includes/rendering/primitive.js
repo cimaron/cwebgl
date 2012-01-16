@@ -55,22 +55,22 @@ cnvgl_rendering_primitive = (function() {
 	cnvgl_rendering_primitive.send = function(vertex) {
 		this.vertices.push(vertex);
 		switch (this.mode) {
-			case GL_POINTS:
+			case cnvgl.POINTS:
 				this.points();
 				break;
-			case GL_LINES:
+			case cnvgl.LINES:
 				this.lines();
 				break;
-			case GL_LINE_STRIP:
+			case cnvgl.LINE_STRIP:
 				this.lineStrip();
 				break;
-			case GL_LINE_LOOP:
+			case cnvgl.LINE_LOOP:
 				this.lineLoop();
 				break;
-			case GL_TRIANGLES:
+			case cnvgl.TRIANGLES:
 				this.triangles();
 				break;
-			case GL_TRIANGLE_STRIP:
+			case cnvgl.TRIANGLE_STRIP:
 				this.triangleStrip();
 				break;
 		}
@@ -78,7 +78,7 @@ cnvgl_rendering_primitive = (function() {
 
 	cnvgl_rendering_primitive.end = function() {
 		switch (this.mode) {
-			case GL_LINE_LOOP:
+			case cnvgl.LINE_LOOP:
 				//swap vertices
 				this.vertices.push(this.vertices.shift());
 				this.lines();

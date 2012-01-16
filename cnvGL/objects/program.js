@@ -113,6 +113,6 @@ function cnvgl_program_var(name, location, size) {
 	this.location = location;
 	this.size = size;
 	this.slots = Math.ceil(size / 4);
-	this.type = GL_FLOAT;
+	this.type = cnvgl.FLOAT;
 }
 

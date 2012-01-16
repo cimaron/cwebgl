@@ -38,7 +38,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		var state = cnvgl.getCurrentContext();
 	
 		if (width < 0 || height < 0) {
-			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
+			cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
 			return;
 		}
 	

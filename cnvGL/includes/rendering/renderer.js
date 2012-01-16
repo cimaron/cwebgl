@@ -85,28 +85,28 @@ cnvgl_renderer = (function() {
 		depth = this.depthBuffer[i];
 
 		switch (this.depthFunc) {
-			case GL_NEVER:
+			case cnvgl.NEVER:
 				pass = false;
 				break;
-			case GL_ALWAYS:
+			case cnvgl.ALWAYS:
 				pass = true;
 				break;
-			case GL_LESS:
+			case cnvgl.LESS:
 				pass = z < depth;
 				break;
-			case GL_LEQUAL:
+			case cnvgl.LEQUAL:
 				pass = z <= depth;
 				break;
-			case GL_EQUAL:
+			case cnvgl.EQUAL:
 				pass = z == depth;
 				break;
-			case GL_GREATER:
+			case cnvgl.GREATER:
 				pass = z > depth;
 				break;
-			case GL_GEQUAL:
+			case cnvgl.GEQUAL:
 				pass = z >= depth;
 				break;
-			case GL_NOTEQUAL:
+			case cnvgl.NOTEQUAL:
 				pass = z != depth;
 				break;
 			default:

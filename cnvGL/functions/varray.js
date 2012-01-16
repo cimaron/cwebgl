@@ -28,14 +28,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		ctx = cnvgl.getCurrentContext();
 	
-		if (index > GL_MAX_VERTEX_ATTRIBS) {
-			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
+		if (index > cnvgl.MAX_VERTEX_ATTRIBS) {
+			cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
 			return;			
 		}
 	
 		vtx_attrib_obj = ctx.array.arrayObj.vertexAttrib[index];
 		vtx_attrib_obj.size = v.length;
-		vtx_attrib_obj.type = GL_FLOAT;
+		vtx_attrib_obj.type = cnvgl.FLOAT;
 		vtx_attrib_obj.normalized = false;
 		vtx_attrib_obj.stride = 0;
 		vtx_attrib_obj.pointer = 0;	
@@ -58,11 +58,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		//out of bounds
 		if (index >= ctx.const.maxVertexAttribs || index < 0) {
-			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
+			cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
 			return;
 		}
 
-		ctx.array.arrayObj.vertexAttrib[index].enabled = GL_TRUE;	
+		ctx.array.arrayObj.vertexAttrib[index].enabled = cnvgl.TRUE;	
 	};
 
 
@@ -80,11 +80,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		//out of bounds
 		if (index >= GPU.shader.MAX_VERTEX_ATTRIBS || index < 0) {
-			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
+			cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
 			return;
 		}
 	
-		ctx.array.arrayObj.vertexAttrib[index].enabled = GL_FALSE;
+		ctx.array.arrayObj.vertexAttrib[index].enabled = cnvgl.FALSE;
 	};
 
 
@@ -280,24 +280,24 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		ctx = cnvgl.getCurrentContext();
 	
-		if (index > GL_MAX_VERTEX_ATTRIBS) {
-			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
+		if (index > cnvgl.MAX_VERTEX_ATTRIBS) {
+			cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
 			return;			
 		}
 	
 		if (size < 1 || size > 4) {
-			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
+			cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
 			return;
 		}
 		
 	
-		if ([GL_BYTE, GL_UNSIGNED_BYTE, GL_SHORT, GL_UNSIGNED_SHORT, GL_INT, GL_UNSIGNED_INT, GL_FLOAT, GL_DOUBLE].indexOf(type) == -1) {
-			cnvgl.throw_error(GL_INVALID_ENUM, ctx);
+		if ([cnvgl.BYTE, cnvgl.UNSIGNED_BYTE, cnvgl.SHORT, cnvgl.UNSIGNED_SHORT, cnvgl.INT, cnvgl.UNSIGNED_INT, cnvgl.FLOAT, cnvgl.DOUBLE].indexOf(type) == -1) {
+			cnvgl.throw_error(cnvgl.INVALID_ENUM, ctx);
 			return;			
 		}
 	
 		if (stride < 0) {
-			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
+			cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
 			return;			
 		}
 

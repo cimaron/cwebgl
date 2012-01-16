@@ -34,12 +34,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.bindTexture = function(target, texture) {
 		var ctx, unit, texture_unit, texture_obj;
 	
-		if (target != GL_TEXTURE_1D &&
-			target != GL_TEXTURE_2D &&
-			target != GL_TEXTURE_3D &&
-			target != GL_TEXTURE_CUBE_MAP
+		if (target != cnvgl.TEXTURE_1D &&
+			target != cnvgl.TEXTURE_2D &&
+			target != cnvgl.TEXTURE_3D &&
+			target != cnvgl.TEXTURE_CUBE_MAP
 			) {
-			cnvgl.throw_error(GL_INVALID_ENUM, ctx);
+			cnvgl.throw_error(cnvgl.INVALID_ENUM, ctx);
 			return;
 		}
 	
@@ -48,12 +48,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		texture_unit = ctx.texture.unit[unit];
 	
 		if (texture == 0) {
-			texture_obj = ctx.shared.default_texture_objects[GL_TEXTURE_2D];
+			texture_obj = ctx.shared.default_texture_objects[cnvgl.TEXTURE_2D];
 		} else {
 			texture_obj = ctx.shared.texture_objects[texture];
 			if (texture_obj) {
 				if (texture_obj.target != 0 && texture_obj.target != target) {
-					cnvgl.throw_error(GL_INVALID_OPERATION, ctx);	
+					cnvgl.throw_error(cnvgl.INVALID_OPERATION, ctx);	
 					return;
 				}
 				texture_obj.target = target;
@@ -80,7 +80,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		var current, list, i, t, texture_obj;
 	
 		if (n < 0) {
-			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
+			cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
 			return;
 		}
 	

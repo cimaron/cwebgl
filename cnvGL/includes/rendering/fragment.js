@@ -84,7 +84,7 @@ cnvgl_rendering_fragment = (function() {
 		c[2] *= 255;
 		c[3] *= 255;
 
-		if (this.ctx.color.blendEnabled == GL_TRUE) {
+		if (this.ctx.color.blendEnabled == cnvgl.TRUE) {
 			this.blend(c, c[0], c[1], c[2], c[3], c_buffer[i], c_buffer[i + 1], c_buffer[i + 2], c_buffer[i + 3]);
 		}
 
@@ -100,22 +100,22 @@ cnvgl_rendering_fragment = (function() {
 		state = this.ctx.color;
 
 		switch (state.blendSrcA) {
-			case GL_ONE:
+			case cnvgl.ONE:
 				a_sr = a_sg = a_sb = a_sa = (1);
 				break;
-			case GL_ZERO:
+			case cnvgl.ZERO:
 				a_sr = a_sg = a_sb = a_sa = (0);
 				break;
-			case GL_SRC_ALPHA:
+			case cnvgl.SRC_ALPHA:
 				a_sr = a_sg = a_sb = a_sa = (sa / 255);
 				break;
-			case GL_ONE_MINUS_SRC_ALPHA:
+			case cnvgl.ONE_MINUS_SRC_ALPHA:
 				a_sr = a_sg = a_sb = a_sa = (1 - (sa / 255));
 				break;
-			case GL_DST_ALPHA:
+			case cnvgl.DST_ALPHA:
 				a_sr = a_sg = a_sb = a_sa = (da / 255);
 				break;
-			case GL_ONE_MINUS_DST_ALPHA:
+			case cnvgl.ONE_MINUS_DST_ALPHA:
 				a_sr = a_sg = a_sb = a_sa = (1 - (da / 255));
 				break;
 			default:
@@ -123,22 +123,22 @@ cnvgl_rendering_fragment = (function() {
 		}
 
 		switch (state.blendDestA) {
-			case GL_ONE:
+			case cnvgl.ONE:
 				a_dr = a_dg = a_db = a_da = (1);
 				break;
-			case GL_ZERO:
+			case cnvgl.ZERO:
 				a_dr = a_dg = a_db = a_da = (0);
 				break;
-			case GL_SRC_ALPHA:
+			case cnvgl.SRC_ALPHA:
 				a_dr = a_dg = a_db = a_da = (sa / 255);
 				break;
-			case GL_ONE_MINUS_SRC_ALPHA:
+			case cnvgl.ONE_MINUS_SRC_ALPHA:
 				a_dr = a_dg = a_db = a_da = (1 - (sa / 255));
 				break;
-			case GL_DST_ALPHA:
+			case cnvgl.DST_ALPHA:
 				a_dr = a_dg = a_db = a_da = (da / 255);
 				break;
-			case GL_ONE_MINUS_DST_ALPHA:
+			case cnvgl.ONE_MINUS_DST_ALPHA:
 				a_dr = a_dg = a_db = a_da = (1 - (da / 255));
 				break;
 			default:
@@ -146,7 +146,7 @@ cnvgl_rendering_fragment = (function() {
 		}
 
 		switch (state.blendEquationRGB) {
-			case GL_FUNC_ADD:
+			case cnvgl.FUNC_ADD:
 				color[0] = (a_sr * sr) + (a_dr * dr);
 				color[1] = (a_sg * sg) + (a_dg * dg);
 				color[2] = (a_sb * sb) + (a_db * db);
@@ -156,7 +156,7 @@ cnvgl_rendering_fragment = (function() {
 		}
 
 		switch (state.blendEquationA) {
-			case GL_FUNC_ADD:
+			case cnvgl.FUNC_ADD:
 				color[3] = (a_sa * sa) + (a_da * da);
 				break;
 			default:

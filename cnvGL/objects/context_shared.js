@@ -53,13 +53,13 @@ var cnvgl_context_shared = (function() {
 		var tex2d, tex2di;
 
 		//default texture objects
-		tex2d = new cnvgl_texture_object(0, GL_TEXTURE_2D);
-		this.default_texture_objects[GL_TEXTURE_2D] = tex2d;
+		tex2d = new cnvgl_texture_object(0, cnvgl.TEXTURE_2D);
+		this.default_texture_objects[cnvgl.TEXTURE_2D] = tex2d;
 		tex2di = new cnvgl_texture_object(tex2d);
 		tex2di.data = new Uint8Array([0,0,0,255]);
 		tex2di.width = 1;
 		tex2di.height = 1;
-		tex2di.internalFormat = GL_RGBA;
+		tex2di.internalFormat = cnvgl.RGBA;
 		tex2d.images[0] = tex2di;
 	};
 

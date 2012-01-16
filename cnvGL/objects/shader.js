@@ -26,8 +26,8 @@ function cnvgl_shader(name, type) {
 	this.type = type;
 	
 	//state
-	this.delete_status = GL_FALSE;
-	this.compile_status = GL_FALSE;
+	this.delete_status = cnvgl.FALSE;
+	this.compile_status = cnvgl.FALSE;
 	this.information_log = '';
 	this.shader_string = '';
 

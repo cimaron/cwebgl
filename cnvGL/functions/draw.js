@@ -26,7 +26,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	/**
 	 * glDrawArrays — render primitives from array data
 	 *
-	 * @var GLenum   mode   Specifies what kind of primitives to render. Symbolic constants GL_POINTS, GL_LINE_STRIP, GL_LINE_LOOP, GL_LINES, GL_TRIANGLE_STRIP, GL_TRIANGLE_FAN, GL_TRIANGLES, GL_QUAD_STRIP, GL_QUADS, and GL_POLYGON are accepted.
+	 * @var GLenum   mode   Specifies what kind of primitives to render.
 	 * @var GLint    first  Specifies the starting index in the enabled arrays.
 	 * @var GLsizei  count  Specifies the number of indices to be rendered.
 	 *
@@ -55,9 +55,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	/**
 	 * glDrawElements — render primitives from array data
 	 *
-	 * @var GLenum    mode     Specifies what kind of primitives to render. Symbolic constants GL_POINTS, GL_LINE_STRIP, GL_LINE_LOOP, GL_LINES, GL_TRIANGLE_STRIP, GL_TRIANGLE_FAN, GL_TRIANGLES, GL_QUAD_STRIP, GL_QUADS, and GL_POLYGON are accepted.
+	 * @var GLenum    mode     Specifies what kind of primitives to render.
 	 * @var GLsizei   count    Specifies the number of elements to be rendered.
-	 * @var GLenum    type     Specifies the type of the values in indices. Must be one of GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, or GL_UNSIGNED_INT.
+	 * @var GLenum    type     Specifies the type of the values in indices.
 	 * @var [GLvoid]  indices  Specifies a pointer to the location where the indices are stored.
 	 *
 	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glDrawElements.xml

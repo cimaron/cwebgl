@@ -42,7 +42,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	/**
 	 * glDepthFunc — specify the value used for depth buffer comparisons
 	 *
-	 * @var GLenum  func  Specifies the depth comparison function. Symbolic constants GL_NEVER, GL_LESS, GL_EQUAL, GL_LEQUAL, GL_GREATER, GL_NOTEQUAL, GL_GEQUAL, and GL_ALWAYS are accepted. The initial value is GL_LESS.
+	 * @var GLenum  func  Specifies the depth comparison function.
 	 *
 	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glDepthFunc.xml
 	 */
@@ -50,15 +50,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		var ctx;
 		ctx = cnvgl.getCurrentContext();
 		
-		if (func != GL_NEVER
-			&& func != GL_LESS
-			&& func != GL_EQUAL
-			&& func != GL_LEQUAL
-			&& func != GL_GREATER
-			&& func != GL_NOTEQUAL
-			&& func != GL_GEQUAL
-			&& func != GL_ALWAYS) {
-			cnvgl.throw_error(GL_INVALID_ENUM, ctx);
+		if (func != cnvgl.NEVER
+			&& func != cnvgl.LESS
+			&& func != cnvgl.EQUAL
+			&& func != cnvgl.LEQUAL
+			&& func != cnvgl.GREATER
+			&& func != cnvgl.NOTEQUAL
+			&& func != cnvgl.GEQUAL
+			&& func != cnvgl.ALWAYS) {
+			cnvgl.throw_error(cnvgl.INVALID_ENUM, ctx);
 			return;		
 		}
 	
@@ -69,7 +69,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	/**
 	 * glDepthMask — enable or disable writing into the depth buffer
 	 *
-	 * @var GLboolean  flag  Specifies whether the depth buffer is enabled for writing. If flag is GL_FALSE, depth buffer writing is disabled. Otherwise, it is enabled. Initially, depth buffer writing is enabled.
+	 * @var GLboolean  flag  Specifies whether the depth buffer is enabled for writing.
 	 *
 	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glDepthMask.xml
 	 */
@@ -77,7 +77,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		var ctx;
 		ctx = cnvgl.getCurrentContext();
 	
-		ctx.depth.mask = mask ? GL_TRUE : GL_FALSE;
+		ctx.depth.mask = mask ? cnvgl.TRUE : cnvgl.FALSE;
 	};
 
 

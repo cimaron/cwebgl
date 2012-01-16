@@ -48,7 +48,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	/**
 	 * glColorMask — enable and disable writing of frame buffer color components
 	 *
-	 * @var GLboolean  red    Specify whether red, green, blue, and alpha can or cannot be written into the frame buffer. The initial values are all GL_TRUE, indicating that the color components can be written.
+	 * @var GLboolean  red    Specify whether red, green, blue, and alpha can or cannot be written into the frame buffer.
 	 * @var GLboolean  green
 	 * @var GLboolean  blue
 	 * @var GLboolean  alpha

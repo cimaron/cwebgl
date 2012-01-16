@@ -40,7 +40,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		target = 0;
 		mipmap_level = 0;
 
-		texture = texUnit[sampler].current_texture[GL_TEXTURE_2D];
+		texture = texUnit[sampler].current_texture[cnvgl.TEXTURE_2D];
 		img = texture.images[mipmap_level];
 
 		if (!img) {
@@ -56,7 +56,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		img_d = img.data;
 
 		switch (texture.min_filter) {
-			case GL_LINEAR:
+			case cnvgl.LINEAR:
 				u = (s * img_w - .5)|0; //floor(s * img.width - .5)
 				v = (t * img_h - .5)|0; //floor(t * img.height - .5)
 				u1 = u + 1;
@@ -80,7 +80,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				c[3] = u0v0 * img_d[i + 3] + u1v0 * img_d[i + 7] + u0v1 * img_d[i1 + 3] + u1v1 * img_d[i1 + 7];
 				break;
 
-			case GL_NEAREST:
+			case cnvgl.NEAREST:
 			default:
 				u = (s * img_w)|0; //floor(s * img.width)
 				v = (t * img_h)|0; //floor(t * img.height)

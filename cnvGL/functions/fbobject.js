@@ -36,8 +36,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		ctx = cnvgl.getCurrentContext();
 	
-		if (target != GL_FRAMEBUFFER) {
-			cnvgl.throw_error(GL_INVALID_ENUM, ctx);
+		if (target != cnvgl.FRAMEBUFFER) {
+			cnvgl.throw_error(cnvgl.INVALID_ENUM, ctx);
 			return;
 		}
 	
@@ -48,7 +48,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 	
 		if (!framebuffer_obj) {
-			cnvgl.throw_error(GL_INVALID_OPERATION, ctx);
+			cnvgl.throw_error(cnvgl.INVALID_OPERATION, ctx);
 			return;		
 		}
 	
@@ -65,7 +65,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	/**
 	 * glBindRenderbuffer — bind a renderbuffer to a renderbuffer target
 	 *
-	 * @var GLenum  target        Specifies the renderbuffer target of the binding operation. target must be GL_RENDERBUFFER.
+	 * @var GLenum  target        Specifies the renderbuffer target of the binding operation.
 	 * @var GLuint  renderbuffer  Specifies the name of the renderbuffer object to bind.
 	 *
 	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glBindRenderbuffer.xml
@@ -75,8 +75,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		ctx = cnvgl.getCurrentContext();
 	
-		if (target != GL_RENDERBUFFER) {
-			cnvgl.throw_error(GL_INVALID_ENUM, ctx);
+		if (target != cnvgl.RENDERBUFFER) {
+			cnvgl.throw_error(cnvgl.INVALID_ENUM, ctx);
 			return;
 		}
 	
@@ -85,7 +85,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 	
 		if (!renderbuffer_obj) {
-			cnvgl.throw_error(GL_INVALID_OPERATION, ctx);
+			cnvgl.throw_error(cnvgl.INVALID_OPERATION, ctx);
 			return;		
 		}
 	
@@ -113,7 +113,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		list = [];
 	
 		if (n < 0) {
-			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
+			cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
 			return;
 		}
 	
@@ -142,7 +142,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		list = [];
 	
 		if (n < 0) {
-			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
+			cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
 			return;
 		}
 	
@@ -171,31 +171,31 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		ctx = cnvgl.getCurrentContext();
 	
-		if (target != GL_RENDERBUFFER) {
-			cnvgl.throw_error(GL_INVALID_ENUM, ctx);
+		if (target != cnvgl.RENDERBUFFER) {
+			cnvgl.throw_error(cnvgl.INVALID_ENUM, ctx);
 			return;
 		}
 		
 		/*
 		if (internalformat is not an accepted format) {
-			cnvgl.throw_error(GL_INVALID_ENUM, ctx);
+			cnvgl.throw_error(cnvgl.INVALID_ENUM, ctx);
 		}
 		*/
 		
 		if (width < 1 || width > ctx.const.maxRenderbufferSize) {
-			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
+			cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
 			return;
 		}
 	
 		if (height < 1 || height > ctx.const.maxRenderbufferSize) {
-			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
+			cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
 			return;
 		}
 	
 		renderbuffer_obj = ctx.currentRenderbuffer;
 	
 		if (!renderbuffer_obj) {
-			cnvgl.throw_error(GL_INVALID_OPERATION, ctx);
+			cnvgl.throw_error(cnvgl.INVALID_OPERATION, ctx);
 			return;		
 		}
 	

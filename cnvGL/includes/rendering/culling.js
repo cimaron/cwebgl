@@ -39,14 +39,14 @@ cnvgl_rendering_culling = (function() {
 		if (this.ctx.polygon.cullFlag) {
 			
 			//always cull if front and back
-			if (this.ctx.polygon.cullFaceMode == GL_FRONT_AND_BACK) {
+			if (this.ctx.polygon.cullFaceMode == cnvgl.FRONT_AND_BACK) {
 				return true;	
 			}
 			
 			dir = this.getPolygonFaceDir(prim);
 			if (!(
-				(dir > 0 && (this.ctx.polygon.cullFlag == GL_FALSE || this.ctx.polygon.cullFaceMode == GL_FRONT)) ||
-				(dir < 0 && (this.ctx.polygon.cullFlag == GL_FALSE || this.ctx.polygon.cullFaceMode == GL_BACK)))) {
+				(dir > 0 && (this.ctx.polygon.cullFlag == cnvgl.FALSE || this.ctx.polygon.cullFaceMode == cnvgl.FRONT)) ||
+				(dir < 0 && (this.ctx.polygon.cullFlag == cnvgl.FALSE || this.ctx.polygon.cullFaceMode == cnvgl.BACK)))) {
 				return true;
 			}
 		}
@@ -56,7 +56,7 @@ cnvgl_rendering_culling = (function() {
 	cnvgl_rendering_culling.getPolygonFaceDir = function(prim) {
 		var dir;
 		dir = prim.getDirection();
-		if (this.ctx.polygon.frontFace == GL_CCW) {
+		if (this.ctx.polygon.frontFace == cnvgl.CCW) {
 			dir = -dir;
 		}
 		return dir;

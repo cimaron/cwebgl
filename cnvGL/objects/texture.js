@@ -32,8 +32,8 @@ function cnvgl_texture_object(name, target) {
 	this.name = name;
 	this.target = target;
 
-	this.min_filter = GL_NEAREST_MIPMAP_LINEAR;
-	this.mag_filter = GL_LINEAR;
+	this.min_filter = cnvgl.NEAREST_MIPMAP_LINEAR;
+	this.mag_filter = cnvgl.LINEAR;
 
 	this.images = [];
 }

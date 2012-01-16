@@ -29,15 +29,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		switch (cap) {
 
-			case GL_CULL_FACE:
+			case cnvgl.CULL_FACE:
 				ctx.polygon.cullFlag = s;
 				break;
 
-			case GL_DEPTH_TEST:
+			case cnvgl.DEPTH_TEST:
 				ctx.depth.test = s;
 				break;
 
-			case GL_BLEND:
+			case cnvgl.BLEND:
 				ctx.color.blendEnabled = s;
 				break;
 	
@@ -55,7 +55,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glEnable.xml
 	 */
 	cnvgl.enable = function(cap) {
-		cnvgl_enable_disable(cap, GL_TRUE);
+		cnvgl_enable_disable(cap, cnvgl.TRUE);
 	};
 
 
@@ -67,7 +67,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glEnable.xml
 	 */
 	cnvgl.disable = function(cap) {
-		cnvgl_enable_disable(cap, GL_FALSE);
+		cnvgl_enable_disable(cap, cnvgl.FALSE);
 	};
 
 

@@ -26,11 +26,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	function cnvgl_texParameter(target, pname, param) {
 		var ctx, unit, texture_unit, texture_obj;
 		
-		if (target != GL_TEXTURE_1D
-			&& target != GL_TEXTURE_2D
-			&& target != GL_TEXTURE_3D
-			&& target != GL_TEXTURE_CUBE_MAP) {
-			cnvgl.throw_error(GL_INVALID_ENUM, ctx);
+		if (target != cnvgl.TEXTURE_1D
+			&& target != cnvgl.TEXTURE_2D
+			&& target != cnvgl.TEXTURE_3D
+			&& target != cnvgl.TEXTURE_CUBE_MAP) {
+			cnvgl.throw_error(cnvgl.INVALID_ENUM, ctx);
 			return;
 		}
 	
@@ -41,11 +41,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		switch (pname) {
 
-			case GL_TEXTURE_MIN_FILTER:
+			case cnvgl.TEXTURE_MIN_FILTER:
 				texture_obj.min_filter = param;
 				break;
 
-			case GL_TEXTURE_MAG_FILTER:
+			case cnvgl.TEXTURE_MAG_FILTER:
 				texture_obj.min_filter = param;
 				break;
 		}		

@@ -47,7 +47,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	/**
 	 * glClear — clear buffers to preset values
 	 *
-	 * @var GLbitfield  mask  Bitwise OR of masks that indicate the buffers to be cleared. The four masks are GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT, GL_ACCUM_BUFFER_BIT, and GL_STENCIL_BUFFER_BIT.
+	 * @var GLbitfield  mask  Bitwise OR of masks that indicate the buffers to be cleared.
 	 *
 	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glClear.xml
 	 */
@@ -56,23 +56,23 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		ctx = cnvgl.getCurrentContext();
 	
-		if (mask & ~(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT)) {
-			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
+		if (mask & ~(cnvgl.COLOR_BUFFER_BIT | cnvgl.DEPTH_BUFFER_BIT | cnvgl.STENCIL_BUFFER_BIT)) {
+			cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
 			return;
 		}
 
 		//Color Buffer
-		if (mask & GL_COLOR_BUFFER_BIT) {
+		if (mask & cnvgl.COLOR_BUFFER_BIT) {
 			ctx.driver.clearColorBuffer(ctx.drawBuffer.colorDrawBuffers[0].data, ctx.color.clearColor);
 		}
 
 		//Depth Buffer
-		if (mask & GL_DEPTH_BUFFER_BIT) {
+		if (mask & cnvgl.DEPTH_BUFFER_BIT) {
 			ctx.driver.clearDepthBuffer(ctx.drawBuffer.depthBuffer.data, ctx.depth.clear);
 		}
 
 		//Stencil Buffer
-		if (mask & GL_STENCIL_BUFFER_BIT) {
+		if (mask & cnvgl.STENCIL_BUFFER_BIT) {
 			throw new Error('clear: stencil_buffer not implemented yet');
 		}
 	};

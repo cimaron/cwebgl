@@ -24,10 +24,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	function cnvgl_get(pname, params) {
 		switch (pname) {
-			case GL_MAX_VERTEX_ATTRIBS:
+			case cnvgl.MAX_VERTEX_ATTRIBS:
 				params[0] = GPU.shader.MAX_VERTEX_ATTRIBS;
 				return;
-			case GL_MAX_FRAGMENT_UNIFORM_COMPONENTS:
+			case cnvgl.MAX_FRAGMENT_UNIFORM_COMPONENTS:
 				params[0] = GPU.shader.MAX_FRAGMENT_UNIFORM_COMPONENTS;
 				return;
 			default:
@@ -45,7 +45,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		var ctx, error;
 		ctx = cnvgl.getCurrentContext();
 		error = ctx.errorValue;
-		ctx.errorValue = GL_NO_ERROR;
+		ctx.errorValue = cnvgl.NO_ERROR;
 		return error;
 	};
 
@@ -60,7 +60,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	cnvgl.getBooleanv = function(pname, params) {
 		cnvgl_get(pname, params);
-		params[0] = (params[0] == 0.0 ? GL_FALSE : GL_TRUE);
+		params[0] = (params[0] == 0.0 ? cnvgl.FALSE : cnvgl.TRUE);
 	};
 
 
@@ -75,7 +75,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.getDoublev = function(pname, params) {
 		cnvgl_get(pname, params);
 		if (typeof params[0] == 'boolean') {
-			params[0] = params[0] ? GL_TRUE : GL_FALSE;	
+			params[0] = params[0] ? cnvgl.TRUE : cnvgl.FALSE;	
 		}
 	};
 
@@ -91,7 +91,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.getFloatv = function(pname, params) {
 		cnvgl_get(pname, params);
 		if (typeof params[0] == 'boolean') {
-			params[0] = params[0] ? GL_TRUE : GL_FALSE;	
+			params[0] = params[0] ? cnvgl.TRUE : cnvgl.FALSE;	
 		}
 	};
 
@@ -107,7 +107,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.getIntegerv = function(pname, params) {
 		cnvgl_get(pname, params);
 		if (typeof params[0] == 'boolean') {
-			params[0] = params[0] ? GL_TRUE : GL_FALSE;	
+			params[0] = params[0] ? cnvgl.TRUE : cnvgl.FALSE;	
 		} else {
 			params[0] = Math.round(params[0]);
 		}

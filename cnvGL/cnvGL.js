@@ -63,7 +63,7 @@ cnvgl = {
 	 */
 	throw_error : function(error, ctx) {
 		ctx = ctx || cnvgl.getCurrentContext();
-		if (error && ctx.errorValue == GL_NO_ERROR) {
+		if (error && ctx.errorValue == cnvgl.NO_ERROR) {
 			ctx.errorValue = error;
 		}
 	}

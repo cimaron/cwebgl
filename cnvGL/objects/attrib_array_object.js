@@ -27,9 +27,9 @@ function cnvgl_attrib_array_object() {
 	//this.format		= 0;
 	this.stride			= 0;
 	this.pointer		= 0;
-	this.enabled		= GL_FALSE;
-	this.normalized		= GL_FALSE;
-	this.integer		= GL_FALSE;
+	this.enabled		= cnvgl.FALSE;
+	this.normalized		= cnvgl.FALSE;
+	this.integer		= cnvgl.FALSE;
 	this.element_size	= 0;
 	this.buffer_obj		= null;
 	//this.max_element	= 0;

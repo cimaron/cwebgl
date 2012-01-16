@@ -41,11 +41,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.texImage2D = function(target, level, internalFormat, width, height, border, format, type, data) {
 		var ctx, unit, texture_unit, texture_obj, texture_img, size, a, n, s, k, size, group, j, src, dest;
 	
-		if (target != GL_TEXTURE_1D
-			&& target != GL_TEXTURE_2D
-			&& target != GL_TEXTURE_3D
-			&& target != GL_TEXTURE_CUBE_MAP) {
-			cnvgl.throw_error(GL_INVALID_ENUM, ctx);
+		if (target != cnvgl.TEXTURE_1D
+			&& target != cnvgl.TEXTURE_2D
+			&& target != cnvgl.TEXTURE_3D
+			&& target != cnvgl.TEXTURE_CUBE_MAP) {
+			cnvgl.throw_error(cnvgl.INVALID_ENUM, ctx);
 			return;
 		}
 	
@@ -64,25 +64,25 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		//get bytes per group
 		switch (format) {
-			case GL_RGB:
+			case cnvgl.RGB:
 				n = 3;
 				s = 3;
 				break;
-			case GL_RGBA:
+			case cnvgl.RGBA:
 				n = 4;
 				s = 4;
 				break;
-			case GL_COLOR_INDEX:
-			case GL_RED:
-			case GL_GREEN:
-			case GL_BLUE:
-			case GL_ALPHA:
-			case GL_INTENSITY:
-			case GL_BGR:
-			case GL_BGRA:
-			case GL_LUMINANCE:
-			case GL_LUMINANCE_ALPHA:
-			case GL_DEPTH_COMPONENT:
+			case cnvgl.COLOR_INDEX:
+			case cnvgl.RED:
+			case cnvgl.GREEN:
+			case cnvgl.BLUE:
+			case cnvgl.ALPHA:
+			case cnvgl.INTENSITY:
+			case cnvgl.BGR:
+			case cnvgl.BGRA:
+			case cnvgl.LUMINANCE:
+			case cnvgl.LUMINANCE_ALPHA:
+			case cnvgl.DEPTH_COMPONENT:
 				throw new Error('glTextImage2D format not implemented');
 			default:		
 		}
@@ -105,12 +105,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			for (j = 0; j < width; j++) {
 				src = (i * k) + (j * s);
 				switch (format) {
-					case GL_RGB:
+					case cnvgl.RGB:
 						group[0] = data[src    ] / 255;
 						group[1] = data[src + 1] / 255;
 						group[2] = data[src + 2] / 255;
 						break;
-					case GL_RGBA:
+					case cnvgl.RGBA:
 						group[0] = data[src    ] / 255;
 						group[1] = data[src + 1] / 255;
 						group[2] = data[src + 2] / 255;

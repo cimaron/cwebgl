@@ -162,7 +162,7 @@ cnvgl_rendering_primitive_triangle = (function() {
 			//Early depth test
 			//Need to add check for shader writing to depth value.
 			//If so, this needs to run after processing the fragment
-			if (this.ctx.depth.test == GL_TRUE) {
+			if (this.ctx.depth.test == cnvgl.TRUE) {
 				this.frag.gl_FragDepth = int.interpolateTriangle(this.v1.zw, this.v2.zw, this.v3.zw);
 				if (!this.renderer.checkDepth(i, this.frag.gl_FragDepth)) {
 					i++;

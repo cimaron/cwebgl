@@ -34,10 +34,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		var ctx;
 		ctx = cnvgl.getCurrentContext();
 		
-		if (mode != GL_FRONT_AND_BACK
-			&& mode != GL_FRONT
-			&& mode != GL_BACK) {
-			cnvgl.throw_error(GL_INVALID_ENUM, ctx);
+		if (mode != cnvgl.FRONT_AND_BACK
+			&& mode != cnvgl.FRONT
+			&& mode != cnvgl.BACK) {
+			cnvgl.throw_error(cnvgl.INVALID_ENUM, ctx);
 			return;
 		}
 	
@@ -56,9 +56,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		var ctx;
 		ctx = cnvgl.getCurrentContext();
 	
-		if (mode != GL_CW
-			&& mode != GL_CCW) {
-			cnvgl.throw_error(GL_INVALID_ENUM, ctx);
+		if (mode != cnvgl.CW
+			&& mode != cnvgl.CCW) {
+			cnvgl.throw_error(cnvgl.INVALID_ENUM, ctx);
 			return;
 		}
 	

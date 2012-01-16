@@ -30,26 +30,26 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		switch (pname) {
 
-			case GL_PACK_ALIGNMENT:
+			case cnvgl.PACK_ALIGNMENT:
 				param = Math.round(param);
 				if ([1, 2, 4, 8].indexOf(param) == -1) {
-					cnvgl.throw_error(GL_INVALID_VALUE, ctx);
+					cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
 					return;
 				}
 				ctx.pack.alignment = param;
 				break;
 
-			case GL_UNPACK_ALIGNMENT:
+			case cnvgl.UNPACK_ALIGNMENT:
 				param = Math.round(param);
 				if ([1, 2, 4, 8].indexOf(param) == -1) {
-					cnvgl.throw_error(GL_INVALID_VALUE, ctx);
+					cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
 					return;
 				}
 				ctx.unpack.alignment = param;
 				break;
 
 			default:
-				cnvgl.throw_error(GL_INVALID_ENUM, ctx);
+				cnvgl.throw_error(cnvgl.INVALID_ENUM, ctx);
 				return;
 		}
 	}
