@@ -178,3 +178,5 @@ include('glsl/ir_generator.js');
 include('glsl/ir_generator_tables.php');
 include('glsl/generator.js');
 
+include('glsl/linker/linker.js');
+
