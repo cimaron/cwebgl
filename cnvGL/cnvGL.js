@@ -72,14 +72,14 @@ include('cnvGL/objects/buffer.js');
 include('cnvGL/objects/constants.js');
 include('cnvGL/objects/context.js');
 include('cnvGL/objects/context_shared.js');
-include('cnvGL/objects/cnvgl_fragment.js');
+include('cnvGL/objects/fragment.js');
 include('cnvGL/objects/framebuffer.js');
-include('cnvGL/objects/cnvgl_primitive.js');
+include('cnvGL/objects/primitive.js');
 include('cnvGL/objects/program.js');
-include('cnvGL/objects/cnvgl_shader.js');
+include('cnvGL/objects/shader.js');
 include('cnvGL/objects/renderbuffer.js');
 include('cnvGL/objects/texture.js');
-include('cnvGL/objects/cnvgl_vertex.js');
+include('cnvGL/objects/vertex.js');
 
 include('cnvGL/functions/blend.js');
 include('cnvGL/functions/bufferobj.js');
