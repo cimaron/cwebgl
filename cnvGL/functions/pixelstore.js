@@ -24,12 +24,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		  
 
 	function cnvgl_pixelStore(pname, param) {
-		var ctx, valid_range;
+		var ctx;
 
 		ctx = cnvgl_context.getCurrentContext();
 
-		valid_range =  != -1;
-	
 		switch (pname) {
 
 			case GL_PACK_ALIGNMENT:
