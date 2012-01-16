@@ -1,4 +1,3 @@
-<?php
 /*
 Copyright (c) 2011 Cimaron Shanahan
 
@@ -20,30 +19,35 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-require_once dirname(__FILE__).'/include.php';
+cWebGL.Driver = (function() {
 
-//Extra Libraries
-$include('library/jClass/jClass.js');
-$include('library/stdio/stdio.js');
-$include('library/TypedArray/TypedArray.js');
+	function Initializer() {
+		this.canvas = null;
+		this.config = null;
+		this.compileStatus = null;
+		this.compileErrors = "";
+		this.linkStatus = null;
+		this.linkErrors = "";
 
-//cnvGL Library
-$include('cnvGL/cnvGL.js');
+		this.ready = false;
+	}
 
-//WebGL Library
-$include('WebGL/WebGLObject.js');
-$include('WebGL/WebGLBuffer.js');
-$include('WebGL/WebGLContextAttributes.js');
-$include('WebGL/WebGLFramebuffer.js');
-$include('WebGL/WebGLProgram.js');
-$include('WebGL/WebGLShader.js');
-$include('WebGL/WebGLTexture.js');
-$include('WebGL/WebGLRenderbuffer.js');
-$include('WebGL/WebGLRenderingContext.js');
-$include('WebGL/WebGLUniformLocation.js');
+	var Driver = jClass('Driver', Initializer);
 
-$include('cWebGL.js');
+	//static:
 
-//Drivers
-$include('drivers/driver.js');
+	Driver.Static.test = function() {
+		return false;
+	};
+
+	//public:
+
+	Driver.Driver = function(canvas, config) {
+		this.canvas = canvas;
+		this.config = config;
+	};
+
+	return Driver.Constructor;
+	
+}());
 
