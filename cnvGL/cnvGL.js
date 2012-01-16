@@ -62,7 +62,7 @@ cnvgl = {
 	 * @var cnvgl_context  ctx    Specifies the context to set the error code
 	 */
 	throw_error : function(error, ctx) {
-		ctx = ctx || cnvgl_context.getCurrentContext();
+		ctx = ctx || cnvgl.getCurrentContext();
 		if (error && ctx.errorValue == GL_NO_ERROR) {
 			ctx.errorValue = error;
 		}
