@@ -164,17 +164,17 @@ var glsl = (function(ARB) {
 	return glsl;
 }(ARB));
 
-include('cnvGL/includes/glsl/symbol.js');
-include('cnvGL/includes/glsl/preprocessor.js');
-include('cnvGL/includes/glsl/lexer.js');
-include('cnvGL/includes/glsl/lexer_extern.js');
-include('cnvGL/includes/glsl/parser.js');
-//include('cnvGL/includes/glsl/parser_debug.js');
-include('cnvGL/includes/glsl/builtin.js');
-include('cnvGL/includes/glsl/ast.js');
-include('cnvGL/includes/glsl/type.js');
-include('cnvGL/includes/glsl/ir.js');
-include('cnvGL/includes/glsl/ir_generator.js');
-include('cnvGL/includes/glsl/ir_generator_tables.php');
-include('cnvGL/includes/glsl/generator.js');
+include('glsl/symbol.js');
+include('glsl/preprocessor.js');
+include('glsl/lexer.js');
+include('glsl/lexer_extern.js');
+include('glsl/parser.js');
+//include('glsl/parser_debug.js');
+include('glsl/builtin.js');
+include('glsl/ast.js');
+include('glsl/type.js');
+include('glsl/ir.js');
+include('glsl/ir_generator.js');
+include('glsl/ir_generator_tables.php');
+include('glsl/generator.js');
 
