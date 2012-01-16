@@ -50,7 +50,8 @@ function jClass(name, Initializer, Extends) {
 		my_proto.Initializer = Initializer;
 	}
 
-	my_proto.Constructor = Constructor;
+	my_proto.Constructor = Constructor;	
+	my_proto.Static = Constructor;	//alias
 	my_proto.TypeOf = name;
 	my_proto.typeOf = jClass.typeOf;
 	my_proto.Enumerate = jClass.Enumerate;
