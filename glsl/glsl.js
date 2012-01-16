@@ -117,7 +117,7 @@ var glsl = (function(ARB) {
 
 			this.token = this.parser.yytokentype;
 		},
- 
+
 		compile : function(source, target) {
 			var status, irs;
 

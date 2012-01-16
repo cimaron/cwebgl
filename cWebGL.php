@@ -30,6 +30,9 @@ $include('library/TypedArray/TypedArray.js');
 //cnvGL Library
 $include('cnvGL/cnvGL.js');
 
+//GLSL Library
+$include('glsl/glsl.js');
+
 //WebGL Library
 $include('WebGL/WebGLObject.js');
 $include('WebGL/WebGLBuffer.js');
@@ -46,4 +49,5 @@ $include('cWebGL.js');
 
 //Drivers
 $include('drivers/driver.js');
+$include('drivers/WebGL/WebGL.js');
 
