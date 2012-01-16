@@ -275,7 +275,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 *
 	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glVertexAttribPointer.xml
 	 */
-	function glVertexAttribPointer(index, size, type, normalized, stride, pointer) {
+	cnvgl.vertexAttribPointer = function(index, size, type, normalized, stride, pointer) {
 		var ctx, buffer_obj, vtx_attrib_obj;
 	
 		ctx = cnvgl.getCurrentContext();
