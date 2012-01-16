@@ -48,6 +48,12 @@ cnvgl = {
 		cnvgl.currentContext = context;
 	},
 
+	/**
+	 * Sets an error in the specified context
+	 *
+	 * @var GLenum         error  Specifies the error code
+	 * @var cnvgl_context  ctx    Specifies the context to set the error code
+	 */
 	throw_error : function(error, ctx) {
 		ctx = ctx || cnvgl_context.getCurrentContext();
 		if (error && ctx.errorValue == GL_NO_ERROR) {
@@ -93,7 +99,4 @@ include('cnvGL/functions/texstate.js');
 include('cnvGL/functions/uniforms.js');
 include('cnvGL/functions/varray.js');
 include('cnvGL/functions/viewport.js');
-
-
-cnvgl_objects = [0];
 

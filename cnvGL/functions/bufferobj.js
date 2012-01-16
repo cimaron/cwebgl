@@ -33,13 +33,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	cnvgl.bindBuffer = function(target, buffer) {
 		var ctx, buffer_obj;
-	
+
 		ctx = cnvgl_context.getCurrentContext();
 		
 		if (buffer != 0) {
-		
-			buffer_obj = cnvgl_objects[buffer];
-		
+
+			buffer_obj = ctx.shared.bufferObjects[buffer];
+
 			//buffer does not exist
 			if (!buffer_obj) {
 				cnvgl.throw_error(GL_INVALID_VALUE, ctx);
@@ -214,13 +214,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glGenBuffers.xml
 	 */
 	cnvgl.genBuffers = function(n, buffers) {
-		var list = [], buffer, ref, i;
+		var ctx, list, buffer_obj, name, i;
+
+		ctx = cnvgl_context.getCurrentContext();
+		list = [];
 
 		for (i = 0; i < n; i++) {
-			buffer = new cnvgl_buffer();
-			cnvgl_objects.push(buffer);
-			ref = cnvgl_objects.length - 1;
-			list.push(ref);
+			buffer_obj = new cnvgl_buffer();
+			name = cnvgl_context.findFreeName(ctx.shared.bufferObjects);
+			ctx.shared.bufferObjects[name] = buffer_obj;			
+			list.push(name);
 		}
 
 		buffers[0] = list;

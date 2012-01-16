@@ -23,9 +23,10 @@ var cnvgl_context_shared = (function() {
 							  
 	function Initializer() {
 		//public:
-		this.texture_objects = [];
+		this.texture_objects = [0];
 		this.default_texture_objects = {};
 
+		this.bufferObjects = [0];
 		this.shaderObjects = [0];
 		this.frameBuffers = [0];
 		this.renderBuffers = [0];
@@ -50,7 +51,6 @@ var cnvgl_context_shared = (function() {
 	
 	cnvgl_context_shared.initTextures = function() {
 		var tex2d, tex2di;
-		this.texture_objects[0] = 0;
 
 		//default texture objects
 		tex2d = new cnvgl_texture_object(0, GL_TEXTURE_2D);
