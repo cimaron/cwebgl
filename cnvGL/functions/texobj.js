@@ -43,7 +43,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			return;
 		}
 	
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 		unit = ctx.texture.currentUnit;
 		texture_unit = ctx.texture.unit[unit];
 	
@@ -84,7 +84,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			return;
 		}
 	
-		current = cnvgl_context.getCurrentContext().shared.texture_objects;
+		current = cnvgl.getCurrentContext().shared.texture_objects;
 	
 		list = [];
 		for (i = 0; i < n; i++) {

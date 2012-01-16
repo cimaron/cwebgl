@@ -34,7 +34,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.attachShader = function(program, shader) {
 		var ctx, program_obj, shader_obj;
 	
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 	
 		program_obj = ctx.shared.shaderObjects[program];
 		shader_obj = ctx.shared.shaderObjects[shader];
@@ -67,7 +67,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.bindAttribLocation = function(program, index, name) {
 		var ctx, program_obj, attr_obj;
 	
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 		program_obj = ctx.shared.shaderObjects[program];
 
 		//no program exists
@@ -95,7 +95,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		var ctx, program_obj, attr_obj;
 	
 		//get program
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 		program_obj = ctx.shared.shaderObjects[program];
 	
 		//no program exists
@@ -127,7 +127,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.compileShader = function(shader) {
 		var ctx, shader_obj, target, status;
 	
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 		shader_obj = ctx.shared.shaderObjects[shader];
 	
 		//no shader exists
@@ -156,7 +156,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.createProgram = function() {
 		var ctx, program_obj, name;
 
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 		name = ctx.shared.shaderObjects.length;
 	
 		program_obj = new cnvgl_program();
@@ -178,7 +178,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.createShader = function(shaderType) {
 		var ctx, shader_obj, name;
 
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 
 		if (shaderType != GL_FRAGMENT_SHADER && shaderType != GL_VERTEX_SHADER) {
 			cnvgl.throw_error(GL_INVALID_ENUM, ctx);
@@ -207,7 +207,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		var ctx, program_obj, t, i;
 	
 		//get program
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 		program_obj = ctx.shared.shaderObjects[program];
 	
 		//no shader exists
@@ -287,7 +287,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		var ctx, shader_obj;
 
 		//get shader
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 		shader_obj = ctx.shared.shaderObjects[shader];
 		
 		//no shader exists
@@ -331,7 +331,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		var ctx, shader_obj;
 		
 		//get shader
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 		shader_obj = ctx.shared.shaderObjects[shader];
 	
 		//no shader exists
@@ -380,7 +380,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		var ctx, program_obj, i, shaders;
 	
 		//get program
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 		program_obj = ctx.shared.shaderObjects[program];
 	
 		//no program exists
@@ -420,7 +420,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.shaderSource = function(shader, count, string, length) {
 		var ctx, shader_obj;
 	
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 		shader_obj = ctx.shared.shaderObjects[shader];
 	
 		//no shader exists
@@ -449,7 +449,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.useProgram = function(program) {
 		var ctx, program_obj, i, shader_obj;
 	
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 	
 		if (program == 0) {
 			ctx.shader.activeProgram = null;

@@ -32,7 +32,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	cnvgl.cullFace = function(mode) {
 		var ctx;
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 		
 		if (mode != GL_FRONT_AND_BACK
 			&& mode != GL_FRONT
@@ -54,7 +54,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	cnvgl.frontFace = function(mode) {
 		var ctx;
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 	
 		if (mode != GL_CW
 			&& mode != GL_CCW) {

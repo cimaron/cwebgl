@@ -43,7 +43,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	cnvgl.getError = function() {
 		var ctx, error;
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 		error = ctx.errorValue;
 		ctx.errorValue = GL_NO_ERROR;
 		return error;

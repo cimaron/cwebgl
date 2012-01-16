@@ -49,6 +49,13 @@ cnvgl = {
 	},
 
 	/**
+	 * Gets the current context
+	 */
+	getCurrentContext : function() {
+		return cnvgl.currentContext;
+	},
+
+	/**
 	 * Sets an error in the specified context
 	 *
 	 * @var GLenum         error  Specifies the error code

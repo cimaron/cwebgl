@@ -183,10 +183,6 @@ var cnvgl_context = (function() {
 
 	//static:
 
-	cnvgl_context.Static.getCurrentContext = function() {
-		return cnvgl.currentContext;
-	};
-
 	cnvgl_context.Static.findFreeName = function(list, start) {
 		start = start || 1;
 		while (list[start]) {

@@ -35,7 +35,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	cnvgl.viewport = function(x, y, width, height) {
 	
-		var state = cnvgl_context.getCurrentContext();
+		var state = cnvgl.getCurrentContext();
 	
 		if (width < 0 || height < 0) {
 			cnvgl.throw_error(GL_INVALID_VALUE, ctx);

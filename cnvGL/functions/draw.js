@@ -35,7 +35,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.drawArrays = function(mode, first, count) {
 		var ctx, renderer, program_obj, i, vertex;
 	
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 		renderer = ctx.renderer;
 		program_obj = ctx.shader.activeProgram;
 	
@@ -65,7 +65,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	function glDrawElements(mode, count, type, indices) {
 		var ctx, renderer, program_obj, buffer_obj, elements, i, vertex, index;
 
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 		renderer = ctx.renderer;
 		program_obj = ctx.shader.activeProgram;
 	

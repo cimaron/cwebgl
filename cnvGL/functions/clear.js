@@ -35,7 +35,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	cnvgl.clearColor = function(red, green, blue, alpha) {
 		var ctx, c;
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 		c = ctx.color.clearColor;	
 		c[0] = Math.round(255 * Math.max(Math.min(red, 1), 0));
 		c[1] = Math.round(255 * Math.max(Math.min(green, 1), 0));
@@ -54,7 +54,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.clear = function(mask) {
 		var ctx, buffer, clear, i, l;
 
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 	
 		if (mask & ~(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT)) {
 			cnvgl.throw_error(GL_INVALID_VALUE, ctx);

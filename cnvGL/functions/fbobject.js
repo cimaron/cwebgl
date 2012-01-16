@@ -34,7 +34,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.bindFramebuffer = function(target, framebuffer) {
 		var ctx, framebuffer_obj;
 	
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 	
 		if (target != GL_FRAMEBUFFER) {
 			cnvgl.throw_error(GL_INVALID_ENUM, ctx);
@@ -73,7 +73,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.bindRenderbuffer = function(target, renderbuffer) {
 		var ctx, renderbuffer_obj, name;
 	
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 	
 		if (target != GL_RENDERBUFFER) {
 			cnvgl.throw_error(GL_INVALID_ENUM, ctx);
@@ -109,7 +109,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.genFramebuffers = function(n, framebuffers) {
 		var ctx, list, name;
 
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 		list = [];
 	
 		if (n < 0) {
@@ -138,7 +138,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.genRenderbuffers = function(n, renderbuffers) {
 		var ctx, list, name;
 	
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 		list = [];
 	
 		if (n < 0) {
@@ -169,7 +169,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.renderbufferStorage = function(target, internalFormat, width, height) {
 		var ctx, renderbuffer_obj, baseFormat, temp;	
 	
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 	
 		if (target != GL_RENDERBUFFER) {
 			cnvgl.throw_error(GL_INVALID_ENUM, ctx);

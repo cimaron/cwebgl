@@ -26,7 +26,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	function cnvgl_uniform(location, value, slots, components) {
 		var ctx, program_obj, uniform_obj, i;
 	
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 		program_obj = ctx.shader.activeProgram;
 	
 		if (!program_obj) {
@@ -74,7 +74,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		var ctx, program_obj, u;
 
 		//get program
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 		program_obj = ctx.shared.shaderObjects[program];
 	
 		//no program exists

@@ -49,7 +49,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			return;
 		}
 	
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 		unit = ctx.texture.currentUnit;
 		texture_unit = ctx.texture.unit[unit];
 		texture_obj = texture_unit.current_texture[target];

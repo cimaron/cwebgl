@@ -34,7 +34,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.blendFunc = function(sfactor, dfactor) {
 		var ctx, i;
 
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 		
 		//todo: add checks here
 		
@@ -58,7 +58,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.colorMask = function(r, g, b, a) {
 		var ctx;
 	
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 	
 		ctx.color.colorMask = [
 			r ? 0xFF : 0,

@@ -34,7 +34,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.bindBuffer = function(target, buffer) {
 		var ctx, buffer_obj;
 
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 		
 		if (buffer != 0) {
 
@@ -85,7 +85,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.bufferData = function(target, size, data, usage) {
 		var ctx, buffer_obj, data_type, view, temp, i;
 
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 	
 		if (usage != GL_STREAM_DRAW &&
 				usage != GL_STREAM_READ && 
@@ -161,7 +161,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.bufferSubData = function(target, offset, size, data) {
 		var ctx, buffer_obj, view, data_type, temp, i;
 	
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 	
 		switch (target) {
 			case GL_ARRAY_BUFFER:
@@ -216,7 +216,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.genBuffers = function(n, buffers) {
 		var ctx, list, buffer_obj, name, i;
 
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 		list = [];
 
 		for (i = 0; i < n; i++) {

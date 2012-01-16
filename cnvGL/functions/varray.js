@@ -26,7 +26,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	function cnvgl_vertexAttrib(index, v) {
 		var ctx, buffer_obj, vtx_attrib_obj;
 	
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 	
 		if (index > GL_MAX_VERTEX_ATTRIBS) {
 			cnvgl.throw_error(GL_INVALID_VALUE, ctx);
@@ -54,7 +54,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.enableVertexAttribArray = function(index) {
 		var ctx;
 
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 	
 		//out of bounds
 		if (index >= ctx.const.maxVertexAttribs || index < 0) {
@@ -76,7 +76,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.disableVertexAttribArray = function(index) {
 		var ctx;
 		
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 	
 		//out of bounds
 		if (index >= GPU.shader.MAX_VERTEX_ATTRIBS || index < 0) {
@@ -278,7 +278,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	function glVertexAttribPointer(index, size, type, normalized, stride, pointer) {
 		var ctx, buffer_obj, vtx_attrib_obj;
 	
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 	
 		if (index > GL_MAX_VERTEX_ATTRIBS) {
 			cnvgl.throw_error(GL_INVALID_VALUE, ctx);

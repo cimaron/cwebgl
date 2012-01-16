@@ -33,7 +33,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.activeTexture = function(texture) {
 		var ctx, i;
 
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 		i = texture - GL_TEXTURE0;
 
 		if (i < 0 || i > (GPU.texture.MAX_COMBINED_TEXTURE_IMAGE_UNITS - 1)) {

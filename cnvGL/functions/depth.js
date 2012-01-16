@@ -32,7 +32,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	cnvgl.clearDepth = function(depth) {
 		var ctx;
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 	
 		depth = Math.max(Math.min(depth, 1), 0);
 		ctx.depth.clear = depth;
@@ -48,7 +48,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	cnvgl.depthFunc = function(func) {
 		var ctx;
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 		
 		if (func != GL_NEVER
 			&& func != GL_LESS
@@ -75,7 +75,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	cnvgl.depthMask = function(mask) {
 		var ctx;
-		ctx = cnvgl_context.getCurrentContext();
+		ctx = cnvgl.getCurrentContext();
 	
 		ctx.depth.mask = mask ? GL_TRUE : GL_FALSE;
 	};
