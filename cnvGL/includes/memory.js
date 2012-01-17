@@ -19,9 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(GPU) {
-
-	GPU.memory = {};
+(function(cnvgl) {
 
 	/**
 	 * Allocate a block of memory
@@ -29,28 +27,32 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * @param   integer   size to create
 	 * @param   integer   stride
 	 */
-	GPU.malloc = function(size, stride) {
-		var data, i;
+	cnvgl.malloc = function(size, stride, format) {
+		var block, i;
 
+		format = format.native ? format : Array;
 		stride = stride || 1;
 		size = Math.ceil(size / stride);
-		data = {
+
+		block = {
 			size : size * stride,
-			stride : stride,
-			data : new Array(size)
+			stride : stride
 		};
 
 		//create sub-arrays
 		if (stride > 1) {
+			block.data = new Array(size);
 			for (i = 0; i < size; i++) {
-				data.data[i] = new Array(stride);
+				block.data[i] = new format(stride);
 			}
+		} else {
+			block = new format(size);
 		}
 
 		//initialize memory to 0
-		GPU.memset(data, 0, 0, data.size);
+		GPU.memset(block, 0, 0, block.size);
 
-		return data;
+		return block;
 	};
 
 	/**
@@ -60,22 +62,19 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * @param   integer   dest start pointer
 	 * @param   array     source data
 	 * @param   integer   source length to copy
-v	 * @param   integer   source start
+	 * @param   integer   source start
 	 */
-	GPU.memcpy = function(dest, di, source, size, si) {
-		var srci, dc, stride;
+	cnvgl.memcpy = function(dest, di, source, size, si) {
+		var data, srci, dc, stride;
 
-		stride = dest.stride;
-		if (!(dest instanceof Array)) {
-			dest = dest.data;
-		}
+		stride = dest.stride || 1;
+		data = dest.data || dest;
 
 		si = si || 0;
 		dc = di % stride;
 		di = (di - dc) / stride;
 
 		for (srci = si; srci < si + size; srci++) {
-
 			if (stride == 1) {
 				dest[di++] = source[srci];
 			} else {
@@ -96,11 +95,11 @@ v	 * @param   integer   source start
 	 * @param   number    value
 	 * @param   integer   length
 	 */
-	GPU.memset = function(dest, di, value, size) {
-		var i, dc, stride, mem;
+	cnvgl.memset = function(dest, di, value, size) {
+		var i, dc, stride, data;
 
-		mem = dest.data;
-		stride = dest.stride;
+		data = dest.data || dest;
+		stride = dest.stride || 1;
 
 		dc = di % stride;
 		di = (di - dc) / stride;
@@ -108,9 +107,9 @@ v	 * @param   integer   source start
 		for (i = 0; i < size; i++) {
 
 			if (stride == 1) {
-				mem[di++] = value;
+				data[di++] = value;
 			} else {
-				mem[di][dc++] = value;
+				data[di][dc++] = value;
 				if (dc == stride) {
 					dc = 0;
 					di++;
@@ -119,5 +118,5 @@ v	 * @param   integer   source start
 		}
 	};
 
-}(GPU));
+}(cnvgl));
 

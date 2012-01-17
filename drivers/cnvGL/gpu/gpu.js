@@ -21,7 +21,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 var GPU = {};
 
-include('cnvGL/includes/gpu/memory.js');
-include('cnvGL/includes/gpu/shader.js');
-include('cnvGL/includes/gpu/texture.js');
+include('drivers/cnvGL/gpu/shader.js');
+include('drivers/cnvGL/gpu/texture.js');
 

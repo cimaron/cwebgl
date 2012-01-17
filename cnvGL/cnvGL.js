@@ -107,3 +107,5 @@ include('cnvGL/functions/uniforms.js');
 include('cnvGL/functions/varray.js');
 include('cnvGL/functions/viewport.js');
 
+include('cnvGL/includes/memory.js');
+
