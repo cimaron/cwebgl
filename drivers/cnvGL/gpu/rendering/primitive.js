@@ -25,105 +25,92 @@ cnvgl_rendering_primitive = (function() {
 	function Initializer() {
 
 		//public:
-		this.ctx = null;
 		this.renderer = null;
 
 		this.line = null;
 		this.point = null;
 		this.triangle = null;
 		
-		this.mode = null;
 		this.vertices = [];
 	}
 
 	var cnvgl_rendering_primitive = jClass('cnvgl_rendering_primitive', Initializer);
 
-	cnvgl_rendering_primitive.cnvgl_rendering_primitive = function(ctx, renderer) {
-
-		this.ctx = ctx;
+	cnvgl_rendering_primitive.cnvgl_rendering_primitive = function(renderer) {
 		this.renderer = renderer;
-
-		this.line = new cnvgl_rendering_primitive_line(ctx, renderer);
-		this.point = new cnvgl_rendering_primitive_point(ctx, renderer);
-		this.triangle = new cnvgl_rendering_primitive_triangle(ctx, renderer);
+		this.line = new cnvgl_rendering_primitive_line(renderer);
+		this.point = new cnvgl_rendering_primitive_point(renderer);
+		this.triangle = new cnvgl_rendering_primitive_triangle(renderer);
 	};
 
-	cnvgl_rendering_primitive.setMode = function(mode) {
-		this.mode = mode;
-	};
-	
-	cnvgl_rendering_primitive.send = function(vertex) {
+	cnvgl_rendering_primitive.send = function(state, mode, vertex) {
 		this.vertices.push(vertex);
-		switch (this.mode) {
+		switch (mode) {
 			case cnvgl.POINTS:
-				this.points();
+				this.points(state);
 				break;
 			case cnvgl.LINES:
-				this.lines();
+				this.lines(state);
 				break;
 			case cnvgl.LINE_STRIP:
-				this.lineStrip();
+				this.lineStrip(state);
 				break;
 			case cnvgl.LINE_LOOP:
-				this.lineLoop();
+				this.lineLoop(state);
 				break;
 			case cnvgl.TRIANGLES:
-				this.triangles();
+				this.triangles(state);
 				break;
 			case cnvgl.TRIANGLE_STRIP:
-				this.triangleStrip();
+				this.triangleStrip(state);
 				break;
 		}
 	};
 
-	cnvgl_rendering_primitive.end = function() {
-		switch (this.mode) {
+	cnvgl_rendering_primitive.end = function(state, mode) {
+		switch (mode) {
 			case cnvgl.LINE_LOOP:
 				//swap vertices
 				this.vertices.push(this.vertices.shift());
-				this.lines();
+				this.lines(state);
 				break;
 		}
 		this.vertices = [];
 	};
 
-	cnvgl_rendering_primitive.points = function(vertices) {
+	cnvgl_rendering_primitive.points = function(state) {
 		var prim;
-		prim = new cnvgl_primitive();
-		prim.mode = this.mode;
+		prim = new cnvgl.primitive();
 		prim.vertices.push(this.vertices.shift());
-		this.point.render(prim);	
+		this.point.render(state, prim);
 	};
 
-	cnvgl_rendering_primitive.lines = function() {
+	cnvgl_rendering_primitive.lines = function(state) {
 		var prim;
 		if (this.vertices.length > 1) {
-			prim = new cnvgl_primitive();
-			prim.mode = this.mode;
+			prim = new cnvgl.primitive();
 			prim.vertices.push(this.vertices.shift());
 			prim.vertices.push(this.vertices.shift());
-			this.line.render(prim);
+			this.line.render(state, prim);
 		}
 	};
 
-	cnvgl_rendering_primitive.lineStrip = function() {
+	cnvgl_rendering_primitive.lineStrip = function(state) {
 		var prim;
 		if (this.vertices.length > 1) {
-			prim = new cnvgl_primitive();
-			prim.mode = this.mode;
+			prim = new cnvgl.primitive();
 			prim.vertices.push(this.vertices.shift());
 			prim.vertices.push(this.vertices[0]);
-			this.line.render(prim);
+			this.line.render(state, prim);
 		}
 	};
 
-	cnvgl_rendering_primitive.lineLoop = function() {
+	cnvgl_rendering_primitive.lineLoop = function(state) {
 		var prim, v0;
 		if (this.vertices.length < 2) {
 			return;
 		}
-		prim = new cnvgl_primitive();
-		prim.mode = this.mode;
+		prim = new cnvgl.primitive();
 		if (this.vertices.length > 2) {
 			v0 = this.vertices.shift();
 			prim.vertices.push(this.vertices.shift());
@@ -133,30 +120,28 @@ cnvgl_rendering_primitive = (function() {
 			prim.vertices.push(this.vertices[0]);
 			prim.vertices.push(this.vertices[1]);
 		}
-		this.line.render(prim);
+		this.line.render(state, prim);
 	};
 
-	cnvgl_rendering_primitive.triangles = function() {
+	cnvgl_rendering_primitive.triangles = function(state) {
 		var prim;
 		if (this.vertices.length > 2) {
-			prim = new cnvgl_primitive();
-			prim.mode = this.mode;
+			prim = new cnvgl.primitive();
 			prim.vertices.push(this.vertices.shift());	
 			prim.vertices.push(this.vertices.shift());	
 			prim.vertices.push(this.vertices.shift());
-			this.triangle.render(prim);
+			this.triangle.render(state, prim);
 		}
 	};
 
-	cnvgl_rendering_primitive.triangleStrip = function() {
+	cnvgl_rendering_primitive.triangleStrip = function(state) {
 		var prim;
 		if (this.vertices.length > 2) {
-			prim = new cnvgl_primitive();
-			prim.mode = this.mode;
+			prim = new cnvgl.primitive();
 			prim.vertices.push(this.vertices.shift());	
 			prim.vertices.push(this.vertices[0]);
 			prim.vertices.push(this.vertices[1]);
-			this.triangle.render(prim);
+			this.triangle.render(state, prim);
 		}
 	};
 

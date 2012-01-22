@@ -62,10 +62,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		//public:
 	
 		cnvgl_context.cnvgl_context = function(driver) {
-	
+
+			cnvgl.setContext(this);
 			this.shared = cnvgl.context_shared.getInstance();
 			this.driver = driver;
-	
+
 			//array state
 			this.array = {
 				arrayBufferObj : null,
@@ -107,7 +108,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				cullFlag : cnvgl.FALSE,
 				frontFace : cnvgl.CCW
 			};
-	
+			cnvgl.disable(cnvgl.CULL_FACE);
+			cnvgl.cullFace(cnvgl.BACK);
+			cnvgl.frontFace(cnvgl.CCW);
+
 			//shader state
 			this.shader = {
 				activeProgram : null	
@@ -127,6 +131,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				w : 0,
 				h : 0
 			};
+			cnvgl.viewport(0, 0, 0, 0);
+			cnvgl.depthRange(0, 1.0);
 	
 			//direct
 			this.errorValue = cnvgl.NO_ERROR;
@@ -154,16 +160,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			colorBuffer.internalFormat = cnvgl.RGBA;
 			colorBuffer.width = width;
 			colorBuffer.height = height;
-			colorBuffer.data = this.driver.getColorBuffer(0, width, height);
+			colorBuffer.data = this.driver.colorBuffer;
 			frameBuffer.colorDrawBuffers[0] = colorBuffer;
-	
+
 			//set up depth buffer
 			depthBuffer = new cnvgl.renderbuffer(0);
 			depthBuffer.internalFormat = cnvgl.DEPTH_COMPONENT16;
 			depthBuffer.width = width;
 			depthBuffer.height = height;
-			depthBuffer.data = this.driver.getDepthBuffer(0, width, height);
-			frameBuffer.depthBuffer = depthBuffer;
+			depthBuffer.data = this.driver.depthBuffer;
+			frameBuffer.depthBuffer = depthBuffer;			
 		};
 	
 		cnvgl_context.initTextures = function() {

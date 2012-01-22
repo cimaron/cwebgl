@@ -24,6 +24,25 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	
 	/**
+	 * glDepthRange — specify mapping of depth values from normalized device coordinates to window coordinates
+	 *
+	 * @var GLclampd  nearVal  Specifies the mapping of the near clipping plane to window coordinates.
+	 * @var GLclampd  farVal   Specifies the mapping of the far clipping plane to window coordinates.
+	 *
+	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glDepthRange.xml
+	 */
+	cnvgl.depthRange = function(nearVal, farVal) {
+		var ctx;
+		ctx = cnvgl.getCurrentContext();
+
+		ctx.viewport.near = nearVal;
+		ctx.viewport.far = farVal;
+
+		ctx.driver.depthRange(ctx, nearVal, farVal);
+	};
+
+
+	/**
 	 * glViewport — set the viewport
 	 *
 	 * @var GLint    x       Specify the lower left corner of the viewport rectangle, in pixels. The initial value is (0,0).
@@ -34,18 +53,20 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glViewport.xml
 	 */
 	cnvgl.viewport = function(x, y, width, height) {
-	
-		var state = cnvgl.getCurrentContext();
-	
+		var ctx;
+		ctx = cnvgl.getCurrentContext();
+
 		if (width < 0 || height < 0) {
 			cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
 			return;
 		}
 	
-		state.viewport.x = x;
-		state.viewport.y = y;
-		state.viewport.w = width;
-		state.viewport.h = height;
+		ctx.viewport.x = x;
+		ctx.viewport.y = y;
+		ctx.viewport.w = width;
+		ctx.viewport.h = height;
+
+		ctx.driver.viewport(ctx, x, y, width, height);
 	};
 
 

@@ -20,16 +20,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 (function(GPU) {
-	var result, vertex, temp, program, memory;
+	var shader, result, vertex, temp, program, memory;
+	var tex;
 
-	var shader = {
+	shader = {
 		MAX_UNIFORMS : 128,
 		MAX_FRAGMENT_UNIFORM_COMPONENTS : 128,
 		MAX_VERTEX_ATTRIBS : 16,
 		MAX_VARYING_VECTORS : 12,
 		MAX_TEMPORARIES : 12
 	};
-
+	
 	GPU.executeVertex = function(){};
 	GPU.executeFragment = function(){};
 
@@ -43,42 +44,28 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		'result.color' : 1
 	};
 
-	memory = {
-		temp : GPU.malloc(shader.MAX_TEMPORARIES * 4, 4),
-		uniforms : GPU.malloc(shader.MAX_UNIFORMS * 4, 4),
-		attributes : GPU.malloc(shader.MAX_VERTEX_ATTRIBS * 4, 4),
-		varying : GPU.malloc(shader.MAX_VARYING_VECTORS * 4, 4),
-		result : GPU.malloc(1, 4)
-	};
+	GPU.memory.temp = cnvgl.malloc(shader.MAX_TEMPORARIES * 4, 4);
+	cnvgl.memset(GPU.memory.temp, 0, 0);
+	//GPU.memory.uniforms = cnvgl.malloc(shader.MAX_UNIFORMS * 4, 4);
+	GPU.memory.uniforms = cnvgl.malloc(10 * 4, 4);
+	cnvgl.memset(GPU.memory.uniforms, 0, 0);
+	GPU.memory.attributes = cnvgl.malloc(shader.MAX_VERTEX_ATTRIBS, 1);
+	cnvgl.memset(GPU.memory.attributes, 0, 0);
+	GPU.memory.result = cnvgl.malloc(1, 4);
+	cnvgl.memset(GPU.memory.result, 0, 0);
 
-	//Pointers
-	result = {
-		position : [0,0,0,0],
-		color : {
-			primary : [0,0,0,0]	
-		}
-	};
+	program = {};
+	vertex = {};
+	fragment = {};
+	result = {};
 
-	//result = memory.result.data;
-	temp = memory.temp.data;
-
-	program = {
-		local : memory.uniforms.data
-	};
-
-	vertex = {
-		attrib : memory.attributes.data,
-		varying : memory.varying.data
-	};
-
-	fragment = {
-		attrib : memory.varying.data
-	};
-
-	GPU.setAttribPtr = function(attributes) {
-		GPU.memory.shader.attributes = attributes.data;
-		vertex.attrib = attributes.data;
-	};
+	//set up alias for use by shaders
+	temp = GPU.memory.temp;
+	program.local = GPU.memory.uniforms.data;
+	vertex.attrib = GPU.memory.attributes.data;
+	result.position = GPU.memory.result.data;
+	result.color = {};
+	result.color.primary = GPU.memory.result.data;
 
 	GPU.uploadVertexShader = function(source) {
 		eval(source);
@@ -90,20 +77,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		this.executeFragment = main;
 	};
 
-	GPU.uploadShader = function(source, target) {
-		if (target == glsl.mode.vertex) {
-			this.uploadVertexShader(source);	
-		} else {
-			this.uploadFragmentShader(source);	
-		}
-	}
-
 	GPU.shader = shader;
-	GPU.memory.shader = memory;
-
-	GPU.shader.result = result;
-	GPU.shader.vertex = vertex;
-	GPU.shader.fragment = fragment;
 
 	//
 	var tex;

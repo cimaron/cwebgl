@@ -25,66 +25,42 @@ cnvgl_renderer = (function() {
 	function Initializer() {
 
 		//public:
-		this.ctx = null;
-
 		this.clipping = null;
 		this.culling = null;
 		this.fragment = null;
 		this.interpolate = null;
 		this.primitive = null;
 		this.vertex = null;
-
-		this.mode = null;
-		this.depthBuffer = null;
-		this.depthFunc = null;
 	}
 
 	var cnvgl_renderer = jClass('cnvgl_renderer', Initializer);
 
 	//public:
 
-	cnvgl_renderer.cnvgl_renderer = function(ctx) {
-		this.ctx = ctx;
-
-		this.clipping = new cnvgl_rendering_clipping(ctx, this);
-		this.culling = new cnvgl_rendering_culling(ctx, this);
-		this.interpolate = new cnvgl_rendering_interpolate(ctx, this);
-		this.primitive = new cnvgl_rendering_primitive(ctx, this);
-
-		this.fragment = new cnvgl_rendering_fragment(ctx, this);
-		this.vertex = new cnvgl_rendering_vertex(ctx, this);
+	cnvgl_renderer.cnvgl_renderer = function() {
+		this.clipping = new cnvgl_rendering_clipping(this);
+		this.culling = new cnvgl_rendering_culling(this);
+		this.interpolate = new cnvgl_rendering_interpolate(this);
+		this.primitive = new cnvgl_rendering_primitive(this);
+		this.fragment = new cnvgl_rendering_fragment(this);
+		this.vertex = new cnvgl_rendering_vertex(this);
 	};
 
-	cnvgl_renderer.setMode = function(mode) {
-		this.mode = mode;
-		this.primitive.setMode(mode);
-	};
-	
-	cnvgl_renderer.setCurrentState = function() {
-		
-		this.depthBuffer = this.ctx.drawBuffer.depthBuffer.data;
-		this.depthFunc = this.ctx.depth.func;
-
-		//set current state in sub-renderers
-		this.fragment.setCurrentState();
-	};
-	
-	cnvgl_renderer.send = function(vertex) {
-		this.setCurrentState();
-		this.vertex.process(vertex);
-		this.primitive.send(vertex);
-	};
-	
-	cnvgl_renderer.end = function() {
-		this.primitive.end();	
+	cnvgl_renderer.send = function(state, mode, vertex) {
+		this.vertex.process(state, vertex);
+		this.primitive.send(state, mode, vertex);
 	};
 
-	cnvgl_renderer.checkDepth = function(i, z) {
+	cnvgl_renderer.end = function(mode) {
+		this.primitive.end(mode);
+	};
+
+	cnvgl_renderer.checkDepth = function(state, i, z) {
 		var depth, pass;
 
-		depth = this.depthBuffer[i];
+		depth = state.depthBuffer[i];
 
-		switch (this.depthFunc) {
+		switch (state.depthFunc) {
 			case cnvgl.NEVER:
 				pass = false;
 				break;
@@ -119,3 +95,18 @@ cnvgl_renderer = (function() {
 
 }());
 
+
+
+include('drivers/cnvGL/gpu/rendering/clipping.js');
+include('drivers/cnvGL/gpu/rendering/culling.js');
+include('drivers/cnvGL/gpu/rendering/fragment.js');
+include('drivers/cnvGL/gpu/rendering/interpolate.js');
+include('drivers/cnvGL/gpu/rendering/primitive.js');
+include('drivers/cnvGL/gpu/rendering/vertex.js');
+include('drivers/cnvGL/gpu/rendering/primitive/point.js');
+include('drivers/cnvGL/gpu/rendering/primitive/line.js');
+include('drivers/cnvGL/gpu/rendering/primitive/triangle.js');
+
+include('drivers/cnvGL/gpu/rendering/objects/primitive.js');
+include('drivers/cnvGL/gpu/rendering/objects/vertex.js');
+include('drivers/cnvGL/gpu/rendering//objects/fragment.js');

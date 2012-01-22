@@ -532,23 +532,21 @@ cWebGLRenderingContext = (function() {
 				size = 0;
 			}
 		}
-		if (data && data.byteLength) {
-			size = data.byteLength;	
+		if (data && data.length) {
+			size = data.length;	
 		}
 		if (!size) {
 			this.errors.push(this.INVALID_VALUE);
 			return;
 		}
-		
+
 		cnvgl.setContext(this._context);
 		cnvgl.bufferData(target, size, data, usage);
 	};
 
 	cWebGLRenderingContext.bufferSubData = function(target, offset, data) {
 		var size;
-		if (data && data.byteLength) {
-			size = data.byteLength;
-		}
+		size = data.length;
 		if (!size) {
 			this.errors.push(this.INVALID_VALUE);
 			return;
@@ -617,10 +615,10 @@ cWebGLRenderingContext = (function() {
 	};
 	
 	cWebGLRenderingContext.drawArrays = function(mode, first, count) {
-		//@validation	
-		this._context.drawArrays(mode, first, count);	
+		cnvgl.setContext(this._context);
+		cnvgl.drawArrays(mode, first, count);	
 	};
-	
+
 	cWebGLRenderingContext.drawElements = function(mode, count, type, offset) {
 		//@validation
 		this._context.drawElements(mode, count, type, offset);
@@ -705,6 +703,7 @@ cWebGLRenderingContext = (function() {
 	cWebGLRenderingContext.linkProgram = function(program) {
 		cnvgl.setContext(this._context);
 		cnvgl.linkProgram(program.object());
+		program.increaseLinkCount();
 	};
 
 	cWebGLRenderingContext.onReady = function(func) {
@@ -791,53 +790,63 @@ cWebGLRenderingContext = (function() {
 	};
 	
 	cWebGLRenderingContext.uniform1f = function(location, x) {
-		this._context.uniform1f(location.object(), x);
+		cnvgl.setContext(this._context);
+		cnvgl.uniform1f(location.location(), x);
 	};
 	
 	cWebGLRenderingContext.uniform1i = function(location, x) {
-		this._context.uniform1i(location.object(), x);
+		cnvgl.setContext(this._context);
+		cnvgl.uniform1i(location.location(), x);
 	};
 	
 	cWebGLRenderingContext.uniform1u = function(location, x) {
-		this._context.uniform1u(location.object(), x);
+		cnvgl.setContext(this._context);
+		cnvgl.uniform1u(location.location(), x);
 	};
 
 	cWebGLRenderingContext.uniform2f = function(location, x, y) {
-		this._context.uniform1f(location.object(), x);
+		cnvgl.setContext(this._context);
+		cnvgl.uniform1f(location.location(), x);
 	};
 	
 	cWebGLRenderingContext.uniform2i = function(location, x, y) {
-		this._context.uniform1i(location.object(), x, y);
+		cnvgl.setContext(this._context);
+		cnvgl.uniform1i(location.location(), x, y);
 	};
 	
 	cWebGLRenderingContext.uniform2u = function(location, x, y) {
-		this._context.uniform1u(location.object(), x);
+		cnvgl.setContext(this._context);
+		cnvgl.uniform1u(location.location(), x);
 	};
 
 	cWebGLRenderingContext.uniform3f = function(location, x, y, z) {
-		this._context.uniform3f(location.object(), x, y, z);
+		cnvgl.setContext(this._context);
+		cnvgl.uniform3f(location.location(), x, y, z);
 	};
 
 	cWebGLRenderingContext.uniform3i = function(location, x, y, z) {
-		this._context.uniform3f(location.object(), x, y, z);
+		cnvgl.setContext(this._context);
+		cnvgl.uniform3f(location.location(), x, y, z);
 	};
 
 	cWebGLRenderingContext.uniform3u = function(location, x, y, z) {
-		this._context.uniform3f(location.object(), x, y, z);
+		cnvgl.setContext(this._context);
+		cnvgl.uniform3f(location.location(), x, y, z);
 	};
 
 	cWebGLRenderingContext.uniform3fv = function(location, v) {
-		this._context.uniform3fv(location.object(), v);
+		cnvgl.setContext(this._context);
+		cnvgl.uniform3fv(location.location(), v);
 	};
 
 	cWebGLRenderingContext.uniformMatrix3fv = function(location, transpose, value) {
-		//@validation
-		this._context.uniformMatrix3fv(location.object(), transpose, value);
+		cnvgl.setContext(this._context);
+		cnvgl.uniformMatrix3fv(location.location(), value.length / 9, transpose, value);
 	};
 	
 	cWebGLRenderingContext.uniformMatrix4fv = function(location, transpose, value) {
-		//@validation
-		this._context.uniformMatrix4fv(location.object(), transpose, value);
+		cnvgl.setContext(this._context);
+		cnvgl.uniformMatrix4fv(location.location(), value.length / 16, transpose, value);
 	};
 
 	cWebGLRenderingContext.useProgram = function(program) {

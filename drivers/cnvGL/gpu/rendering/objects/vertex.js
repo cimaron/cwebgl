@@ -19,39 +19,34 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+(function(cnvgl) {
 
-cWebGLProgram = (function() {
-						  
-	function Initializer() {
-		cWebGLObject.Initializer.apply(this);
-		this._activeAttribLocations = null;
-		this._linkStatus = null;
-		this._linkCount = null;
-		this._vertexShader = null;
-		this._fragmentShader = null;
-	}
-
-	var cWebGLProgram = jClass('cWebGLProgram', Initializer, cWebGLObject);
 	
-	//public:
+	cnvgl.vertex = function(i) {
+		
+		this.x = 0;
+		this.y = 0;
+		this.z = 0;
+		this.w = 0;
+		
+		this.xd = 0;
+		this.yd = 0;
+		this.zd = 0;
 	
-	cWebGLProgram.cWebGLProgram = function(context) {
-		this.cWebGLObject(context);
-		this._linkStatus = false;
-		this._linkCount = 0;
-		cnvgl.setContext(context._context);
-		this.setObject(cnvgl.createProgram());
+		this.xw = 0;
+		this.yw = 0;
+		this.zw = 0;
+		
+		this.xc = 0;
+		this.yc = 0;
+		this.zc = 0;
+		
+		this.i = 4 * i;
+
+		//allocate memory
+		this.varying = cnvgl.malloc(GPU.shader.MAX_VARYING_VECTORS * 4, 4);
 	};
 
-	cWebGLProgram.getLinkCount = function() {
-		return this._linkCount;
-	};
 
-	cWebGLProgram.increaseLinkCount = function() {
-		this._linkCount++;
-	};
-
-	return cWebGLProgram.Constructor;
-
-}());
+}(cnvgl));
 

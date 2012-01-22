@@ -20,38 +20,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-cWebGLProgram = (function() {
-						  
-	function Initializer() {
-		cWebGLObject.Initializer.apply(this);
-		this._activeAttribLocations = null;
-		this._linkStatus = null;
-		this._linkCount = null;
-		this._vertexShader = null;
-		this._fragmentShader = null;
-	}
+(function(GPU) {
 
-	var cWebGLProgram = jClass('cWebGLProgram', Initializer, cWebGLObject);
-	
-	//public:
-	
-	cWebGLProgram.cWebGLProgram = function(context) {
-		this.cWebGLObject(context);
-		this._linkStatus = false;
-		this._linkCount = 0;
-		cnvgl.setContext(context._context);
-		this.setObject(cnvgl.createProgram());
-	};
+	GPU.memory = {};
 
-	cWebGLProgram.getLinkCount = function() {
-		return this._linkCount;
-	};
+	GPU.memory.temp = null;
+	GPU.memory.uniforms = null;
+	GPU.memory.attributes = null;
+	GPU.memory.cur_attributes = null;
+	GPU.memory.varying = null;
+	GPU.memory.result = null;
 
-	cWebGLProgram.increaseLinkCount = function() {
-		this._linkCount++;
-	};
-
-	return cWebGLProgram.Constructor;
-
-}());
+}(GPU));
 

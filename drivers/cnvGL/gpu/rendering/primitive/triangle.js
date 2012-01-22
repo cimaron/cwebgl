@@ -24,9 +24,8 @@ cnvgl_rendering_primitive_triangle = (function() {
 	//Internal Constructor
 	function Initializer() {
 		//public:
-		this.ctx = null;
 		this.renderer = null;
-		
+
 		this.prim = null;
 		this.frag = null;
 		this.v1 = null;
@@ -38,18 +37,19 @@ cnvgl_rendering_primitive_triangle = (function() {
 
 	//public:
 
-	cnvgl_rendering_primitive_triangle.cnvgl_rendering_primitive_triangle = function(ctx, renderer) {
-		this.ctx = ctx;
+	cnvgl_rendering_primitive_triangle.cnvgl_rendering_primitive_triangle = function(renderer) {
 		this.renderer = renderer;
 		this.frag = new cnvgl.fragment();
 	};
 
-	cnvgl_rendering_primitive_triangle.render = function(prim) {
+	cnvgl_rendering_primitive_triangle.render = function(state, prim) {
 		var clipped, num, i;
 
-		if (this.renderer.culling.checkCull(prim)) {
+		if (this.renderer.culling.checkCull(state, prim)) {
 			return;
 		}
+		
+		console.log(prim);
 
 		//clipping may split triangle into multiple triangles
 		clipped = [];

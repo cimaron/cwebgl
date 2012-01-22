@@ -52,29 +52,21 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glClear.xml
 	 */
 	cnvgl.clear = function(mask) {
-		var ctx, buffer, clear, i, l;
+		var ctx;
 
 		ctx = cnvgl.getCurrentContext();
-	
+
 		if (mask & ~(cnvgl.COLOR_BUFFER_BIT | cnvgl.DEPTH_BUFFER_BIT | cnvgl.STENCIL_BUFFER_BIT)) {
 			cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
 			return;
-		}
-
-		//Color Buffer
-		if (mask & cnvgl.COLOR_BUFFER_BIT) {
-			ctx.driver.clearColorBuffer(ctx.drawBuffer.colorDrawBuffers[0].data, ctx.color.clearColor);
-		}
-
-		//Depth Buffer
-		if (mask & cnvgl.DEPTH_BUFFER_BIT) {
-			ctx.driver.clearDepthBuffer(ctx.drawBuffer.depthBuffer.data, ctx.depth.clear);
 		}
 
 		//Stencil Buffer
 		if (mask & cnvgl.STENCIL_BUFFER_BIT) {
 			throw new Error('clear: stencil_buffer not implemented yet');
 		}
+
+		ctx.driver.clear(ctx, ctx.color.clearColor, ctx.depth.clear, mask);
 	};
 
 

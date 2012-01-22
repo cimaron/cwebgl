@@ -89,10 +89,6 @@ GraphicsContext3D = (function() {
 		glBindAttribLocation(program, index, name);
 	};
 
-	GraphicsContext3D.bindBuffer = function(target, buffer) {
-		glBindBuffer(target, buffer);
-	};
-
 	GraphicsContext3D.bindFramebuffer = function(target, framebuffer) {
 		glBindFramebuffer(target, framebuffer);
 	};
@@ -109,39 +105,16 @@ GraphicsContext3D = (function() {
 		glBlendFunc(sfactor, dfactor);
 	};
 
-	GraphicsContext3D.bufferData = function(target, size, data, usage) {
-		glBufferData(target, size, data, usage);
-	};
-
 	GraphicsContext3D.bufferSubData = function(target, offset, size, data) {
 		glBufferSubData(target, offset, size, data);
-	};
-
-	GraphicsContext3D.clear = function(mask) {
-		this._dirty = true;
-		glClear(mask);
-	};
-
-	GraphicsContext3D.clearColor = function(red, green, blue, alpha) {
-		glClearColor(red, green, blue, alpha);
 	};
 
 	GraphicsContext3D.clearDepth = function(depth) {
 		glClearDepth(depth);
 	};
 
-	GraphicsContext3D.compileShader = function(shader) {
-		glCompileShader(shader);
-	};
-
 	GraphicsContext3D.colorMask = function(red, green, blue, alpha) {
 		glColorMask(red, green, blue, alpha);
-	};
-
-	GraphicsContext3D.createBuffer = function() {
-		var buffers = [];
-		glGenBuffers(1, buffers);
-		return buffers[0][0];
 	};
 
 	GraphicsContext3D.createFramebuffer = function() {
@@ -150,20 +123,12 @@ GraphicsContext3D = (function() {
 		return framebuffers[0][0];
 	};
 
-	GraphicsContext3D.createProgram = function() {
-		return glCreateProgram();
-	};
-	
 	GraphicsContext3D.createRenderbuffer = function() {
 		var renderbuffers = [];
 		glGenRenderbuffers(1, renderbuffers);
 		return renderbuffers[0][0];
 	};
 
-	GraphicsContext3D.createShader = function(type) {
-		return glCreateShader(type);
-	};
-	
 	GraphicsContext3D.createTexture = function() {
 		var textures = [];
 		glGenTextures(1, textures);
@@ -192,20 +157,8 @@ GraphicsContext3D = (function() {
 		glDrawElements(mode, count, type, offset);
 	};
 
-	GraphicsContext3D.disable = function(cap) {
-		glDisable(cap);
-	};
-
 	GraphicsContext3D.disableVertexAttribArray = function(index) {
 		glDisableVertexAttribArray(index);
-	};
-
-	GraphicsContext3D.enable = function(cap) {
-		glEnable(cap);
-	};
-	
-	GraphicsContext3D.enableVertexAttribArray = function(index) {
-		glEnableVertexAttribArray(index);
 	};
 
 	GraphicsContext3D.frontFace = function(mode) {
@@ -216,38 +169,12 @@ GraphicsContext3D = (function() {
 		//glGenerateMipmap(target);
 	};
 
-	GraphicsContext3D.getAttribLocation = function(program, name) {
-		return glGetAttribLocation(program, name);
-	};
-
 	GraphicsContext3D.getError = function() {
 		return glGetError();
 	};
 
-	GraphicsContext3D.getProgramParameter = function(program, pname) {
-		var params = [];
-		glGetProgramiv(program, pname, params);
-		return params[0];
-	};
-
-	GraphicsContext3D.getShaderInfoLog = function(shader) {
-		var length = [], infoLog = [];
-		glGetShaderInfoLog(shader, null, length, infoLog);
-		return infoLog[0];
-	};
-	
-	GraphicsContext3D.getShaderParameter = function(shader, pname) {
-		var params = [];
-		glGetShaderiv(shader, pname, params);
-		return params[0];
-	};
-
 	GraphicsContext3D.getUniformLocation = function(program, name) {
 		return glGetUniformLocation(program, name);
-	};
-	
-	GraphicsContext3D.linkProgram = function(program) {
-		glLinkProgram(program);
 	};
 	
 	GraphicsContext3D.pixelStorei = function(pname, param) {
@@ -258,17 +185,13 @@ GraphicsContext3D = (function() {
 		glRenderbufferStorage(target, internalformat, width, height);
 	};
 
-	GraphicsContext3D.shaderSource = function(shader, source) {
-		glShaderSource(shader, 1, [source], [source.length]);
-	};
-	
 	GraphicsContext3D.uniform1i = function(location, v0) {
 		glUniform1i(location, v0);
 	};
 
 	GraphicsContext3D.uniform1f = function(location, v0) {
 		glUniform1f(location, v0);
-	};
+	};\
 
 	GraphicsContext3D.uniform3f = function(location, v0, v1, v2) {
 		glUniform3f(location, v0, v1, v2);
@@ -286,45 +209,12 @@ GraphicsContext3D = (function() {
 		glUniformMatrix4fv(location, value.length / 16, transpose, value);
 	};
 	
-	GraphicsContext3D.useProgram = function(program) {
-		glUseProgram(program);
-	};
-
 	GraphicsContext3D.texImage2D = function(target, level, internalformat, width, height, border, format, type, source) {
 		glTexImage2D(target, level, internalformat, width, height, border, format, type, source);
 	};
 
 	GraphicsContext3D.texParameteri = function(target, pname, param) {
 		glTexParameteri(target, pname, param);
-	};
-
-	GraphicsContext3D.vertexAttrib1f = function(indx, x) {
-		glVertexAttrib1f(indx, x);
-	};
-
-	GraphicsContext3D.vertexAttrib2f = function(indx, x, y) {
-		glVertexAttrib2f(indx, x, y);
-	};
-
-	GraphicsContext3D.vertexAttrib3f = function(indx, x, y, z) {
-		glVertexAttrib3f(indx, x, y, z);
-	};
-
-	GraphicsContext3D.vertexAttrib4f = function(indx, x, y, z, w) {
-		glVertexAttrib4f(indx, x, y, z, w);
-	};
-
-	GraphicsContext3D.vertexAttribPointer = function(indx, size, type, normalized, stride, offset) {
-		glVertexAttribPointer(indx, size, type, normalized, stride, offset);
-	};
-
-	GraphicsContext3D.viewport = function(x, y, width, height) {
-		x = Math.round(x / this._quality.factor);
-		y = Math.round(y / this._quality.factor);
-		width = Math.round(width / this._quality.factor);
-		height = Math.round(height / this._quality.factor);
-
-		glViewport(x, y, width, height);
 	};
 
 	GraphicsContext3D.setTargetFps = function(low, high) {
@@ -373,37 +263,6 @@ GraphicsContext3D = (function() {
 			this._quality.ctx = this._quality.cnv.getContext('2d');
 			this.context.mozImageSmoothingEnabled = false;
 		}
-
-		//set up framebuffer
-		frameBuffer = new cnvgl_framebuffer(0);
-		frameBuffer.width = width;
-		frameBuffer.height = height;
-
-		ctx.winDrawBuffer = frameBuffer;
-		ctx.drawBuffer = frameBuffer;
-
-		//set up color buffer
-		colorBuffer = new cnvgl_renderbuffer(0);
-		colorBuffer.internalFormat = GL_RGBA;
-		colorBuffer.width = width;
-		colorBuffer.height = height;
-		frameBuffer.colorDrawBuffers[0] = colorBuffer;
-
-		if (this._quality.factor > 1) {
-			this._quality.buffer = this.context.createImageData(width, height);
-			colorBuffer.data = this._quality.buffer.data;
-		} else {
-			this.buffer = this.context.createImageData(width, height);
-			colorBuffer.data = this.buffer.data;
-		}
-		
-		//set up depth buffer
-		depthBuffer = new cnvgl_renderbuffer(0);
-		depthBuffer.internalFormat = GL_DEPTH_COMPONENT16;
-		depthBuffer.width = width;
-		depthBuffer.height = height;
-		depthBuffer.data = cnvgl_malloc(GL_DEPTH_COMPONENT16, width * height);
-		frameBuffer.depthBuffer = depthBuffer;
 	};
 
 	GraphicsContext3D._updateFrame = function() {

@@ -377,7 +377,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glLinkProgram.xml
 	 */
 	cnvgl.linkProgram = function(program) {
-		var ctx, program_obj, i, shaders;
+		var ctx, program_obj, i, shaders, attrib, unif, attrib_obj, uniform_obj;
 	
 		//get program
 		ctx = cnvgl.getCurrentContext();
@@ -388,7 +388,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
 			return;
 		}
-	
+
 		//object is not a program
 		if (!program_obj instanceof cnvgl.program) {
 			cnvgl.throw_error(cnvgl.INVALID_OPERATION, ctx);
@@ -400,9 +400,24 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			shaders.push(program_obj.attached_shaders[i].object_code);
 		}
 
-		ctx.driver.link(shaders);
+		program_obj.program = ctx.driver.link(shaders);
 		program_obj.link_status = ctx.driver.linkStatus;
 		program_obj.information_log = ctx.driver.linkErrors;
+
+		if (program_obj.link_status) {
+
+			for (i = 0; i < program_obj.program.attributes.length; i++) {
+				attrib = program_obj.program.attributes[i];
+				attrib_obj = new cnvgl.program_var(attrib.name, attrib.location, attrib.slots, attrib.components);
+				program_obj.addActiveAttribute(attrib_obj);
+			}
+
+			for (i = 0; i < program_obj.program.uniforms.length; i++) {
+				unif = program_obj.program.uniforms[i];
+				uniform_obj = new cnvgl.program_var(unif.name, unif.location, unif.slots, unif.components);
+				program_obj.addActiveUniform(uniform_obj);
+			}	
+		}
 
 	};
 
@@ -478,7 +493,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			return;
 		}
 	
-		ctx.shader.activeProgram = program_obj;
+		ctx.shader.activeProgram = program_obj;		
 	};
 
 

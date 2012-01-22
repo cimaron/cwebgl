@@ -179,7 +179,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 * @param   string    Operand
 	 */
 	function enter_symbol(oper, i) {
-		var entry, size, symbol, reg, j;
+		var entry, size, slots, symbol, reg, j;
 
 		//empty operand
 		if (!oper) {
@@ -213,12 +213,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 
 		size = glsl.type.size[entry.type];
+		slots = glsl.type.slots[entry.type];
 		symbol = {
 			name : oper.name,
 			out : entry.out,
 			entry : entry,
-			size : Math.ceil(size / 4),
-			type_size : glsl.type.size[entry.type]
+			size : slots,
+			components : size / slots,
+			type_size : size
 		};
 
 		symbols[oper.name] = symbol;

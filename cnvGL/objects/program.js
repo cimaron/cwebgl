@@ -45,6 +45,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			this.uniforms = null;
 			this.attributes = null;
 			this.varying = null;
+
+			this.program = null;
 		}
 	
 		var cnvgl_program = jClass('cnvgl_program', Initializer);
@@ -78,22 +80,22 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			last = set.active[set.active.length - 1];
 			return last.location + last.slots;
 		};
-		
+
 		cnvgl_program.addActiveAttribute = function(attr) {
 			this.attributes.active.push(attr);
 			this.attributes.names[attr.name] = attr;
 		};
-	
+
 		cnvgl_program.addActiveUniform = function(uniform) {
 			this.uniforms.active.push(uniform);
 			this.uniforms.names[uniform.name] = uniform;
 		};
-	
+
 		cnvgl_program.addActiveVarying = function(varying) {
 			this.varying.active.push(varying);
 			this.varying.names[varying.name] = varying;
 		};
-	
+
 		cnvgl_program.getActiveAttribute = function(name) {
 			return this.attributes.names[name];
 		};
@@ -111,11 +113,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	}());
 	
 	
-	cnvgl.program_var = function(name, location, size) {
+	cnvgl.program_var = function(name, location, slots, components) {
 		this.name = name;
 		this.location = location;
-		this.size = size;
-		this.slots = Math.ceil(size / 4);
+		this.slots = slots;
+		this.components = components;
 		this.type = cnvgl.FLOAT;
 	};
 	

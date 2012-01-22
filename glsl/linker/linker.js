@@ -36,7 +36,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		symbol.location = new_index;
 
-		code = shader_obj.object_code.body;
+		code = shader_obj.body;
 		for (i = 0; i < code.length; i++) {
 			ins = code[i];
 
@@ -59,7 +59,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	function addVarying(program_obj, shader_obj) {
 		var attribs, i, attrib, location;
 
-		attribs = shader_obj.object_code.fragment.attrib;
+		attribs = shader_obj.fragment.attrib;
 
 		for (i = 0; i < attribs.length; i++) {
 			attrib = attribs[i];
@@ -76,7 +76,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			}
 
 			location = program_obj.getOpenSlot(program_obj.varying);
-			attrib_obj = new cnvgl.program_var(attrib.name, location, attrib.type_size);
+			attrib_obj = new cnvgl.program_var(attrib.name, location, attrib.size, attrib.components);
 			program_obj.addActiveVarying(attrib_obj);
 		}
 
@@ -91,7 +91,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	function addAttributes(program_obj, shader_obj) {
 		var attribs, i, j, attrib, location;
 
-		attribs = shader_obj.object_code.vertex.attrib;
+		attribs = shader_obj.vertex.attrib;
 
 		for (i = 0; i < attribs.length; i++) {
 			attrib = attribs[i];
@@ -110,10 +110,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				location = program_obj.getOpenSlot(program_obj.attributes);			
 			}
 
-			attrib_obj = new cnvgl.program_var(attrib.name, location, attrib.type_size);
+			attrib_obj = new cnvgl.program_var(attrib.name, location, attrib.size, attrib.components);
 			program_obj.addActiveAttribute(attrib_obj);
 		}
-		
+
 		//adjust addresses
 		for (i = attribs.length - 1; i >= 0; i--) {
 			attrib = attribs[i];
@@ -125,8 +125,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	function addUniforms(program_obj, shader_obj) {
 		var constants, uniforms, i, c, uniform, uniform_obj, location;
 
-		constants = shader_obj.object_code.constants;
-		uniforms = shader_obj.object_code.program.local;
+		constants = shader_obj.constants;
+		uniforms = shader_obj.program.local;
 
 		c = 0;
 		for (i = 0; i < constants.length; i++) {
@@ -140,7 +140,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			//get new location and reindex
 			if (i % 4 == 0) {
 				location = program_obj.getOpenSlot(program_obj.uniforms);
-				uniform_obj = new cnvgl.program_var('$constant'+c, location, 1);
+				uniform_obj = new cnvgl.program_var('$constant'+c, location, 1, 1);
 				program_obj.addActiveUniform(uniform_obj);
 				c++;
 			} else {
@@ -164,7 +164,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			//get new location and reindex
 			location = program_obj.getOpenSlot(program_obj.uniforms);
 
-			uniform_obj = new cnvgl.program_var(uniform.name, location, uniform.type_size);
+			uniform_obj = new cnvgl.program_var(uniform.name, location, uniform.size, uniform.components);
 			program_obj.addActiveUniform(uniform_obj);
 		}
 
@@ -197,26 +197,28 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 
 		//do translation into native javascript
-		result = ARB.translate(shader_obj.object_code, 'javascript');
+		result = ARB.translate(shader_obj, 'javascript');
 		output = result ? ARB.output : null;
 
 		return output;
 	}
 
-	function link(program_obj) {
+	function link(shaders) {
 		var i, status, shader_obj;
 		status = 1;
 
-		//reset
-		program_obj.reset();
+		glsl.errors = [];
+		program_obj = new cnvgl.program();
 
-		for (i = 0; i < program_obj.attached_shaders.length; i++) {
-			shader_obj = program_obj.attached_shaders[i];
+		for (i = 0; i < shaders.length; i++) {
+			shader_obj = shaders[i];
 			shader_obj.exec = linkObject(program_obj, shader_obj);
 			status &= !!shader_obj.exec;
 		}
 
-		return status;
+		program_obj.status = status;
+
+		return program_obj;
 	}
 
 	/**

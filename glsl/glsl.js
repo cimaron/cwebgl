@@ -85,8 +85,8 @@ var glsl = (function(ARB) {
 		 * Compilation mode enumerations
 		 */
 		mode : {
-			vertex : 0,
-			fragment : 1
+			vertex : 1,
+			fragment : 0
 		},
 
 		/**
@@ -116,6 +116,77 @@ var glsl = (function(ARB) {
 			//this.parser.initialize_types = initialize_types;
 
 			this.token = this.parser.yytokentype;
+			this.symbols = null;
+		},
+		
+		prepareSymbols : function() {
+			var symbols, i, symbol, sym;
+
+			symbols = {
+				uniforms : [],
+				attributes : []
+			};
+
+			for (i in this.state.symbols.table) {
+				
+				symbol = this.state.symbols.get_variable(i);
+				if (!symbol || !symbol.qualifier) {
+					continue;
+				}
+
+				sym = {
+					name : i,
+					type : symbol.type,
+					slots : glsl.type.slots[symbol.type],
+					components : glsl.type.size[symbol.type] / glsl.type.slots[symbol.type]
+				};
+
+				switch (symbol.qualifier) {
+					case glsl.ast.type_qualifier.flags.attribute:
+						symbols.attributes.push(sym);
+						break;
+					case glsl.ast.type_qualifier.flags.uniform:
+						symbols.uniforms.push(sym);
+						break;
+				}
+			}
+
+			return symbols;			
+		},
+
+		getSymbols : function(source, target) {
+			var symbols, i, symbol, sym;
+
+			if (!initialized) {
+				this.initialize();
+				initialized = true;
+			}
+
+			//reset output
+			this.output = null;
+			this.errors = [];
+			this.state = new parse_state(target);
+
+			//preprocess
+			source = this.preprocess(source, this.state);
+			if (!source) {
+				return false;
+			}
+
+			//scan/parse
+			lexer.setInput(source);
+			//need to get errors here
+			if (this.parser.yyparse(this.state) != 0) {
+				return false;
+			}
+
+			if (!this.generate_ir(this.state)) {
+				return false;	
+			}
+
+			this.symbols = this.prepareSymbols();
+
+			return this.symbols;
 		},
 
 		compile : function(source, target) {
@@ -129,6 +200,7 @@ var glsl = (function(ARB) {
 			//reset output
 			this.output = null;
 			this.errors = [];
+			this.symbols = null;
 			this.state = new parse_state(target);
 
 			//preprocess
@@ -155,6 +227,8 @@ var glsl = (function(ARB) {
 
 			//generate ARB code
 			this.output = this.generate_arb(irs, this.state);
+
+			this.symbols = this.prepareSymbols();
 
 			status = (this.output ? true : false)
 			return status;

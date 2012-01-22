@@ -42,6 +42,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 	
 		ctx.polygon.cullFaceMode = mode;
+		
+		ctx.driver.cullFace(ctx, mode);
 	};
 	
 
@@ -63,6 +65,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 	
 		ctx.polygon.frontFace = mode;
+		
+		ctx.driver.frontFace(ctx, mode);
 	};
 	
 	

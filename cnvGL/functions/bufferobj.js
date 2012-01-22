@@ -122,29 +122,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			cnvgl.throw_error(cnvgl.INVALID_OPERATION, ctx);
 			return;
 		}
-	
+
 		buffer_obj.target = target;
 		buffer_obj.usage = usage;
 		buffer_obj.size = size;
-	
-		data_type = TypedArray.getType(data);
-		view = new ArrayBuffer(size);
-		if (data) {
-			size /= data_type.BYTES_PER_ELEMENT;
-			if (ArrayBuffer.native) {
-				temp = new data_type(view);
-			} else {
-				temp = view;	
-			}
-			for (i = 0; i < size; i++) {
-				temp[i] = data[i];
-			}
-		}
-	
-		if (data_type != ArrayBuffer) {
-			buffer_obj.data_type = data_type;
-		}
-		buffer_obj.data = view;
+		buffer_obj.data = cnvgl.malloc(size);
+		cnvgl.memcpy(buffer_obj.data, 0, data, size, 0);
 	};
 
 
@@ -184,7 +167,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
 			return;
 		}
-		
+debugger;		
 		data_type = TypedArray.getType(data);
 		view = buffer_obj.data;
 		if (ArrayBuffer.native) {

@@ -23,24 +23,24 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 (function(cnvgl) {
 
 
-	function cnvgl_vertexAttrib(index, v) {
+	function cnvgl_vertexAttrib(index, v0, v1, v2, v3) {
 		var ctx, buffer_obj, vtx_attrib_obj;
-	
+
 		ctx = cnvgl.getCurrentContext();
-	
+
 		if (index > cnvgl.MAX_VERTEX_ATTRIBS) {
 			cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
-			return;			
+			return;
 		}
-	
+
 		vtx_attrib_obj = ctx.array.arrayObj.vertexAttrib[index];
 		vtx_attrib_obj.size = v.length;
 		vtx_attrib_obj.type = cnvgl.FLOAT;
 		vtx_attrib_obj.normalized = false;
 		vtx_attrib_obj.stride = 0;
-		vtx_attrib_obj.pointer = 0;	
-		vtx_attrib_obj.buffer_obj = false;
-		vtx_attrib_obj.value = v;
+		vtx_attrib_obj.pointer = 0;
+		vtx_attrib_obj.buffer_obj = null;
+		vtx_attrib_obj.value = [v0, v1, v2, v3];
 	}
 
 
@@ -110,7 +110,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glVertexAttrib.xml
 	 */
 	cnvgl.vertexAttrib1f = function(index, v0) {
-		cnvgl_vertexAttrib(index, [v0]);
+		cnvgl_vertexAttrib(index, v0, 0, 0, 1);
 	};
 
 
@@ -123,7 +123,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glVertexAttrib.xml
 	 */
 	cnvgl.vertexAttrib1s = function(index, v0) {
-		cnvgl_vertexAttrib(index, [v0]);
+		cnvgl_vertexAttrib(index, v0, 0, 0, 1);
 	};
 
 
@@ -137,7 +137,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glVertexAttrib.xml
 	 */
 	cnvgl.vertexAttrib2d = function(index, v0, v1) {
-		cnvgl_vertexAttrib(index, [v0, v1]);
+		cnvgl_vertexAttrib(index, v0, v1, 0, 1);
 	};
 
 
@@ -151,7 +151,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glVertexAttrib.xml
 	 */
 	cnvgl.vertexAttrib2f = function(index, v0, v1) {
-		cnvgl_vertexAttrib(index, [v0, v1]);
+		cnvgl_vertexAttrib(index, v0, v1, 0, 1);
 	};
 
 
@@ -165,7 +165,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glVertexAttrib.xml
 	 */
 	cnvgl.vertexAttrib2s = function(index, v0, v1) {
-		cnvgl_vertexAttrib(index, [v0, v1]);
+		cnvgl_vertexAttrib(index, v0, v1, 0, 1);
 	};
 
 
@@ -180,7 +180,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glVertexAttrib.xml
 	 */
 	cnvgl.vertexAttrib3d = function(index, v0, v1, v2) {
-		cnvgl_vertexAttrib(index, [v0, v1, v2]);
+		cnvgl_vertexAttrib(index, v0, v1, v2, 1);
 	};
 
 
@@ -195,7 +195,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glVertexAttrib.xml
 	 */
 	cnvgl.vertexAttrib3f = function(index, v0, v1, v2) {
-		cnvgl_vertexAttrib(index, [v0, v1, v2]);
+		cnvgl_vertexAttrib(index, v0, v1, v2, 1);
 	};
 
 
@@ -210,7 +210,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glVertexAttrib.xml
 	 */
 	cnvgl.vertexAttrib3s = function(index, v0, v1, v2) {
-		cnvgl_vertexAttrib(index, [v0, v1, v2]);
+		cnvgl_vertexAttrib(index, v0, v1, v2, 1);
 	};
 
 
@@ -226,7 +226,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glVertexAttrib.xml
 	 */
 	cnvgl.vertexAttrib4d = function(index, v0, v1, v2, v3) {
-		cnvgl_vertexAttrib(index, [v0, v1, v2, v3]);
+		cnvgl_vertexAttrib(index, v0, v1, v2, v3);
 	};
 
 
@@ -242,7 +242,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glVertexAttrib.xml
 	 */
 	cnvgl.vertexAttrib4f = function(index, v0, v1, v2, v3) {
-		cnvgl_vertexAttrib(index, [v0, v1, v2, v3]);
+		cnvgl_vertexAttrib(index, v0, v1, v2, v3);
 	};
 
 
@@ -258,7 +258,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glVertexAttrib.xml
 	 */
 	cnvgl.vertexAttrib4s = function(index, v0, v1, v2, v3) {
-		cnvgl_vertexAttrib(index, [v0, v1, v2, v3]);
+		cnvgl_vertexAttrib(index, v0, v1, v2, v3);
 	};
 
 

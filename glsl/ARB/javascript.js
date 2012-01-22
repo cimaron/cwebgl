@@ -89,9 +89,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 		
 		if (out.name == 'vertex.attrib') {
-			out.name = 'attrib';	
+			out.name = 'attrib';
 		}
-		
+
 		if (out.name == 'vertex.varying') {
 			out.name = 'varying';	
 		}
@@ -113,7 +113,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				out.comp.push(out.comp[i - 1]);	
 			} else {
 				//push the location of the current component
-				out.comp.push("[" + "xyzw".indexOf(swz[i]) + "]");			
+				if (out.name == 'attrib') {
+					out.comp.push("[ai" + "xyzw".indexOf(swz[i]) + "]");
+				} else {					
+					out.comp.push("[" + "xyzw".indexOf(swz[i]) + "]");
+				}
 			}
 		}
 
@@ -283,7 +287,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		errors = 0;
 
 		header = [];
-		body = ["function main(R, c, attrib, varying, result) {"];
+		body = ["function main(R, c, attrib, ai0, ai1, ai2, ai3, varying, result) {"];
 
 		processSymbols(object_code);
 		//optimize(irs, symbols);

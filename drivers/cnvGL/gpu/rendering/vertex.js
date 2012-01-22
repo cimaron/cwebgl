@@ -24,56 +24,51 @@ cnvgl_rendering_vertex = (function() {
 	//Internal Constructor
 	function Initializer() {
 		//public:
-		this.ctx = null;
 		this.renderer = null;
 	}
 
 	var cnvgl_rendering_vertex = jClass('cnvgl_rendering_vertex', Initializer);
 
 	//public:
-	cnvgl_rendering_vertex.cnvgl_rendering_vertex = function(ctx, renderer) {
-		this.ctx = ctx;
+	cnvgl_rendering_vertex.cnvgl_rendering_vertex = function(renderer) {
 		this.renderer = renderer;
-
-		this.result = GPU.shader.result;
 	};
 
-	cnvgl_rendering_vertex.process = function(v) {
-		var position, shader_mem;
-		shader_mem = GPU.memory.shader;
+	cnvgl_rendering_vertex.process = function(state, v) {
+		var position, result;
+
+		result = {};
+		result.position = GPU.memory.result.data[0];
 
 		GPU.executeVertex(
-			shader_mem.temp.data,
-			shader_mem.uniforms.data,
-			v.attributes.data, 
+			GPU.memory.temp.data,
+			GPU.memory.uniforms.data,
+			GPU.memory.attributes,
+			v.i,
+			v.i + 1,
+			v.i + 2,
+			v.i + 3,
 			v.varying.data,
-			this.result);
+			result);
 
-		position = this.result.position;
+		position = GPU.memory.result.data[0];
 
 		v.x = position[0];
 		v.y = position[1];
 		v.z = position[2];
 		v.w = position[3];
 
-		this.setNormalizedCoordinates(v);
-		this.setWindowCoordinates(v);
-	};
-
-	cnvgl_rendering_vertex.setNormalizedCoordinates = function(v) {
+		//set normalized coordinates
 		if (v.w) {
 			v.xd = v.x / v.w;
 			v.yd = v.y / v.w;
 			v.zd = v.z / v.w;
-		}
-	};
 
-	cnvgl_rendering_vertex.setWindowCoordinates = function(v) {		
-		var vp;
-		vp = this.ctx.viewport;
-		v.xw = (vp.x + vp.w / 2) + (vp.w / 2 * v.xd);
-		v.yw = (vp.y + vp.h / 2) - (vp.h / 2 * v.yd);
-		v.zw = ((vp.far - vp.near) / 2) * v.zd + ((vp.near + vp.far) / 2);
+			//set window coordinates
+			v.xw = (state.viewportX + state.viewportW / 2) + (state.viewportW / 2 * v.xd);
+			v.yw = (state.viewportY + state.viewportH / 2) - (state.viewportH / 2 * v.yd);
+			v.zw = ((state.viewportF - state.viewportN) / 2) * v.zd + ((state.viewportN + state.viewportF) / 2);
+		}
 	};
 
 	cnvgl_rendering_vertex.sortVertices = function(prim) {

@@ -30,7 +30,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.malloc = function(size, stride, format) {
 		var block, i;
 
-		format = format.native ? format : Array;
+		format = format && format.native ? format : Array;
 		stride = stride || 1;
 		size = Math.ceil(size / stride);
 
@@ -49,36 +49,68 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			block = new format(size);
 		}
 
-		//initialize memory to 0
-		GPU.memset(block, 0, 0, block.size);
-
 		return block;
 	};
 
 	/**
-	 * Copies data from source into GPU memory structure specified by dest
+	 * Copies data from source into memory structure specified by dest
 	 *
-	 * @param   object    GPU dest memory structure
-	 * @param   integer   dest start pointer
-	 * @param   array     source data
-	 * @param   integer   source length to copy
-	 * @param   integer   source start
+	 * @param   object    Dest memory structure
+	 * @param   integer   Dest start pointer
+	 * @param   array     Source data
+	 * @param   integer   Source length to copy
+	 * @param   integer   Source start
 	 */
 	cnvgl.memcpy = function(dest, di, source, size, si) {
-		var data, srci, dc, stride;
+		var data, srci, dc, ds;
 
-		stride = dest.stride || 1;
+		ds = dest.stride || 1;
 		data = dest.data || dest;
 
 		si = si || 0;
+		dc = di % ds;
+		di = (di - dc) / ds;
+
+		if (ds == 1) {
+			for (srci = si; srci < si + size; srci++) {
+				data[di++] = source[srci];
+			}
+		} else {
+			for (srci = si; srci < si + size; srci++) {
+				data[di][dc++] = source[srci];
+				if (dc == ds) {
+					dc = 0;
+					di++;
+				}
+			}
+		}
+	};
+
+	/**
+	 * Sets data from source into memory structure specified by dest
+	 *
+	 * @param   object    Dest memory structure
+	 * @param   integer   Dest start pointer
+	 * @param   number    Value
+	 * @param   integer   Length
+	 */
+	cnvgl.memset = function(dest, di, value, size) {
+		var i, dc, stride, data;
+
+		data = dest.data || dest;
+		stride = dest.stride || 1;
+		size = size || data.length * stride;
+
 		dc = di % stride;
 		di = (di - dc) / stride;
 
-		for (srci = si; srci < si + size; srci++) {
-			if (stride == 1) {
-				dest[di++] = source[srci];
-			} else {
-				dest[di][dc++] = source[srci];
+		if (stride == 1) {
+			for (i = 0; i < size; i++) {
+				data[di++] = value;
+			}
+		} else {
+			for (i = 0; i < size; i++) {
+				data[di][dc++] = value;
 				if (dc == stride) {
 					dc = 0;
 					di++;
@@ -88,31 +120,42 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	};
 
 	/**
-	 * Sets data from source into GPU memory structure specified by dest
+	 * Sets data from src values into memory structure specified by dest n times
 	 *
-	 * @param   object    GPU dest memory structure
-	 * @param   integer   dest start pointer
-	 * @param   number    value
-	 * @param   integer   length
+	 * @param   object    Dest memory structure
+	 * @param   integer   Dest start pointer
+	 * @param   number    Values
+	 * @param   integer   Length
 	 */
-	cnvgl.memset = function(dest, di, value, size) {
-		var i, dc, stride, data;
+	cnvgl.memseta = function(dest, di, src, n) {
+		var i, dc, si, ss, ds, data;
 
 		data = dest.data || dest;
-		stride = dest.stride || 1;
+		ds = dest.stride || 1;
+		n = n || data.length;
 
-		dc = di % stride;
-		di = (di - dc) / stride;
+		dc = di % ds;
+		di = (di - dc) / ds;
 
-		for (i = 0; i < size; i++) {
+		si = 0;
+		ss = src.length;
 
-			if (stride == 1) {
-				data[di++] = value;
-			} else {
-				data[di][dc++] = value;
-				if (dc == stride) {
+		if (ds == 1) {
+			for (i = 0; i < n; i++) {
+				data[di++] = src[si++];
+				if (si == ss) {
+					si = 0;
+				}
+			}
+		} else {
+			for (i = 0; i < n; i++) {
+				data[di][dc++] = src[si++];
+				if (dc == ds) {
 					dc = 0;
 					di++;
+				}
+				if (si == ss) {
+					si = 0;
 				}
 			}
 		}

@@ -20,38 +20,61 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-cWebGLProgram = (function() {
-						  
-	function Initializer() {
-		cWebGLObject.Initializer.apply(this);
-		this._activeAttribLocations = null;
-		this._linkStatus = null;
-		this._linkCount = null;
-		this._vertexShader = null;
-		this._fragmentShader = null;
-	}
+(function(GPU) {
 
-	var cWebGLProgram = jClass('cWebGLProgram', Initializer, cWebGLObject);
-	
-	//public:
-	
-	cWebGLProgram.cWebGLProgram = function(context) {
-		this.cWebGLObject(context);
-		this._linkStatus = false;
-		this._linkCount = 0;
-		cnvgl.setContext(context._context);
-		this.setObject(cnvgl.createProgram());
-	};
+	GPU.CommandQueue = (function() {
 
-	cWebGLProgram.getLinkCount = function() {
-		return this._linkCount;
-	};
+		function Initializer() {
+			this.commands = [];
+			this.timer = null;
+			this.driver = null;
+		}
 
-	cWebGLProgram.increaseLinkCount = function() {
-		this._linkCount++;
-	};
+		var CommandQueue = jClass('CommandQueue', Initializer);
+		
+		//public:
 
-	return cWebGLProgram.Constructor;
+		CommandQueue.CommandQueue = function(driver) {
+			this.driver = driver;
+		};
 
-}());
+		CommandQueue.enqueue = function(cmd) {
+			this.commands.push(cmd);
+			this.schedule();
+		};
+
+		CommandQueue.process = function() {
+			var command, start, now;
+
+			this.timer = null;
+			start = new Date().getTime();
+
+			while (this.commands.length > 0) {
+
+				command = this.commands.shift();
+				GPU.execute(command);
+
+				now = new Date().getTime();
+				if (now - start > 100) {
+					this.schedule();
+					return;
+				}
+			}
+
+			this.driver.present();
+		};
+
+		CommandQueue.schedule = function() {
+			var This;
+			if (!this.timer) {
+				This = this;
+				this.timer = setTimeout(function() { This.process(); }, 0);
+			}
+		};
+		
+		return CommandQueue.Constructor;
+
+	}());
+
+}(GPU));
 

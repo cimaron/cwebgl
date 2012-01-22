@@ -23,40 +23,38 @@ cnvgl_rendering_culling = (function() {
 
 	function Initializer() {
 		//public:
-		this.ctx = null;
 		this.renderer = null;
 	}
 
 	var cnvgl_rendering_culling = jClass('cnvgl_rendering_culling', Initializer);	
 
-	cnvgl_rendering_culling.cnvgl_rendering_culling = function(ctx, renderer) {
-		this.ctx = ctx;
+	cnvgl_rendering_culling.cnvgl_rendering_culling = function(renderer) {
 		this.renderer = renderer;
 	};
 
-	cnvgl_rendering_culling.checkCull = function(prim) {
+	cnvgl_rendering_culling.checkCull = function(state, prim) {
 		var dir;
-		if (this.ctx.polygon.cullFlag) {
-			
+		if (state.cullFlag) {
+
 			//always cull if front and back
-			if (this.ctx.polygon.cullFaceMode == cnvgl.FRONT_AND_BACK) {
+			if (state.cullFaceMode == cnvgl.FRONT_AND_BACK) {
 				return true;	
 			}
-			
+
 			dir = this.getPolygonFaceDir(prim);
 			if (!(
-				(dir > 0 && (this.ctx.polygon.cullFlag == cnvgl.FALSE || this.ctx.polygon.cullFaceMode == cnvgl.FRONT)) ||
-				(dir < 0 && (this.ctx.polygon.cullFlag == cnvgl.FALSE || this.ctx.polygon.cullFaceMode == cnvgl.BACK)))) {
+				(dir > 0 && (state.cullFlag == cnvgl.FALSE || state.cullFaceMode == cnvgl.FRONT)) ||
+				(dir < 0 && (state.cullFlag == cnvgl.FALSE || state.cullFaceMode == cnvgl.BACK)))) {
 				return true;
 			}
 		}
 		return false;
 	};
 
-	cnvgl_rendering_culling.getPolygonFaceDir = function(prim) {
+	cnvgl_rendering_culling.getPolygonFaceDir = function(state, prim) {
 		var dir;
 		dir = prim.getDirection();
-		if (this.ctx.polygon.frontFace == cnvgl.CCW) {
+		if (state.cullFrontFace == cnvgl.CCW) {
 			dir = -dir;
 		}
 		return dir;

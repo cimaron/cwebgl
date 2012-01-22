@@ -22,6 +22,27 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 (function(cnvgl) {
 
+	function uploadAttributes(ctx) {
+		var program_obj, array_objs, array_obj, a, attrib_objs, attrib_obj, data, buffer_obj, data;
+
+		program_obj = ctx.shader.activeProgram;
+		array_objs = ctx.array.arrayObj.vertexAttrib;
+		attrib_objs = program_obj.attributes.active;
+
+		//initialize attributes for vertex
+		for (a = 0; a < program_obj.attributes.active.length; a++) {
+
+			attrib_obj = attrib_objs[a];
+			array_obj = array_objs[attrib_obj.location];
+
+			ctx.driver.uploadAttributes(ctx,
+										attrib_obj.location,
+										array_obj.size,
+										array_obj.stride,
+										array_obj.pointer,
+										array_obj.buffer_obj.data);
+		}		
+	}
 
 	/**
 	 * glDrawArrays — render primitives from array data
@@ -33,24 +54,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glDrawArrays.xml
 	 */
 	cnvgl.drawArrays = function(mode, first, count) {
-		var ctx, renderer, program_obj, i, vertex;
-	
+		var ctx;
 		ctx = cnvgl.getCurrentContext();
-		renderer = ctx.renderer;
-		program_obj = ctx.shader.activeProgram;
-	
-		renderer.setMode(mode);
-	
-		//each vertex
-		for (i = first; i < count; i++) {
-			vertex = new cnvgl.vertex();
-			cnvgl_copy_initialize_attribute_data(ctx, program_obj, i, vertex);
-			renderer.send(vertex);
-		}
-	
-		renderer.end();
+		uploadAttributes(ctx);
+		ctx.driver.drawArrays(ctx, mode, first, count);
 	};
-
 
 	/**
 	 * glDrawElements — render primitives from array data
@@ -62,7 +70,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 *
 	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glDrawElements.xml
 	 */
-	function glDrawElements(mode, count, type, indices) {
+	cnvgl.drawElements = function(mode, count, type, indices) {
 		var ctx, renderer, program_obj, buffer_obj, elements, i, vertex, index;
 
 		ctx = cnvgl.getCurrentContext();
@@ -72,7 +80,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		renderer.setMode(mode);
 	
 		buffer_obj = ctx.array.elementArrayBufferObj;
-		elements = buffer_obj.getData();
+		elements = buffer_obj.data;
 	
 		//each vertex
 		for (i = 0; i < count; i++) {
@@ -83,36 +91,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 	
 		renderer.end();
-	}
-
-	
-	function cnvgl_copy_initialize_attribute_data(ctx, program_obj, index, vertex) {
-		var a, default_value, arrays, attrib_obj, data, buffer_obj, buffer_data, start;
-	
-		arrays = ctx.array.arrayObj.vertexAttrib;
-		default_value = [0, 0, 0, 1];
-	
-		//initialize attributes for vertex
-		for (a in program_obj.attributes.active) {
-			attrib_obj = program_obj.attributes.active[a];
-	
-			data = arrays[attrib_obj.location];
-	
-			if (buffer_obj = data.buffer_obj) {
-				buffer_data = buffer_obj.getData(Float32Array);
-				start = (data.pointer / buffer_data.BYTES_PER_ELEMENT) + (index * data.size + data.stride);
-			} else {
-				// but constant data was specified, so use that
-				buffer_data = data.value;
-				start = 0;
-			}
-	
-			//@todo: add support for attributes using multiple slots
-			GPU.memcpy(vertex.attributes, attrib_obj.location * 4, buffer_data, data.size, start);
-			GPU.memcpy(vertex.attributes, attrib_obj.location * 4 + data.size, default_value, 4 - data.size, data.size);
-		}
-	}
-
+	};
 
 }(cnvgl));
 

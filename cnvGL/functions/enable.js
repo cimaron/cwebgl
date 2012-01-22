@@ -40,10 +40,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			case cnvgl.BLEND:
 				ctx.color.blendEnabled = s;
 				break;
-	
+
 			default:
 				throw new Error('Enable/Disable for ' + cap + ' not implemented yet');
 		}
+
+		ctx.driver.enable(ctx, cap, (s == cnvgl.TRUE));
 	}
 
 
