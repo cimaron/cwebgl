@@ -23,19 +23,23 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 (function(GPU) {
 
 	GPU.Context = function() {
+		this.activeVarying = [];
+
 		this.clearColor = null;
 		this.clearDepth = null;
-		this.color = null;
-		this.cullFlag = null;
-		this.cullFrontFace = null;
-		this.cullMode = null;
-		this.depth = null;
-		this.viewportF = null;
-		this.viewportH = null;
-		this.viewportN = null;
-		this.viewportW = null;
-		this.viewportX = null;
-		this.viewportY = null;
+		this.colorBuffer = null;
+		this.colorMask = [0xFF, 0xFF, 0xFF, 0xFF];
+		this.cullFlag = cnvgl.FALSE;
+		this.cullFrontFace = cnvgl.CCW;
+		this.cullFaceMode = cnvgl.BACK;
+		this.depthBuffer = null;
+		this.depthTest = null;
+		this.viewportF = 1;
+		this.viewportH = 0;
+		this.viewportN = 0;
+		this.viewportW = 0;
+		this.viewportX = 0;
+		this.viewportY = 0;
 	};
 
 }(GPU));

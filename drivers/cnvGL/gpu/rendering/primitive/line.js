@@ -23,9 +23,7 @@ cnvgl_rendering_primitive_line = (function() {
 
 	//Internal Constructor
 	function Initializer() {
-
 		//public:
-		this.ctx = null;
 		this.renderer = null;
 		
 		this.prim = null;
@@ -36,44 +34,41 @@ cnvgl_rendering_primitive_line = (function() {
 
 	//public:
 
-	cnvgl_rendering_primitive_line.cnvgl_rendering_primitive_line = function(ctx, renderer) {
-		this.ctx = ctx;
+	cnvgl_rendering_primitive_line.cnvgl_rendering_primitive_line = function(renderer) {
 		this.renderer = renderer;
 		this.frag = new cnvgl.fragment();
 	};
 
-	cnvgl_rendering_primitive_line.render = function(prim) {
+	cnvgl_rendering_primitive_line.render = function(state, prim) {
 		var clipped, num, i;
 
 		clipped = [];
 		num = this.renderer.clipping.clipLine(prim, clipped);
 
 		for (i = 0; i < num; i++) {
-			this.renderClipped(clipped[i]);
+			this.renderClipped(state, clipped[i]);
 		}
 	};
 
-	cnvgl_rendering_primitive_line.renderClipped = function(prim) {
+	cnvgl_rendering_primitive_line.renderClipped = function(state, prim) {
 		var v1, v2, dx, dy, dir;
 		this.prim = prim;
 		v1 = prim.vertices[0];
 		v2 = prim.vertices[1];
-		
+
 		dx = this.renderer.vertex.slope(v1.xw, v1.yw, v2.xw, v2.yw);
 		dy = this.renderer.vertex.slope(v1.yw, v1.xw, v2.yw, v2.xw);		
 		dir = Math.abs(dx) > Math.abs(dy) ? 1 : -1; //x-major = 1 : y-major = -1
 
 		if (dir > 0) {
-			this.lineX(v1, v2, dy);
+			this.lineX(state, v1, v2, dy);
 		} else {
-			this.lineY(v1, v2, dx);
+			this.lineY(state, v1, v2, dx);
 		}
 	};
 
-	cnvgl_rendering_primitive_line.lineX = function(v1, v2, dy) {
-		var vw, frag, x_start, x_end, xi_start, xi_end, y, v, xi, yi, p, i;
-
-		vw = this.ctx.viewport.w;
+	cnvgl_rendering_primitive_line.lineX = function(state, v1, v2, dy) {
+		var frag, x_start, x_end, xi_start, xi_end, y, v, xi, yi, p, i;
 
 		//make v1 left vertex
 		if (v2.xw < v1.xw) {
@@ -93,23 +88,23 @@ cnvgl_rendering_primitive_line = (function() {
 			yi = (y|0); //floor(y)
 			p = [xi, yi, 0, 1];
 			this.renderer.interpolate.setPoint(p);
+			/*
 			for (v in v1.varying) {
 				this.frag.varying[v] = this.renderer.interpolate.interpolateLine(v1.varying[v], v2.varying[v]);
 			}
+			*/
 
-			i = (vw * yi + xi);
+			i = (state.viewportW * yi + xi);
 
-			this.renderer.fragment.process(this.frag);
-			this.renderer.fragment.write(i, this.frag);
+			this.renderer.fragment.process(state, this.frag);
+			this.renderer.fragment.write(state, i, this.frag);
 
 			y += dy;
 		}
 	};
 
-	cnvgl_rendering_primitive_line.lineY = function(v1, v2, dx) {
-		var vw, frag, y_start, y_end, yi_start, yi_end, x, v, yi, xi, p, i;
-
-		vw = this.ctx.viewport.w;
+	cnvgl_rendering_primitive_line.lineY = function(state, v1, v2, dx) {
+		var frag, y_start, y_end, yi_start, yi_end, x, v, yi, xi, p, i;
 
 		//make v1 top vertex
 		if (v2.yw < v1.yw) {
@@ -131,14 +126,16 @@ cnvgl_rendering_primitive_line = (function() {
 			p = [xi, yi, 0, 1];
 			this.renderer.interpolate.setPoint(p);
 
+			/*
 			for (v in v1.varying) {
 				this.frag.varying[v] = this.renderer.interpolate.interpolateLine(v1.varying[v], v2.varying[v]);
 			}
+			*/
 
-			i = (vw * yi + xi);
+			i = (state.viewportW * yi + xi);
 
-			this.renderer.fragment.process(this.frag);
-			this.renderer.fragment.write(i, this.frag);
+			this.renderer.fragment.process(state, this.frag);
+			this.renderer.fragment.write(state, i, this.frag);
 
 			x += dx;
 		}

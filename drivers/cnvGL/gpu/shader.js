@@ -34,24 +34,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	GPU.executeVertex = function(){};
 	GPU.executeFragment = function(){};
 
-	shader.external_bindings = {
-		'gl_FragColor' : 0,
-		'gl_Position' : 1
-	};
-
-	shader.internal_bindings = {
-		'result.position' : 0,
-		'result.color' : 1
-	};
-
 	GPU.memory.temp = cnvgl.malloc(shader.MAX_TEMPORARIES * 4, 4);
 	cnvgl.memset(GPU.memory.temp, 0, 0);
-	//GPU.memory.uniforms = cnvgl.malloc(shader.MAX_UNIFORMS * 4, 4);
-	GPU.memory.uniforms = cnvgl.malloc(10 * 4, 4);
+	GPU.memory.uniforms = cnvgl.malloc(shader.MAX_UNIFORMS * 4, 4);
 	cnvgl.memset(GPU.memory.uniforms, 0, 0);
 	GPU.memory.attributes = cnvgl.malloc(shader.MAX_VERTEX_ATTRIBS, 1);
 	cnvgl.memset(GPU.memory.attributes, 0, 0);
-	GPU.memory.result = cnvgl.malloc(1, 4);
+	GPU.memory.result = cnvgl.malloc(3 * 4, 4);
 	cnvgl.memset(GPU.memory.result, 0, 0);
 
 	program = {};

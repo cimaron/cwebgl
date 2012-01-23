@@ -112,13 +112,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 	}());
 	
-	
-	cnvgl.program_var = function(name, location, slots, components) {
+
+	cnvgl.program_var = function(name, type, location, slots, components) {
 		this.name = name;
+		this.type = type;
 		this.location = location;
 		this.slots = slots;
 		this.components = components;
-		this.type = cnvgl.FLOAT;
+		this.basetype = cnvgl.FLOAT;
 	};
 	
 

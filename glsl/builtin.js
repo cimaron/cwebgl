@@ -26,7 +26,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	];
 
 	var fragment_vars = [
-		['out', 1, 'vec4', 'gl_FragColor', 'result.color.primary']
+		['out', 2, 'vec4', 'gl_FragColor', 'result.color']
 	];
 
 	glsl.parser.initialize_types = function(state) {

@@ -46,15 +46,14 @@ cnvgl_rendering_interpolate = (function() {
 
 	//public:
 
-	cnvgl_rendering_interpolate.cnvgl_rendering_interpolate = function(ctx, renderer) {
-		this.ctx = ctx;
+	cnvgl_rendering_interpolate.cnvgl_rendering_interpolate = function(renderer) {
 		this.renderer = renderer;
 	};
 
 	cnvgl_rendering_interpolate.setVertices = function(v1, v2, v3) {
-		
-		this.varying = this.ctx.shader.activeProgram.varying.names;
-		this.attributes = this.ctx.shader.activeProgram.attributes.names;
+
+		//this.varying = this.ctx.shader.activeProgram.varying.names;
+		//this.attributes = this.ctx.shader.activeProgram.attributes.names;
 
 		this.v1 = [v1.xw, v1.yw, v1.zw, v1.w];
 		this.v2 = [v2.xw, v2.yw, v2.zw, v2.w];
@@ -79,15 +78,11 @@ cnvgl_rendering_interpolate = (function() {
 		}
 	};
 
-	cnvgl_rendering_interpolate.interpolateVarying = function(v1, v2, v3, dest) {
-		var varying, vi, vl, vs;
-		for (v in this.varying) {
-			varying = this.varying[v];
-			vl = varying.location;
-			vs = varying.size;
-			for (vi = 0; vi < varying.slots; vi++) {
-				this.interpolateTriangleVector(v1.varying.data[vl], v2.varying.data[vl], v3.varying.data[vl], dest[vl], vs);
-				vs -= 4;
+	cnvgl_rendering_interpolate.interpolateVarying = function(state, v1, v2, v3, dest) {
+		var i;
+		for (i = 0; i < state.activeVarying.length; i++) {
+			if (state.activeVarying[i]) {
+				this.interpolateTriangleVector(v1.varying.data[i], v2.varying.data[i], v3.varying.data[i], dest[i], state.activeVarying[i]);
 			}
 		}
 	};
@@ -181,9 +176,6 @@ cnvgl_rendering_interpolate = (function() {
 	cnvgl_rendering_interpolate.interpolateTriangleVector = function(f1, f2, f3, dest, size) {
 		var i;
 		//todo: do a check that we need to interpolate at all
-		if (size > 4) {
-			size = 4;
-		}
 		for (i = 0; i < size; i++) {
 			dest[i] = ((this.a * f1[i]) + (this.b * f2[i]) + (this.c * f3[i])) * this.t.p;
 		}

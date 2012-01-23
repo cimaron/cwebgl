@@ -23,9 +23,7 @@ cnvgl_rendering_primitive_point = (function() {
 
 	//Internal Constructor
 	function Initializer() {
-
 		//public:
-		this.ctx = null;
 		this.renderer = null;
 
 		this.prim = null;
@@ -35,25 +33,24 @@ cnvgl_rendering_primitive_point = (function() {
 
 	//public:
 
-	cnvgl_rendering_primitive_point.cnvgl_rendering_primitive_point = function(ctx, renderer) {
-		this.ctx = ctx;
+	cnvgl_rendering_primitive_point.cnvgl_rendering_primitive_point = function(renderer) {
 		this.renderer = renderer;
 		this.frag = new cnvgl.fragment();
 	};
 
-	cnvgl_rendering_primitive_point.render = function(prim) {
+	cnvgl_rendering_primitive_point.render = function(state, prim) {
 		var num;
-		
-		num = this.renderer.clipping.clipLine(prim);		
+
+		num = this.renderer.clipping.clipPoint(prim);
 
 		if (num) {
-			this.renderClipped(prim);
+			this.renderClipped(state, prim);
 		}
 
 	};
 
-	cnvgl_rendering_primitive_point.renderClipped = function(prim) {
-		var c_buffer, d_buffer, vw, v, x, y, frag, i;
+	cnvgl_rendering_primitive_point.renderClipped = function(state, prim) {
+		var vw, v, x, y, i;
 
 		this.prim = prim;
 
@@ -61,16 +58,18 @@ cnvgl_rendering_primitive_point = (function() {
 		x = Math.round(v.xw);
 		y = Math.round(v.yw);
 
-		vw = this.ctx.viewport.w;
+		vw = state.viewportW;
 
+		/*
 		for (i in v.varying) {
-			this.frag.varying[i] = v.varying[i];	
+			this.frag.varying[i] = v.varying[i];
 		}
+		*/
 
 		i = (vw * y + x);
 
-		this.renderer.fragment.process(this.frag);
-		this.renderer.fragment.write(i, this.frag);
+		this.renderer.fragment.process(state, this.frag);
+		this.renderer.fragment.write(state, i, this.frag);
 	};
 
 	return cnvgl_rendering_primitive_point.Constructor;

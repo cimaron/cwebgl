@@ -30,7 +30,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	/**
 	 * Global
 	 */
-	var irs, symbols, header, body;
+	var irs, symbols, header, body, object_code;
 
 
 	var constants = {
@@ -69,6 +69,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				 '%1* = jstemp[%i]']
 	}; 
 
+	var translation_vars = {
+		'vertex.attrib' : 'attrib',
+		'vertex.varying' : 'varying',
+		'fragment.attrib' : 'attrib',
+		'result.position' : 'result[0]',
+		'result.color' : 'result[2]'
+	};
 
 	/**
 	 * Set up individual vector components
@@ -76,7 +83,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * @param   object    Operand
 	 */
 	function buildComponents(oprd) {
-		var i, swz, out;
+		var i, swz, out, repl;
 		
 		if (!oprd) {
 			return "";	
@@ -88,16 +95,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			out.name = sprintf("R[%s]", i[1]);
 		}
 		
-		if (out.name == 'vertex.attrib') {
-			out.name = 'attrib';
-		}
-
-		if (out.name == 'vertex.varying') {
-			out.name = 'varying';	
-		}
-
-		if (out.name == 'fragment.attrib') {
-			out.name = 'varying';	
+		if (translation_vars[out.name]) {
+			out.name = translation_vars[out.name];	
 		}
 
 		//generate array representation of swizzle components, expanding if necessary
@@ -166,6 +165,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 	}
 
+	function buildVariable(oper, i, c) {
+		var out;
+		if (oper.name == 'attrib' && object_code.target == 1) {
+			out = oper.neg + oper.out + (oper.swizzle ? oper.comp[i] : c.replace('[', '[ai'));
+		} else {
+			out = oper.neg + oper.out + (oper.swizzle ? oper.comp[i] : c);
+		}
+		return out;
+	}
+
 	/**
 	 * Translates ASM instruction into output format
 	 *
@@ -207,9 +216,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				c = dest.comp[i];
 
 				d = dest.out + c;
-				s1 = src1.neg + src1.out + (src1.swizzle ? src1.comp[i] : c);
-				s2 = src2.neg + src2.out + (src2.swizzle ? src2.comp[i] : c);
-				s3 = src3.neg + src3.out + (src3.swizzle ? src3.comp[i] : c);
+				s1 = buildVariable(src1, i, c);
+				s2 = buildVariable(src2, i, c);
+				s3 = buildVariable(src3, i, c);
 
 				if (src1 && src1.comp[i].indexOf('jstemp') != -1) {
 					s1 = src1.comp[i];
@@ -278,16 +287,22 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 *
 	 * @return  bool      true if there were no errors
 	 */
-	function translate(object_code) {
+	function translate(code) {
 		var i, errors;
 
 		symbols = {};
+		object_code = code;
 		irs = object_code.body;
 
 		errors = 0;
 
 		header = [];
-		body = ["function main(R, c, attrib, ai0, ai1, ai2, ai3, varying, result) {"];
+
+		if (object_code.target == 1) {
+			body = ["function main(R, c, attrib, ai0, ai1, ai2, ai3, varying, result) {"];
+		} else {
+			body = ["function main(R, c, attrib, result) {"];
+		}
 
 		processSymbols(object_code);
 		//optimize(irs, symbols);

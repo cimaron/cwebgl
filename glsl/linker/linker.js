@@ -57,7 +57,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	}
 
 	function addVarying(program_obj, shader_obj) {
-		var attribs, i, attrib, location;
+		var attribs, i, attrib, location, attrib_obj;
 
 		attribs = shader_obj.fragment.attrib;
 
@@ -68,7 +68,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			if (attrib_obj = program_obj.getActiveVarying(attrib.name)) {
 
 				//already exists as different type
-				if (attrib_obj.size != attrib.type_size) {
+				if (attrib_obj.type != attrib.type) {
 					throw new Error(sprintf("Varying '%s' redeclared with different type", attrib.name));
 				}
 
@@ -76,7 +76,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			}
 
 			location = program_obj.getOpenSlot(program_obj.varying);
-			attrib_obj = new cnvgl.program_var(attrib.name, location, attrib.size, attrib.components);
+			attrib_obj = new cnvgl.program_var(attrib.name, attrib.type, location, attrib.size, attrib.components);
 			program_obj.addActiveVarying(attrib_obj);
 		}
 
@@ -89,7 +89,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	}
 
 	function addAttributes(program_obj, shader_obj) {
-		var attribs, i, j, attrib, location;
+		var attribs, i, j, attrib, attrib_obj, location;
 
 		attribs = shader_obj.vertex.attrib;
 
@@ -98,7 +98,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 			//check if already declared
 			if (attrib_obj = program_obj.getActiveAttribute(attrib.name)) {
-				if (attrib_obj.size != attrib.type_size) {
+				if (attrib_obj.type != attrib.type) {
 					throw new Error(sprintf("Attribute '%s' redeclared with different type", attrib.name));
 				}
 			
@@ -110,7 +110,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				location = program_obj.getOpenSlot(program_obj.attributes);			
 			}
 
-			attrib_obj = new cnvgl.program_var(attrib.name, location, attrib.size, attrib.components);
+			attrib_obj = new cnvgl.program_var(attrib.name, attrib.type, location, attrib.size, attrib.components);
 			program_obj.addActiveAttribute(attrib_obj);
 		}
 
@@ -140,7 +140,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			//get new location and reindex
 			if (i % 4 == 0) {
 				location = program_obj.getOpenSlot(program_obj.uniforms);
-				uniform_obj = new cnvgl.program_var('$constant'+c, location, 1, 1);
+				uniform_obj = new cnvgl.program_var('$constant'+c, glsl.type.vec4, location, 1, 1);
 				program_obj.addActiveUniform(uniform_obj);
 				c++;
 			} else {
@@ -154,7 +154,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			//check if already declared
 			if (uniform_obj = program_obj.getActiveUniform(uniform.name)) {
 
-				if (uniform_obj.size != uniform.type_size) {
+				if (uniform_obj.type != uniform.type) {
 					throw new Error(sprintf("Uniform '%s' redeclared with different type", uniform.name));
 				}
 
@@ -163,8 +163,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 			//get new location and reindex
 			location = program_obj.getOpenSlot(program_obj.uniforms);
-
-			uniform_obj = new cnvgl.program_var(uniform.name, location, uniform.size, uniform.components);
+			uniform_obj = new cnvgl.program_var(uniform.name, uniform.type, location, uniform.size, uniform.components);
 			program_obj.addActiveUniform(uniform_obj);
 		}
 
@@ -204,7 +203,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	}
 
 	function link(shaders) {
-		var i, status, shader_obj;
+		var i, status, shader_obj, program_obj;
 		status = 1;
 
 		glsl.errors = [];

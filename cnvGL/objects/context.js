@@ -108,9 +108,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				cullFlag : cnvgl.FALSE,
 				frontFace : cnvgl.CCW
 			};
-			cnvgl.disable(cnvgl.CULL_FACE);
-			cnvgl.cullFace(cnvgl.BACK);
-			cnvgl.frontFace(cnvgl.CCW);
 
 			//shader state
 			this.shader = {
@@ -131,8 +128,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				w : 0,
 				h : 0
 			};
-			cnvgl.viewport(0, 0, 0, 0);
-			cnvgl.depthRange(0, 1.0);
 	
 			//direct
 			this.errorValue = cnvgl.NO_ERROR;

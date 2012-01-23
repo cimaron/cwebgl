@@ -24,57 +24,36 @@ cnvgl_rendering_fragment = (function() {
 	//Internal Constructor
 	function Initializer() {
 		//public:
-		this.ctx = null;
 		this.renderer = null;
-		
-		//current state
-		this.colorBuffer = null;
-		this.depthBuffer = null;
-		this.colorMask = null;
 	}
 
 	var cnvgl_rendering_fragment = jClass('cnvgl_rendering_fragment', Initializer);
 
 	//public:
 
-	cnvgl_rendering_fragment.cnvgl_rendering_fragment = function(ctx, renderer) {
-		this.ctx = ctx;
+	cnvgl_rendering_fragment.cnvgl_rendering_fragment = function(renderer) {
 		this.renderer = renderer;
-		this.result = GPU.shader.result;
 	};
 
-	cnvgl_rendering_fragment.setCurrentState = function() {
-		this.colorBuffer = this.ctx.drawBuffer.colorDrawBuffers[0].data;
-		this.depthBuffer = this.ctx.drawBuffer.depthBuffer.data;
-		this.colorMask = this.ctx.color.colorMask;
-		this.depthMask = this.ctx.depth.mask;
-	};
-
-	cnvgl_rendering_fragment.process = function(f) {
-		var color, shader_mem;
-		shader_mem = GPU.memory.shader;
-
+	cnvgl_rendering_fragment.process = function(state, f) {
 		GPU.executeFragment(
-			shader_mem.temp.data,
-			shader_mem.uniforms.data,
-			null, 
-			f.attributes.data,
-			this.result);
-
-		f.color = this.result.color.primary;
+			GPU.memory.temp.data,
+			GPU.memory.uniforms.data,
+			f.attrib.data,
+			f.result.data
+		);
 	};
 
-	cnvgl_rendering_fragment.write = function(i, frag) {
-		var c_buffer, d_buffer, c, c_mask;
+	cnvgl_rendering_fragment.write = function(state, i, frag) {
+		var c_buffer, c, c_mask;
 
-		c_buffer = this.colorBuffer;
-		d_buffer = this.depthBuffer;
+		c_buffer = state.colorBuffer.data;
 
-		c = frag.color;
-		c_mask = this.colorMask;
+		c = frag.result.data[2];
+		c_mask = state.colorMask;
 
-		if (this.depthMask) {
-			d_buffer[i] = frag.gl_FragDepth;
+		if (state.depthMask) {
+			state.depthBuffer[i] = frag.gl_FragDepth;
 		}
 
 		i <<= 2;
@@ -84,8 +63,8 @@ cnvgl_rendering_fragment = (function() {
 		c[2] *= 255;
 		c[3] *= 255;
 
-		if (this.ctx.color.blendEnabled == cnvgl.TRUE) {
-			this.blend(c, c[0], c[1], c[2], c[3], c_buffer[i], c_buffer[i + 1], c_buffer[i + 2], c_buffer[i + 3]);
+		if (state.blendEnabled) {
+			this.blend(state, c, c[0], c[1], c[2], c[3], c_buffer[i], c_buffer[i + 1], c_buffer[i + 2], c_buffer[i + 3]);
 		}
 
 		c_buffer[i    ] = c_mask[0] & (c[0] + .5)|0; //round(frag.r)
@@ -94,11 +73,9 @@ cnvgl_rendering_fragment = (function() {
 		c_buffer[i + 3] = c_mask[3] & (c[3] + .5)|0; //round(frag.a)		
 	};
 	
-	cnvgl_rendering_fragment.blend = function(color, sr, sg, sb, sa, dr, dg, db, da) {
+	cnvgl_rendering_fragment.blend = function(state, color, sr, sg, sb, sa, dr, dg, db, da) {
 		var state, a_sr, a_sg, a_sb, a_sa, a_dr, a_dg, a_db, a_da;
 		
-		state = this.ctx.color;
-
 		switch (state.blendSrcA) {
 			case cnvgl.ONE:
 				a_sr = a_sg = a_sb = a_sa = (1);

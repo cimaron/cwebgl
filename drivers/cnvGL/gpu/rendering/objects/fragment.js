@@ -24,21 +24,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 	cnvgl.fragment = function() {
-	
-		//used by renderer
-		this.color = null;
-	
-		this.x = 0;
-		this.y = 0;
-		this.z = 0;
-		this.w = 1;
-	
-		this.gl_FragDepth = 0;
-	
-		//Allocate memory
-		this.result = cnvgl.malloc(2, 4);
-		//varying
-		this.attributes = cnvgl.malloc(GPU.shader.MAX_VARYING_VECTORS * 4, 4);
+		this.attrib = cnvgl.malloc(GPU.shader.MAX_VARYING_VECTORS * 4, 4);
+		this.result = cnvgl.malloc(3 * 4, 4);
 	};
 
 

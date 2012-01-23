@@ -57,7 +57,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	cnvgl.colorMask = function(r, g, b, a) {
 		var ctx;
-	
 		ctx = cnvgl.getCurrentContext();
 	
 		ctx.color.colorMask = [
@@ -66,6 +65,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			b ? 0xFF : 0,
 			a ? 0xFF : 0
 		];
+
+		ctx.driver.colorMask(ctx, r, g, b, a);
 	};
 	
 	

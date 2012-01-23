@@ -216,6 +216,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		slots = glsl.type.slots[entry.type];
 		symbol = {
 			name : oper.name,
+			type : entry.type,
 			out : entry.out,
 			entry : entry,
 			size : slots,

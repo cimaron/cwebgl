@@ -24,6 +24,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	GPU.execute = function(cmd) {
 		if (GPU.commands[cmd[1]]) {
+			console.log(cmd);
 			GPU.commands[cmd[1]].apply(GPU, cmd);
 		} else {
 			console.log(cmd);
@@ -36,12 +37,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		ctx[name] = value;
 	};
 
+	GPU.commands.setArray = function(ctx, cmd, name, index, value) {
+		ctx[name][index] = value;
+	};
+
 	GPU.commands.clear = function(ctx, cmd, mask) {
 		if (mask && cnvgl.COLOR_BUFFER_BIT) {
-			cnvgl.memseta(ctx.color, 0, ctx.clearColor, ctx.color.size);
+			cnvgl.memseta(ctx.colorBuffer, 0, ctx.clearColor, ctx.colorBuffer.size);
 		}
 		if (mask && cnvgl.DEPTH_BUFFER_BIT) {
-			cnvgl.memset(ctx.depth, 0, ctx.clearDepth);
+			cnvgl.memset(ctx.depthBuffer, 0, ctx.clearDepth);
 		}
 	};
 

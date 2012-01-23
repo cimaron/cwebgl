@@ -49,18 +49,16 @@ cnvgl_rendering_primitive_triangle = (function() {
 			return;
 		}
 		
-		console.log(prim);
-
 		//clipping may split triangle into multiple triangles
 		clipped = [];
 		num = this.renderer.clipping.clipTriangle(prim, clipped);
  
 		for (i = 0; i < num; i++) {
-			this.renderClipped(clipped[i]);
+			this.renderClipped(state, clipped[i]);
 		}
 	};
 
-	cnvgl_rendering_primitive_triangle.renderClipped = function(prim) {
+	cnvgl_rendering_primitive_triangle.renderClipped = function(state, prim) {
 		var dir, t;
 
 		this.prim = prim;
@@ -75,10 +73,10 @@ cnvgl_rendering_primitive_triangle = (function() {
 			prim.vertices[1] = t;
 		}
 
-		this.rasterize(prim);
+		this.rasterize(state, prim);
 	};
 
-	cnvgl_rendering_primitive_triangle.rasterize = function(prim) {
+	cnvgl_rendering_primitive_triangle.rasterize = function(state, prim) {
 		var v1, v2, v3, dx1, dx2, dx3, yi_start, yi_end, yi, x_start, x_end, vpass;
 
 		v1 = this.v1 = prim.vertices[0];
@@ -127,7 +125,7 @@ cnvgl_rendering_primitive_triangle = (function() {
 				vpass = true;
 			}
 
-			this.rasterizeScanline(yi, x_start, x_end);
+			this.rasterizeScanline(state, yi, x_start, x_end);
 
 			x_start += dx1;
 			x_end += dx2;
@@ -135,10 +133,9 @@ cnvgl_rendering_primitive_triangle = (function() {
 	};
 
 	var p = [0, 0, 0, 1];
-	cnvgl_rendering_primitive_triangle.rasterizeScanline = function(yi, x_start, x_end) {
-		var vw, int, xi_start, xi_end, xi, i, v;
+	cnvgl_rendering_primitive_triangle.rasterizeScanline = function(state, yi, x_start, x_end) {
+		var int, xi_start, xi_end, xi, i, v;
 
-		vw = this.ctx.viewport.w;
 		int = this.renderer.interpolate;
 		p[1] = yi;
 
@@ -152,7 +149,7 @@ cnvgl_rendering_primitive_triangle = (function() {
 			xi_end--;
 		}
 
-		i = vw * (yi - .5) + (xi_start - .5);
+		i = state.viewportW * (yi - .5) + (xi_start - .5);
 
 		for (xi = xi_start; xi <= xi_end; xi++) {
 
@@ -162,18 +159,18 @@ cnvgl_rendering_primitive_triangle = (function() {
 			//Early depth test
 			//Need to add check for shader writing to depth value.
 			//If so, this needs to run after processing the fragment
-			if (this.ctx.depth.test == cnvgl.TRUE) {
+			if (state.depthTest == cnvgl.TRUE) {
 				this.frag.gl_FragDepth = int.interpolateTriangle(this.v1.zw, this.v2.zw, this.v3.zw);
-				if (!this.renderer.checkDepth(i, this.frag.gl_FragDepth)) {
+				if (!this.renderer.checkDepth(state, i, this.frag.gl_FragDepth)) {
 					i++;
 					continue;
 				}
 			}
 
-			this.renderer.interpolate.interpolateVarying(this.v1, this.v2, this.v3, this.frag.attributes.data);
+			this.renderer.interpolate.interpolateVarying(state, this.v1, this.v2, this.v3, this.frag.attrib.data);
 
-			this.renderer.fragment.process(this.frag);
-			this.renderer.fragment.write(i, this.frag);
+			this.renderer.fragment.process(state, this.frag);
+			this.renderer.fragment.write(state, i, this.frag);
 
 			i++;
 		}		

@@ -408,13 +408,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 			for (i = 0; i < program_obj.program.attributes.length; i++) {
 				attrib = program_obj.program.attributes[i];
-				attrib_obj = new cnvgl.program_var(attrib.name, attrib.location, attrib.slots, attrib.components);
+				attrib_obj = new cnvgl.program_var(attrib.name, attrib.type, attrib.location, attrib.slots, attrib.components);
 				program_obj.addActiveAttribute(attrib_obj);
 			}
 
 			for (i = 0; i < program_obj.program.uniforms.length; i++) {
 				unif = program_obj.program.uniforms[i];
-				uniform_obj = new cnvgl.program_var(unif.name, unif.location, unif.slots, unif.components);
+				uniform_obj = new cnvgl.program_var(unif.name, unif.type, unif.location, unif.slots, unif.components);
 				program_obj.addActiveUniform(uniform_obj);
 			}	
 		}

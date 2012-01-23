@@ -65,8 +65,8 @@ cWebGL.drivers.cnvGL = (function() {
 			this.queue = new GPU.CommandQueue(this);
 			this._context = new GPU.Context();
 
-			this.command('set', 'color', this.colorBuffer);
-			this.command('set', 'depth', this.depthBuffer);
+			this.command('set', 'colorBuffer', this.colorBuffer);
+			this.command('set', 'depthBuffer', this.depthBuffer);
 		}
 		//need to add failure code
 	};
@@ -79,6 +79,10 @@ cWebGL.drivers.cnvGL = (function() {
 			this.command('set', 'clearDepth', depth);
 		}
 		this.command('clear', mask);
+	};
+
+	DriverCnvGL.colorMask = function(ctx, r, g, b, a) {
+		this.command('set', 'colorMask', [r, g, b, a]);
 	};
 
 	DriverCnvGL.command = function() {
@@ -118,12 +122,23 @@ cWebGL.drivers.cnvGL = (function() {
 		this.command('drawPrimitives', mode, first, count);
 	};
 
+	DriverCnvGL.enable = function(ctx, flag, v) {
+		switch (flag) {
+			case cnvgl.CULL_FACE:
+				this.command('set', 'cullFlag', v);
+				break;
+			case cnvgl.DEPTH_TEST:
+				this.command('set', 'depthTest', v);
+				break;
+		}
+	};
+
 	DriverCnvGL.frontFace = function(ctx, mode) {
 		this.command('set', 'cullFrontFace', mode);
 	};
 
 	DriverCnvGL.link = function(shaders) {
-		var program, i, unif;
+		var program, i, j, unif, varying;
 
 		program = new cWebGL.Driver.Program();
 		program.programObj = glsl.link(shaders);
@@ -134,6 +149,17 @@ cWebGL.drivers.cnvGL = (function() {
 		if (this.linkStatus) {
 			program.attributes = program.programObj.attributes.active;
 			program.uniforms = program.programObj.uniforms.active;
+			program.varying = program.programObj.varying.active;
+
+			varying = new Array(GPU.shader.MAX_VARYING_VECTORS);
+			for (i = 0; i < program.varying.length; i++) {
+				for (j = 0; j < program.varying[i].slots; j++) {
+					varying[program.varying[i].location + j] = program.varying[i].components;
+				}
+			}
+			for (i = 0; i < varying.length; i++) {
+				this.command('setArray', 'activeVarying', i, varying[i] || 0);
+			}
 		}
 
 		return program;
@@ -141,14 +167,6 @@ cWebGL.drivers.cnvGL = (function() {
 
 	DriverCnvGL.present = function() {
 		this._context2d.putImageData(this.colorBuffer, 0, 0);
-	};
-	
-	DriverCnvGL.enable = function(flag, v) {
-		switch (flag) {
-			case cnvgl.CULL_FACE:
-				this.command('set', 'cullFlag', v);
-				break;
-		}
 	};
 
 	DriverCnvGL.uploadAttributes = function(ctx, location, size, stride, pointer, data) {

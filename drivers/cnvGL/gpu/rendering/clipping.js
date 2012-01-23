@@ -35,8 +35,7 @@ cnvgl_rendering_clipping = (function() {
 
 	var cnvgl_rendering_clipping = jClass('cnvgl_rendering_clipping', Initializer);	
 
-	cnvgl_rendering_clipping.cnvgl_rendering_clipping = function(ctx, renderer) {
-		this.ctx = ctx;
+	cnvgl_rendering_clipping.cnvgl_rendering_clipping = function(renderer) {
 		this.renderer = renderer;
 		this.planes = [[ 1,  0,  0],
 					  [-1,  0,  0],
@@ -60,7 +59,7 @@ cnvgl_rendering_clipping = (function() {
 		return 1;
 	};
 
-	cnvgl_rendering_clipping.clipLine = function(prim) {
+	cnvgl_rendering_clipping.clipLine = function(prim, clipped) {
 		clipped.push(prim);
 		return 1;
 	};
@@ -85,7 +84,7 @@ cnvgl_rendering_clipping = (function() {
 		//prim is now clipped, and may have extra vertices
 		
 		for (i = 0; i < prim.vertices.length; i+=3) {
-			nprim = new cnvgl_primitive();
+			nprim = new cnvgl.primitive();
 			nprim.vertices.push(prim.vertices[i]);
 			nprim.vertices.push(prim.vertices[i + 1]);
 			nprim.vertices.push(prim.vertices[i + 2]);
