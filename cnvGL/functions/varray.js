@@ -53,7 +53,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	cnvgl.enableVertexAttribArray = function(index) {
 		var ctx;
-
 		ctx = cnvgl.getCurrentContext();
 	
 		//out of bounds
@@ -62,7 +61,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			return;
 		}
 
-		ctx.array.arrayObj.vertexAttrib[index].enabled = cnvgl.TRUE;	
+		ctx.array.arrayObj.vertexAttrib[index].enabled = cnvgl.TRUE;
+
+		ctx.driver.enableVertexAttribArray(ctx, index);
 	};
 
 

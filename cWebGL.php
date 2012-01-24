@@ -51,6 +51,6 @@ $include('cWebGL.js');
 //Drivers
 $include('drivers/driver.js');
 $include('drivers/WebGL/WebGL.js');
-//$include('drivers/Stage3D/Stage3D.js');
+$include('drivers/Stage3D/Stage3D.js');
 $include('drivers/cnvGL/cnvGL.js');
 

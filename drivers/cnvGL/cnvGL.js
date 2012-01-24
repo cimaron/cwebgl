@@ -91,42 +91,40 @@ cWebGL.drivers.cnvGL = (function() {
 		args.unshift(this._context);
 		this.queue.enqueue(args);
 	};
-
-	DriverCnvGL.compileShader = function(source, type) {
-		var shaderObj;
-
-		this.compileStatus = glsl.compile(source, type == cnvgl.VERTEX_SHADER ? glsl.mode.vertex : glsl.mode.fragment);
+	
+	DriverCnvGL.compileShader = function(ctx, shader, source, type) {
+		this.compileStatus = glsl.compile(source, type - cnvgl.FRAGMENT_SHADER);
 		this.compileLog = glsl.errors.join("\n");
 
 		if (this.compileStatus) {
-			shaderObj = glsl.output;
+			shader.out = glsl.output;
 		}
-
-		return shaderObj;
 	};
 
 	DriverCnvGL.cullFace = function(ctx, mode) {
 		this.command('set', 'cullFaceMode', mode);
 	};
 
+	DriverCnvGL.createProgram = function() {
+		var program;
+		program = new cWebGL.Driver.Program();
+		return program;
+	};
+
+	DriverCnvGL.createShader = function(ctx, type) {
+		return {};
+	};
+
 	DriverCnvGL.depthRange = function(ctx, n, f) {
 		this.command('set', 'viewportN', n);
-		this.command('set', 'viewportF', f);		
+		this.command('set', 'viewportF', f);
 	};
 
 	DriverCnvGL.drawArrays = function(ctx, mode, first, count) {
-		var shaders;
-		shaders = ctx.shader.activeProgram.attached_shaders;
-		this.command('uploadProgram', 'fragment', shaders[1].object_code.exec);
-		this.command('uploadProgram', 'vertex', shaders[0].object_code.exec);
 		this.command('drawPrimitives', mode, first, count);
 	};
 
 	DriverCnvGL.drawElements = function(ctx, mode, first, count, indices) {
-		var shaders;
-		shaders = ctx.shader.activeProgram.attached_shaders;
-		this.command('uploadProgram', 'fragment', shaders[1].object_code.exec);
-		this.command('uploadProgram', 'vertex', shaders[0].object_code.exec);
 		this.command('drawIndexedPrimitives', mode, first, count, indices);
 	};
 
@@ -141,23 +139,39 @@ cWebGL.drivers.cnvGL = (function() {
 		}
 	};
 
+	DriverCnvGL.enableVertexAttribArray = function(ctx, index) {
+
+	};
+
 	DriverCnvGL.frontFace = function(ctx, mode) {
 		this.command('set', 'cullFrontFace', mode);
 	};
 
-	DriverCnvGL.link = function(shaders) {
-		var program, i, j, unif, varying;
+	DriverCnvGL.link = function(ctx, program, shaders) {
+		var sh, i, j, unif, varying;
+		
+		sh = [];
+		for (i = 0; i < shaders.length; i++) {
+			sh[i] = shaders[i].out;	
+		}
 
-		program = new cWebGL.Driver.Program();
-		program.programObj = glsl.link(shaders);
+		program.GLSL = glsl.link(sh);
 
-		this.linkStatus = program.programObj.status;
+		for (i = 0; i < sh.length; i++) {
+			if (sh[i].target == 0) {
+				program.fragmentProgram = sh[i].exec;
+			} else {
+				program.vertexProgram = sh[i].exec;	
+			}
+		}
+
+		this.linkStatus = program.GLSL.status;
 		this.linkLog = glsl.errors.join("\n");
 
 		if (this.linkStatus) {
-			program.attributes = program.programObj.attributes.active;
-			program.uniforms = program.programObj.uniforms.active;
-			program.varying = program.programObj.varying.active;
+			program.attributes = program.GLSL.attributes.active;
+			program.uniforms = program.GLSL.uniforms.active;
+			program.varying = program.GLSL.varying.active;
 
 			varying = new Array(GPU.shader.MAX_VARYING_VECTORS);
 			for (i = 0; i < program.varying.length; i++) {
@@ -169,8 +183,6 @@ cWebGL.drivers.cnvGL = (function() {
 				this.command('setArray', 'activeVarying', i, varying[i] || 0);
 			}
 		}
-
-		return program;
 	};
 
 	DriverCnvGL.present = function() {
@@ -184,6 +196,11 @@ cWebGL.drivers.cnvGL = (function() {
 
 	DriverCnvGL.uploadUniform = function(ctx, location, data, slots, components) {
 		this.command('uploadUniforms', location, data, slots, components);
+	};
+	
+	DriverCnvGL.useProgram = function(ctx, program) {
+		this.command('uploadProgram', 'fragment', program.fragmentProgram);
+		this.command('uploadProgram', 'vertex', program.vertexProgram);
 	};
 
 	DriverCnvGL.viewport = function(ctx, x, y, w, h) {

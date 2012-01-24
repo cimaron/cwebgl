@@ -49,7 +49,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.depthFunc = function(func) {
 		var ctx;
 		ctx = cnvgl.getCurrentContext();
-		
+
 		if (func != cnvgl.NEVER
 			&& func != cnvgl.LESS
 			&& func != cnvgl.EQUAL
@@ -61,8 +61,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			cnvgl.throw_error(cnvgl.INVALID_ENUM, ctx);
 			return;		
 		}
-	
+
 		ctx.depth.func = func;
+
+		ctx.driver.depthFunc(ctx, func);
 	};
 
 

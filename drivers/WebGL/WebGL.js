@@ -53,11 +53,20 @@ cWebGL.drivers.WebGL = (function() {
 		this._context.clearDepth(depth);
 		this._context.clear(mask);
 	};
+	
+	DriverWebGL.createProgram = function() {
+		program = new cWebGL.Driver.Program();
+		program.WebGL = this._context.createProgram();
+		return program;
+	};
 
-	DriverWebGL.compileShader = function(source, type) {
+	DriverWebGL.createShader = function(ctx, type) {
+		return this._context.createShader(type);
+	};
+
+	DriverWebGL.compileShader = function(ctx, shader, source, type) {
 		var shader, symbols;
 
-		shader = this._context.createShader(type);
 		this._context.shaderSource(shader, source);
 		this._context.compileShader(shader);
 		this.compileStatus = this._context.getShaderParameter(shader, this._context.COMPILE_STATUS);
@@ -80,8 +89,6 @@ cWebGL.drivers.WebGL = (function() {
 	};
 
 	DriverWebGL.drawArrays = function(ctx, mode, first, count) {
-		this._context.enable(this._context.DEPTH_TEST);
-		this._context.useProgram(ctx.shader.activeProgram.program.programObj);
 		this._context.drawArrays(mode, first, count);
 	};
 
@@ -93,47 +100,46 @@ cWebGL.drivers.WebGL = (function() {
 		}
 	};
 
+	DriverWebGL.enableVertexAttribArray = function(ctx, index) {
+		this._context.enableVertexAttribArray(index);
+	};
+
 	DriverWebGL.frontFace = function(ctx, mode) {
 		this._context.frontFace(mode);
 	};
 
-	DriverWebGL.link = function(shaders) {
+	DriverWebGL.link = function(ctx, program, shaders) {
 		var i, j, program, symbols, symbol, attr, unif;
-		program = new cWebGL.Driver.Program();
-		program.programObj = this._context.createProgram();
 
 		for (i = 0; i < shaders.length; i++) {
-			this._context.attachShader(program.programObj, shaders[i]);
+			this._context.attachShader(program.WebGL, shaders[i]);
 		}
 
-		this._context.linkProgram(program.programObj);
-		this.linkStatus = this._context.getProgramParameter(program.programObj, this._context.LINK_STATUS)
-		this.linkErrors = this._context.getProgramInfoLog(program.programObj);
+		this._context.linkProgram(program.WebGL);
+		this.linkStatus = this._context.getProgramParameter(program.WebGL, this._context.LINK_STATUS)
+		this.linkErrors = this._context.getProgramInfoLog(program.WebGL);
 
 		if (this.linkStatus) {
 			for (i = 0; i < this.symbols.length; i++) {
 				symbols = this.symbols[i];
 				for (j = 0; j < symbols.attributes.length; j++) {
 					symbol = symbols.attributes[j];
-					symbol.location = this._context.getAttribLocation(program.programObj, symbol.name);
+					symbol.location = this._context.getAttribLocation(program.WebGL, symbol.name);
 					program.attributes.push(symbol);
 				}
 				for (j = 0; j < symbols.uniforms.length; j++) {
 					symbol = symbols.uniforms[j];
-					symbol.location = this._context.getUniformLocation(program.programObj, symbol.name);
+					symbol.location = this._context.getUniformLocation(program.WebGL, symbol.name);
 					program.uniforms.push(symbol);
 				}
 			}
 			this.symbols = [];
 		}
-
-		return program;
 	};
 
 	DriverWebGL.uploadAttributes = function(ctx, location, size, stride, offset, data) {
 		var _ctx, buffer;
 		_ctx = this._context;
-		_ctx.useProgram(ctx.shader.activeProgram.program.programObj);
 		buffer = _ctx.createBuffer();
 		_ctx.bindBuffer(_ctx.ARRAY_BUFFER, buffer);
         _ctx.bufferData(_ctx.ARRAY_BUFFER, new Float32Array(data), _ctx.STATIC_DRAW);
@@ -144,12 +150,15 @@ cWebGL.drivers.WebGL = (function() {
 	DriverWebGL.uploadUniform = function(ctx, location, data, slots, components) {
 		var _ctx;
 		_ctx = this._context;
-		_ctx.useProgram(ctx.shader.activeProgram.program.programObj);
 		switch (slots * components) {
 			case 16:
 				_ctx.uniformMatrix4fv(location, false, new Float32Array(data));
 				break;
 		}
+	};
+
+	DriverWebGL.useProgram = function(ctx, program) {
+		this._context.useProgram(program.WebGL);
 	};
 
 	DriverWebGL.viewport = function(ctx, x, y, width, height) {		

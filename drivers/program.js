@@ -21,7 +21,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 cWebGL.Driver.Program = function() {
-	this.programObj = null;
+	
+	this.Stage3D = null;
+	this.WebGL = null;
+	this.GLSL = null;
+	this.fragmentProgram = null;
+	this.vertexProgram = null;
+	
 	this.attributes = [];
 	this.uniforms = [];
 };

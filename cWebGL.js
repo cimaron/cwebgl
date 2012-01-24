@@ -197,3 +197,18 @@ cWebGL = {
 cWebGL.initialize();
 
 
+(function() {
+	var native = window.requestAnimationFrame;
+	var list = [];
+
+	window.requestAnimationFrame = function(func) {
+		list.push(func);
+	};
+
+	cWebGL.frameComplete = function() {
+		var i;
+		while (list.length > 0) {
+			window.setTimeout(list.shift(), 0);	
+		}
+	};
+}());

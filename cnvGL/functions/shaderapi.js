@@ -135,14 +135,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
 			return;
 		}
-	
+
 		//object is not a shader (BAD!)
 		if (!shader_obj instanceof cnvgl.shader) {
 			cnvgl.throw_error(cnvgl.INVALID_OPERATION, ctx);
 			return;
 		}
 
-		shader_obj.object_code = ctx.driver.compileShader(shader_obj.shader_string, shader_obj.type);
+		ctx.driver.compileShader(ctx, shader_obj.driverObj, shader_obj.shader_string, shader_obj.type);
 		shader_obj.compile_status = ctx.driver.compileStatus;
 		shader_obj.information_log = ctx.driver.compileErrors;
 	};
@@ -163,7 +163,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		program_obj.name = name;
 	
 		ctx.shared.shaderObjects.push(program_obj);
-	
+
+		program_obj.driverObj = ctx.driver.createProgram(ctx);
+
 		return name;
 	};
 	
@@ -189,7 +191,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		shader_obj = new cnvgl.shader(name, shaderType);	
 		ctx.shared.shaderObjects.push(shader_obj);
-	
+
+		shader_obj.driverObj = ctx.driver.createShader(ctx, shaderType);
+
 		return shader_obj.name;
 	};
 
@@ -397,23 +401,23 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		shaders = [];
 		for (i = 0; i < program_obj.attached_shaders.length; i++) {
-			shaders.push(program_obj.attached_shaders[i].object_code);
+			shaders.push(program_obj.attached_shaders[i].driverObj);
 		}
 
-		program_obj.program = ctx.driver.link(shaders);
+		ctx.driver.link(ctx, program_obj.driverObj, shaders);
 		program_obj.link_status = ctx.driver.linkStatus;
 		program_obj.information_log = ctx.driver.linkErrors;
 
 		if (program_obj.link_status) {
 
-			for (i = 0; i < program_obj.program.attributes.length; i++) {
-				attrib = program_obj.program.attributes[i];
+			for (i = 0; i < program_obj.driverObj.attributes.length; i++) {
+				attrib = program_obj.driverObj.attributes[i];
 				attrib_obj = new cnvgl.program_var(attrib.name, attrib.type, attrib.location, attrib.slots, attrib.components);
 				program_obj.addActiveAttribute(attrib_obj);
 			}
 
-			for (i = 0; i < program_obj.program.uniforms.length; i++) {
-				unif = program_obj.program.uniforms[i];
+			for (i = 0; i < program_obj.driverObj.uniforms.length; i++) {
+				unif = program_obj.driverObj.uniforms[i];
 				uniform_obj = new cnvgl.program_var(unif.name, unif.type, unif.location, unif.slots, unif.components);
 				program_obj.addActiveUniform(uniform_obj);
 			}	
@@ -492,8 +496,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			cnvgl.throw_error(cnvgl.INVALID_OPERATION, ctx);
 			return;
 		}
-	
-		ctx.shader.activeProgram = program_obj;		
+
+		ctx.shader.activeProgram = program_obj;	
+		
+		ctx.driver.useProgram(ctx, program_obj.driverObj);
 	};
 
 
