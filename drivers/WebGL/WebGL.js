@@ -42,7 +42,7 @@ cWebGL.drivers.WebGL = (function() {
 
 	DriverWebGL.DriverWebGL = function(canvas, config) {
 		this.Driver(canvas, config);
-		this._context = WebGLDebugUtils.makeDebugContext(canvas.getContext('experimental-webgl', config, true));
+		this._context = canvas.getContext('experimental-webgl', config, true);
 		if (this._context) {
 			this.ready = true;
 		}

@@ -48,7 +48,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 			this.timer = null;
 			start = new Date().getTime();
-
 			while (this.commands.length > 0) {
 
 				command = this.commands.shift();

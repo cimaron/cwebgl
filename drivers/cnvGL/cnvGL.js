@@ -122,6 +122,14 @@ cWebGL.drivers.cnvGL = (function() {
 		this.command('drawPrimitives', mode, first, count);
 	};
 
+	DriverCnvGL.drawElements = function(ctx, mode, first, count, indices) {
+		var shaders;
+		shaders = ctx.shader.activeProgram.attached_shaders;
+		this.command('uploadProgram', 'fragment', shaders[1].object_code.exec);
+		this.command('uploadProgram', 'vertex', shaders[0].object_code.exec);
+		this.command('drawIndexedPrimitives', mode, first, count, indices);
+	};
+
 	DriverCnvGL.enable = function(ctx, flag, v) {
 		switch (flag) {
 			case cnvgl.CULL_FACE:
@@ -167,6 +175,7 @@ cWebGL.drivers.cnvGL = (function() {
 
 	DriverCnvGL.present = function() {
 		this._context2d.putImageData(this.colorBuffer, 0, 0);
+		cWebGL.frameComplete();
 	};
 
 	DriverCnvGL.uploadAttributes = function(ctx, location, size, stride, pointer, data) {

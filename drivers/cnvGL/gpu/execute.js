@@ -24,10 +24,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	GPU.execute = function(cmd) {
 		if (GPU.commands[cmd[1]]) {
-			console.log(cmd);
+			//console.log(cmd);
 			GPU.commands[cmd[1]].apply(GPU, cmd);
 		} else {
-			console.log(cmd);
+			//console.log(cmd);
 		}
 	};
 
@@ -59,6 +59,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		GPU.renderer.end(ctx, mode);
 	};
 
+	GPU.commands.drawIndexedPrimitives = function(ctx, cmd, mode, first, count, indices) {
+		var i;
+		for (i = first; i < count; i++) {
+			vertex = new cnvgl.vertex(indices[i]);
+			GPU.renderer.send(ctx, mode, vertex);
+		}
+		GPU.renderer.end(ctx, mode);
+	};
+		
 	GPU.commands.uploadProgram = function(ctx, cmd, name, data) {
 		if (name == 'vertex') {
 			GPU.uploadVertexShader(data);

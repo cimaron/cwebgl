@@ -494,7 +494,7 @@ cWebGLRenderingContext = (function() {
 			this.errors.push(this.INVALID_OPERATION);
 			return;
 		}
-		
+
 		cnvgl.setContext(this._context);
 		cnvgl.bindBuffer(target, buffer ? buffer.object() : 0);
 
@@ -620,10 +620,10 @@ cWebGLRenderingContext = (function() {
 	};
 
 	cWebGLRenderingContext.drawElements = function(mode, count, type, offset) {
-		//@validation
-		this._context.drawElements(mode, count, type, offset);
+		cnvgl.setContext(this._context);
+		cnvgl.drawElements(mode, count, type, offset);
 	};
-	
+
 	cWebGLRenderingContext.enable = function(cap) {
 		cnvgl.setContext(this._context);
 		cnvgl.enable(cap);

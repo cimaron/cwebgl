@@ -23,7 +23,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 require_once dirname(__FILE__).'/include.php';
 
 //Extra Libraries
-$include('debug.js');
 $include('library/jClass/jClass.js');
 $include('library/stdio/stdio.js');
 $include('library/TypedArray/TypedArray.js');

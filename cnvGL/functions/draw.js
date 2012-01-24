@@ -71,27 +71,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glDrawElements.xml
 	 */
 	cnvgl.drawElements = function(mode, count, type, indices) {
-		var ctx, renderer, program_obj, buffer_obj, elements, i, vertex, index;
-
+		var ctx;
 		ctx = cnvgl.getCurrentContext();
-		renderer = ctx.renderer;
-		program_obj = ctx.shader.activeProgram;
-	
-		renderer.setMode(mode);
-	
-		buffer_obj = ctx.array.elementArrayBufferObj;
-		elements = buffer_obj.data;
-	
-		//each vertex
-		for (i = 0; i < count; i++) {
-			index = elements[i + indices];
-			vertex = new cnvgl.vertex();
-			cnvgl_copy_initialize_attribute_data(ctx, program_obj, index, vertex);
-			renderer.send(vertex);
-		}
-	
-		renderer.end();
+		uploadAtributes(ctx);
+		ctx.driver.drawElements(ctx, mode, count, type, indices);
 	};
-
+		
 }(cnvgl));
 

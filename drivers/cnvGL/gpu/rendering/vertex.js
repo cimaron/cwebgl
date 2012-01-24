@@ -49,7 +49,7 @@ cnvgl_rendering_vertex = (function() {
 			GPU.memory.result.data);
 
 		position = GPU.memory.result.data[0];
-		console.log(v.varying.data[0]);
+
 		v.x = position[0];
 		v.y = position[1];
 		v.z = position[2];

@@ -51,7 +51,7 @@ cnvgl_rendering_primitive_triangle = (function() {
 		
 		//clipping may split triangle into multiple triangles
 		clipped = [];
-		num = this.renderer.clipping.clipTriangle(prim, clipped);
+		num = this.renderer.clipping.clipTriangle(state, prim, clipped);
  
 		for (i = 0; i < num; i++) {
 			this.renderClipped(state, clipped[i]);
