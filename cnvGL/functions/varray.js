@@ -80,12 +80,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		ctx = cnvgl.getCurrentContext();
 	
 		//out of bounds
-		if (index >= GPU.shader.MAX_VERTEX_ATTRIBS || index < 0) {
+		if (index >= ctx.const.maxVertexAttribs || index < 0) {
 			cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
 			return;
 		}
 	
 		ctx.array.arrayObj.vertexAttrib[index].enabled = cnvgl.FALSE;
+
+		ctx.driver.disableVertexAttribArray(ctx, index);
 	};
 
 

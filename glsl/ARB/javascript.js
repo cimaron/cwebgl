@@ -112,7 +112,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				out.comp.push(out.comp[i - 1]);	
 			} else {
 				//push the location of the current component
-				if (out.name == 'attrib') {
+				if (out.name == 'attrib' && object_code.target == glsl.mode.vertex) {
 					out.comp.push("[ai" + "xyzw".indexOf(swz[i]) + "]");
 				} else {					
 					out.comp.push("[" + "xyzw".indexOf(swz[i]) + "]");
@@ -120,7 +120,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			}
 		}
 
-		if (typeof out.offset == "number") {
+		if (typeof out.offset2 == "number") {
+			out.out = sprintf("%s[%s]", out.name, out.offset2);
+		} else if (typeof out.offset == "number") {
 			out.out = sprintf("%s[%s]", out.name, out.offset);
 		} else {
 			out.out = out.name;
@@ -167,7 +169,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	function buildVariable(oper, i, c) {
 		var out;
-		if (oper.name == 'attrib' && object_code.target == 1) {
+		if (oper.name == 'attrib' && object_code.target == glsl.mode.vertex) {
 			out = oper.neg + oper.out + (oper.swizzle ? oper.comp[i] : c.replace('[', '[ai'));
 		} else {
 			out = oper.neg + oper.out + (oper.swizzle ? oper.comp[i] : c);

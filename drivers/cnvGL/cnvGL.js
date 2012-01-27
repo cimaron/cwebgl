@@ -44,6 +44,44 @@ cWebGL.drivers.cnvGL = (function() {
 	DriverCnvGL.Static.test = function() {
 		return true;
 	};
+	
+	DriverCnvGL.Static.animationFrameQueue = [];
+
+	DriverCnvGL.Static.animationFrameFunc = true;
+
+	DriverCnvGL.Static.requestAnimationFrameNative = null;
+	DriverCnvGL.Static.requestAnimationFrame = function(func, el) {
+		DriverCnvGL.Static.animationFrameQueue.push(func);
+	};
+	DriverCnvGL.Static.requestAnimationFrameWrapper = function(func, el) {
+		DriverCnvGL.Static.animationFrameFunc.call(window, func, el);
+	};
+
+	DriverCnvGL.Static.setupRequestAnimationFrame = function() {
+		DriverCnvGL.Static.requestAnimationFrameNative =
+			window.requestAnimationFrame ||
+			window.webkitRequestAnimationFrame ||
+			window.mozRequestAnimationFrame ||
+			window.oRequestAnimationFrame ||
+			window.msRequestAnimationFrame ||
+			function(func, el) {
+				window.setTimeout(el, 1000 / 60);
+			};
+
+		DriverCnvGL.Static.animationFrameFunc = DriverCnvGL.Static.requestAnimationFrameNative;
+		window.requestAnimationFrame = DriverCnvGL.Static.requestAnimationFrameWrapper;
+	};
+
+	DriverCnvGL.Static.frameComplete = function() {
+		var list;
+		list = DriverCnvGL.Static.animationFrameQueue;
+		while (list.length > 0) {
+			window.setTimeout(list.shift(), 0);
+		}
+	};
+
+	DriverCnvGL.Static.setupRequestAnimationFrame();
+
 
 	//public:
 
@@ -67,8 +105,28 @@ cWebGL.drivers.cnvGL = (function() {
 
 			this.command('set', 'colorBuffer', this.colorBuffer);
 			this.command('set', 'depthBuffer', this.depthBuffer);
+
+			DriverCnvGL.Static.animationFrameFunc = DriverCnvGL.Static.requestAnimationFrame;
 		}
 		//need to add failure code
+	};
+	
+	DriverCnvGL.command = function() {
+		var args;
+		args = [].slice.call(arguments, 0);
+		args.unshift(this._context);
+		this.queue.enqueue(args);
+	};
+
+	DriverCnvGL.bindTexture = function(ctx, unit, target, tex_obj) {
+		this.command('uploadTexture', unit, tex_obj);
+	};
+
+	DriverCnvGL.blendFunc = function(ctx, sfactor, dfactor) {
+		this.command('set', 'blendSrcA', sfactor);
+		this.command('set', 'blendSrcRGB', sfactor);
+		this.command('set', 'blendDestA', dfactor);
+		this.command('set', 'blendDestRGB', dfactor);
 	};
 
 	DriverCnvGL.clear = function(ctx, color, depth, mask) {
@@ -85,13 +143,6 @@ cWebGL.drivers.cnvGL = (function() {
 		this.command('set', 'colorMask', [r, g, b, a]);
 	};
 
-	DriverCnvGL.command = function() {
-		var args;
-		args = [].slice.call(arguments, 0);
-		args.unshift(this._context);
-		this.queue.enqueue(args);
-	};
-	
 	DriverCnvGL.compileShader = function(ctx, shader, source, type) {
 		this.compileStatus = glsl.compile(source, type - cnvgl.FRAGMENT_SHADER);
 		this.compileLog = glsl.errors.join("\n");
@@ -120,12 +171,22 @@ cWebGL.drivers.cnvGL = (function() {
 		this.command('set', 'viewportF', f);
 	};
 
+	DriverCnvGL.depthFunc = function(ctx, func) {
+		this.command('set', 'depthFunc', func);
+	};
+
+	DriverCnvGL.depthMask = function(ctx, mask) {
+		this.command('set', 'depthMask', mask);
+	};
+
 	DriverCnvGL.drawArrays = function(ctx, mode, first, count) {
 		this.command('drawPrimitives', mode, first, count);
 	};
 
-	DriverCnvGL.drawElements = function(ctx, mode, first, count, indices) {
-		this.command('drawIndexedPrimitives', mode, first, count, indices);
+	DriverCnvGL.drawElements = function(ctx, mode, first, count, type) {
+		var buffer;
+		buffer = ctx.array.elementArrayBufferObj.data;
+		this.command('drawIndexedPrimitives', mode, buffer, first, count, type);
 	};
 
 	DriverCnvGL.enable = function(ctx, flag, v) {
@@ -136,6 +197,11 @@ cWebGL.drivers.cnvGL = (function() {
 			case cnvgl.DEPTH_TEST:
 				this.command('set', 'depthTest', v);
 				break;
+			case cnvgl.BLEND:
+				this.command('set', 'blendEnabled', v);
+				break;
+			default:
+				console.log(flag);
 		}
 	};
 
@@ -187,7 +253,7 @@ cWebGL.drivers.cnvGL = (function() {
 
 	DriverCnvGL.present = function() {
 		this._context2d.putImageData(this.colorBuffer, 0, 0);
-		cWebGL.frameComplete();
+		DriverCnvGL.Static.frameComplete();
 	};
 
 	DriverCnvGL.uploadAttributes = function(ctx, location, size, stride, pointer, data) {

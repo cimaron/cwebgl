@@ -36,14 +36,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		ctx = cnvgl.getCurrentContext();
 		i = texture - cnvgl.TEXTURE0;
 
-		if (i < 0 || i > (GPU.texture.MAX_COMBINED_TEXTURE_IMAGE_UNITS - 1)) {
+		if (i < 0 || i > (cnvgl.constants.maxTextureUnits - 1)) {
 			cnvgl.throw_error(cnvgl.INVALID_ENUM, ctx);
 			return;
 		}
 
 		ctx.texture.currentUnit = i;
 		if (!ctx.texture.unit[i]) {
-			ctx.texture.unit[i] = new cnvgl.texture_unit(ctx, texture);	
+			ctx.texture.unit[i] = new cnvgl.texture_unit(texture);	
 		}
 	}
 

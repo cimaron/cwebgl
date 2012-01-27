@@ -765,7 +765,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		for (i in symbols.table) {
 			entry = symbols.table[i];
 			if (entry.typedef == glsl.symbol_table_entry.typedef.variable) {
-				//console.log(entry);	
+				//console.log(entry);
 			}
 		}
 	}

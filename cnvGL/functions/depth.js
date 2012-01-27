@@ -80,6 +80,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		ctx = cnvgl.getCurrentContext();
 	
 		ctx.depth.mask = mask ? cnvgl.TRUE : cnvgl.FALSE;
+		
+		ctx.driver.depthMask(ctx, mask);
 	};
 
 

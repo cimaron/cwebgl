@@ -58,12 +58,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				}
 				texture_obj.target = target;
 			} else {
-				texture_obj = new cnvgl.texture.object(texture, target);
+				texture_obj = new cnvgl.texture_object(texture, target);
 				ctx.shared.texture_objects[texture] = texture_obj;
 			}
 		}
 	
 		texture_unit.current_texture[target] = texture_obj;
+
+		ctx.driver.bindTexture(ctx, unit, target, texture_obj);
 	};
 	
 	

@@ -2,6 +2,7 @@ package {
 
 	import flash.display.Sprite;
 	import flash.display3D.Program3D;
+	import flash.utils.ByteArray;
 
 	import flash.display.Stage;
 	import flash.display.Stage3D;
@@ -29,7 +30,7 @@ package {
 		private var _stage:Stage;
 		private var stage3D:Stage3D;
 		private var _context3D:Context3D;
-		private var programs:Array;
+		private var programs:Array = new Array();
 
         private var vertexAssembly:AGALMiniAssembler = new AGALMiniAssembler();
         private var fragmentAssembly:AGALMiniAssembler = new AGALMiniAssembler();
@@ -67,7 +68,7 @@ package {
 		private function render():void {
 			_context3D.present();			
 		}
-		
+
 		private function constants():Object {
 			var c:Object = new Object;
 
@@ -97,6 +98,13 @@ package {
 			c.triangleFace.FRONT_AND_BACK = Context3DTriangleFace.FRONT_AND_BACK;
 			c.triangleFace.NONE = Context3DTriangleFace.NONE;
 
+			c.vertexBufferFormat = new Object;
+			c.vertexBufferFormat.BYTES_4 = Context3DVertexBufferFormat.BYTES_4;
+			c.vertexBufferFormat.FLOAT_1 = Context3DVertexBufferFormat.FLOAT_1;
+			c.vertexBufferFormat.FLOAT_2 = Context3DVertexBufferFormat.FLOAT_2;
+			c.vertexBufferFormat.FLOAT_3 = Context3DVertexBufferFormat.FLOAT_3;
+			c.vertexBufferFormat.FLOAT_4 = Context3DVertexBufferFormat.FLOAT_4;
+
 			return c;
 		}
 
@@ -108,14 +116,23 @@ package {
 				try {
 					result = execCommand(cmd, args);
 				} catch (e:Error) {
-					return {status:0,result:e.message,stack:e.getStackTrace()};
+					return {
+						cmd : cmd,
+						status : 0,
+						result : e.message,
+						stack : e.getStackTrace(),
+						name : e.name
+					};
 				}
 			}
 			return {status:1,result:result};
 		}
 
-		private function execCommand(cmd:String, args:Array):String {
+		private function execCommand(cmd:String, args:Array):* {
 			switch (cmd) {
+				case 'configureBackBuffer':
+					configureBackBuffer.apply(this, args);
+					break;
 				case 'clear':
 					clear.apply(this, args);
 					return '1';
@@ -126,85 +143,92 @@ package {
 				case 'drawTriangles':
 					drawTriangles.apply(this, args);
 					break;
+				case 'present':
+					render();
+					break;
 				case 'setCulling':
 					setCulling.apply(this, args);
 					break;
+				case 'setDepthTest':
+					setDepthTest.apply(this, args);
+					break;
+				case 'setProgramConstantsFromVector':
+					setProgramConstantsFromVector.apply(this, args);
+					break;
 				case 'upload':
 					upload.apply(this, args);
+					break;
+				case 'setVertexData':
+					setVertexData.apply(this, args);
 					break;
 				default:
 					throw new Error(cmd + " not implemented");
 			}
 			return '';
 		}
-
-		private function assemble(vertex:String, fragment:String) {
-   			vertexAssembly.assemble( Context3DProgramType.VERTEX, vertex, false );
-            fragmentAssembly.assemble( Context3DProgramType.FRAGMENT, fragment, false );			
-		}
 		
 		private function clear(r:Number, g:Number, b:Number, a:Number, d:Number, s:Number, m:Number):void {
 			_context3D.clear(r, g, b, a, d, s, m);
 		}
+		
+		private function configureBackBuffer(width:int, height:int, antiAlias:int, enableDepthAndStencil:Boolean):void {
+			_context3D.configureBackBuffer(width, height, antiAlias, enableDepthAndStencil);
+		}
 
-		private function createProgram():String {
+		private function createProgram():Number {
 			var prgm:Program3D;
 			prgm = _context3D.createProgram();
 			programs.push(prgm);
-			return (programs.length - 1).toString();
+			return (programs.length - 1);
 		}
-		
+
 		private function setCulling(triangleFaceToCull:String):void {
 			_context3D.setCulling(triangleFaceToCull);
 		}
 
-		private function drawTriangles():void {
+		private function drawTriangles(indices:Array, start:uint, count:uint):void {
 		    var indexList:IndexBuffer3D;
+			_context3D.clear(0, 0, 0, 1, 1, 0, Context3DClearMask.ALL);
+			//Create vertex index list for the triangles
+            var triangles:Vector.<uint> = Vector.<uint>(indices);
+            indexList = _context3D.createIndexBuffer(triangles.length);
+            indexList.uploadFromVector(triangles, 0, triangles.length);
+            _context3D.drawTriangles(indexList, start, count); //Top triangle draws all colors, so is white
+		}
+
+		private function setDepthTest(mask:Boolean, mode:String):void {
+			_context3D.setDepthTest(mask, mode);
+		}
+
+		private function setProgramConstantsFromVector(programType:String, firstRegister:int, numRegisters:int, data:Array, byteArrayOffset:uint):void {
+			var vecData:Vector.<Number> = Vector.<Number>(data);
+			_context3D.setProgramConstantsFromVector(programType, firstRegister, vecData, numRegisters);
+		}
+
+		private function setVertexData(index:uint, data:Array, dataPerVertex:uint, format:String):void {
 			var vertexes:VertexBuffer3D;
 
-			_context3D.clear(0, 0, 0, 1, 1, 0, 7);
-			
-		 //Create vertex index list for the triangles
-            var triangles:Vector.<uint> = Vector.<uint>( [ 0, 1, 2, 0, 3, 4 ] );
-            indexList = _context3D.createIndexBuffer( triangles.length );
-            indexList.uploadFromVector( triangles, 0, triangles.length );
-            
-            //Create vertexes
-            const dataPerVertex:int = 6;
-            var vertexData:Vector.<Number> = Vector.<Number>(
-                [
-                  // x, y, z    r, g, b format
-                     0, 0, 0,   1, 1, 1,
-                    -1, 1, 0,   1, 1, 1,
-                     1, 1, 0,   1, 1, 1,
-                     1,-1, 0,   1, 1, 1,
-                    -1,-1, 0,   1, 1, 1
-                ]
-            );
-            vertexes = _context3D.createVertexBuffer( vertexData.length/dataPerVertex, dataPerVertex );
-            vertexes.uploadFromVector( vertexData, 0, vertexData.length/dataPerVertex );
-            
-            //Identify vertex data inputs for vertex program
-            _context3D.setVertexBufferAt( 0, vertexes, 0, Context3DVertexBufferFormat.FLOAT_3 ); //va0 is position
-            _context3D.setVertexBufferAt( 1, vertexes, 3, Context3DVertexBufferFormat.FLOAT_3 ); //va1 is color
+			//Create vertexes
+            var vertexData:Vector.<Number> = Vector.<Number>(data);
+            vertexes = _context3D.createVertexBuffer(vertexData.length / dataPerVertex, dataPerVertex);
+            vertexes.uploadFromVector(vertexData, 0, vertexData.length / dataPerVertex);
 
-            _context3D.drawTriangles(indexList, 0, 1); //Top triangle draws all colors, so is white
-            _context3D.setColorMask(true, false, false, false ); //Mask all but red channel            
-            _context3D.drawTriangles(indexList, 3, 1); //Bottom triangle only updates red
+            //Identify vertex data inputs for vertex program
+            _context3D.setVertexBufferAt(index, vertexes, 0, format);
 		}
 
 		private function test():Boolean {
 			return true;
 		}
 
-		private function upload(vertex:String, fragment:String):void {
-			var programPair:Program3D;
-
-			programPair = _context3D.createProgram();
-            programPair.upload( vertexAssembly.agalcode, fragmentAssembly.agalcode );
-            _context3D.setProgram( programPair );
+		private function upload(prgm:Number, vertex:String, fragment:String):void {
+			var programPair:Program3D = programs[int(prgm)];
+   			vertexAssembly.assemble(Context3DProgramType.VERTEX, vertex, false);
+            fragmentAssembly.assemble(Context3DProgramType.FRAGMENT, fragment, false);
+            programPair.upload(vertexAssembly.agalcode, fragmentAssembly.agalcode);
+            _context3D.setProgram(programPair);
 		}
-                          
+		
 		private function getFlashVersion():String {
 			return Capabilities.version;
 		}

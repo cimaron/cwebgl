@@ -24,7 +24,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	GPU.Context = function() {
 		this.activeVarying = [];
-
+		this.blendEnabled = cnvgl.FALSE;
+		this.blendDestA = cnvgl.ZERO;
+		this.blendDestRGB = cnvgl.ZERO;
+		this.blendEquationA = cnvgl.FUNC_ADD;
+		this.blendEquationRGB = cnvgl.FUNC_ADD;
+		this.blendSrcA = cnvgl.ONE;
+		this.blendSrcRGB = cnvgl.ONE;
 		this.clearColor = null;
 		this.clearDepth = null;
 		this.colorBuffer = null;
@@ -33,6 +39,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		this.cullFrontFace = cnvgl.CCW;
 		this.cullFaceMode = cnvgl.BACK;
 		this.depthBuffer = null;
+		this.depthFunc = cnvgl.LESS;
+		this.depthMask = cnvgl.TRUE;
 		this.depthTest = null;
 		this.viewportF = 1;
 		this.viewportH = 0;

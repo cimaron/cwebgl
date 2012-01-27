@@ -24,12 +24,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	
 	cnvgl.texture_unit = function(ctx, unit) {
-		this.ctx = ctx;
-		this.unit = unit;
-	
-		this.current_texture = [];
+		this.unit = unit;	
+		this.current_texture = {};
 	};
-	
 	
 	cnvgl.texture_object = function(name, target) {
 		this.name = name;

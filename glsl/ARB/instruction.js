@@ -28,6 +28,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			this.name = "";
 			this.neg = "";
 			this.offset = "";
+			this.offset2 = "";
 			this.swizzle = "";
 		}
 
@@ -101,10 +102,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		 * @return  string
 		 */
 		Operand.toString = function() {
-			var off, swz;
-			off = (this.offset || this.offset === 0) ? StdIO.sprintf("[%s]", this.offset) : ""
+			var off, off2, swz;
+			off = (this.offset || this.offset === 0) ? StdIO.sprintf("[%s]", this.offset) : "";
+			off2 = (this.offset2 || this.offset2 === 0) ? StdIO.sprintf("[%s]", this.offset2) : null;
 			swz = this.swizzle ? "." + this.swizzle : "";
-			return StdIO.sprintf("%s%s%s%s", this.neg, this.name, off, swz);
+			return StdIO.sprintf("%s%s%s%s", this.neg, this.name, off2 || off, swz);
 		};
 
 		return Operand.Constructor;

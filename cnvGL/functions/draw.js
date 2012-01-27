@@ -73,8 +73,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.drawElements = function(mode, count, type, indices) {
 		var ctx;
 		ctx = cnvgl.getCurrentContext();
-		uploadAtributes(ctx);
-		ctx.driver.drawElements(ctx, mode, count, type, indices);
+		uploadAttributes(ctx);
+		ctx.driver.drawElements(ctx, mode, indices, count, type);
 	};
 		
 }(cnvgl));

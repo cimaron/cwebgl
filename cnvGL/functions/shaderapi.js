@@ -472,8 +472,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		if (program == 0) {
 			ctx.shader.activeProgram = null;
-			GPU.setVertexProgram(null);
-			GPU.setFragmentProgram(null);
+			ctx.driver.useProgram(ctx, 0);
 			return;
 		}
 	

@@ -24,8 +24,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	GPU.execute = function(cmd) {
 		if (GPU.commands[cmd[1]]) {
-			//console.log(cmd);
-			GPU.commands[cmd[1]].apply(GPU, cmd);
+			return GPU.commands[cmd[1]].apply(GPU, cmd);
 		} else {
 			//console.log(cmd);
 		}
@@ -35,10 +34,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	GPU.commands.set = function(ctx, cmd, name, value) {
 		ctx[name] = value;
+		return true;
 	};
 
 	GPU.commands.setArray = function(ctx, cmd, name, index, value) {
 		ctx[name][index] = value;
+		return true;
 	};
 
 	GPU.commands.clear = function(ctx, cmd, mask) {
@@ -48,24 +49,57 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		if (mask && cnvgl.DEPTH_BUFFER_BIT) {
 			cnvgl.memset(ctx.depthBuffer, 0, ctx.clearDepth);
 		}
+		return true;
 	};
 
+	var i = -1;
 	GPU.commands.drawPrimitives = function(ctx, cmd, mode, first, count) {
-		var i;
-		for (i = first; i < count; i++) {
+		var start, now;
+		
+		start = Date.now();
+		if (i == -1) {
+			i = first;
+		}
+
+		for (; i < count; i++) {
 			vertex = new cnvgl.vertex(i);
 			GPU.renderer.send(ctx, mode, vertex);
+
+			now = Date.now();
+			if (now - start > 200) {
+				//time limit is up
+				i++;
+				return false;
+			}
 		}
 		GPU.renderer.end(ctx, mode);
+		i = -1;
+		return true;
 	};
 
-	GPU.commands.drawIndexedPrimitives = function(ctx, cmd, mode, first, count, indices) {
-		var i;
-		for (i = first; i < count; i++) {
-			vertex = new cnvgl.vertex(indices[i]);
-			GPU.renderer.send(ctx, mode, vertex);
+	GPU.commands.drawIndexedPrimitives = function(ctx, cmd, mode, indices, first, count, type) {
+		var start, now;
+		
+		start = Date.now();
+		if (i == -1) {
+			i = first;
 		}
+
+		for (; i < count; i++) {
+			vertex = new cnvgl.vertex(indices[first + i]);
+			GPU.renderer.send(ctx, mode, vertex);
+
+			now = Date.now();
+			if (now - start > 100) {
+				//time limit is up
+				i++;
+				return false;
+			}
+		}
+
 		GPU.renderer.end(ctx, mode);
+		i = -1;
+		return true;
 	};
 		
 	GPU.commands.uploadProgram = function(ctx, cmd, name, data) {
@@ -74,6 +108,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		} else {
 			GPU.uploadFragmentShader(data);
 		}
+		return true;
 	};
 
 	GPU.commands.uploadAttributes = function(ctx, cmd, location, size, stride, si, data) {
@@ -101,6 +136,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				c = 0;
 			}
 		}
+		return true;
+	};
+
+	GPU.commands.uploadTexture = function(ctx, cmd, unit, texture_obj) {
+		GPU.texture.upload(unit, texture_obj);
+		return true;
 	};
 
 	GPU.commands.uploadUniforms = function(ctx, cmd, location, data, slots, components) {
@@ -108,6 +149,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		for (i = 0; i < slots; i++) {
 			cnvgl.memcpy(GPU.memory.uniforms, (location + i) * 4, data, components, (components * i));
 		}
+		return true;
 	};
 
 }(GPU));

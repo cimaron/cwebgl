@@ -77,42 +77,6 @@ GraphicsContext3D = (function() {
 
 	//public:
 
-	GraphicsContext3D.activeTexture = function(texture) {
-		glActiveTexture(texture);
-	};
-
-	GraphicsContext3D.attachShader = function(program, shader) {
-		glAttachShader(program, shader);
-	};
-
-	GraphicsContext3D.bindAttribLocation = function(program, index, name) {
-		glBindAttribLocation(program, index, name);
-	};
-
-	GraphicsContext3D.bindFramebuffer = function(target, framebuffer) {
-		glBindFramebuffer(target, framebuffer);
-	};
-
-	GraphicsContext3D.bindRenderbuffer = function(target, renderbuffer) {
-		glBindRenderbuffer(target, renderbuffer);
-	};
-
-	GraphicsContext3D.bindTexture = function(target, texture) {
-		glBindTexture(target, texture);
-	};
-
-	GraphicsContext3D.blendFunc = function(sfactor, dfactor) {
-		glBlendFunc(sfactor, dfactor);
-	};
-
-	GraphicsContext3D.bufferSubData = function(target, offset, size, data) {
-		glBufferSubData(target, offset, size, data);
-	};
-
-	GraphicsContext3D.clearDepth = function(depth) {
-		glClearDepth(depth);
-	};
-
 	GraphicsContext3D.colorMask = function(red, green, blue, alpha) {
 		glColorMask(red, green, blue, alpha);
 	};
@@ -128,12 +92,6 @@ GraphicsContext3D = (function() {
 		glGenRenderbuffers(1, renderbuffers);
 		return renderbuffers[0][0];
 	};
-
-	GraphicsContext3D.createTexture = function() {
-		var textures = [];
-		glGenTextures(1, textures);
-		return textures[0][0];
-	};	
 
 	GraphicsContext3D.cullFace = function(mode) {
 		glCullFace(mode);
@@ -183,38 +141,6 @@ GraphicsContext3D = (function() {
 
 	GraphicsContext3D.renderbufferStorage = function(target, internalformat, width, height) {
 		glRenderbufferStorage(target, internalformat, width, height);
-	};
-
-	GraphicsContext3D.uniform1i = function(location, v0) {
-		glUniform1i(location, v0);
-	};
-
-	GraphicsContext3D.uniform1f = function(location, v0) {
-		glUniform1f(location, v0);
-	};\
-
-	GraphicsContext3D.uniform3f = function(location, v0, v1, v2) {
-		glUniform3f(location, v0, v1, v2);
-	};
-
-	GraphicsContext3D.uniform3fv = function(location, value) {
-		glUniform3fv(location, 1, value);
-	};
-
-	GraphicsContext3D.uniformMatrix3fv = function(location, transpose, value) {
-		glUniformMatrix3fv(location, value.length / 9, transpose, value);
-	};
-
-	GraphicsContext3D.uniformMatrix4fv = function(location, transpose, value) {
-		glUniformMatrix4fv(location, value.length / 16, transpose, value);
-	};
-	
-	GraphicsContext3D.texImage2D = function(target, level, internalformat, width, height, border, format, type, source) {
-		glTexImage2D(target, level, internalformat, width, height, border, format, type, source);
-	};
-
-	GraphicsContext3D.texParameteri = function(target, pname, param) {
-		glTexParameteri(target, pname, param);
 	};
 
 	GraphicsContext3D.setTargetFps = function(low, high) {

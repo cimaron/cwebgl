@@ -44,17 +44,25 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		};
 
 		CommandQueue.process = function() {
-			var command, start, now;
+			var command, start, now, result;
 
 			this.timer = null;
-			start = new Date().getTime();
+			start = Date.now();
+	
 			while (this.commands.length > 0) {
 
 				command = this.commands.shift();
-				GPU.execute(command);
+				result = GPU.execute(command);
+				
+				if (!result) {
+					this.commands.unshift(command);
+					this.schedule();
+					return;
+				}
 
-				now = new Date().getTime();
-				if (now - start > 100) {
+				now = Date.now();
+
+				if (this.commands.length > 0 && now - start > 200) {
 					this.schedule();
 					return;
 				}

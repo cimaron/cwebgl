@@ -42,6 +42,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		ctx.color.blendSrcA = sfactor;
 		ctx.color.blendDestRGB = dfactor;
 		ctx.color.blendDestA = dfactor;
+		
+		ctx.driver.blendFunc(ctx, sfactor, dfactor);
 	};
 
 

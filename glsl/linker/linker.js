@@ -48,9 +48,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			//each operand
 			for (j = 0; j < glsl.IR.operands.length; j++) {
 				f = glsl.IR.operands[j];
-				if (ins[f] && ins[f].name == name
+				if (ins[f] && ins[f].name == symbol.out
 					&& ins[f].offset >= old_index && ins[f].offset < old_index + size) {
-					ins[f].addOffset(diff);
+					ins[f].offset2 = ins[f].offset + diff;
+					//ins[f].addOffset(diff);
 				}
 			}
 		}
@@ -123,7 +124,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	}
 
 	function addUniforms(program_obj, shader_obj) {
-		var constants, uniforms, i, c, uniform, uniform_obj, location;
+		var constants, uniforms, i, c, uniform, uniform_obj, location, last;
 
 		constants = shader_obj.constants;
 		uniforms = shader_obj.program.local;
@@ -133,7 +134,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			uniform = constants[i];
 
 			//check if already declared
-			if (program_obj.getActiveUniform(uniform.value)) {
+			if (uniform_obj = program_obj.getActiveUniform(uniform.value)) {
+				uniform_obj.value[i] = parseFloat(uniform.value);
 				continue;
 			}
 
@@ -142,10 +144,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				location = program_obj.getOpenSlot(program_obj.uniforms);
 				uniform_obj = new cnvgl.program_var('$constant'+c, glsl.type.vec4, location, 1, 1);
 				program_obj.addActiveUniform(uniform_obj);
+				last = uniform_obj;
 				c++;
 			} else {
+				uniform_obj = last;
 				uniform_obj.slots++;
 			}
+
+			uniform_obj.value[i % 4] = parseFloat(uniform.value);
 		}
 
 		for (i = 0; i < uniforms.length; i++) {

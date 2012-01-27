@@ -28,6 +28,8 @@ cWebGL.drivers.Stage3D = (function() {
 		this.src = "../../drivers/Stage3D/actionscript/bin/cWebGL.swf?r="+(new Date().getTime());
 		this.constants = null;
 		this.state = {};
+		this.queue = [];
+		this.timer = null;
 	}
 
 	var DriverStage3D = jClass('DriverStage3D', Initializer, cWebGL.Driver);
@@ -94,10 +96,33 @@ cWebGL.drivers.Stage3D = (function() {
 	};
 
 	DriverStage3D.command = function() {
-		var args, result;
+		var args, This;
 		args = [].slice.call(arguments, 0);
-		result = this.object.execCommands([args]);
-		console.log(args[0], result);
+
+		this.queue.push(args);
+		console.log(args);
+
+		if (!this.timer) {
+			This = this;
+			this.timer = setTimeout(function(){ This.flush(true); }, 0);
+		}
+	};
+
+	DriverStage3D.flush = function(present) {
+		var results;
+
+		clearTimeout(this.timer);
+		this.timer = null;
+
+		if (present) {
+			this.queue.push(['present']);
+		}
+
+		results = this.object.execCommands(this.queue);
+		this.queue = [];
+
+		console.log(results);
+		return results.result;
 	};
 
 	DriverStage3D.compileShader = function(ctx, shader, source, type) {
@@ -113,7 +138,8 @@ cWebGL.drivers.Stage3D = (function() {
 	DriverStage3D.createProgram = function(ctx) {
 		var program;
 		program = new cWebGL.Driver.Program();
-		program.Stage3D = this.command('createProgram');
+		this.command('createProgram');
+		program.Stage3D = parseInt(this.flush());
 		return program;
 	};
 
@@ -126,8 +152,18 @@ cWebGL.drivers.Stage3D = (function() {
 	};
 
 	DriverStage3D.drawArrays = function(ctx, mode, first, count) {
-		this.command('drawTriangles');
-		this.object.render();
+		var indices, i;
+		indices = [];
+		switch (mode) {
+			case cnvgl.TRIANGLES:
+				for (i = 0; i < count; i++) {
+					indices[i] = i;
+				}
+				break;
+			default:
+				return;
+		}
+		this.command('drawTriangles', indices, first, indices.length / 3);
 	};
 
 	DriverStage3D.enable = function(ctx, flag, v) {
@@ -137,7 +173,7 @@ cWebGL.drivers.Stage3D = (function() {
 				this._SetCulling(v, ctx.polygon.cullFaceMode);
 				break;
 			case cnvgl.DEPTH_TEST:
-				this._SetDepthTest(v, ctx.depth.func);
+				this._SetDepthTest(v, ctx.depth.func, ctx.depth.mask);
 				break;
 			default:
 				throw new Error('not implemented yet');
@@ -148,27 +184,53 @@ cWebGL.drivers.Stage3D = (function() {
 	DriverStage3D.enableVertexAttribArray = function(ctx, index) {
 	};
 
-	DriverStage3D.link = function(shaders) {
-		var program, i, j, unif, varying;
+	DriverStage3D.link = function(ctx, program, shaders) {
+		var sh, i, j, unif, varying;
 
-		program.programObj = glsl.link(shaders);
+		sh = [];
+		for (i = 0; i < shaders.length; i++) {
+			sh[i] = shaders[i].out;	
+		}
 
-		this.linkStatus = program.programObj.status;
+		program.GLSL = glsl.link(sh);
+
+		for (i = 0; i < sh.length; i++) {
+			if (sh[i].target == 0) {
+				program.fragmentProgram = "mov oc, fc0.xxxx"; //sh[i].exec;
+			} else {
+				//console.log(shaders[0].out.body.toString());
+				program.vertexProgram = "mov vt0, vc5\n"+
+										"m44 vt0, vc1, vt0\n"+
+										"mov vt1, vc6\n"+
+										"m44 vt1, vc1, vt1\n"+
+										"mov vt2, vc7\n"+
+										"m44 vt2, vc1, vt2\n"+
+										"mov vt3, vc8\n"+
+										"m44 vt3, vc1, vt3\n"+
+										"mov vt4.xyz, va0.xyz\n"+
+										"mov vt4.w, vc0.x\n"+
+										"m44 vt5, vt0, vt4\n"+
+										"mov op, vt5"; //sh[i].exec;	
+			}
+		}
+		
+		this.command('upload', program.Stage3D, program.vertexProgram, program.fragmentProgram);
+
+		this.linkStatus = program.GLSL.status;
 		this.linkLog = glsl.errors.join("\n");
 
 		if (this.linkStatus) {
-			program.attributes = program.programObj.attributes.active;
-			program.uniforms = program.programObj.uniforms.active;
-			program.varying = program.programObj.varying.active;
+			program.attributes = program.GLSL.attributes.active;
+			program.uniforms = program.GLSL.uniforms.active;
+			program.varying = program.GLSL.varying.active;
 
-			varying = new Array(GPU.shader.MAX_VARYING_VECTORS);
-			for (i = 0; i < program.varying.length; i++) {
-				for (j = 0; j < program.varying[i].slots; j++) {
-					varying[program.varying[i].location + j] = program.varying[i].components;
+			//upload constants
+			for (i = 0; i < program.uniforms.length; i++) {
+				unif = program.uniforms[i];
+				if (unif.name.match(/^\$constant/)) {
+					this.command('setProgramConstantsFromVector', this.constants.programType.VERTEX, unif.location, 1, unif.value, 0);
+					this.command('setProgramConstantsFromVector', this.constants.programType.FRAGMENT, unif.location, 1, unif.value, 0);
 				}
-			}
-			for (i = 0; i < varying.length; i++) {
-				//this.command('setArray', 'activeVarying', i, varying[i] || 0);
 			}
 		}
 
@@ -176,19 +238,27 @@ cWebGL.drivers.Stage3D = (function() {
 	};
 
 	DriverStage3D.uploadAttributes = function(ctx, location, size, stride, pointer, data) {
+		var formats;
+		formats = [
+			this.constants.vertexBufferFormat.BYTES_4,
+			this.constants.vertexBufferFormat.FLOAT_1,
+			this.constants.vertexBufferFormat.FLOAT_2,
+			this.constants.vertexBufferFormat.FLOAT_3,
+			this.constants.vertexBufferFormat.FLOAT_4,
+		]
+		this.command('setVertexData', location, data, size, formats[size]);
 	};
 
 	DriverStage3D.uploadUniform = function(ctx, location, data, slots, components) {
-		this.command('setProgramConstantsFromVector', this.constants.programType.VERTEX, location, -1);
-		this.command('setProgramConstantsFromVector', this.constants.programType.FRAGMENT, location, -1);
+		var newData;
+		//need to pad each vector to 4
+		newData = data;
+		this.command('setProgramConstantsFromVector', this.constants.programType.VERTEX, location, slots, newData, 0);
+		this.command('setProgramConstantsFromVector', this.constants.programType.FRAGMENT, location, slots, newData, 0);
 	};
 
 	DriverStage3D.useProgram = function(ctx, program) {
 		var shaders;
-		shaders = ctx.shader.activeProgram.attached_shaders;
-		//shaders[1].object_code.exec
-		//shaders[0].object_code.exec
-		this.command('upload', "mov op, va0\nmov v0, va1", "mov oc, v0");
 	};
 
 	DriverStage3D.viewport = function(ctx, x, y, w, h) {
@@ -213,7 +283,7 @@ cWebGL.drivers.Stage3D = (function() {
 		this.command('setCulling', newmode);
 	};
 
-	DriverStage3D._SetDepthTest = function(en, func) {
+	DriverStage3D._SetDepthTest = function(en, func, mask) {
 		var command, newfunc;
 		switch (func) {
 			case cnvgl.ALWAYS:
@@ -242,7 +312,7 @@ cWebGL.drivers.Stage3D = (function() {
 				break;
 		}
 
-		this.command('setDepthTest', en ? newfunc : this.constants.compareMode.ALWAYS);
+		this.command('setDepthTest', mask, en ? newfunc : this.constants.compareMode.ALWAYS);
 	};
 
 

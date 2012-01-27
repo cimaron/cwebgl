@@ -29,18 +29,24 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	texUnit = [];
 	for (i = 0; i < texture.MAX_COMBINED_TEXTURE_IMAGE_UNITS; i++) {
-		texUnit[i] = [];
-		for (j = 0; j < 1; j++) {
-			texUnit[i][j] = [];	
-		}
+		texUnit[i] = null;
 	}
 
 	function tex(c, sampler, s, t, target) {
-		var texture, mipmap_level, img, img_w, img_h, img_d, i, u, v, u1, v1, i1;
+		var texture, mipmap_level, img, img_w, img_h, img_d, i, u, v, a, b, i1;
 		target = 0;
 		mipmap_level = 0;
 
-		texture = texUnit[sampler].current_texture[cnvgl.TEXTURE_2D];
+		texture = texUnit[sampler];
+		
+		if (!texture) {
+			c[0] = 0;
+			c[1] = 0;
+			c[2] = 0;
+			c[3] = 1;
+			return;
+		}
+		
 		img = texture.images[mipmap_level];
 
 		if (!img) {
@@ -57,27 +63,29 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		switch (texture.min_filter) {
 			case cnvgl.LINEAR:
-				u = (s * img_w - .5)|0; //floor(s * img.width - .5)
-				v = (t * img_h - .5)|0; //floor(t * img.height - .5)
-				u1 = u + 1;
-				v1 = v + 1;
-				var a, b;
-				a = (s - .5)%1; //fpart(s - .5)
-				b = (t - .5)%1; //fpart(t - .5)
-				
-				var u0v0, u1v0, u0v1, v1v1;
+
+				var ui, vi, u0v0, u1v0, u0v1, u1v1, ai, bi;
+
+				u = (s * (img_w - 1));
+				v = (t * (img_h - 1));
+				ui = (u | 0); //floor(s * img.width)
+				vi = (v | 0); //floor(t * img.height)
+				a = u - ui;
+				b = v - vi;
+
 				u0v0 = (1 - a) * (1 - b);
 				u1v0 =      a  * (1 - b);
 				u0v1 = (1 - a) *      b ;
 				u1v1 =      a  *      b ;
 
-				i = (v * img_w + u) * 4;
+				i = (vi * img_w + ui) * 4;
 				i1 = i + (img_w * 4);
 
 				c[0] = u0v0 * img_d[i    ] + u1v0 * img_d[i + 4] + u0v1 * img_d[i1    ] + u1v1 * img_d[i1 + 4];
 				c[1] = u0v0 * img_d[i + 1] + u1v0 * img_d[i + 5] + u0v1 * img_d[i1 + 1] + u1v1 * img_d[i1 + 5];
 				c[2] = u0v0 * img_d[i + 2] + u1v0 * img_d[i + 6] + u0v1 * img_d[i1 + 2] + u1v1 * img_d[i1 + 6];
 				c[3] = u0v0 * img_d[i + 3] + u1v0 * img_d[i + 7] + u0v1 * img_d[i1 + 3] + u1v1 * img_d[i1 + 7];
+				
 				break;
 
 			case cnvgl.NEAREST:
@@ -100,10 +108,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	}
 
 	GPU.texture = texture;
+
 	GPU.shader.setTexFunc(tex);
 
-	GPU.setTextureUnit = function(unit) {
-		texUnit = unit;
+	GPU.texture.upload = function(unit, texture_obj) {
+		texUnit[unit] = texture_obj;
 	};
 
 }(GPU));

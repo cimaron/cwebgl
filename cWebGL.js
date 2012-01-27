@@ -66,7 +66,7 @@ cWebGL = {
 	 */	
 		//define extended properties
 	extensions : {
-		onReady : function(f) { window.setTimeout(f, 100); },
+		onReady : function(f) { window.setTimeout(f, 0); },
 	},
 
 	/**
@@ -196,19 +196,3 @@ cWebGL = {
 
 cWebGL.initialize();
 
-
-(function() {
-	var native = window.requestAnimationFrame;
-	var list = [];
-
-	window.requestAnimationFrame = function(func) {
-		list.push(func);
-	};
-
-	cWebGL.frameComplete = function() {
-		var i;
-		while (list.length > 0) {
-			window.setTimeout(list.shift(), 0);	
-		}
-	};
-}());

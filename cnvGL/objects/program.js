@@ -120,6 +120,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		this.slots = slots;
 		this.components = components;
 		this.basetype = cnvgl.FLOAT;
+		this.value = [0,0,0,0];
 	};
 	
 
