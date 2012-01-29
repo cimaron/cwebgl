@@ -446,7 +446,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		var i, v;
 		for (i = 0; i < count; i++) {
 			v = 4 * i;
-			cnvgl_uniform(i + location, [value[v], value[v + 1], value[v + 2], value[v + 3]], 1, 4);
+			cnvgl_uniform(i + location, [value[v], value[v + 1], value[v + 2]], 1, 3);
 		}
 	};
 
@@ -502,7 +502,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		for (i = 0; i < count; i++) {
 			v = 4 * i;
 			l = i * 2 + location;
-			if (transpose == cnvgl.TRUE) {
+			if (transpose != cnvgl.TRUE) {
 				cnvgl_uniform(l,     [value[v    ], value[v + 1]], 1, 2);
 				cnvgl_uniform(l + 1, [value[v + 2], value[v + 3]], 1, 2);
 			} else {
@@ -528,7 +528,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		for (i = 0; i < count; i++) {
 			v = 6 * i;
 			l = i * 3 + location;
-			if (transpose == cnvgl.TRUE) {
+			if (transpose != cnvgl.TRUE) {
 				cnvgl_uniform(l,     [value[v    ], value[v + 1]], 1, 2);
 				cnvgl_uniform(l + 1, [value[v + 2], value[v + 3]], 1, 2);
 				cnvgl_uniform(l + 2, [value[v + 4], value[v + 5]], 1, 2);
@@ -556,7 +556,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		for (i = 0; i < count; i++) {
 			v = 8 * i;
 			l = i * 4 + location;
-			if (transpose == cnvgl.TRUE) {
+			if (transpose != cnvgl.TRUE) {
 				cnvgl_uniform(l,     [value[v    ], value[v + 1]], 1, 2);
 				cnvgl_uniform(l + 1, [value[v + 2], value[v + 3]], 1, 2);
 				cnvgl_uniform(l + 2, [value[v + 4], value[v + 5]], 1, 2);
@@ -586,7 +586,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		for (i = 0; i < count; i++) {
 			v = 6 * i;
 			l = i * 2 + location;
-			if (transpose == cnvgl.TRUE) {
+			if (transpose != cnvgl.TRUE) {
 				cnvgl_uniform(l,     [value[v    ], value[v + 1], value[v + 2]], 1, 3);
 				cnvgl_uniform(l + 1, [value[v + 3], value[v + 4], value[v + 5]], 1, 3);
 			} else {
@@ -612,14 +612,18 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		for (i = 0; i < count; i++) {
 			v = 9 * i;
 			l = i * 3 + location;
-			if (transpose == cnvgl.TRUE) {
-				cnvgl_uniform(l,     [value[v    ], value[v + 1], value[v + 2]], 1, 3);
-				cnvgl_uniform(l + 1, [value[v + 3], value[v + 4], value[v + 5]], 1, 3);
-				cnvgl_uniform(l + 2, [value[v + 6], value[v + 7], value[v + 8]], 1, 3);
+			if (transpose != cnvgl.TRUE) {
+				cnvgl_uniform(l,
+							  [value[v    ], value[v + 1], value[v + 2],
+							   value[v + 3], value[v + 4], value[v + 5],
+							   value[v + 6], value[v + 7], value[v + 8]],
+							  3, 3);
 			} else {
-				cnvgl_uniform(l,     [value[v    ], value[v + 3], value[v + 6]], 1, 3);
-				cnvgl_uniform(l + 1, [value[v + 1], value[v + 4], value[v + 7]], 1, 3);
-				cnvgl_uniform(l + 2, [value[v + 2], value[v + 5], value[v + 8]], 1, 3);
+				cnvgl_uniform(l,
+							  [value[v    ], value[v + 3], value[v + 6],
+							   value[v + 1], value[v + 4], value[v + 7],
+							   value[v + 2], value[v + 5], value[v + 8]],
+							  3, 3);
 			}
 		}
 	};
@@ -640,7 +644,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		for (i = 0; i < count; i++) {
 			v = 12 * i;
 			l = i * 4 + location;
-			if (transpose == cnvgl.TRUE) {
+			if (transpose != cnvgl.TRUE) {
 				cnvgl_uniform(l,     [value[v    ], value[v + 1], value[v + 2]], 1, 3);
 				cnvgl_uniform(l + 1, [value[v + 3], value[v + 4], value[v + 5]], 1, 3);
 				cnvgl_uniform(l + 2, [value[v + 6], value[v + 7], value[v + 8]], 1, 3);
@@ -670,7 +674,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		for (i = 0; i < count; i++) {
 			v = 8 * i;
 			l = i * 2 + location;
-			if (transpose == cnvgl.TRUE) {
+			if (transpose != cnvgl.TRUE) {
 				cnvgl_uniform(l,     [value[v    ], value[v + 1], value[v + 2], value[v + 3]], 1, 4);
 				cnvgl_uniform(l + 1, [value[v + 4], value[v + 5], value[v + 6], value[v + 7]], 1, 4);
 			} else {
@@ -696,10 +700,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		for (i = 0; i < count; i++) {
 			v = 12 * i;
 			l = i * 3 + location;
-			if (transpose == cnvgl.TRUE) {
-				cnvgl_uniform(l,     [value[v    ], value[v + 1], value[v + 2], value[v + 3]], 1, 4);
-				cnvgl_uniform(l + 1, [value[v + 4], value[v + 5], value[v + 6], value[v + 7]], 1, 4);
-				cnvgl_uniform(l + 2, [value[v + 8], value[v + 9], value[v +10], value[v +11]], 1, 4);
+			if (transpose != cnvgl.TRUE) {
+				cnvgl_uniform(l,
+					[value[v    ], value[v + 1], value[v + 2], value[v + 3],
+					 value[v + 4], value[v + 5], value[v + 6], value[v + 7],
+					 value[v + 8], value[v + 9], value[v +10], value[v +11]],
+					3, 4);
 			} else {
 				cnvgl_uniform(l,     [value[v    ], value[v + 3], value[v + 6], value[v + 9]], 1, 4);
 				cnvgl_uniform(l + 1, [value[v + 1], value[v + 4], value[v + 7], value[v +10]], 1, 4);
@@ -721,26 +727,25 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	cnvgl.uniformMatrix4fv = function(location, count, transpose, value) {
 		var i, v, l;
-		i = 0;
-		//for (i = 0; i < count; i++) {
+		for (i = 0; i < count; i++) {
 			v = 16 * i;
 			l = i * 4 + location;
 			if (transpose != cnvgl.TRUE) {
-				cnvgl_uniform(location,
+				cnvgl_uniform(l,
 							  [value[v    ], value[v + 1], value[v + 2], value[v + 3],
 							   value[v + 4], value[v + 5], value[v + 6], value[v + 7],
 							   value[v + 8], value[v + 9], value[v +10], value[v +11],
 							   value[v +12], value[v +13], value[v +14], value[v +15]],
 							  4, 4);
 			} else {
-				cnvgl_uniform(location,
+				cnvgl_uniform(l,
 							  [value[v    ], value[v + 4], value[v + 8], value[v +12],
 							   value[v + 1], value[v + 5], value[v + 9], value[v +13],
 							   value[v + 2], value[v + 6], value[v +10], value[v +14],
 							   value[v + 3], value[v + 7], value[v +11], value[v +15]],
 							  4, 4);
 			}
-		//}
+		}
 	};
 
 

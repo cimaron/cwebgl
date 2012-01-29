@@ -844,7 +844,7 @@ cWebGLRenderingContext = (function() {
 
 	cWebGLRenderingContext.uniform3fv = function(location, v) {
 		cnvgl.setContext(this._context);
-		cnvgl.uniform3fv(location.location(), v);
+		cnvgl.uniform3fv(location.location(), v.length / 3, v);
 	};
 
 	cWebGLRenderingContext.uniformMatrix3fv = function(location, transpose, value) {
