@@ -135,10 +135,6 @@ GraphicsContext3D = (function() {
 		return glGetUniformLocation(program, name);
 	};
 	
-	GraphicsContext3D.pixelStorei = function(pname, param) {
-		glPixelStorei(pname, param);
-	};
-
 	GraphicsContext3D.renderbufferStorage = function(target, internalformat, width, height) {
 		glRenderbufferStorage(target, internalformat, width, height);
 	};

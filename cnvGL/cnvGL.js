@@ -88,6 +88,7 @@ include('cnvGL/objects/texture.js');
 include('cnvGL/functions/blend.js');
 include('cnvGL/functions/bufferobj.js');
 include('cnvGL/functions/clear.js');
+include('cnvGL/functions/context.js');
 include('cnvGL/functions/depth.js');
 include('cnvGL/functions/draw.js');
 include('cnvGL/functions/enable.js');

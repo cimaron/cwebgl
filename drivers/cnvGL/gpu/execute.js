@@ -77,20 +77,31 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		return true;
 	};
 
+	var cache;
 	GPU.commands.drawIndexedPrimitives = function(ctx, cmd, mode, indices, first, count, type) {
-		var start, now;
+		var start, now, idx;
 		
 		start = Date.now();
 		if (i == -1) {
+			cache = [];
 			i = first;
 		}
 
 		for (; i < count; i++) {
-			vertex = new cnvgl.vertex(indices[first + i]);
+			
+			idx = indices[first + i];
+
+			if (cache[idx]) {
+				vertex = cache[idx];
+			} else {
+				vertex = new cnvgl.vertex(idx);
+				cache[idx] = vertex;
+			}
+
 			GPU.renderer.send(ctx, mode, vertex);
 
 			now = Date.now();
-			if (now - start > 100) {
+			if (now - start > 200) {
 				//time limit is up
 				i++;
 				return false;

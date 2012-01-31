@@ -66,7 +66,12 @@ cWebGL = {
 	 */	
 		//define extended properties
 	extensions : {
-		onReady : function(f) { window.setTimeout(f, 0); },
+		onReady : function(f) {
+			var This = this;
+			window.setTimeout(function() {
+				f(This);
+			}, 0);
+		},
 	},
 
 	/**

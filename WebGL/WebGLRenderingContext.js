@@ -617,6 +617,11 @@ cWebGLRenderingContext = (function() {
 		return o;
 	};
 	
+	cWebGLRenderingContext.depthFunc = function(func) {
+		cnvgl.setContext(this._context);
+		cnvgl.depthFunc(func);
+	};
+
 	cWebGLRenderingContext.disable = function(cap) {
 		cnvgl.setContext(this._context);
 		cnvgl.disable(cap);
@@ -640,6 +645,11 @@ cWebGLRenderingContext = (function() {
 	cWebGLRenderingContext.enableVertexAttribArray = function(index) {
 		cnvgl.setContext(this._context);
 		cnvgl.enableVertexAttribArray(index);
+	};
+
+	cWebGLRenderingContext.flush = function() {
+		cnvgl.setContext(this._context);
+		cnvgl.flush();
 	};
 
 	cWebGLRenderingContext.framebufferRenderbuffer = function(target, attachment, renderbuffertarget, renderbuffer) {
@@ -668,7 +678,8 @@ cWebGLRenderingContext = (function() {
 		if (this.errors.length > 0) {
 			return this.errors.shift();	
 		}
-		return this._context.getError();
+		cnvgl.setContext(this._context);
+		return cnvgl.getError();
 	};
 
 	cWebGLRenderingContext.getParameter = function(pname) {
@@ -706,6 +717,10 @@ cWebGLRenderingContext = (function() {
 		return new cWebGLUniformLocation(program, location);
 	};
 
+	cWebGLRenderingContext.lineWidth = function(width) {
+		cnvgl.setContext(this._context);
+	};
+
 	cWebGLRenderingContext.linkProgram = function(program) {
 		cnvgl.setContext(this._context);
 		cnvgl.linkProgram(program.object());
@@ -722,7 +737,8 @@ cWebGLRenderingContext = (function() {
 				this._state.UNPACK_FLIP_Y_WEBGL = pname;
 				break;
 			default:
-				this._context.pixelStorei(pname, param);
+				cnvgl.setContext(this._context);
+				cnvgl.pixelStorei(pname, param);
 		}
 	};
 	

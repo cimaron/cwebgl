@@ -99,7 +99,7 @@ cnvgl_rendering_primitive_triangle = (function() {
 		} else {
 			yi = v2.yw;
 		}
-		yi_end = Math.ceil(yi) - .5;
+		yi_end = yi + 1;
 		if (yi_end >= yi) {
 			yi_end--;
 		}

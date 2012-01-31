@@ -209,6 +209,9 @@ cWebGL.drivers.cnvGL = (function() {
 
 	};
 
+	DriverCnvGL.flush = function(ctx, mode) {
+	};
+
 	DriverCnvGL.frontFace = function(ctx, mode) {
 		this.command('set', 'cullFrontFace', mode);
 	};

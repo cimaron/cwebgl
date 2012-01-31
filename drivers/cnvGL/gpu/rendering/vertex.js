@@ -62,9 +62,9 @@ cnvgl_rendering_vertex = (function() {
 			v.zd = v.z / v.w;
 
 			//set window coordinates
-			v.xw = (state.viewportX + state.viewportW / 2) + (state.viewportW / 2 * v.xd);
-			v.yw = (state.viewportY + state.viewportH / 2) - (state.viewportH / 2 * v.yd);
-			v.zw = ((state.viewportF - state.viewportN) / 2) * v.zd + ((state.viewportN + state.viewportF) / 2);
+			v.xw = state.viewportX + (state.viewportW / 2) * (1 + v.xd);
+			v.yw = state.viewportY + (state.viewportH / 2) * (1 - v.yd);
+			v.zw = (((state.viewportF - state.viewportN) * v.zd) + state.viewportN + state.viewportF) / 2;
 		}
 	};
 

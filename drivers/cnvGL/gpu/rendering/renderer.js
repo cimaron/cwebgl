@@ -47,7 +47,9 @@ cnvgl_renderer = (function() {
 	};
 
 	cnvgl_renderer.send = function(state, mode, vertex) {
-		this.vertex.process(state, vertex);
+		if (!vertex.processed) {
+			this.vertex.process(state, vertex);
+		}
 		this.primitive.send(state, mode, vertex);
 	};
 
