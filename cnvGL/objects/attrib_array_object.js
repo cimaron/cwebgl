@@ -20,18 +20,23 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-function cnvgl_attrib_array_object() {
-	//state
-	this.size			= 4;
-	this.type			= 0;
-	//this.format		= 0;
-	this.stride			= 0;
-	this.pointer		= 0;
-	this.enabled		= GL_FALSE;
-	this.normalized		= GL_FALSE;
-	this.integer		= GL_FALSE;
-	this.element_size	= 0;
-	this.buffer_obj		= null;
-	//this.max_element	= 0;
-}
+(function(cnvgl) {
+
+
+	cnvgl.attrib_array_object = function() {
+		//state
+		this.size			= 4;
+		this.type			= 0;
+		//this.format		= 0;
+		this.stride			= 0;
+		this.pointer		= 0;
+		this.enabled		= cnvgl.FALSE;
+		this.normalized		= cnvgl.FALSE;
+		this.integer		= cnvgl.FALSE;
+		this.element_size	= 0;
+		this.buffer_obj		= null;
+		//this.max_element	= 0;
+	};
+	
+}(cnvgl));
 

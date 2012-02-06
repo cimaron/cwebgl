@@ -20,20 +20,33 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-function glActiveTexture(unit) {
-	var ctx, i;
-	
-	ctx = cnvgl_context.getCurrentContext();
-	i = unit - GL_TEXTURE0;
+(function(cnvgl) {
 
-	if (i < 0 || i > Math.max(GPU.texture.MAX_TEXTURE_COORDS, GPU.texture.MAX_COMBINED_TEXTURE_IMAGE_UNITS) - 1) {
-		cnvgl_throw_error(GL_INVALID_ENUM);
-		return;
+
+	/**
+	 * glActiveTexture — select active texture unit
+	 *
+	 * @var GLenum   texture  Specifies which texture unit to make active.
+	 *
+	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glActiveTexture.xml
+	 */
+	cnvgl.activeTexture = function(texture) {
+		var ctx, i;
+
+		ctx = cnvgl.getCurrentContext();
+		i = texture - cnvgl.TEXTURE0;
+
+		if (i < 0 || i > (cnvgl.constants.maxTextureUnits - 1)) {
+			cnvgl.throw_error(cnvgl.INVALID_ENUM, ctx);
+			return;
+		}
+
+		ctx.texture.currentUnit = i;
+		if (!ctx.texture.unit[i]) {
+			ctx.texture.unit[i] = new cnvgl.texture_unit(texture);	
+		}
 	}
 
-	ctx.texture.currentUnit = i;
-	if (!ctx.texture.unit[i]) {
-		ctx.texture.unit[i] = new cnvgl_texture_unit(ctx, unit);	
-	}
-}
+
+}(cnvgl));
 

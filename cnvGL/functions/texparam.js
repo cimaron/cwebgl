@@ -20,29 +20,65 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-function glTexParameteri(target, pname, param) {
-	var ctx, unit, texture_unit, texture_obj;
+(function(cnvgl) {
+
 	
-	if (target != GL_TEXTURE_1D
-		&& target != GL_TEXTURE_2D
-		&& target != GL_TEXTURE_3D
-		&& target != GL_TEXTURE_CUBE_MAP) {
-		cnvgl_throw_error(GL_INVALID_ENUM);
-		return;
+	function cnvgl_texParameter(target, pname, param) {
+		var ctx, unit, texture_unit, texture_obj;
+		
+		if (target != cnvgl.TEXTURE_1D
+			&& target != cnvgl.TEXTURE_2D
+			&& target != cnvgl.TEXTURE_3D
+			&& target != cnvgl.TEXTURE_CUBE_MAP) {
+			cnvgl.throw_error(cnvgl.INVALID_ENUM, ctx);
+			return;
+		}
+	
+		ctx = cnvgl.getCurrentContext();
+		unit = ctx.texture.currentUnit;
+		texture_unit = ctx.texture.unit[unit];
+		texture_obj = texture_unit.current_texture[target];
+	
+		switch (pname) {
+
+			case cnvgl.TEXTURE_MIN_FILTER:
+				texture_obj.min_filter = param;
+				break;
+
+			case cnvgl.TEXTURE_MAG_FILTER:
+				texture_obj.min_filter = param;
+				break;
+		}		
 	}
 
-	ctx = cnvgl_context.getCurrentContext();
-	unit = ctx.texture.currentUnit;
-	texture_unit = ctx.texture.unit[unit];
-	texture_obj = texture_unit.current_texture[target];
 
-	switch (pname) {
-		case GL_TEXTURE_MIN_FILTER:
-			texture_obj.min_filter = param;
-			break;
-		case GL_TEXTURE_MAG_FILTER:
-			texture_obj.min_filter = param;
-			break;
-	}
-}
+	/**
+	 * glTexParameteri — set texture parameters
+	 *
+	 * @var GLenum   target  Specifies the target texture, which must be either GL_TEXTURE_1D, GL_TEXTURE_2D, GL_TEXTURE_3D, GL_TEXTURE_1D_ARRAY, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_RECTANGLE, or GL_TEXTURE_CUBE_MAP.
+	 * @var GLenum   pname   Specifies the symbolic name of a single-valued texture parameter.
+	 * @var GLfloat  param   Specifies the value of pname.
+	 *
+	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glTexParameter.xml
+	 */
+	cnvgl.texParameterf = function(target, pname, param) {
+		cnvgl_texParameter(target, pname, param);
+	};
+
+
+	/**
+	 * glTexParameteri — set texture parameters
+	 *
+	 * @var GLenum  target  Specifies the target texture, which must be either GL_TEXTURE_1D, GL_TEXTURE_2D, GL_TEXTURE_3D, GL_TEXTURE_1D_ARRAY, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_RECTANGLE, or GL_TEXTURE_CUBE_MAP.
+	 * @var GLenum  pname   Specifies the symbolic name of a single-valued texture parameter.
+	 * @var GLint   param   Specifies the value of pname.
+	 *
+	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glTexParameter.xml
+	 */
+	cnvgl.texParameteri = function(target, pname, param) {
+		cnvgl_texParameter(target, pname, param);
+	};
+	
+
+}(cnvgl));
 

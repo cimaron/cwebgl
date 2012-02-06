@@ -29,7 +29,10 @@ $include('library/TypedArray/TypedArray.js');
 
 //cnvGL Library
 $include('cnvGL/cnvGL.js');
-$include('drivers/cnvGL/GraphicsContext3D.js');
+
+//GLSL Library
+$include('glsl/ARB/ARB.js');
+$include('glsl/glsl.js');
 
 //WebGL Library
 $include('WebGL/WebGLObject.js');
@@ -44,4 +47,10 @@ $include('WebGL/WebGLRenderingContext.js');
 $include('WebGL/WebGLUniformLocation.js');
 
 $include('cWebGL.js');
+
+//Drivers
+$include('drivers/driver.js');
+//$include('drivers/WebGL/WebGL.js');
+//$include('drivers/Stage3D/Stage3D.js');
+$include('drivers/cnvGL/cnvGL.js');
 

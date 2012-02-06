@@ -24,7 +24,6 @@ cWebGLShader = (function() {
 	
 	function Initializer() {
 		cWebGLObject.Initializer.apply(this);
-		//public:
 		this._type = null;
 		this._source = null;
 	}
@@ -37,7 +36,8 @@ cWebGLShader = (function() {
 		this.cWebGLObject(context);
 		this._type = type;
 		this._source = '';
-		this.setObject(this.context().graphicsContext3D().createShader(type));
+		cnvgl.setContext(context._context);
+		this.setObject(cnvgl.createShader(type));
 	};
 
 	cWebGLShader.getType = function() {
@@ -48,7 +48,7 @@ cWebGLShader = (function() {
 		return this._source;	
 	};
 
-	cWebGLShader.setSource = function(/*DOMString*/ source) {
+	cWebGLShader.setSource = function(source) {
 		this._source = source;
 	};
 

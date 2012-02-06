@@ -46,6 +46,13 @@ cWebGL = {
 	names : ["webgl", "experimental-webgl"],
 
 	/**
+	 * List of drivers
+	 *
+	 * @var    array
+	 */
+	drivers : {},
+
+	/**
 	 * List of valid native webgl context names
 	 *
 	 * @var    array
@@ -59,10 +66,12 @@ cWebGL = {
 	 */	
 		//define extended properties
 	extensions : {
-		native : true,
-		ready : true,
-		setTargetFps : function() {},
-		setQuality : function() {}
+		onReady : function(f) {
+			var This = this;
+			window.setTimeout(function() {
+				f(This);
+			}, 0);
+		},
 	},
 
 	/**
@@ -78,8 +87,6 @@ cWebGL = {
 	/**
 	 * Tests for a native webgl context type
 	 *
-	 * @param    string    name    The context name to check for
-	 *
 	 * @return   boolean
 	 */
 	test : function() {
@@ -94,10 +101,27 @@ cWebGL = {
 				//can't generate context
 			}
 		}
-		
+
 		this.native = this.valid.length > 0;
-		
+
 		return this.native;
+	},
+
+	/**
+	 * Tests drivers to determine which to use
+	 *
+	 * @return   boolean
+	 */
+	getDriver : function() {
+		var i;
+
+		for (i in this.drivers) {
+			if (this.drivers[i].test()) {
+				return this.drivers[i];
+			}
+		}
+
+		return null;
 	},
 
 	/**
@@ -110,7 +134,7 @@ cWebGL = {
 	 * @return   object
 	 */
 	getContext : function(name, config, ntv) {
-		var _, ctx;
+		var _, ctx, driver;
 
 		//with(WebGLRenderingContextNative)
 		_ = cWebGL;
@@ -129,11 +153,15 @@ cWebGL = {
 			}
 
 			//native or software context
-			if (ntv || _.native) {
+			if ((ntv || _.native) && (!config || config.native)) {
 				ctx = _.getNativeContext.call(this, name, config);
 				_.extend(ctx);
 			} else {
-				ctx = new WebGLRenderingContext(this, new cWebGLContextAttributes(config));
+				if (!(driver = _.getDriver())) {
+					throw new Error('Could not load graphics driver');	
+				}
+
+				ctx = new cWebGLRenderingContext(this, new cWebGLContextAttributes(config), new driver(this));
 			}
 
 			_.contexts[this] = ctx;
@@ -172,5 +200,4 @@ cWebGL = {
 };
 
 cWebGL.initialize();
-
 

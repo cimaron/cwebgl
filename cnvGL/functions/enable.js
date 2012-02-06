@@ -19,34 +19,59 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-function _glEnableDisable(cap, s) {
-	var ctx;
-	
-	ctx = cnvgl_context.getCurrentContext();
-	s = s ? GL_TRUE : GL_FALSE;
 
-	switch (cap) {
-		case GL_CULL_FACE:
-			ctx.polygon.cullFlag = s;
-			break;
-		case GL_DEPTH_TEST:
-			ctx.depth.test = s;
-			break;
-		case GL_BLEND:
-			ctx.color.blendEnabled = s;
-			break;
+(function(cnvgl) {
 
-		default:
-			throw new Error('Enable/Disable for ' + cap + ' not implemented yet');
+
+	function cnvgl_enable_disable(cap, s) {
+		var ctx;
+		ctx = cnvgl.getCurrentContext();
+
+		switch (cap) {
+
+			case cnvgl.CULL_FACE:
+				ctx.polygon.cullFlag = s;
+				break;
+
+			case cnvgl.DEPTH_TEST:
+				ctx.depth.test = s;
+				break;
+
+			case cnvgl.BLEND:
+				ctx.color.blendEnabled = s;
+				break;
+
+			default:
+				throw new Error('Enable/Disable for ' + cap + ' not implemented yet');
+		}
+
+		ctx.driver.enable(ctx, cap, (s == cnvgl.TRUE));
 	}
-	
-}
 
-function glEnable(cap) {
-	_glEnableDisable(cap, true);
-}
 
-function glDisable(cap) {
-	_glEnableDisable(cap, false);
-}
+	/**
+	 * glEnable — enable or disable server-side GL capabilities
+	 *
+	 * @var GLenum  cap  Specifies a symbolic constant indicating a GL capability.
+	 *
+	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glEnable.xml
+	 */
+	cnvgl.enable = function(cap) {
+		cnvgl_enable_disable(cap, cnvgl.TRUE);
+	};
+
+
+	/**
+	 * glDisable — enable or disable server-side GL capabilities
+	 *
+	 * @var GLenum  cap  Specifies a symbolic constant indicating a GL capability.
+	 *
+	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glEnable.xml
+	 */
+	cnvgl.disable = function(cap) {
+		cnvgl_enable_disable(cap, cnvgl.FALSE);
+	};
+
+
+}(cnvgl));
 

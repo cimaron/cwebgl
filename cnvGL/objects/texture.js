@@ -20,32 +20,35 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-function cnvgl_texture_unit(ctx, unit) {
-	this.ctx = ctx;
-	this.unit = unit;
+(function(cnvgl) {
 
-	this.current_texture = [];
-}
+	
+	cnvgl.texture_unit = function(ctx, unit) {
+		this.unit = unit;	
+		this.current_texture = {};
+	};
+	
+	cnvgl.texture_object = function(name, target) {
+		this.name = name;
+		this.target = target;
+	
+		this.min_filter = cnvgl.NEAREST_MIPMAP_LINEAR;
+		this.mag_filter = cnvgl.LINEAR;
+	
+		this.images = [];
+	};
+	
+	
+	cnvgl.texture_image = function(texture_object) {
+		this.texture_object = texture_object;
+	
+		this.width = 0;
+		this.height = 0;
+	
+		this.data = null;
+		this.internalFormat = null;
+	};
 
 
-function cnvgl_texture_object(name, target) {
-	this.name = name;
-	this.target = target;
-
-	this.min_filter = GL_NEAREST_MIPMAP_LINEAR;
-	this.mag_filter = GL_LINEAR;
-
-	this.images = [];
-}
-
-
-function cnvgl_texture_image(texture_object) {
-	this.texture_object = texture_object;
-
-	this.width = 0;
-	this.height = 0;
-
-	this.data = null;
-	this.internalFormat = null;
-}
+}(cnvgl));
 

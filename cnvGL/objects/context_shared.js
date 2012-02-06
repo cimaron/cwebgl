@@ -19,51 +19,58 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-var cnvgl_context_shared = (function() {
-							  
-	function Initializer() {
-		//public:
-		this.texture_objects = [];
-		this.default_texture_objects = {};
 
-		this.shaderObjects = [0];
-		this.frameBuffers = [0];
-		this.renderBuffers = [0];
-	}
+(function(cnvgl) {
 
-	var cnvgl_context_shared = jClass('cnvgl_context_shared', Initializer);
 	
-	//static:
-	var instance = null;
-	cnvgl_context_shared.Constructor.getInstance = function() {
-		if (instance) {
-			return instance;	
+	cnvgl.context_shared = (function() {
+								  
+		function Initializer() {
+			//public:
+			this.texture_objects = [0];
+			this.default_texture_objects = {};
+	
+			this.bufferObjects = [0];
+			this.shaderObjects = [0];
+			this.frameBuffers = [0];
+			this.renderBuffers = [0];
 		}
-		return new cnvgl_context_shared.Constructor();
-	};
-
-	//public:
-
-	cnvgl_context_shared.cnvgl_context_shared = function() {
-		this.initTextures();
-	};
 	
-	cnvgl_context_shared.initTextures = function() {
-		var tex2d, tex2di;
-		this.texture_objects[0] = 0;
+		var cnvgl_context_shared = jClass('cnvgl_context_shared', Initializer);
+		
+		//static:
+		var instance = null;
+		cnvgl_context_shared.Constructor.getInstance = function() {
+			if (instance) {
+				return instance;	
+			}
+			return new cnvgl_context_shared.Constructor();
+		};
+	
+		//public:
+	
+		cnvgl_context_shared.cnvgl_context_shared = function() {
+			this.initTextures();
+		};
+		
+		cnvgl_context_shared.initTextures = function() {
+			var tex2d, tex2di;
+	
+			//default texture objects
+			tex2d = new cnvgl.texture_object(0, cnvgl.TEXTURE_2D);
+			this.default_texture_objects[cnvgl.TEXTURE_2D] = tex2d;
+			tex2di = new cnvgl.texture_object(tex2d);
+			tex2di.data = new Uint8Array([0,0,0,255]);
+			tex2di.width = 1;
+			tex2di.height = 1;
+			tex2di.internalFormat = cnvgl.RGBA;
+			tex2d.images[0] = tex2di;
+		};
+	
+		return cnvgl_context_shared.Constructor;
+	
+	}());
 
-		//default texture objects
-		tex2d = new cnvgl_texture_object(0, GL_TEXTURE_2D);
-		this.default_texture_objects[GL_TEXTURE_2D] = tex2d;
-		tex2di = new cnvgl_texture_object(tex2d);
-		tex2di.data = new Uint8Array([0,0,0,255]);
-		tex2di.width = 1;
-		tex2di.height = 1;
-		tex2di.internalFormat = GL_RGBA;
-		tex2d.images[0] = tex2di;
-	};
 
-	return cnvgl_context_shared.Constructor;
-
-}());
+}(cnvgl));
 

@@ -32,8 +32,11 @@ cWebGLTexture = (function() {
 	//public:
 
 	cWebGLTexture.cWebGLTexture = function(context) {
+		var textures = [];
 		this.cWebGLObject(context);
-		this.setObject(this.context().graphicsContext3D().createTexture());
+		cnvgl.setContext(context._context);
+		cnvgl.genTextures(1, textures);
+		this.setObject(textures[0][0]);
 	};
 
 	return cWebGLTexture.Constructor;

@@ -32,8 +32,11 @@ cWebGLFramebuffer = (function() {
 	//public:
 
 	cWebGLFramebuffer.cWebGLFramebuffer = function(context) {
+		var framebuffers = [];
 		this.cWebGLObject(context);
-		this.setObject(this.context().graphicsContext3D().createFramebuffer());
+		cnvgl.setContext(context._context);
+		cnvgl.genFramebuffers(1, framebuffers);
+		this.setObject(framebuffers[0][0]);
 	};
 
 	return cWebGLFramebuffer.Constructor;

@@ -20,64 +20,88 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-function glBindTexture(target, texture) {
-	var ctx, unit, texture_unit, texture_obj;
+(function(cnvgl) {
 
-	if (target != GL_TEXTURE_1D &&
-		target != GL_TEXTURE_2D &&
-		target != GL_TEXTURE_3D &&
-		target != GL_TEXTURE_CUBE_MAP
-		) {
-		cnvgl_throw_error(GL_INVALID_ENUM);
-		return;
-	}
 
-	ctx = cnvgl_context.getCurrentContext();
-	unit = ctx.texture.currentUnit;
-	texture_unit = ctx.texture.unit[unit];
-
-	if (texture == 0) {
-		texture_obj = ctx.shared.default_texture_objects[GL_TEXTURE_2D];
-	} else {
-		texture_obj = ctx.shared.texture_objects[texture];
-		if (texture_obj) {
-			if (texture_obj.target != 0 && texture_obj.target != target) {
-				cnvgl_throw_error(GL_INVALID_OPERATION);	
-				return;
-			}
-			texture_obj.target = target;
+	/**
+	 * glBindTexture — bind a named texture to a texturing target
+	 *
+	 * @var GLenum  target   Specifies the target to which the texture is bound.
+	 * @var GLuint  texture  Specifies the name of a texture.
+	 *
+	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glBindTexture.xml
+	 */
+	cnvgl.bindTexture = function(target, texture) {
+		var ctx, unit, texture_unit, texture_obj;
+	
+		if (target != cnvgl.TEXTURE_1D &&
+			target != cnvgl.TEXTURE_2D &&
+			target != cnvgl.TEXTURE_3D &&
+			target != cnvgl.TEXTURE_CUBE_MAP
+			) {
+			cnvgl.throw_error(cnvgl.INVALID_ENUM, ctx);
+			return;
+		}
+	
+		ctx = cnvgl.getCurrentContext();
+		unit = ctx.texture.currentUnit;
+		texture_unit = ctx.texture.unit[unit];
+	
+		if (texture == 0) {
+			texture_obj = ctx.shared.default_texture_objects[cnvgl.TEXTURE_2D];
 		} else {
-			texture_obj = new cnvgl_texture_object(texture, target);
-			ctx.shared.texture_objects[texture] = texture_obj;
+			texture_obj = ctx.shared.texture_objects[texture];
+			if (texture_obj) {
+				if (texture_obj.target != 0 && texture_obj.target != target) {
+					cnvgl.throw_error(cnvgl.INVALID_OPERATION, ctx);	
+					return;
+				}
+				texture_obj.target = target;
+			} else {
+				texture_obj = new cnvgl.texture_object(texture, target);
+				ctx.shared.texture_objects[texture] = texture_obj;
+			}
 		}
-	}
+	
+		texture_unit.current_texture[target] = texture_obj;
 
-	texture_unit.current_texture[target] = texture_obj;
-}
-
-
-function glGenTextures(n, textures) {
-
-	var current, list, i, t, texture_obj;
-
-	if (n < 0) {
-		cnvgl_throw_error(GL_INVALID_VALUE);
-		return;
-	}
-
-	current = cnvgl_context.getCurrentContext().shared.texture_objects;
-
-	list = [];
-	for (i = 0; i < n; i++) {
-		t = current.indexOf(null);
-		if (t == -1) {
-			t = current.length;
+		ctx.driver.bindTexture(ctx, unit, target, texture_obj);
+	};
+	
+	
+	/**
+	 * glGenTextures — generate texture names
+	 *
+	 * @var GLsizei   n         Specifies the number of texture names to be generated.
+	 * @var [GLuint]  textures  Specifies an array in which the generated texture names are stored.
+	 *
+	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glGenTextures.xml
+	 */
+	cnvgl.genTextures = function(n, textures) {
+	
+		var current, list, i, t, texture_obj;
+	
+		if (n < 0) {
+			cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
+			return;
 		}
-		texture_obj = new cnvgl_texture_object(t, 0);
-		current[t] = texture_obj;
-		list[i] = t;
-	}
-
-	textures[0] = list;
-}
+	
+		current = cnvgl.getCurrentContext().shared.texture_objects;
+	
+		list = [];
+		for (i = 0; i < n; i++) {
+			t = current.indexOf(null);
+			if (t == -1) {
+				t = current.length;
+			}
+			texture_obj = new cnvgl.texture_object(t, 0);
+			current[t] = texture_obj;
+			list[i] = t;
+		}
+	
+		textures[0] = list;
+	};
+	
+	
+}(cnvgl));
 

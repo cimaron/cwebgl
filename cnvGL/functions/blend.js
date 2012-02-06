@@ -19,30 +19,58 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-function glBlendFunc(sfactor, dfactor) {
-	var ctx, i;
 
-	ctx = cnvgl_context.getCurrentContext();
+(function(cnvgl) {
+
+
+	/**
+	 * glBlendFunc — specify pixel arithmetic
+	 *
+	 * @var GLenum  sfactor  Specifies how the red, green, blue, and alpha source blending factors are computed.
+	 * @var GLenum  dfactor  Specifies how the red, green, blue, and alpha destination blending factors are computed.
+	 *
+	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glBlendFunc.xml
+	 */
+	cnvgl.blendFunc = function(sfactor, dfactor) {
+		var ctx, i;
+
+		ctx = cnvgl.getCurrentContext();
+		
+		//todo: add checks here
+		
+		ctx.color.blendSrcRGB = sfactor;
+		ctx.color.blendSrcA = sfactor;
+		ctx.color.blendDestRGB = dfactor;
+		ctx.color.blendDestA = dfactor;
+		
+		ctx.driver.blendFunc(ctx, sfactor, dfactor);
+	};
+
+
+	/**
+	 * glColorMask — enable and disable writing of frame buffer color components
+	 *
+	 * @var GLboolean  red    Specify whether red, green, blue, and alpha can or cannot be written into the frame buffer.
+	 * @var GLboolean  green
+	 * @var GLboolean  blue
+	 * @var GLboolean  alpha
+	 *
+	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glColorMask.xml
+	 */
+	cnvgl.colorMask = function(r, g, b, a) {
+		var ctx;
+		ctx = cnvgl.getCurrentContext();
 	
-	//todo: add checks here
+		ctx.color.colorMask = [
+			r ? 0xFF : 0,
+			g ? 0xFF : 0,
+			b ? 0xFF : 0,
+			a ? 0xFF : 0
+		];
+
+		ctx.driver.colorMask(ctx, r, g, b, a);
+	};
 	
-	ctx.color.blendSrcRGB = sfactor;
-	ctx.color.blendSrcA = sfactor;
-	ctx.color.blendDestRGB = dfactor;
-	ctx.color.blendDestA = dfactor;
-}
-
-
-function glColorMask(r, g, b, a) {
-	var ctx;
-
-	ctx = cnvgl_context.getCurrentContext();
-
-	ctx.color.colorMask = [
-		r ? 0xFF : 0,
-		g ? 0xFF : 0,
-		b ? 0xFF : 0,
-		a ? 0xFF : 0
-	];
-}
+	
+}(cnvgl));
 

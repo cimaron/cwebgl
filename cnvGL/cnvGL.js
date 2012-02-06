@@ -19,46 +19,76 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+cnvgl = {
+
+	/**
+	 * Current cnvGL context
+	 *
+	 * @var  cnvgl_context
+	 */	
+	currentContext : null,
+
+	/**
+	 * Create a new cnvgl context
+	 *
+	 * @var Object  driver  The graphics driver to attach to the context
+	 */
+	createContext : function(driver) {
+		var ctx;
+		ctx = new cnvgl.context(driver);
+		return ctx;
+	},
+
+	/**
+	 * Sets the current context
+	 *
+	 * @var cnvgl_context  context  The cnvgl context to make current
+	 */
+	setContext : function(context) {
+		cnvgl.currentContext = context;
+	},
+
+	/**
+	 * Gets the current context
+	 */
+	getCurrentContext : function() {
+		return cnvgl.currentContext;
+	},
+
+	/**
+	 * Sets an error in the specified context
+	 *
+	 * @var GLenum         error  Specifies the error code
+	 * @var cnvgl_context  ctx    Specifies the context to set the error code
+	 */
+	throw_error : function(error, ctx) {
+		ctx = ctx || cnvgl.getCurrentContext();
+		if (error && ctx.errorValue == cnvgl.NO_ERROR) {
+			ctx.errorValue = error;
+		}
+	}
+
+};
+
+
 
 include('cnvGL/defines.js');
 
 include('cnvGL/objects/attrib_array_object.js');
 include('cnvGL/objects/buffer.js');
 include('cnvGL/objects/constants.js');
-include('cnvGL/objects/cnvgl_context.js');
+include('cnvGL/objects/context.js');
 include('cnvGL/objects/context_shared.js');
-include('cnvGL/objects/cnvgl_fragment.js');
 include('cnvGL/objects/framebuffer.js');
-include('cnvGL/objects/cnvgl_primitive.js');
-include('cnvGL/objects/cnvgl_program.js');
-include('cnvGL/objects/cnvgl_shader.js');
+include('cnvGL/objects/program.js');
+include('cnvGL/objects/shader.js');
 include('cnvGL/objects/renderbuffer.js');
 include('cnvGL/objects/texture.js');
-include('cnvGL/objects/cnvgl_vertex.js');
-
-//Compiler
-include('cnvGL/includes/ARB/ARB.js');
-include('cnvGL/includes/ARB/instruction.js');
-include('cnvGL/includes/glsl/glsl.js');
-include('cnvGL/includes/linker/linker.js');
-
-//Rendering Pipeline
-include('cnvGL/includes/gpu/gpu.js');
-include('cnvGL/includes/rendering/primitive/line.js');
-include('cnvGL/includes/rendering/primitive/point.js');
-include('cnvGL/includes/rendering/primitive/triangle.js');
-include('cnvGL/includes/rendering/clipping.js');
-include('cnvGL/includes/rendering/culling.js');
-include('cnvGL/includes/rendering/fragment.js');
-include('cnvGL/includes/rendering/interpolate.js');
-include('cnvGL/includes/rendering/primitive.js');
-include('cnvGL/includes/rendering/renderer.js');
-include('cnvGL/includes/rendering/vertex.js');
-
 
 include('cnvGL/functions/blend.js');
 include('cnvGL/functions/bufferobj.js');
 include('cnvGL/functions/clear.js');
+include('cnvGL/functions/context.js');
 include('cnvGL/functions/depth.js');
 include('cnvGL/functions/draw.js');
 include('cnvGL/functions/enable.js');
@@ -75,40 +105,5 @@ include('cnvGL/functions/uniforms.js');
 include('cnvGL/functions/varray.js');
 include('cnvGL/functions/viewport.js');
 
-//internal functions
-function cnvgl_throw_error(error) {
-	var ctx;
-	ctx = cnvgl_context.getCurrentContext();
-	if (error && ctx.errorValue == GL_NO_ERROR) {
-		ctx.errorValue = error;
-	}
-}
-
-function cnvgl_malloc(format, size) {
-	var data, zero, i;
-	switch (format) {
-		case GL_RGBA:
-			data = new Uint8Array(size * 4);
-			break;
-		case GL_DEPTH_COMPONENT16:
-		case GL_DEPTH_COMPONENT32:
-			if (Float32Array.native) {
-				data = new Float32Array(size);
-			} else {
-				data = new Array(size);
-				zero = true;
-			}
-			break;
-		default:
-			throw new Error('format not implemented');
-	}
-	if (zero) {
-		for (i = 0; i < data.length; i++) {
-			data[i] = 0;	
-		}
-	}
-	return data;
-}
-
-cnvgl_objects = [0];
+include('cnvGL/includes/memory.js');
 

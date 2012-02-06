@@ -20,60 +20,55 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-function glClearColor(r, g, b, a) {
-	var ctx, c;
+(function(cnvgl) {
+		  
 
-	ctx = cnvgl_context.getCurrentContext();
+	/**
+	 * glClearColor — specify clear values for the color buffers
+	 *
+	 * @var GLclampf  red    Specify the red, green, blue, and alpha values used when the color buffers are cleared. The initial values are all 0.
+	 * @var GLclampf  green
+	 * @var GLclampf  blue
+	 * @var GLclampf  alpha
+	 *
+	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glClearColor.xml
+	 */
+	cnvgl.clearColor = function(red, green, blue, alpha) {
+		var ctx, c;
+		ctx = cnvgl.getCurrentContext();
+		c = ctx.color.clearColor;	
+		c[0] = Math.round(255 * Math.max(Math.min(red, 1), 0));
+		c[1] = Math.round(255 * Math.max(Math.min(green, 1), 0));
+		c[2] = Math.round(255 * Math.max(Math.min(blue, 1), 0));
+		c[3] = Math.round(255 * Math.max(Math.min(alpha, 1), 0));
+	};
 
-	r = Math.max(Math.min(r, 1), 0);
-	g = Math.max(Math.min(g, 1), 0);
-	b = Math.max(Math.min(b, 1), 0);
-	a = Math.max(Math.min(a, 1), 0);
 
-	ctx.color.clearColor = [r, g, b, a];
-}
+	/**
+	 * glClear — clear buffers to preset values
+	 *
+	 * @var GLbitfield  mask  Bitwise OR of masks that indicate the buffers to be cleared.
+	 *
+	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glClear.xml
+	 */
+	cnvgl.clear = function(mask) {
+		var ctx;
 
+		ctx = cnvgl.getCurrentContext();
 
-function glClear(mask) {
-	var ctx, buffer, clear, i, l;
-
-	ctx = cnvgl_context.getCurrentContext();
-
-	if (mask & ~(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT)) {
-		cnvgl_throw_error(GL_INVALID_VALUE);
-		return;
-	}
-
-	//Color Buffer
-	if (mask & GL_COLOR_BUFFER_BIT) {
-		buffer = ctx.drawBuffer.colorDrawBuffers[0].data;
-
-		clear = [];
-		for (i = 0; i < 4; i++) {
-			clear[i] = Math.round(255 * ctx.color.clearColor[i]);
+		if (mask & ~(cnvgl.COLOR_BUFFER_BIT | cnvgl.DEPTH_BUFFER_BIT | cnvgl.STENCIL_BUFFER_BIT)) {
+			cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
+			return;
 		}
-		l = buffer.length;
-		for (i = 0; i < l; i += 4) {
-			buffer[i] = clear[0];
-			buffer[i + 1] = clear[1];
-			buffer[i + 2] = clear[2];
-			buffer[i + 3] = clear[3];
-		}
-	}
 
-	//Depth Buffer
-	if (mask & GL_DEPTH_BUFFER_BIT) {
-		buffer = ctx.drawBuffer.depthBuffer.data;
-		clear = ctx.depth.clear;
-		l = buffer.length;
-		for (i = 0; i < l; i++) {
-			buffer[i] = clear;
+		//Stencil Buffer
+		if (mask & cnvgl.STENCIL_BUFFER_BIT) {
+			throw new Error('clear: stencil_buffer not implemented yet');
 		}
-	}
 
-	//Stencil Buffer
-	if (mask & GL_STENCIL_BUFFER_BIT) {
-		throw new Error('glClear: todo');
-	}
-}
+		ctx.driver.clear(ctx, ctx.color.clearColor, ctx.depth.clear, mask);
+	};
+
+
+}(cnvgl));
 

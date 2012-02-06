@@ -19,29 +19,67 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-function glPixelStorei(pname, param) {
-	var ctx, valid_range;
-	
-	ctx = cnvgl_context.getCurrentContext();
 
-	valid_range = [1, 2, 4, 8].indexOf(param) != -1;
+(function(cnvgl) {
+		  
 
-	switch (pname) {
-		case GL_PACK_ALIGNMENT:
-			if (!valid_range) {
-				cnvgl_throw_error(GL_INVALID_VALUE);
-			}
-			ctx.pack.alignment = param;
-			break;
-		case GL_UNPACK_ALIGNMENT:
-			if (!valid_range) {
-				cnvgl_throw_error(GL_INVALID_VALUE);
-			}
-			ctx.unpack.alignment = param;
-			break;
-		default:
-			cnvgl_throw_error(GL_INVALID_ENUM);
-			return;
-	}	
-}
+	function cnvgl_pixelStore(pname, param) {
+		var ctx;
+
+		ctx = cnvgl.getCurrentContext();
+
+		switch (pname) {
+
+			case cnvgl.PACK_ALIGNMENT:
+				param = Math.round(param);
+				if ([1, 2, 4, 8].indexOf(param) == -1) {
+					cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
+					return;
+				}
+				ctx.pack.alignment = param;
+				break;
+
+			case cnvgl.UNPACK_ALIGNMENT:
+				param = Math.round(param);
+				if ([1, 2, 4, 8].indexOf(param) == -1) {
+					cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
+					return;
+				}
+				ctx.unpack.alignment = param;
+				break;
+
+			default:
+				cnvgl.throw_error(cnvgl.INVALID_ENUM, ctx);
+				return;
+		}
+	}
+
+
+	/**
+	 * glPixelStoref — set pixel storage modes
+	 *
+	 * @var GLenum   pname   Specifies the symbolic name of the parameter to be set.
+	 * @var GLfloat  param   Specifies the value that pname is set to.
+	 *
+	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glPixelStore.xml
+	 */
+	cnvgl.pixelStoref = function(pname, param) {
+		cnvgl_pixelStore(pname, param);
+	};  
+
+
+	/**
+	 * glPixelStorei — set pixel storage modes
+	 *
+	 * @var GLenum  pname   Specifies the symbolic name of the parameter to be set.
+	 * @var GLint   param   Specifies the value that pname is set to.
+	 *
+	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glPixelStore.xml
+	 */
+	cnvgl.pixelStorei = function(pname, param) {
+		cnvgl_pixelStore(pname, param);
+	};
+
+
+}(cnvgl));
 

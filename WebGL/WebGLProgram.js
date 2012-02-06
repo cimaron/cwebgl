@@ -24,7 +24,11 @@ cWebGLProgram = (function() {
 						  
 	function Initializer() {
 		cWebGLObject.Initializer.apply(this);
-		//public:
+		this._activeAttribLocations = null;
+		this._linkStatus = null;
+		this._linkCount = null;
+		this._vertexShader = null;
+		this._fragmentShader = null;
 	}
 
 	var cWebGLProgram = jClass('cWebGLProgram', Initializer, cWebGLObject);
@@ -33,9 +37,20 @@ cWebGLProgram = (function() {
 	
 	cWebGLProgram.cWebGLProgram = function(context) {
 		this.cWebGLObject(context);
-		this.setObject(this.context().graphicsContext3D().createProgram());
+		this._linkStatus = false;
+		this._linkCount = 0;
+		cnvgl.setContext(context._context);
+		this.setObject(cnvgl.createProgram());
 	};
-	
+
+	cWebGLProgram.getLinkCount = function() {
+		return this._linkCount;
+	};
+
+	cWebGLProgram.increaseLinkCount = function() {
+		this._linkCount++;
+	};
+
 	return cWebGLProgram.Constructor;
 
 }());
