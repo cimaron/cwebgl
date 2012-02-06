@@ -259,6 +259,10 @@ cWebGL.drivers.cnvGL = (function() {
 		DriverCnvGL.Static.frameComplete();
 	};
 
+	DriverCnvGL.renderTexture = function(ctx, fb_obj, tex_obj, textarget, level, offset) {
+		this.command('renderTexture', fb_obj, tex_obj, textarget, level, offset);
+	};
+
 	DriverCnvGL.uploadAttributes = function(ctx, location, size, stride, pointer, data) {
 		this.command('uploadAttributes', location, size, stride, pointer, data);
 	};
@@ -270,6 +274,9 @@ cWebGL.drivers.cnvGL = (function() {
 	DriverCnvGL.useProgram = function(ctx, program) {
 		this.command('uploadProgram', 'fragment', program.fragmentProgram);
 		this.command('uploadProgram', 'vertex', program.vertexProgram);
+	};
+
+	DriverCnvGL.texImage2D = function(ctx, target, unit, tex_obj) {
 	};
 
 	DriverCnvGL.viewport = function(ctx, x, y, w, h) {

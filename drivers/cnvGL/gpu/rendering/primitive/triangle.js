@@ -94,11 +94,7 @@ cnvgl_rendering_primitive_triangle = (function() {
 		if (yi_start < v1.yw) {
 			yi_start++;
 		}
-		if (v3.yw > v2.yw) {
-			yi = v3.yw;
-		} else {
-			yi = v2.yw;
-		}
+		yi = v3.yw > v2.yw ? v3.yw : v2.yw;
 		yi_end = yi + 1;
 		if (yi_end >= yi) {
 			yi_end--;

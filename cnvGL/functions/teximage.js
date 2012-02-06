@@ -95,11 +95,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		}
 		size = width * height * 4;
 	
-		texture_img.data = new Float32Array(size);
-	
-		group = new Float32Array(4);
-		group[3] = 1.0;
-	
+		texture_img.data = cnvgl.malloc(size, 1, Float32Array);
+
+		group = [0, 0, 0, 1];
 		dest = 0;
 		for (i = 0; i < height; i++) {
 			for (j = 0; j < width; j++) {
@@ -123,6 +121,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				texture_img.data[dest++] = group[3];
 			}
 		}
+
+		ctx.driver.texImage2D(ctx, target, unit, texture_img);
 	};
 
 

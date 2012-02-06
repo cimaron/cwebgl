@@ -32,8 +32,11 @@ cWebGLRenderbuffer = (function() {
 	//public:
 
 	cWebGLRenderbuffer.cWebGLRenderbuffer = function(context) {
+		var renderbuffers = [];
 		this.cWebGLObject(context);
-		this.setObject(this.context().graphicsContext3D().createRenderbuffer());
+		cnvgl.setContext(context._context);
+		cnvgl.genRenderbuffers(1, renderbuffers);
+		this.setObject(renderbuffers[0][0]);
 	};
 
 	return cWebGLRenderbuffer.Constructor;

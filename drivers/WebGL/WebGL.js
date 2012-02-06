@@ -28,6 +28,7 @@ cWebGL.drivers.WebGL = (function() {
 		this.symbols = [];
 		this.attributes = [];
 		this.uniforms = [];
+		this.locationMap = [];
 	}
 
 	var DriverWebGL = jClass('DriverWebGL', Initializer, cWebGL.Driver);
@@ -46,6 +47,12 @@ cWebGL.drivers.WebGL = (function() {
 		if (this._context) {
 			this.ready = true;
 		}
+	};
+
+	DriverWebGL.bindTexture = function(ctx, unit, target, tex_obj) {
+		this._context.bindTexture(target, texture);
+		this._context.texParameteri(target, this._context.TEXTURE_MAG_FILTER, tex_obj.mag_filter);
+		this._context.texParameteri(target, this._context.TEXTURE_MIN_FILTER, tex_obj.min_filter);
 	};
 
 	DriverWebGL.clear = function(ctx, color, depth, mask) {
@@ -92,6 +99,10 @@ cWebGL.drivers.WebGL = (function() {
 		this._context.drawArrays(mode, first, count);
 	};
 
+	DriverWebGL.drawElements = function(ctx, mode, first, count, type) {
+		this._context.drawElements(mode, count, type, first);
+	};
+
 	DriverWebGL.enable = function(ctx, cap, v) {
 		if (v) {
 			this._context.enable(cap);
@@ -120,6 +131,7 @@ cWebGL.drivers.WebGL = (function() {
 		this.linkErrors = this._context.getProgramInfoLog(program.WebGL);
 
 		if (this.linkStatus) {
+			this.locationMap = [];
 			for (i = 0; i < this.symbols.length; i++) {
 				symbols = this.symbols[i];
 				for (j = 0; j < symbols.attributes.length; j++) {
@@ -129,12 +141,18 @@ cWebGL.drivers.WebGL = (function() {
 				}
 				for (j = 0; j < symbols.uniforms.length; j++) {
 					symbol = symbols.uniforms[j];
-					symbol.location = this._context.getUniformLocation(program.WebGL, symbol.name);
+					this.locationMap.push(this._context.getUniformLocation(program.WebGL, symbol.name));
+					symbol.location = this.locationMap.length - 1;
 					program.uniforms.push(symbol);
 				}
 			}
 			this.symbols = [];
 		}
+	};
+	
+	DriverWebGL.texImage2D = function(ctx, target, unit, data) {
+		debugger;
+		//this._context.texImage2D(target, unit, this._context.RGBA, this._context.RGBA, gl.UNSIGNED_BYTE, texture.image);	
 	};
 
 	DriverWebGL.uploadAttributes = function(ctx, location, size, stride, offset, data) {
@@ -148,12 +166,15 @@ cWebGL.drivers.WebGL = (function() {
 	};
 
 	DriverWebGL.uploadUniform = function(ctx, location, data, slots, components) {
-		var _ctx;
+		var _ctx, loc;
 		_ctx = this._context;
+		loc = this.locationMap[location];
 		switch (slots * components) {
 			case 16:
-				_ctx.uniformMatrix4fv(location, false, new Float32Array(data));
+				_ctx.uniformMatrix4fv(loc, false, new Float32Array(data));
 				break;
+			default:
+				console.log(slots, components);
 		}
 	};
 

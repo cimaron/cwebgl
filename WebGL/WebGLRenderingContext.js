@@ -576,6 +576,16 @@ cWebGLRenderingContext = (function() {
 		cnvgl.clearDepth(depth);
 	};
 
+	cWebGLRenderingContext.colorMask = function(red, green, blue, alpha) {
+		cnvgl.setContext(this._context);
+		cnvgl.colorMask(red, green, blue, alpha);
+	};
+
+	cWebGLRenderingContext.cullFace = function(mode) {
+		cnvgl.setContext(this._context);
+		cnvgl.cullFace(mode);
+	};
+
 	cWebGLRenderingContext.compileShader = function(shader) {
 		var shaderObj, shaderSrc;
 
@@ -622,11 +632,21 @@ cWebGLRenderingContext = (function() {
 		cnvgl.depthFunc(func);
 	};
 
+	cWebGLRenderingContext.depthMask = function(flag) {
+		cnvgl.setContext(this._context);
+		cnvgl.depthMask(flag);
+	};
+
 	cWebGLRenderingContext.disable = function(cap) {
 		cnvgl.setContext(this._context);
 		cnvgl.disable(cap);
 	};
-	
+
+	cWebGLRenderingContext.disableVertexAttribArray = function(index) {
+		cnvgl.setContext(this._context);
+		cnvgl.disableVertexAttribArray(index);
+	};
+
 	cWebGLRenderingContext.drawArrays = function(mode, first, count) {
 		cnvgl.setContext(this._context);
 		cnvgl.drawArrays(mode, first, count);	
@@ -653,13 +673,18 @@ cWebGLRenderingContext = (function() {
 	};
 
 	cWebGLRenderingContext.framebufferRenderbuffer = function(target, attachment, renderbuffertarget, renderbuffer) {
-		//@validation
-		this._context.framebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer.object());
+		cnvgl.setContext(this._context);
+		cnvgl.framebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer.object());
 	};
 	
 	cWebGLRenderingContext.framebufferTexture2D = function(target, attachment, textarget, texture, level) {
-		//@validation
-		this._context.framebufferTexture2D(target, attachment, textarget, texture.object(), level);
+		cnvgl.setContext(this._context);
+		cnvgl.framebufferTexture2D(target, attachment, textarget, texture.object(), level);
+	};
+
+	cWebGLRenderingContext.frontFace = function(mode) {
+		cnvgl.setContext(this._context);
+		cnvgl.frontFace(mode);
 	};
 
 	cWebGLRenderingContext.generateMipmap = function(target) {
@@ -743,7 +768,8 @@ cWebGLRenderingContext = (function() {
 	};
 	
 	cWebGLRenderingContext.renderbufferStorage = function(target, internalformat, width, height) {
-		this._context.renderbufferStorage(target, internalformat, width, height);
+		cnvgl.setContext(this._context);
+		cnvgl.renderbufferStorage(target, internalformat, width, height);
 	};
 	
 	cWebGLRenderingContext.shaderSource = function(shader, string) {
@@ -812,20 +838,18 @@ cWebGLRenderingContext = (function() {
 		cnvgl.setContext(this._context);
 		cnvgl.texParameteri(target, pname, param);
 	};
-	
+
 	cWebGLRenderingContext.uniform1f = function(location, x) {
 		cnvgl.setContext(this._context);
 		cnvgl.uniform1f(location.location(), x);
 	};
-	
+
 	cWebGLRenderingContext.uniform1i = function(location, x) {
+		if (!location) {
+			return;
+		}
 		cnvgl.setContext(this._context);
-		cnvgl.uniform1i(location.location(), x);
-	};
-	
-	cWebGLRenderingContext.uniform1u = function(location, x) {
-		cnvgl.setContext(this._context);
-		cnvgl.uniform1u(location.location(), x);
+		cnvgl.uniform1i(location.location(), Math.floor(x));
 	};
 
 	cWebGLRenderingContext.uniform2f = function(location, x, y) {
