@@ -28,7 +28,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		this.target = null;
 		this.access = null;
 		this.size = 0;
-		this.data_type = null;
+		this.bpe = 0;
 	};
 
 }(cnvgl));

@@ -123,22 +123,20 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	};
 
 	GPU.commands.uploadAttributes = function(ctx, cmd, location, size, stride, si, data) {
-		var ds, i, c, array, dest;
+		var ds, i, c, dest;
 
-		ds = Math.ceil(data.length / (size + stride)) * 4;
+		ds = Math.ceil((data.length - si) / (size + stride)) * 4;
 		dest = cnvgl.malloc(ds, 1);
 
 		GPU.memory.attributes[location] = dest;
-		array = dest;
-
 		c = 0;
 		for (i = 0; i < ds; i++) {
 
 			if (c < size) {
-				array[i] = data[si];
+				dest[i] = data[si];
 				si++;
 			} else {
-				array[i] = (c == 3) ? 1 : 0;
+				dest[i] = (c == 3) ? 1 : 0;
 			}
 
 			c++;

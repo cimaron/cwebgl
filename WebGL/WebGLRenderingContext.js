@@ -532,14 +532,10 @@ cWebGLRenderingContext = (function() {
 		var size;
 		if (typeof data == 'number') {
 			size = parseInt(data);
-			if (size > 0) {
-				data = new ArrayBuffer(size);
-			} else {
-				size = 0;
-			}
+			data = null;
 		}
 		if (data && data.length) {
-			size = data.length;	
+			size = data.byteLength;
 		}
 		if (!size) {
 			this.errors.push(this.INVALID_VALUE);
@@ -552,7 +548,7 @@ cWebGLRenderingContext = (function() {
 
 	cWebGLRenderingContext.bufferSubData = function(target, offset, data) {
 		var size;
-		size = data.length;
+		size = data.byteLength;
 		if (!size) {
 			this.errors.push(this.INVALID_VALUE);
 			return;

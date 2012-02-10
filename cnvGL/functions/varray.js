@@ -280,9 +280,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	cnvgl.vertexAttribPointer = function(index, size, type, normalized, stride, pointer) {
 		var ctx, buffer_obj, vtx_attrib_obj;
-	
+
 		ctx = cnvgl.getCurrentContext();
-	
+
 		if (index > cnvgl.MAX_VERTEX_ATTRIBS) {
 			cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
 			return;			
@@ -292,13 +292,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
 			return;
 		}
-		
+	
 	
 		if ([cnvgl.BYTE, cnvgl.UNSIGNED_BYTE, cnvgl.SHORT, cnvgl.UNSIGNED_SHORT, cnvgl.INT, cnvgl.UNSIGNED_INT, cnvgl.FLOAT, cnvgl.DOUBLE].indexOf(type) == -1) {
 			cnvgl.throw_error(cnvgl.INVALID_ENUM, ctx);
 			return;			
 		}
-	
+
 		if (stride < 0) {
 			cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
 			return;			
@@ -306,13 +306,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		//check for buffer
 		buffer_obj = ctx.array.arrayBufferObj;
-	
+		
+		pointer /= buffer_obj.bpe;
+
 		vtx_attrib_obj = ctx.array.arrayObj.vertexAttrib[index];
 		vtx_attrib_obj.size = size;
 		vtx_attrib_obj.type = type;
 		vtx_attrib_obj.normalized = normalized;
 		vtx_attrib_obj.stride = stride;
-		vtx_attrib_obj.pointer = pointer;	
+		vtx_attrib_obj.pointer = pointer;
 		vtx_attrib_obj.buffer_obj = buffer_obj;
 	};
 

@@ -35,7 +35,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		var ctx, buffer_obj;
 
 		ctx = cnvgl.getCurrentContext();
-		
+
 		if (buffer != 0) {
 
 			buffer_obj = ctx.shared.bufferObjects[buffer];
@@ -126,8 +126,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		buffer_obj.target = target;
 		buffer_obj.usage = usage;
 		buffer_obj.size = size;
-		buffer_obj.data = cnvgl.malloc(size);
-		cnvgl.memcpy(buffer_obj.data, 0, data, size, 0);
+
+		if (data) {
+			buffer_obj.bpe = data.BYTES_PER_ELEMENT;
+			size /= buffer_obj.bpe;
+			buffer_obj.data = cnvgl.malloc(size);
+			cnvgl.memcpy(buffer_obj.data, 0, data, size, 0);
+		}
 	};
 
 
@@ -142,10 +147,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glBufferSubData.xml
 	 */
 	cnvgl.bufferSubData = function(target, offset, size, data) {
-		var ctx, buffer_obj, view, data_type, temp, i;
-	
+		var ctx, buffer_obj, i;
+
 		ctx = cnvgl.getCurrentContext();
-	
+
 		switch (target) {
 			case cnvgl.ARRAY_BUFFER:
 				buffer_obj = ctx.array.arrayBufferObj;
@@ -157,33 +162,28 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				cnvgl.throw_error(cnvgl.INVALID_ENUM, ctx);
 				return;
 		}
-		
+
 		if (!buffer_obj) {
 			cnvgl.throw_error(cnvgl.INVALID_OPERATION, ctx);
 			return;
 		}
-	
+
 		if (offset < 0 || size < 0 || offset + size > buffer_obj.size) {
 			cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
 			return;
 		}
-debugger;		
-		data_type = TypedArray.getType(data);
-		view = buffer_obj.data;
-		if (ArrayBuffer.native) {
-			offset /= data_type.BYTES_PER_ELEMENT;
-			size /= data_type.BYTES_PER_ELEMENT;
-			temp = data_type(view);
-		} else {
-			temp = view;
+
+		if (!buffer_obj.data) {
+			//this won't work 100% of the time (if we bufferSubData with a different type)
+			buffer_obj.bpe = data.BYTES_PER_ELEMENT;
+			buffer_obj.data = cnvgl.malloc(buffer_obj.size / buffer_obj.bpe);
 		}
-	
+
+		size /= buffer_obj.bpe;
+		offset /= buffer_obj.bpe;
+
 		for (i = 0; i < size; i++) {
-			temp[offset + i] = data[i];
-		}
-	
-		if (!buffer_obj.data_type && data_type != ArrayBuffer) {
-			buffer_obj.data_type = data_type;
+			buffer_obj.data[offset + i] = data[i];
 		}
 	};
 
