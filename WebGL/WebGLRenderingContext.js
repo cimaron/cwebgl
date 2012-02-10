@@ -912,12 +912,20 @@ cWebGLRenderingContext = (function() {
 
 	cWebGLRenderingContext.checkReady = function() {
 		var This;
-		if (this.driver.ready && this._readyFunc) {
-			this._readyFunc(this);
+		if (this.driver.ready) {
+			this.initialize();
+			if (this._readyFunc) {
+				this._readyFunc(this);
+			}
 		} else {
 			This = this;
 			setTimeout(function() { This.checkReady(); }, 10);
 		}
+	};
+
+	cWebGLRenderingContext.initialize = function() {
+		cnvgl.setContext(this._context);
+		cnvgl.viewport(0, 0, this.canvas.width, this.canvas.height);
 	};
 
 	return cWebGLRenderingContext.Constructor;
