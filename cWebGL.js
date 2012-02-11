@@ -22,7 +22,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 cWebGL = {
 
-	version : '0.2.0',
+	version : '0.2.5',
 
 	/**
 	 * List of WebGLRenderingContext contexts
