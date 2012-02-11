@@ -29,6 +29,7 @@ cWebGLRenderingContext = (function() {
 		this.attr = null;
 		this._context = null;
 		this._readyFunc = null;
+		this._initialized = false;
 
 		this._state = {};
 		this.errors = [];
@@ -912,11 +913,14 @@ cWebGLRenderingContext = (function() {
 
 	cWebGLRenderingContext.checkReady = function() {
 		var This;
-		if (this.driver.ready) {
-			this.initialize();
-			if (this._readyFunc) {
-				this._readyFunc(this);
-			}
+
+		if (this.driver.ready && !this._initialized) {
+ 			this.initialize();
+			this._initialized = true;
+		}
+
+		if (this.driver.ready && this._readyFunc) {
+			this._readyFunc(this);
 		} else {
 			This = this;
 			setTimeout(function() { This.checkReady(); }, 10);
