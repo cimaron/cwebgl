@@ -27,7 +27,7 @@ if (typeof ArrayBuffer == 'undefined') {
 			this[i] = 0;
 		}
 		this.byteLength = length;
-		this.BYTES_PER_ELEMENT;
+		this.BYTES_PER_ELEMENT = 1;
 	};
 	Array.BYTES_PER_ELEMENT = 1;
 	ArrayBuffer.prototype = Array;
@@ -56,6 +56,7 @@ function TypedArray(buffer, byteOffset, length, bytes) {
 	}
 	this.length = length;
 	this.byteLength = length * bytes;
+	this.BYTES_PER_ELEMENT = 1;
 };
 TypedArray.prototype = Array;
 TypedArray.getType = function(a) {
