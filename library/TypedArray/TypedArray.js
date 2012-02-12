@@ -62,6 +62,7 @@ function TypedArray(buffer, byteOffset, length, bytes) {
 TypedArray.prototype = Array;
 TypedArray.prototype.set = function(array, offset) {
 	var i;
+	offset = offset || 0;
 	for (i = 0; i < array.length; i++) {
 		this[i + offset] = array[i];
 	}	
