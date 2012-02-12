@@ -57,8 +57,15 @@ function TypedArray(buffer, byteOffset, length, bytes) {
 	this.length = length;
 	this.byteLength = length * bytes;
 	this.BYTES_PER_ELEMENT = 1;
+	this.set = TypedArray.prototype.set;
 };
 TypedArray.prototype = Array;
+TypedArray.prototype.set = function(array, offset) {
+	var i;
+	for (i = 0; i < array.length; i++) {
+		this[i + offset] = array[i];
+	}	
+};
 TypedArray.getType = function(a) {
 	var i, types;
 	types = [ArrayBuffer, Uint8Array, Uint16Array, Float32Array];
