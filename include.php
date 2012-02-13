@@ -116,6 +116,9 @@ function cWebGLIncludeFile($file) {
 
 	$output = preg_replace_callback('#include\(\'([^\']+)\'\);#', 'cWebGLIncludeCallback', $output);
 	$output = "//file: $file\n$output";
+	
+	$output = processCnvGLDefines($output);
+	
 	return $output;
 }
 
@@ -130,6 +133,34 @@ function cWebGLIncludeDebug($file) {
 		$included[$file] = true;
 		echo "include('$file');\n";
 	}
+}
+
+function processCnvglDefines($str) {
+	static $defines = array();
+	
+	while (preg_match('#cnvgl\.([A-Z0-9_]+)\s*=\s*(0x)?([0-9A-F]+);\s*\n#', $str, $matches)) {
+		$sub = $matches[0];
+		$name = $matches[1];
+		$hex = !empty($matches[2]);
+		$value = $matches[3];
+		$defines[$name] = $hex ? base_convert($value, 16, 10) : $value;
+		$str = str_replace($sub, "", $str);
+	}
+
+	$offset = 0;
+	while (preg_match('#cnvgl\.([A-Z0-9_]+)#', $str, $matches, PREG_OFFSET_CAPTURE, $offset)) {
+		$sub = $matches[0][0];
+		$start = $matches[0][1];
+		$name = $matches[1][0];
+		$value = $defines[$name];
+		if (isset($defines[$name])) {
+			$str = substr_replace($str, $value, $start, strlen($sub));
+		} else {
+			$offset = ($matches[0][1] + strlen($sub));
+		}
+	}
+
+	return $str;
 }
 
 $include = 'cWebGLInclude';
