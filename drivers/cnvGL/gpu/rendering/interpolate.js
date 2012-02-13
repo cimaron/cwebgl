@@ -122,11 +122,9 @@ cnvgl_rendering_interpolate = (function() {
 		this.t = t;
 	};
 
-	cnvgl_rendering_interpolate.setPoint = function(p) {
-		var  x1, y1, x, y;
+	cnvgl_rendering_interpolate.setPoint = function(x, y) {
+		var  x1, y1;
 
-		x = p[0];
-		y = p[1];
 		x1 = this.v1[0];
 		y1 = this.v1[1];
 

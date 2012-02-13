@@ -68,7 +68,7 @@ cnvgl_rendering_primitive_line = (function() {
 	};
 
 	cnvgl_rendering_primitive_line.lineX = function(state, v1, v2, dy) {
-		var frag, x_start, x_end, xi_start, xi_end, y, v, xi, yi, p, i;
+		var frag, x_start, x_end, xi_start, xi_end, y, v, xi, yi, i;
 
 		//make v1 left vertex
 		if (v2.xw < v1.xw) {
@@ -86,8 +86,7 @@ cnvgl_rendering_primitive_line = (function() {
 		for (xi = xi_start; xi <= xi_end; xi++) {
 
 			yi = (y|0); //floor(y)
-			p = [xi, yi, 0, 1];
-			this.renderer.interpolate.setPoint(p);
+			this.renderer.interpolate.setPoint(xi, yi);
 			/*
 			for (v in v1.varying) {
 				this.frag.varying[v] = this.renderer.interpolate.interpolateLine(v1.varying[v], v2.varying[v]);
@@ -104,7 +103,7 @@ cnvgl_rendering_primitive_line = (function() {
 	};
 
 	cnvgl_rendering_primitive_line.lineY = function(state, v1, v2, dx) {
-		var frag, y_start, y_end, yi_start, yi_end, x, v, yi, xi, p, i;
+		var frag, y_start, y_end, yi_start, yi_end, x, v, yi, xi, i;
 
 		//make v1 top vertex
 		if (v2.yw < v1.yw) {
@@ -123,8 +122,7 @@ cnvgl_rendering_primitive_line = (function() {
 		for (yi = yi_start; yi <= yi_end; yi++) {
 
 			xi = (x|0); //floor(x)
-			p = [xi, yi, 0, 1];
-			this.renderer.interpolate.setPoint(p);
+			this.renderer.interpolate.setPoint(xi, yi);
 
 			/*
 			for (v in v1.varying) {

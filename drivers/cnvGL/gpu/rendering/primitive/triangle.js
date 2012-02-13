@@ -128,12 +128,10 @@ cnvgl_rendering_primitive_triangle = (function() {
 		}
 	};
 
-	var p = [0, 0, 0, 1];
 	cnvgl_rendering_primitive_triangle.rasterizeScanline = function(state, yi, x_start, x_end) {
 		var int, xi_start, xi_end, xi, i, v;
 
 		int = this.renderer.interpolate;
-		p[1] = yi;
 
 		//left and right bounds
 		xi_start = (x_start|0) + .5; //floor(x_start) + .5
@@ -149,8 +147,7 @@ cnvgl_rendering_primitive_triangle = (function() {
 
 		for (xi = xi_start; xi <= xi_end; xi++) {
 
-			p[0] = xi;
-			int.setPoint(p);
+			int.setPoint(xi, yi);
 
 			//Early depth test
 			//Need to add check for shader writing to depth value.
@@ -163,7 +160,7 @@ cnvgl_rendering_primitive_triangle = (function() {
 				}
 			}
 
-			this.renderer.interpolate.interpolateVarying(state, this.v1, this.v2, this.v3, this.frag.attrib.data);
+			int.interpolateVarying(state, this.v1, this.v2, this.v3, this.frag.attrib.data);
 
 			this.renderer.fragment.process(state, this.frag);
 			this.renderer.fragment.write(state, i, this.frag);

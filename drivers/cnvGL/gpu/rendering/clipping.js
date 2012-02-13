@@ -104,7 +104,7 @@ cnvgl_rendering_clipping = (function() {
 		xw = v1.xw * namt + v2.xw * amt;
 		yw = v1.yw * namt + v2.yw * amt;
 
-		int.setPoint([xw, yw]);
+		int.setPoint(xw, yw);
 
 		vr = new cnvgl.vertex();
 
