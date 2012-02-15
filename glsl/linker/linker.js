@@ -26,7 +26,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	sprint = StdIO.sprintf;
 
 	function reindex(shader_obj, name, old_index, new_index, size, symbol) {
-		var i, j, f, ins, code, diff;
+		var i, j, f, ins, code, diff, idx_chng;
 
 		diff = new_index - old_index;
 
@@ -48,13 +48,19 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			//each operand
 			for (j = 0; j < glsl.IR.operands.length; j++) {
 				f = glsl.IR.operands[j];
-				if (ins[f] && ins[f].name == symbol.out
-					&& ins[f].offset >= old_index && ins[f].offset < old_index + size) {
-					ins[f].offset2 = ins[f].offset + diff;
-					//ins[f].addOffset(diff);
+
+				if (ins[f] && ins[f].name == name) {
+
+					idx_chng = (ins[f].offset >= old_index && ins[f].offset < old_index + size);
+
+					if (idx_chng) {
+						ins[f].offset2 = ins[f].offset + diff;
+						//ins[f].addOffset(diff);
+					}
 				}
 			}
 		}
+
 	}
 
 	function addVarying(program_obj, shader_obj) {
