@@ -102,8 +102,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		 * @param   boolean     True if replacing with a completely new operand
 		 */
 		IRS.replaceName = function(start, old, nw, index, repl) {
-			var i, j, ir, f;
-	
+			var i, j, ir, f, name, neg_const;
+			neg_const = old.match(/^\-([0-9]+\.[0-9]+)/);
+			if (neg_const) {
+				old = neg_const[1];
+				neg_const = true;
+			}
+
 			for (i = start; i < this.code.length; i++) {
 				ir = this.code[i];
 
@@ -112,10 +117,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 					f = IR.operands[j];
 					if (ir[f] && ir[f].name == old) {
 						if (repl) {
-							ir[f] = new ARB.Operand(nw);
+							ir[f] = new ARB.Operand(ir[f].neg + nw);
 						} else {
 							ir[f].name = nw;
 							ir[f].addOffset(index);
+						}
+						if (neg_const && ir[f].neg) {
+							ir[f].neg = "";
 						}
 					}	
 				}

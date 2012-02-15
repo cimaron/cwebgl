@@ -80,7 +80,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 * @param   ast_node    ast_node that represents the constructor components
 	 */
 	function constructor(e, op, se) {
-		var ds, di, si, sei, ses, d, s;
+		var ds, di, si, sei, ses, d, s, ir;
 
 		ds = glsl.type.size[op.type_specifier];
 		si = 0;
@@ -119,7 +119,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 				s = s.join(".");
 			} else {
 				//value
-				if (s[0].match(/[0-9]+(\.[0-9]+)?/)) {
+				if (s[0].match(/^\-?[0-9]+(\.[0-9]+)?/)) {
 					s = s[0];	
 				} else {
 					s = sprintf("%s.%s", s[0], swizzles[0][si]);

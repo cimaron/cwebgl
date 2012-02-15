@@ -179,35 +179,42 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 	 * @param   string    Operand
 	 */
 	function enter_symbol(oper, i) {
-		var entry, size, slots, symbol, reg, j;
+		var entry, size, slots, symbol, reg, j, name;
 
 		//empty operand
 		if (!oper) {
 			return;
 		}
 
+		name = oper.name;
+
 		//already exists (hope we got it right the first time)
-		if (symbols[oper.name]) {
+		if (symbols[name]) {
 			return;	
 		}
 
 		//operand is a constant
-		if (oper.name.match(/[0-9]+\.[0-9]+/)) {
-			symbols[oper.name] = {
-				value : oper.name,
-				constant : 1
+		if (name.match(/[0-9]+\.[0-9]+/)) {
+			//could be negative
+			name = oper.neg + oper.name;
+			symbols[name] = {
+				value : name,
+				constant : 1,
+				size : 1,
+				components : 1,
+				slots : 1
 			};
-			constants.push(symbols[oper.name]);
+			constants.push(symbols[name]);
 			return;
 		}
 
 		//get the operand name and parser symbol table entry
-		entry = state.symbols.get_variable(oper.name);
+		entry = state.symbols.get_variable(name);
 
 		//temporary variable
 		if (!entry) {
 			reg = get_register(i);
-			replace_temp(i, oper.name, oper.offset, reg.out);
+			replace_temp(i, name, oper.offset, reg.out);
 			update_register_life(reg, i + 1);
 			return;
 		}
@@ -215,7 +222,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		size = glsl.type.size[entry.type];
 		slots = glsl.type.slots[entry.type];
 		symbol = {
-			name : oper.name,
+			name : name,
 			type : entry.type,
 			out : entry.out,
 			entry : entry,
@@ -224,7 +231,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			type_size : size
 		};
 
-		symbols[oper.name] = symbol;
+		symbols[name] = symbol;
 
 		if (entry.qualifier_name == 'uniform') {
 			//for (i = 0; i < symbol.size; i++) {
@@ -236,12 +243,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 		if (entry.qualifier_name == 'attribute') {
 			symbol.out = 'vertex.attrib';
 			symbol.location = vertex.attrib.length;
-			irs.replaceName(i, oper.name, symbol.out, symbol.location);
+			irs.replaceName(i, name, symbol.out, symbol.location);
 			for (j = 0; j < symbol.size; j++) {
 				vertex.attrib.push(symbol);
 			}
 			delete symbol.entry;
-			delete symbols[oper.name];
+			delete symbols[name];
 			symbols[symbol.out] = symbol;
 			return;
 		}
@@ -253,18 +260,18 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 				symbol.out = 'fragment.attrib';
 			}
 			symbol.location = fragment.attrib.length;
-			irs.replaceName(i, oper.name, symbol.out, symbol.location);
+			irs.replaceName(i, name, symbol.out, symbol.location);
 			for (j = 0; j < symbol.size; j++) {
 				fragment.attrib.push(symbol);
 			}
 			delete symbol.entry;
-			delete symbols[oper.name];
+			delete symbols[name];
 			symbols[symbol.out] = symbol;
 			return;
 		}
 
-		if (symbol.out != oper.name) {
-			irs.replaceName(i, oper.name, symbol.out);	
+		if (symbol.out != name) {
+			irs.replaceName(i, name, symbol.out);	
 		}
 	}
 
@@ -343,7 +350,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 			}
 		}
 	}
-
+	
 	function gen_object() {
 
 		output = {
