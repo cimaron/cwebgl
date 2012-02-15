@@ -144,7 +144,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		ctx.driver.compileShader(ctx, shader_obj.driverObj, shader_obj.shader_string, shader_obj.type);
 		shader_obj.compile_status = ctx.driver.compileStatus;
-		shader_obj.information_log = ctx.driver.compileErrors;
+		shader_obj.information_log = ctx.driver.compileLog;
 	};
 
 

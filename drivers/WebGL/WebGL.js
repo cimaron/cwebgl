@@ -77,7 +77,7 @@ cWebGL.drivers.WebGL = (function() {
 		this._context.shaderSource(shader, source);
 		this._context.compileShader(shader);
 		this.compileStatus = this._context.getShaderParameter(shader, this._context.COMPILE_STATUS);
-		this.compileErrors = this._context.getShaderInfoLog(shader);
+		this.compileLog = this._context.getShaderInfoLog(shader);
 
 		if (this.compileStatus) {
 			symbols = glsl.getSymbols(source, type - this._context.FRAGMENT_SHADER);
