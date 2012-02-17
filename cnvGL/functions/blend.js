@@ -24,6 +24,29 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 	/**
+	 * glBlendColor — set the blend color
+	 *
+	 * @var GLclampf  red    specify the components of GL_BLEND_COLOR
+	 * @var GLclampf  green
+	 * @var GLclampf  blue
+	 * @var GLclampf  alpha
+	 *
+	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glBlendColor.xml
+	 */
+	cnvgl.blendColor = function(red, green, blue, alpha) {
+		var ctx, c;
+		ctx = cnvgl.getCurrentContext();
+		c = ctx.color.blendColor;
+		c[0] = Math.round(255 * Math.max(Math.min(red, 1), 0));
+		c[1] = Math.round(255 * Math.max(Math.min(green, 1), 0));
+		c[2] = Math.round(255 * Math.max(Math.min(blue, 1), 0));
+		c[3] = Math.round(255 * Math.max(Math.min(alpha, 1), 0));		
+
+		ctx.driver.blendColor(ctx, red, green, blue, alpha);
+	};
+
+
+	/**
 	 * glBlendFunc — specify pixel arithmetic
 	 *
 	 * @var GLenum  sfactor  Specifies how the red, green, blue, and alpha source blending factors are computed.

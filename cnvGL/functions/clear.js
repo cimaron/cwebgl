@@ -36,7 +36,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	cnvgl.clearColor = function(red, green, blue, alpha) {
 		var ctx, c;
 		ctx = cnvgl.getCurrentContext();
-		c = ctx.color.clearColor;	
+		c = ctx.color.clearColor;
 		c[0] = Math.round(255 * Math.max(Math.min(red, 1), 0));
 		c[1] = Math.round(255 * Math.max(Math.min(green, 1), 0));
 		c[2] = Math.round(255 * Math.max(Math.min(blue, 1), 0));
@@ -61,12 +61,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			return;
 		}
 
-		//Stencil Buffer
-		if (mask & cnvgl.STENCIL_BUFFER_BIT) {
-			throw new Error('clear: stencil_buffer not implemented yet');
-		}
-
-		ctx.driver.clear(ctx, ctx.color.clearColor, ctx.depth.clear, mask);
+		ctx.driver.clear(ctx, ctx.color.clearColor, ctx.depth.clear, ctx.stencil.clear, mask);
 	};
 
 

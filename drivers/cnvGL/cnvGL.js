@@ -29,6 +29,7 @@ cWebGL.drivers.cnvGL = (function() {
 
 		this.colorBuffer = null;
 		this.depthBuffer = null;
+		this.stencilBuffer = null;
 
 		this.width = null;
 		this.height = null;
@@ -96,6 +97,7 @@ cWebGL.drivers.cnvGL = (function() {
 
 			this.colorBuffer = this._context2d.createImageData(this.width, this.height);
 			this.depthBuffer = cnvgl.malloc(this.width * this.height, 1, Float32Array);
+			this.stencilBuffer = cnvgl.malloc(this.width * this.height, 1, Uint8Array);
 
 			if (!GPU.renderer) {
 				GPU.renderer = new cnvgl_renderer();
@@ -105,6 +107,7 @@ cWebGL.drivers.cnvGL = (function() {
 
 			this.command('set', 'colorBuffer', this.colorBuffer);
 			this.command('set', 'depthBuffer', this.depthBuffer);
+			this.command('set', 'stencilBuffer', this.stencilBuffer);
 
 			DriverCnvGL.Static.animationFrameFunc = DriverCnvGL.Static.requestAnimationFrame;
 		}
@@ -122,6 +125,10 @@ cWebGL.drivers.cnvGL = (function() {
 		this.command('uploadTexture', unit, tex_obj);
 	};
 
+	DriverCnvGL.blendColor = function(ctx, r, g, b, a) {
+		this.command('set', 'blendColor', [r, g, b, a]);
+	};
+
 	DriverCnvGL.blendFunc = function(ctx, sfactor, dfactor) {
 		this.command('set', 'blendSrcA', sfactor);
 		this.command('set', 'blendSrcRGB', sfactor);
@@ -129,12 +136,15 @@ cWebGL.drivers.cnvGL = (function() {
 		this.command('set', 'blendDestRGB', dfactor);
 	};
 
-	DriverCnvGL.clear = function(ctx, color, depth, mask) {
+	DriverCnvGL.clear = function(ctx, color, depth, stencil, mask) {
 		if (mask && cnvgl.COLOR_BUFFER_BIT) {
 			this.command('set', 'clearColor', color);
 		}
 		if (mask && cnvgl.DEPTH_BUFFER_BIT) {
 			this.command('set', 'clearDepth', depth);
+		}
+		if (mask && cnvgl.STENCIL_BUFFER_BIT) {
+			this.command('set', 'clearStencil', stencil);
 		}
 		this.command('clear', mask);
 	};
@@ -179,6 +189,10 @@ cWebGL.drivers.cnvGL = (function() {
 		this.command('set', 'depthMask', mask);
 	};
 
+	DriverCnvGL.disableVertexAttribArray = function(ctx, index) {
+
+	};
+
 	DriverCnvGL.drawArrays = function(ctx, mode, first, count) {
 		this.command('drawPrimitives', mode, first, count);
 	};
@@ -191,14 +205,19 @@ cWebGL.drivers.cnvGL = (function() {
 
 	DriverCnvGL.enable = function(ctx, flag, v) {
 		switch (flag) {
+			case cnvgl.BLEND:
+				this.command('set', 'blendEnabled', v);
+				break;
 			case cnvgl.CULL_FACE:
 				this.command('set', 'cullFlag', v);
 				break;
 			case cnvgl.DEPTH_TEST:
 				this.command('set', 'depthTest', v);
 				break;
-			case cnvgl.BLEND:
-				this.command('set', 'blendEnabled', v);
+			case cnvgl.DITHER:
+				break;
+			case cnvgl.SCISSOR_TEST:
+				this.command('set', 'scissorTest', v);
 				break;
 			default:
 				console.log(flag);
@@ -254,6 +273,11 @@ cWebGL.drivers.cnvGL = (function() {
 		}
 	};
 
+	DriverCnvGL.polygonOffset = function(ctx, factor, units) {
+		this.command('set', 'polygonOffsetFactor', factor);
+		this.command('set', 'polygonOffsetUnits', units);
+	};
+
 	DriverCnvGL.present = function() {
 		this._context2d.putImageData(this.colorBuffer, 0, 0);
 		DriverCnvGL.Static.frameComplete();
@@ -263,6 +287,41 @@ cWebGL.drivers.cnvGL = (function() {
 		this.command('renderTexture', fb_obj, tex_obj, textarget, level, offset);
 	};
 
+	DriverCnvGL.sampleCoverage = function(ctx, value, invert) {
+		this.command('set', 'mulitsampleCoverageValue', value);
+		this.command('set', 'mulitsampleCoverageInvert', invert);
+	};
+
+	DriverCnvGL.stencilFunc = function(ctx, func, ref, mask) {
+		this.command('set', 'stencilFuncFront', func);
+		this.command('set', 'stencilFuncBack', func);
+		this.command('set', 'stencilRefFront', ref);
+		this.command('set', 'stencilRefBack', ref);
+		this.command('set', 'stencilValueMaskFront', mask);
+		this.command('set', 'stencilValueMaskBack', mask);
+	};
+
+	DriverCnvGL.stencilOp = function(ctx, sfail, dpfail, dppass) {
+		this.command('set', 'stencilFailFuncBack', sfail);
+		this.command('set', 'stencilFailFuncFront', sfail);
+		this.command('set', 'stencilZFailFuncBack', dpfail);
+		this.command('set', 'stencilZFailFuncFront', dpfail);
+		this.command('set', 'stencilZPassFuncBack', dppass);
+		this.command('set', 'stencilZPassFuncFront', dppass);
+	};
+
+	DriverCnvGL.stencilMask = function(ctx, mask) {
+		this.command('set', 'stencilWriteMaskFront', mask);
+		this.command('set', 'stencilWriteMaskBack', mask);
+	};
+
+	DriverCnvGL.scissor = function(ctx, x, y, width, height) {
+		this.command('set', 'scissorX', x);
+		this.command('set', 'scissorY', y);
+		this.command('set', 'scissorWidth', width);
+		this.command('set', 'scissorHeight', height);
+	};
+
 	DriverCnvGL.uploadAttributes = function(ctx, location, size, stride, pointer, data) {
 		this.command('uploadAttributes', location, size, stride, pointer, data);
 	};
@@ -270,7 +329,7 @@ cWebGL.drivers.cnvGL = (function() {
 	DriverCnvGL.uploadUniform = function(ctx, location, data, slots, components) {
 		this.command('uploadUniforms', location, data, slots, components);
 	};
-	
+
 	DriverCnvGL.useProgram = function(ctx, program) {
 		this.command('uploadProgram', 'fragment', program.fragmentProgram);
 		this.command('uploadProgram', 'vertex', program.vertexProgram);

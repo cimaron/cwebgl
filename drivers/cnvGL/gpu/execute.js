@@ -49,6 +49,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		if (mask && cnvgl.DEPTH_BUFFER_BIT) {
 			cnvgl.memset(ctx.depthBuffer, 0, ctx.clearDepth);
 		}
+		if (mask && cnvgl.STENCIL_BUFFER_BIT) {
+			cnvgl.memset(ctx.stencilBuffer, 0, ctx.clearStencil);
+		}
 		return true;
 	};
 

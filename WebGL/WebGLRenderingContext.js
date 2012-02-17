@@ -524,9 +524,17 @@ cWebGLRenderingContext = (function() {
 		cnvgl.bindTexture(target, _texture);
 	};
 
+	cWebGLRenderingContext.blendColor = function(red, green, blue, alpha) {
+		cnvgl.setContext(this._context);
+		cnvgl.blendColor(red, green, blue, alpha);
+	};
+
 	cWebGLRenderingContext.blendFunc = function(sfactor, dfactor) {
 		cnvgl.setContext(this._context);
 		cnvgl.blendFunc(sfactor, dfactor);
+	};
+
+	cWebGLRenderingContext.blendEquation = function() {
 	};
 
 	cWebGLRenderingContext.bufferData = function(target, data, usage) {
@@ -571,6 +579,11 @@ cWebGLRenderingContext = (function() {
 	cWebGLRenderingContext.clearDepth = function(depth) {
 		cnvgl.setContext(this._context);
 		cnvgl.clearDepth(depth);
+	};
+
+	cWebGLRenderingContext.clearStencil = function(s) {
+		cnvgl.setContext(this._context);
+		cnvgl.clearStencil(s);
 	};
 
 	cWebGLRenderingContext.colorMask = function(red, green, blue, alpha) {
@@ -623,7 +636,13 @@ cWebGLRenderingContext = (function() {
 		var o = new cWebGLTexture(this);
 		return o;
 	};
-	
+
+	cWebGLRenderingContext.deleteBuffer = function() {
+	};
+
+	cWebGLRenderingContext.deleteShader = function() {
+	};
+
 	cWebGLRenderingContext.depthFunc = function(func) {
 		cnvgl.setContext(this._context);
 		cnvgl.depthFunc(func);
@@ -632,6 +651,11 @@ cWebGLRenderingContext = (function() {
 	cWebGLRenderingContext.depthMask = function(flag) {
 		cnvgl.setContext(this._context);
 		cnvgl.depthMask(flag);
+	};
+
+	cWebGLRenderingContext.depthRange = function(zNear, zFar) {
+		cnvgl.setContext(this._context);
+		cnvgl.depthRange(zNear, zFar);
 	};
 
 	cWebGLRenderingContext.disable = function(cap) {
@@ -738,9 +762,15 @@ cWebGLRenderingContext = (function() {
 		}
 		return new cWebGLUniformLocation(program, location);
 	};
+	
+	cWebGLRenderingContext.hint = function(target, mode) {
+		cnvgl.setContext(this._context);
+		cnvgl.hint(target, mode);
+	};
 
 	cWebGLRenderingContext.lineWidth = function(width) {
 		cnvgl.setContext(this._context);
+		cnvgl.lineWidth(width);
 	};
 
 	cWebGLRenderingContext.linkProgram = function(program) {
@@ -764,13 +794,43 @@ cWebGLRenderingContext = (function() {
 		}
 	};
 	
+	cWebGLRenderingContext.polygonOffset = function(factor, units) {
+		cnvgl.setContext(this._context);
+		cnvgl.polygonOffset(factor, units);		
+	};	
+	
 	cWebGLRenderingContext.renderbufferStorage = function(target, internalformat, width, height) {
 		cnvgl.setContext(this._context);
 		cnvgl.renderbufferStorage(target, internalformat, width, height);
 	};
 	
+	cWebGLRenderingContext.sampleCoverage = function(value, invert) {
+		cnvgl.setContext(this._context);
+		cnvgl.sampleCoverage(value, invert);		
+	};
+
+	cWebGLRenderingContext.scissor = function(x, y, width, height) {
+		cnvgl.setContext(this._context);
+		cnvgl.scissor(x, y, width, height);		
+	};
+
 	cWebGLRenderingContext.shaderSource = function(shader, string) {
 		shader.setSource(string);
+	};
+
+	cWebGLRenderingContext.stencilFunc = function(func, ref, mask) {
+		cnvgl.setContext(this._context);
+		cnvgl.stencilFunc(func, ref, mask);
+	};
+
+	cWebGLRenderingContext.stencilMask = function(mask) {
+		cnvgl.setContext(this._context);
+		cnvgl.stencilMask(mask);
+	};
+
+	cWebGLRenderingContext.stencilOp = function(fail, zfail, zpass) {
+		cnvgl.setContext(this._context);
+		cnvgl.stencilOp(fail, zfail, zpass);
 	};
 
 	cWebGLRenderingContext.texImage2D = function(target, level, internalformat, format, type, source) {

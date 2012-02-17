@@ -22,6 +22,37 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 (function(cnvgl) {
 
+	function framebuffer_texture(ctx, mode, target, attachment, textarget, texture, level, offset) {
+		var fb_obj, tex_obj;
+		
+		fb_obj = ctx.drawBuffer;
+		
+		if (fb_obj.name == 0) {
+			cnvgl.throw_error(cnvgl.INVALID_OPERATION, ctx);
+			return;
+		}
+
+		tex_obj = ctx.shared.texture_objects[texture];
+
+		ctx.driver.renderTexture(ctx, fb_obj, tex_obj, textarget, level, offset);
+	}
+
+	function cnvgl_get_attachment(ctx, fb_obj, attachment) {
+		var i;
+		switch (attachment) {
+			case cnvgl.COLOR_ATTACHMENT0:
+				i = attachment - cnvgl.COLOR_ATTACHMENT0;
+				return fb_obj.attachment[BUFFER_COLOR0 + i];
+			case cnvgl.DEPTH_STENCIL_ATTACHMENT:
+			case cnvgl.DEPTH_BUFFER:
+				return fb.Attachment[BUFFER_DEPTH];
+			case cnvgl.STENCIL_BUFFER:
+				return fb.attachment[BUFFER_STENCIL];
+			default:
+				return null;
+		}
+	}
+
 
 	/**
 	 * glBindFramebuffer — bind a framebuffer to a framebuffer target
@@ -54,7 +85,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		//create object if necessary
 		if (framebuffer_obj == 1) {
-			framebuffer_obj = new cnvgl_framebuffer(framebuffer);
+			framebuffer_obj = new cnvgl.framebuffer(framebuffer);
 			ctx.shared.frameBuffers[framebuffer] = framebuffer_obj;
 		}
 	
@@ -97,6 +128,81 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		ctx.currentRenderbuffer = renderbuffer_obj;
 	};
 
+	
+	/**
+	 * glFramebufferRenderbuffer — attach a renderbuffer as a logical buffer to the currently bound framebuffer object
+	 *
+	 * @var GLenum  target              Specifies the framebuffer target.
+	 * @var GLenum  attachment          Specifies the attachment point of the framebuffer.
+	 * @var GLenum  renderbuffertarget  Specifies the renderbuffer target and must be GL_RENDERBUFFER.
+	 * @var GLuint  renderbuffer        Specifies the name of an existing renderbuffer object of type renderbuffertarget to attach.
+	 *
+	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glFramebufferRenderbuffer.xml
+	 */
+	cnvgl.framebufferRenderbuffer = function(target, attachment, renderbuffertarget, renderbuffer) {
+		var ctx, att, fb_obj, rb_obj;
+		ctx = cnvgl.getCurrentContext();
+
+		if (target != cnvgl.FRAMEBUFFER) {
+			cnvgl.throw_error(cnvgl.INVALID_ENUM, ctx);
+			return;
+		}
+
+		if (renderbuffertarget != cnvgl.RENDERBUFFER) {
+			cnvgl.throw_error(cnvgl.INVALID_ENUM, ctx);
+			return;
+		}
+		
+		fb_obj = ctx.drawBuffer;
+
+		if (fb_obj.name == 0) {
+			cnvgl.throw_error(cnvgl.INVALID_OPERATION, ctx);
+			return;
+		}
+
+		att = cnvgl_get_attachment(ctx, fb_obj, attachment);
+		
+		if (!att) {
+			cnvgl.throw_error(cnvgl.INVALID_ENUM, ctx);
+			return;
+		}
+
+		if (renderbuffer) {
+			rb_obj = _mesa_lookup_renderbuffer(ctx, renderbuffer);
+			
+			if (rb_obj == null) {
+				cnvgl.throw_error(cnvgl.INVALID_OPERATION);
+				return;
+			}
+			
+			if (rb_obj == 0) {
+				cnvgl.throw_error(cnvgl.INVALID_ENUM, ctx);
+				return;
+			}
+		} else {
+			rb_obj = null;
+		}
+
+		ctx.driver.framebufferRenderbuffer(ctx, fb_obj, attachment, rb_obj);
+	};
+
+	/**
+	 * glFramebufferTexture — attach a level of a texture object as a logical buffer to the currently bound framebuffer object
+	 *
+	 * @var GLenum  target      Specifies the framebuffer target.
+	 * @var GLenum  attachment  Specifies the attachment point of the framebuffer.
+	 * @var GLenum  textarget   For glFramebufferTexture1D, glFramebufferTexture2D and glFramebufferTexture3D, specifies what type of texture is expected in the texture parameter, or for cube map textures, which face is to be attached.
+	 * @var GLuint  texture     Specifies the texture object to attach to the framebuffer attachment point named by attachment.
+	 * @var GLint   level       Specifies the mipmap level of texture to attach.
+	 *
+	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glFramebufferTexture.xml
+	 */
+	cnvgl.framebufferTexture2D = function(target, attachment, textarget, texture, level) {
+		var ctx;
+		ctx = cnvgl.getCurrentContext();
+
+		framebuffer_texture(ctx, "2D", target, attachment, textarget, texture, level, 0);
+	};
 
 	/**
 	 * glGenFramebuffers — generate framebuffer object names
@@ -208,7 +314,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		renderbuffer_obj.format = 0;
 		renderbuffer_obj.numSamples = 0;
 	
-		renderbuffer_obj.data = cnvgl_malloc(internalFormat, width * height);
+		renderbuffer_obj.data = cnvgl.malloc(internalFormat, width * height);
 	
 		renderbuffer_obj.internalFormat = internalFormat;
 		renderbuffer_obj.width = width;

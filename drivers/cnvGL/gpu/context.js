@@ -33,6 +33,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		this.blendSrcRGB = cnvgl.ONE;
 		this.clearColor = null;
 		this.clearDepth = null;
+		this.clearStencil = null;
 		this.colorBuffer = null;
 		this.colorMask = [0xFF, 0xFF, 0xFF, 0xFF];
 		this.cullFlag = cnvgl.FALSE;
@@ -42,6 +43,29 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		this.depthFunc = cnvgl.LESS;
 		this.depthMask = cnvgl.TRUE;
 		this.depthTest = null;
+		this.mulitsampleCoverageValue = 1;
+		this.mulitsampleCoverageInvert = cnvgl.FALSE;
+		this.scissorX = 0;
+		this.scissorY = 0;
+		this.scissorWidth = 0;
+		this.scissorHeight = 0;
+		this.stencilBuffer = null;
+		this.stencilFuncFront = cnvgl.ALWAYS;
+		this.stencilFuncBack = cnvgl.ALWAYS;
+		this.stencilRefFront = 0;
+		this.stencilRefBack = 0;
+		this.stencilValueMaskFront = ~0;
+		this.stencilValueMaskBack = ~0;
+		this.stencilWriteMaskFront = ~0;
+		this.stencilWriteMaskBack = ~0;
+
+		this.stencilFailFuncBack
+		this.stencilFailFuncFront
+		this.stencilZFailFuncBack
+		this.stencilZFailFuncFront
+		this.stencilZPassFuncBack
+		this.stencilZPassFuncFront
+
 		this.viewportF = 1;
 		this.viewportH = 0;
 		this.viewportN = 0;

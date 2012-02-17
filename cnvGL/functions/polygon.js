@@ -68,7 +68,31 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		
 		ctx.driver.frontFace(ctx, mode);
 	};
+
+
+	/**
+	 * glPolygonOffset — set the scale and units used to calculate depth values
+	 *
+	 * @var GLfloat  factor  Specifies a scale factor that is used to create a variable depth offset for each polygon.
+	 * @var GLfloat  units   Is multiplied by an implementation-specific value to create a constant depth offset.
+	 *
+	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glPolygonOffset.xml
+	 */
+	cnvgl.polygonOffset = function(factor, units) {
+		var ctx;
+		ctx = cnvgl.getCurrentContext();
 	
+		if (ctx.polygon.offsetFactor == factor &&
+			ctx.polygon.offsetUnits == units) {
+			return;	
+		}
+
+		ctx.polygon.offsetFactor = factor;
+		ctx.polygon.offsetUnits = units;
+		
+		ctx.driver.polygonOffset(ctx, factor, units);
+	};
+
 	
 }(cnvgl));
 

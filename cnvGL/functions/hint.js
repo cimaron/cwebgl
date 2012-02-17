@@ -23,61 +23,40 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 (function(cnvgl) {
 
 
-	function cnvgl_enable_disable(cap, s) {
-		var ctx;
+	/**
+	 * glHint — specify implementation-specific hints
+	 *
+	 * @var GLenum  target  Specifies a symbolic constant indicating the behavior to be controlled.
+	 * @var GLenum  mode    Specifies a symbolic constant indicating the desired behavior.  
+	 *
+	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glHint.xml
+	 */
+	cnvgl.hint = function(target, mode) {
+		var ctx, name;
 		ctx = cnvgl.getCurrentContext();
+	
+		if (mode != cnvgl.NICEST && mode != cnvgl.FASTEST && mode != cnvgl.DONT_CARE) {
+			cnvgl.throw_error(ctx, cnvgl.INVALID_ENUM);
+			return;
+		}
 
-		switch (cap) {
-
-			case cnvgl.CULL_FACE:
-				ctx.polygon.cullFlag = s;
-				break;
-
-			case cnvgl.DEPTH_TEST:
-				ctx.depth.test = s;
-				break;
-
-			case cnvgl.BLEND:
-				ctx.color.blendEnabled = s;
-				break;
-				
-			case cnvgl.DITHER:
-				ctx.color.ditherFlag = s;
-				break;
-			
-			case cnvgl.SCISSOR_TEST:
-				ctx.scissor.enabled = s;
+		switch (target) {
+			case cnvgl.GENERATE_MIPMAP_HINT:
+				name = 'generateMipmap';
 				break;
 
 			default:
-				throw new Error('Enable/Disable for ' + cap + ' not implemented yet');
+				throw new Error('hint not implemented yet ' + target);
+				return;
+		}
+		
+		if (ctx.hint[name] == mode) {
+			return;	
 		}
 
-		ctx.driver.enable(ctx, cap, (s == cnvgl.TRUE));
-	}
+		ctx.hint[name] = mode;
 
-
-	/**
-	 * glEnable — enable or disable server-side GL capabilities
-	 *
-	 * @var GLenum  cap  Specifies a symbolic constant indicating a GL capability.
-	 *
-	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glEnable.xml
-	 */
-	cnvgl.enable = function(cap) {
-		cnvgl_enable_disable(cap, cnvgl.TRUE);
-	};
-
-
-	/**
-	 * glDisable — enable or disable server-side GL capabilities
-	 *
-	 * @var GLenum  cap  Specifies a symbolic constant indicating a GL capability.
-	 *
-	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glEnable.xml
-	 */
-	cnvgl.disable = function(cap) {
-		cnvgl_enable_disable(cap, cnvgl.FALSE);
+		ctx.driver.hint(ctx, target, mode);
 	};
 
 

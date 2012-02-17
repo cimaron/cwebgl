@@ -78,15 +78,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 			//color state
 			this.color = {
-				clearColor : [0,0,0,0],
-				colorMask : [0xFF, 0xFF, 0xFF, 0xFF],
-				blendEnabled : cnvgl.FALSE,
-				blendSrcRGB : cnvgl.ONE,
-				blendSrcA : cnvgl.ONE,
-				blendDestRGB : cnvgl.ZERO,
+				blendColor : [0, 0, 0, 0],
 				blendDestA : cnvgl.ZERO,
+				blendDestRGB : cnvgl.ZERO,
+				blendEnabled : cnvgl.FALSE,
+				blendEquationA : cnvgl.FUNC_ADD,
 				blendEquationRGB : cnvgl.FUNC_ADD,
-				blendEquationA : cnvgl.FUNC_ADD
+				blendSrcA : cnvgl.ONE,
+				blendSrcRGB : cnvgl.ONE,
+				clearColor : [0, 0, 0, 0],
+				colorMask : [0xFF, 0xFF, 0xFF, 0xFF],
+				ditherFlag : cnvgl.TRUE
 			};
 	
 			//depth state
@@ -96,7 +98,23 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				mask : cnvgl.TRUE,
 				test : cnvgl.FALSE
 			};
-	
+			
+			//hint state
+			this.hint = {
+				generateMipmap : cnvgl.DONT_CARE
+			};
+
+			//line state
+			this.line = {
+				width : 1
+			};
+
+			//multisample state
+			this.multisample = {
+				sampleCoverageInvert : cnvgl.FALSE,
+				sampleCoverageValue : 1
+			};
+
 			//pack state
 			this.pack = {
 				alignment : 4
@@ -106,14 +124,33 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			this.polygon = {
 				cullFaceMode : cnvgl.BACK,
 				cullFlag : cnvgl.FALSE,
-				frontFace : cnvgl.CCW
+				frontFace : cnvgl.CCW,
+				offsetFactor : 0,
+				offsetUnits : 0
+			};
+
+			//scissor state
+			this.scissor = {
+				enabled : cnvgl.FALSE
 			};
 
 			//shader state
 			this.shader = {
 				activeProgram : null	
 			};
-	
+			
+			//stencil state
+			this.stencil = {
+				clear : 0,
+				failFunc : [cnvgl.KEEP, cnvgl.KEEP],
+				func : [cnvgl.ALWAYS, cnvgl.ALWAYS],
+				ref : [0, 0],
+				valueMask : [~0, ~0],
+				writeMask : [~0, ~0],
+				zFailFunc : [cnvgl.KEEP, cnvgl.KEEP],
+				zPassFunc : [cnvgl.KEEP, cnvgl.KEEP]
+			};
+
 			//unpack state
 			this.unpack = {
 				alignment : 4
@@ -140,7 +177,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		};
 	
 		cnvgl_context.initFramebuffer = function(width, height) {
-			var frameBuffer, colorBuffer, depthBuffer;
+			var frameBuffer, colorBuffer, depthBuffer, stencilBuffer;
 	
 			//set up framebuffer
 			frameBuffer = new cnvgl.framebuffer(0);
@@ -164,9 +201,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			depthBuffer.width = width;
 			depthBuffer.height = height;
 			depthBuffer.data = this.driver.depthBuffer;
-			frameBuffer.depthBuffer = depthBuffer;			
+			frameBuffer.depthBuffer = depthBuffer;
+			
+			//set up stencil buffer
+			stencilBuffer = new cnvgl.renderbuffer(0);
+			stencilBuffer.internalFormat = cnvgl.STENCIL_INDEX8;
+			stencilBuffer.width = width;
+			stencilBuffer.height = height;
+			stencilBuffer.data = this.driver.stencilBuffer;
+			frameBuffer.stencilBuffer = stencilBuffer;
 		};
-	
+
 		cnvgl_context.initTextures = function() {
 			var units, i, unit;
 			this.texture.currentUnit = 0;
