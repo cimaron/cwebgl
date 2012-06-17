@@ -897,12 +897,15 @@ cWebGLRenderingContext = (function() {
 	};
 
 	cWebGLRenderingContext.uniform1f = function(location, x) {
+		if (this.isLocationError(location)) {
+			return;
+		}
 		cnvgl.setContext(this._context);
 		cnvgl.uniform1f(location.location(), x);
 	};
 
 	cWebGLRenderingContext.uniform1i = function(location, x) {
-		if (!location) {
+		if (this.isLocationError(location)) {
 			return;
 		}
 		cnvgl.setContext(this._context);
@@ -910,46 +913,73 @@ cWebGLRenderingContext = (function() {
 	};
 
 	cWebGLRenderingContext.uniform2f = function(location, x, y) {
+		if (this.isLocationError(location)) {
+			return;
+		}
 		cnvgl.setContext(this._context);
 		cnvgl.uniform1f(location.location(), x);
 	};
 	
 	cWebGLRenderingContext.uniform2i = function(location, x, y) {
+		if (this.isLocationError(location)) {
+			return;
+		}
 		cnvgl.setContext(this._context);
 		cnvgl.uniform1i(location.location(), x, y);
 	};
 	
 	cWebGLRenderingContext.uniform2u = function(location, x, y) {
+		if (this.isLocationError(location)) {
+			return;
+		}
 		cnvgl.setContext(this._context);
 		cnvgl.uniform1u(location.location(), x);
 	};
 
 	cWebGLRenderingContext.uniform3f = function(location, x, y, z) {
+		if (this.isLocationError(location)) {
+			return;
+		}
 		cnvgl.setContext(this._context);
 		cnvgl.uniform3f(location.location(), x, y, z);
 	};
 
 	cWebGLRenderingContext.uniform3i = function(location, x, y, z) {
+		if (this.isLocationError(location)) {
+			return;
+		}
 		cnvgl.setContext(this._context);
 		cnvgl.uniform3f(location.location(), x, y, z);
 	};
 
 	cWebGLRenderingContext.uniform3u = function(location, x, y, z) {
+		if (this.isLocationError(location)) {
+			return;
+		}
 		cnvgl.setContext(this._context);
 		cnvgl.uniform3f(location.location(), x, y, z);
 	};
 
 	cWebGLRenderingContext.uniform3fv = function(location, v) {
+		if (this.isLocationError(location)) {
+			return;
+		}
 		cnvgl.setContext(this._context);
 		cnvgl.uniform3fv(location.location(), v.length / 3, v);
 	};
 
 	cWebGLRenderingContext.uniformMatrix3fv = function(location, transpose, value) {
+		if (this.isLocationError(location)) {
+			return;
+		}
 		cnvgl.setContext(this._context);
 		cnvgl.uniformMatrix3fv(location.location(), value.length / 9, transpose, value);
 	};
-	
+
 	cWebGLRenderingContext.uniformMatrix4fv = function(location, transpose, value) {
+		if (this.isLocationError(location)) {
+			return;
+		}
 		cnvgl.setContext(this._context);
 		cnvgl.uniformMatrix4fv(location.location(), value.length / 16, transpose, value);
 	};
@@ -970,6 +1000,20 @@ cWebGLRenderingContext = (function() {
 	};
 
 	//private:
+
+	cWebGLRenderingContext.isLocationError = function(l) {
+
+		if (l == null) {
+			return true;
+		}
+
+		if (!(l instanceof cWebGLUniformLocation)) {
+			this.errors.push(this.INVALID_OPERATION);
+			return true;
+		}
+
+		return false;
+	};
 
 	cWebGLRenderingContext.checkReady = function() {
 		var This;
