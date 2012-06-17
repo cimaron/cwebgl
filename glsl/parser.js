@@ -2309,9 +2309,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 						yyval.type_qualifier.flags.q = glsl.ast.type_qualifier.flags.uniform;
 						break;
 
-					  case 173:
+					case 173:
 						yyval = {};
 						yyval.type_specifier = yyvsa[yyvsp].type_specifier;
+						break;
+					
+					case 174:
+						yyval = {};
+						yyval.type_specifier = yyvsa[yyvsp].type_specifier;
+						yyval.type_specifier.precision = yyvsa[yyvsp - 1].n;
 						break;
 
 					case 178:
@@ -2605,7 +2611,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					case 169:
 					case 170:
 					case 171:
-					case 174:
 					case 176:
 					case 177:
 					case 184:
