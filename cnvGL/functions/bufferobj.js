@@ -128,7 +128,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		buffer_obj.size = size;
 
 		if (data) {
-			buffer_obj.bpe = data.BYTES_PER_ELEMENT;
+			buffer_obj.bpe = data.constructor.BYTES_PER_ELEMENT;
 			size /= buffer_obj.bpe;
 			buffer_obj.data = cnvgl.malloc(size);
 			cnvgl.memcpy(buffer_obj.data, 0, data, size, 0);
@@ -175,7 +175,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		if (!buffer_obj.data) {
 			//this won't work 100% of the time (if we bufferSubData with a different type)
-			buffer_obj.bpe = data.BYTES_PER_ELEMENT;
+			buffer_obj.bpe = data.constructor.BYTES_PER_ELEMENT;
 			buffer_obj.data = cnvgl.malloc(buffer_obj.size / buffer_obj.bpe);
 		}
 
