@@ -325,16 +325,18 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		return (errors == 0);
 	}
 
-	/**
-	 * External interface.
-	 */
-	ARB.language.javascript = {
+
+
+/**
+ * External interface.
+ */
+module.exports = {
+	javascript = {
 		translate : translate
-	};
-
-	for (var i in constants) {
-		ARB.language.javascript[i] = constants[i];
 	}
+};
 
-}(ARB));
+for (var i in constants) {
+	module.exports.javascript[i] = constants[i];
+}
 

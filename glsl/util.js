@@ -19,43 +19,26 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-(function(glsl) {
+function isObject(arg) {
+  return typeof arg === 'object' && arg !== null;
+}
 
-	/**
-	 * Preprocesses a source string
-	 *
-	 * @param   string      The source
-	 *
-	 * @return  string
-	 */
-	function preprocess(source) {
-		var output, s, e;
-	
-		//pretty basic, just want to make it work for right now
+/**
+ * Node.js util._extend
+ *
+ * @url   https://github.com/joyent/node/blob/master/lib/util.js
+ */
+module.exports._extend = function(origin, add) {
+  // Don't do anything if add isn't an object
+  if (!add || !isObject(add)) return origin;
 
-		//remove preprocessor directives
-		output = source.replace(/[ \t]*\#[^\n]+/g, '');
+  var keys = Object.keys(add);
+  var i = keys.length;
+  while (i--) {
+    origin[keys[i]] = add[keys[i]];
+  }
+  return origin;
+};
 
-		//remove single-line comments
-		output = output.replace(/\/\/[^\n]*/g, '');
 
-		//remove multi-line comments
-		while ((s = output.indexOf("/*")) != -1) {
-			if ((e = output.indexOf("*/", s + 2)) == -1) {
-				glsl.errors.push("Unterminated comment");
-				return false;
-			}
-			output = output.slice(0, s) + output.slice(e + 2);
-		}
-
-		return output;
-	}
-	
-	/**
-	 * External interface
-	 */
-
-	glsl.preprocess = preprocess;
-
-}(glsl));
 

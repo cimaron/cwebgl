@@ -19,29 +19,37 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-var util = require('./util');
-var parser = require('./parser.jison.js');
-var generator = require('./arb/ir_generator.js');
+var _ins = require('./instruction.js');
+var _parse = require('./parse.js');
+var _javascript = require('./parse.js');
 
-glsl = {
+var ARB = {
 
-	compile : function(source, options) {
+	Instruction : _ins.Instruction,
+	Operand : _ins.Operand,
+	language : 
 
-		var state = parser.compile(source, options);
-
-		var irs = generator.generate(state);
-
-		return irs;
+	language : {
+		javascript : _javascript
 	},
 
-	/**
-	 * Compilation targets
-	 */
-	target : {
-		fragment : 0,
-		vertex : 1,
+	output : "",
+	errors : [],
+
+	translate : function(object_code, lang) {
+		var irs, symbols, engine;
+
+		//this.parse(object_code);
+
+		if (this.errors.count > 0) {
+			return false;	
+		}
+
+		engine = this.language[lang];
+		engine.translate(object_code);
+
+		return (this.errors.length == 0);			
 	}
 };
 
-module.exports = glsl;
 

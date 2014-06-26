@@ -25,7 +25,8 @@ integer "integer"
 */
 
 {
-	ast = glsl.ast;
+	var state = options.state;
+	var ast = options.ast;
 }
 
 
@@ -33,20 +34,21 @@ start
 	= translation_unit
 
 translation_unit
-	= version:version_statement ext:extension_statement_list decl:external_declaration_list {
-		initialize_types(state);
-		//state.symbols = new this.yy.symbol_table();
+	= version:version_statement ! {
 		//initialize_types(state);
+	} ext:extension_statement_list decl:external_declaration_list {
+		//state.symbols = new this.yy.symbol_table();
 		//return ??
-	  }
+	}
 
+/* Line: 229 */
 version_statement
 	= /* blank - no #version specified: defaults are already set */
 	/ VERSION INTCONSTANT EOL { }
 
-
+/* Line: 270 */
 pragma_statement
-	= PRAGMA_DEBUG_ON EOL { return null; }
+	= PRAGMA_DEBUG_ON EOL
 	/*
 	/ PRAGMA_DEBUG_OFF EOL { return null; }
 	/ PRAGMA_OPTIMIZE_ON EOL { return null; }
@@ -56,8 +58,8 @@ pragma_statement
 
 /* Line: 287 */
 extension_statement_list
-	/* Empty Rule */
-	= extension_statement extension_statement_list
+	= /* Empty Rule */
+	/ extension_statement extension_statement_list
 
 /* Line: 292 */
 any_identifier
@@ -73,9 +75,9 @@ extension_statement
 external_declaration_list
 	= decl:external_declaration decl:external_declaration_list_right {
 		if (decl != null) {
-			state.translation_unit.push(decl);
+			state.ast.push(decl);
 		}
-	  }
+	}
 
 external_declaration_list_right
 	=
@@ -133,7 +135,7 @@ multiplicative_expression
 multiplicative_expression_right
 	= 
 	/ '*' right:unary_expression other:multiplicative_expression_right {
-		var expr = new glsl.ast.expression_bin(glsl.ast.operators.mul, null, right);
+		var expr = new ast.expression_bin(ast.operators.mul, null, right);
 		expr.setLocation(line(), column());
 		if (other) {
 			other.subexpressions[0] = expr;
@@ -142,7 +144,7 @@ multiplicative_expression_right
 		return expr;
 	}
 	/ '/' right:unary_expression other:multiplicative_expression_right {
-		var expr = new glsl.ast.expression_bin(glsl.ast.operators.div, null, right);
+		var expr = new ast.expression_bin(ast.operators.div, null, right);
 		expr.setLocation(line(), column());
 		if (other) {
 			other.subexpressions[0] = expr;
@@ -151,7 +153,7 @@ multiplicative_expression_right
 		return expr;
 	}
 	/ '%' right:unary_expression other:multiplicative_expression_right  {
-		var expr = new glsl.ast.expression_bin(glsl.ast.operators.mod, null, right);
+		var expr = new ast.expression_bin(ast.operators.mod, null, right);
 		expr.setLocation(line(), column());
 		if (other) {
 			other.subexpressions[0] = expr;
@@ -175,7 +177,7 @@ additive_expression
 additive_expression_right
 	= 
 	/ '+' right:multiplicative_expression other:additive_expression_right {
-		var expr = new glsl.ast.expression_bin(glsl.ast.operators.add, null, right);
+		var expr = new ast.expression_bin(ast.operators.add, null, right);
 		expr.setLocation(line(), column());
 		if (other) {
 			other.subexpressions[0] = expr;
@@ -184,7 +186,7 @@ additive_expression_right
 		return expr;
 	}
 	/ '-' right:multiplicative_expression other:additive_expression_right {
-		var expr = new glsl.ast.expression_bin(glsl.ast.operators.sub, null, right);
+		var expr = new ast.expression_bin(ast.operators.sub, null, right);
 		expr.setLocation(line(), column());
 		if (other) {
 			other.subexpressions[0] = expr;
@@ -218,7 +220,7 @@ relational_expression
 relational_expression_right
 	=
 	/ '<' right:shift_expression other:relational_expression_right {
-		var expr = new glsl.ast.expression_bin(glsl.ast.operators.less, null, right);
+		var expr = new ast.expression_bin(ast.operators.less, null, right);
 		expr.setLocation(line(), column());
 		if (other) {
 			other.subexpressions[0] = expr;
@@ -302,7 +304,7 @@ conditional_expression
 assignment_expression
 	= conditional_expression
 	/ left:unary_expression op:assignment_operator right:assignment_expression {
-		var expr = new glsl.ast.expression(op, left, right);
+		var expr = new ast.expression(op, left, right);
 		expr.setLocation(line(), column());
 		return expr;
 	}
@@ -336,7 +338,7 @@ declaration
 	/ list:init_declarator_list ';' {
 		return list;
 	}
-	/ PRECISION qual:precision_qualifier spec:type_specifier_no_prec ';' {
+	/ PRECISION SPC qual:precision_qualifier SPC spec:type_specifier_no_prec ';' {
 		spec.type_specifier.precision = qual;
 		spec.type_specifier.is_precision_statement = true;
 		return spec;
@@ -366,7 +368,7 @@ function_header_with_parameters_right
 /* Line: 804 */
 function_header
 	= type:fully_specified_type ident:variable_identifier '(' {
-		var func = new glsl.ast['function']();
+		var func = new ast['function']();
 		func.setLocation(line(), column());
 		func.return_type = type;
 		func.identifier = ident;
@@ -386,9 +388,9 @@ parameter_declaration
 	/ qual:parameter_qualifier decl:parameter_declarator { }
 	/ type:parameter_type_qualifier qual:parameter_qualifier spec:parameter_type_specifier { }
 	/ qual:parameter_qualifier spec:parameter_type_specifier {
-		var pd = new glsl.ast.parameter_declarator();
+		var pd = new ast.parameter_declarator();
 		pd.setLocation(line(), column());
-		pd.type = new glsl.ast.fully_specified_type();
+		pd.type = new ast.fully_specified_type();
 		pd.type.qualifier = qual;
 		pd.type.specifier = spec;
 		return pd;
@@ -398,7 +400,7 @@ parameter_declaration
 parameter_qualifier
 	= {
 		console.log('Figure this out');
-		//yyval.type_qualifier = new glsl.ast.type_qualifier();
+		//yyval.type_qualifier = new ast.type_qualifier();
 	}
 	/ IN_TOK { }
 	/ OUT_TOK { }
@@ -428,28 +430,28 @@ single_declaration
 		if (type.specifier.type_specifier != glsl.type.struct) {
 			expected("empty declaration list");
 		} else {
-			var dl = new glsl.ast.declarator_list(type);
+			var dl = new ast.declarator_list(type);
 			dl.setLocation(line(), column());
 			return dl;
 		}
 	}
 	/ type:fully_specified_type ident:any_identifier {
-		var decl = new glsl.ast.declaration(ident, false);
-		var dl = new glsl.ast.declarator_list(type);
+		var decl = new ast.declaration(ident, false);
+		var dl = new ast.declarator_list(type);
 		dl.setLocation(line(), column());
 		dl.declarations.push(decl);
 		return dl;
 	}
 	/ type:fully_specified_type ident:any_identifier '[' ']' {
-		var decl = new glsl.ast.declaration(ident, true);
-		var dl = new glsl.ast.declarator_list(type);
+		var decl = new ast.declaration(ident, true);
+		var dl = new ast.declarator_list(type);
 		dl.setLocation(line(), column());
 		dl.declarations.push(decl);
 		return dl;
 	}
 	/ type:fully_specified_type ident:any_identifier '[' expr:constant_expression ']' {
-		var decl = new glsl.ast.declaration(ident, true, expr);
-		var dl = new glsl.ast.declarator_list(type);
+		var decl = new ast.declaration(ident, true, expr);
+		var dl = new ast.declarator_list(type);
 		dl.setLocation(line(), column());
 		dl.declarations.push(decl);
 		return dl;
@@ -457,8 +459,8 @@ single_declaration
 	/ fully_specified_type any_identifier '[' ']' '=' initializer { }
 	/ fully_specified_type any_identifier '[' constant_expression ']' '=' initializer { }
 	/ type:fully_specified_type ident:any_identifier '=' init:initializer {
-		var decl = new glsl.ast.declaration(ident, false, null, expr);
-		var dl = new glsl.ast.declarator_list(type);
+		var decl = new ast.declaration(ident, false, null, expr);
+		var dl = new ast.declarator_list(type);
 		dl.setLocation(line(), column());
 		dl.declarations.push(decl);
 		return dl;
@@ -468,13 +470,13 @@ single_declaration
 /* Line: 1049 */
 fully_specified_type
 	= spec:type_specifier {
-		var fst = new glsl.ast.fully_specified_type();
+		var fst = new ast.fully_specified_type();
 		fst.setLocation(line(), column());
 		fst.specifier = spec;
 		return fst;
 	}
 	/ qual:type_qualifier spec:type_specifier {
-		var fst = new glsl.ast.fully_specified_type();
+		var fst = new ast.fully_specified_type();
 		fst.setLocation(line(), column());
 		fst.qualifier = qual;
 		fst.specifier = spec;
@@ -515,61 +517,61 @@ parameter_type_qualifier
 type_qualifier
 	= storage_qualifier
 	/ layout_qualifier
-	/ layout_qualifier storage_qualifier { }
+	/ layout_qualifier SPC storage_qualifier { }
 	/ interpolation_qualifier
-	/ interpolation_qualifier storage_qualifier { }
+	/ interpolation_qualifier SPC storage_qualifier { }
 	/ INVARIANT storage_qualifier { }
-	/ INVARIANT interpolation_qualifier storage_qualifier { }
+	/ INVARIANT interpolation_qualifier SPC storage_qualifier { }
 	/ INVARIANT { }
 
 /* Line: 1222 */
 storage_qualifier
 	= CONST_TOK {
-		var tq = new glsl.ast.type_qualifier();
-		tq.flags.q |= glsl.ast.type_qualifier.flags.constant;
+		var tq = new ast.type_qualifier();
+		tq.flags |= ast.type_qualifier.flags.constant;
 		return tq;
 	}
 	/ ATTRIBUTE {
-		var tq = new glsl.ast.type_qualifier();
-		tq.flags.q |= glsl.ast.type_qualifier.flags.attribute;
+		var tq = new ast.type_qualifier();
+		tq.flags |= ast.type_qualifier.flags.attribute;
 		return tq;
 	}
 	/ VARYING {
-		var tq = new glsl.ast.type_qualifier();
-		tq.flags.q |= glsl.ast.type_qualifier.flags.varying;
+		var tq = new ast.type_qualifier();
+		tq.flags |= ast.type_qualifier.flags.varying;
 		return tq;
 	}
 	/ CENTROID VARYING {
-		var tq = new glsl.ast.type_qualifier();
-		tq.flags.q |= glsl.ast.type_qualifier.flags.centroid;
-		tq.flags.q |= glsl.ast.type_qualifier.flags.varying;
+		var tq = new ast.type_qualifier();
+		tq.flags.q |= ast.type_qualifier.flags.centroid;
+		tq.flags.q |= ast.type_qualifier.flags.varying;
 		return tq;
 	}
 	/ IN_TOK {
-		var tq = new glsl.ast.type_qualifier();
-		tq.flags.q |= glsl.ast.type_qualifier.flags['in'];
+		var tq = new ast.type_qualifier();
+		tq.flags.q |= ast.type_qualifier.flags['in'];
 		return tq;
 	}
 	/ OUT_TOK {
-		var tq = new glsl.ast.type_qualifier();
-		tq.flags.q |= glsl.ast.type_qualifier.flags.out;
+		var tq = new ast.type_qualifier();
+		tq.flags.q |= ast.type_qualifier.flags.out;
 		return tq;
 	}
 	/ CENTROID IN_TOK {
-		var tq = new glsl.ast.type_qualifier();
-		tq.flags.q |= glsl.ast.type_qualifier.flags.centroid;
-		tq.flags.q |= glsl.ast.type_qualifier.flags['in'];
+		var tq = new ast.type_qualifier();
+		tq.flags.q |= ast.type_qualifier.flags.centroid;
+		tq.flags.q |= ast.type_qualifier.flags['in'];
 		return tq;
 	}
 	/ CENTROID OUT_TOK {
-		var tq = new glsl.ast.type_qualifier();
-		tq.flags.q |= glsl.ast.type_qualifier.flags.centroid;
-		tq.flags.q |= glsl.ast.type_qualifier.flags.out;
+		var tq = new ast.type_qualifier();
+		tq.flags.q |= ast.type_qualifier.flags.centroid;
+		tq.flags.q |= ast.type_qualifier.flags.out;
 		return tq;
 	}
 	/ UNIFORM {
-		var tq = new glsl.ast.type_qualifier();
-		tq.flags.q |= glsl.ast.type_qualifier.flags.uniform;
+		var tq = new ast.type_qualifier();
+		tq.flags.q |= ast.type_qualifier.flags.uniform;
 		return tq;
 	}
 
@@ -578,7 +580,7 @@ type_specifier
 	= spec:type_specifier_no_prec {
 		return spec;
 	}
-	/ qual:precision_qualifier spec:type_specifier_no_prec {
+	/ qual:precision_qualifier SPC spec:type_specifier_no_prec {
 		spec.precision = qual;
 	}
 
@@ -591,17 +593,17 @@ type_specifier_no_prec
 /* Line: 1299 */
 type_specifier_nonarray
 	= spec:basic_type_specifier_nonarray {
-		var ts = new glsl.ast.type_specifier(spec);
+		var ts = new ast.type_specifier(spec);
 		ts.setLocation(line(), column());
 		return ts;
 	}
 	/ spec:struct_specifier {
-		var ts = new glsl.ast.type_specifier(spec);
+		var ts = new ast.type_specifier(spec);
 		ts.setLocation(line(), column());
 		return ts;
 	}
 	/ ident:TYPE_IDENTIFIER {
-		var ts = new glsl.ast.type_specifier(ident);
+		var ts = new ast.type_specifier(ident);
 		ts.setLocation(line(), column());
 		return ts;
 	}
@@ -666,25 +668,25 @@ precision_qualifier
 		/*if (!state.es_shader && state.language_version < 130) {
 			yyerror(yylsa[yylsp], state, "precision qualifier forbidden in %s (1.30 or later required)\n", state.version_string);
 		}*/
-		return glsl.ast.precision.high;
+		return ast.precision.high;
 	}
 	/ MEDIUMP {
 		/*if (!state.es_shader && state.language_version < 130) {
 			yyerror(yylsa[yylsp], state, "precision qualifier forbidden in %s (1.30 or later required)\n", state.version_string);
 		}*/
-		return glsl.ast.precision.medium;
+		return ast.precision.medium;
 	}
 	/ LOWP {
 		/*if (!state.es_shader && state.language_version < 130) {
 			yyerror(yylsa[yylsp], state, "precision qualifier forbidden in %s (1.30 or later required)\n", state.version_string);
 		}*/
-		return glsl.ast.precision.low;
+		return ast.precision.low;
 	}
 
 /* Line: 1407 */
 struct_specifier
 	= STRUCT ident:any_identifier '{' list:struct_declaration_list '}' {
-		var ss = new glsl.ast.struct_specifier(ident, list);
+		var ss = new ast.struct_specifier(ident, list);
 		ss.setLocation(line(), column());
 		state.symbols.add_type(ident, glsl.type.void_type);
 		return ss;
@@ -707,10 +709,10 @@ struct_declaration_list
 /* Line: 1436 */
 struct_declaration
 	= spec:type_specifier list:struct_declarator_list ';' {
-		var type = new glsl.ast.fully_specified_type();
+		var type = new ast.fully_specified_type();
 		type.setLocation(line(), column());
 		type.specifier = spec;
-		var dl = new glsl.ast.declarator_list(type);
+		var dl = new ast.declarator_list(type);
 		dl.setLocation(line(), column());
 		dl.declarations.unshift(list);
 		return dl;
@@ -728,7 +730,7 @@ struct_declarator_list_right
 /* Line: 1464 */
 struct_declarator
 	= ident:any_identifier {
-		var dl = new glsl.ast.declaration(ident, false);
+		var dl = new ast.declaration(ident, false);
 		dl.setLocation(line(), column());
 		state.symbols.add_variable(ident);
 		return dl;
@@ -765,11 +767,10 @@ simple_statement
 /* Line: 1505 */
 compound_statement
 	= '{' '}' { }
-	/ '{' {
-		state.symbols.push_scope();
-	}
-	/ list:statement_list '}' {
-		var cs = new glsl.ast.compound_statement(true, list);
+	/ '{' ! {
+		state.symbols.push_scope(); return false;
+	} list:statement_list '}' {
+		var cs = new ast.compound_statement(true, list);
 		cs.setLocation(line(), column());
 		state.symbols.pop_scope();
 		return cs;
@@ -784,7 +785,7 @@ statement_no_new_scope
 compound_statement_no_new_scope
 	= '{' '}' { }
 	/ '{' list:statement_list '}' {
-		var cs = new glsl.ast.compound_statement(false, list);
+		var cs = new ast.compound_statement(false, list);
 		cs.setLocation(line(), column());
 		return cs;
 	}
@@ -793,7 +794,7 @@ compound_statement_no_new_scope
 /* Note: Rewrote left recursion logic */
 statement_list
 	= 
-	/* / stmt:statement list:statement_list {		
+	/ stmt:statement list:statement_list {		
 		
 		if (stmt == null) {
 			expected("<nil> statement");
@@ -805,13 +806,13 @@ statement_list
 		
 		list.unshift(stmt);
 		return list;
-	}*/
+	}
 
 /* Line: 1567 */
 expression_statement
 	= ';' { }
 	/ expr:expression ';' {
-		var n = new glsl.ast.expression_statement(expr);
+		var n = new ast.expression_statement(expr);
 		n.setLocation(line(), column());
 		return n;
 	}
@@ -819,7 +820,7 @@ expression_statement
 /* Line: 1582 */
 selection_statement
 	= IF '(' expr:expression ')' stmt:selection_rest_statement {
-		var node = new glsl.ast.selection_statement(expr, stmt.then_statement, stmt.else_statement);
+		var node = new ast.selection_statement(expr, stmt.then_statement, stmt.else_statement);
 		node.setLocation(line(), column());
 	}
 
@@ -868,7 +869,7 @@ for_init_statement
 /* Line: 1660 */
 conditionopt
 	= condition
-	/*/ { return null; }*/
+	/ { return null; }
 
 /* Line: 1668 */
 for_rest_statement
@@ -892,7 +893,7 @@ external_declaration
 /* Line: 1721 */
 function_definition
 	= proto:function_prototype stmt:compound_statement_no_new_scope {
-		var fd = new glsl.ast.function_definition();
+		var fd = new ast.function_definition();
 		fd.setLocation(line(), column());
 		fd.proto_type = proto;
 		fd.body = stmt;
@@ -1121,3 +1122,9 @@ IMAGEBUFFER = "imageBuffer"
 IIMAGEBUFFER = "iimageBuffer"
 UIMAGEBUFFER = "uimageBuffer"
 ROW_MAJOR = "row_major"
+
+SPC = WS
+
+WS
+  = "\t"
+  / " "

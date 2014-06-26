@@ -16,32 +16,27 @@ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-var util = require('./util');
-var parser = require('./parser.jison.js');
-var generator = require('./arb/ir_generator.js');
+function ARBProgram() {
+	this.profile = "!!ARBvp1.0";
+	this.semantic = [];
+	this.vars = [];
 
-glsl = {
+	this.body = [];
+}
 
-	compile : function(source, options) {
+var proto = ARBProgram.prototype;
 
-		var state = parser.compile(source, options);
 
-		var irs = generator.generate(state);
-
-		return irs;
-	},
-
-	/**
-	 * Compilation targets
-	 */
-	target : {
-		fragment : 0,
-		vertex : 1,
-	}
+proto.addSemantic = function(s) {
+	this.semantic.push(s);
 };
 
-module.exports = glsl;
+proto.addVar = function(name, type) {
+	this.vars.push({n:name, t:type});
+};
+
+
 
