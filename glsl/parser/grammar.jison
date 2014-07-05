@@ -20,8 +20,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 %{
-	var ast = require('./ast.js');
-	var type = require('./type.js').types;
 %}
 
 /* lexical grammar */
@@ -351,12 +349,12 @@ extension_statement:
 /* Line: 307 */
 external_declaration_list:
 	  external_declaration {
-			if ($1 != null) {
+			if ($1 !== null) {
 				yy.state.translation_unit.push($1);
 			}
 		}
 	| external_declaration_list external_declaration {
-			if ($2 != null) {
+			if ($2 !== null) {
 				yy.state.translation_unit.push($2);
 			}
 		}
@@ -370,12 +368,23 @@ variable_identifier:
 
 /* Line: 331 */
 primary_expression:
-			variable_identifier
-		|	'INTCONSTANT'
-		|	'UINTCONSTANT'
-		|	'FLOATCONSTANT'
-		|	'BOOLCONSTANT'
-		|	'(' expression ')'
+		  variable_identifier {
+				$$ = new AstExpression('ident');
+				$$.setLocation(@1);
+				$$.primary_expression.identifier = $1; }
+		| 'INTCONSTANT' {
+				$$ = new AstExpression('int');
+				$$.setLocation(@1);
+				$$.primary_expression.int_constant = $1; }
+		| 'FLOATCONSTANT' {
+				$$ = new AstExpression('float');
+				$$.setLocation(@1);
+				$$.primary_expression.float_constant = $1; }
+		| 'BOOLCONSTANT' {
+				$$ = new AstExpression('bool');
+				$$.setLocation(@1);
+				$$.primary_expression.bool_constant = $1; }
+		| '(' expression ')'
 		;
 
 /* Line: 373 */
@@ -420,18 +429,20 @@ function_call_header_no_parameters:
 function_call_header_with_parameters:
 		  function_call_header assignment_expression {
 				$$ = $1;
-				$$.setLocation(@1.first_line, @1.first_column);
-				$$.expressions.push($2);
-			}	
-		|  function_call_header_with_parameters ',' assignment_expression
+				$$.setLocation(@1);
+				$$.expressions.push($2); }	
+		|  function_call_header_with_parameters ',' assignment_expression {
+				$$ = $1;
+				$$.setLocation(@1);
+				$$.expressions.push($3); }	
 		;
 
 /* Line: 452 */
 /* Fix conflict */
 function_call_header:
 		  type_specifier '(' {
-				$$ = new ast.function_expression($1);
-				$$.setLocation(@1.first_line, @1.first_column);
+				$$ = new AstFunctionExpression($1);
+				$$.setLocation(@1);
 			}
 		| variable_identifier '('
 		| 'FIELD_SELECTION'
@@ -478,16 +489,16 @@ method_call_header:
 unary_expression:
 		  postfix_expression
 		| '++' unary_expression {
-				$$ = new ast.expression($1, $2);
-				$$.setLocation(@1.first_line, @1.first_column);
+				$$ = new AstExpression($1, $2);
+				$$.setLocation(@1);
 			}
 		| '--' unary_expression {
-				$$ = new ast.expression($1, $2);
-				$$.setLocation(@1.first_line, @1.first_column);
+				$$ = new AstExpression($1, $2);
+				$$.setLocation(@1);
 			}
 		| unary_operator unary_expression {
-				$$ = new ast.expression($1, $2);
-				$$.setLocation(@1.first_line, @1.first_column);
+				$$ = new AstExpression($1, $2);
+				$$.setLocation(@1);
 			}
 		;
 
@@ -504,16 +515,16 @@ unary_operator:
 multiplicative_expression:
 		  unary_expression
 		| multiplicative_expression '*' unary_expression {
-				$$ = new ast.expression_bin($2, $1, $3);
-				$$.setLocation(@1.first_line, @1.first_column);
+				$$ = new AstExpressionBin($2, $1, $3);
+				$$.setLocation(@1);
 			}
 		| multiplicative_expression '/' unary_expression {
-				$$ = new ast.expression_bin($2, $1, $3);
-				$$.setLocation(@1.first_line, @1.first_column);
+				$$ = new AstExpressionBin($2, $1, $3);
+				$$.setLocation(@1);
 			}
 		| multiplicative_expression '%' unary_expression {
-				$$ = new ast.expression_bin($2, $1, $3);
-				$$.setLocation(@1.first_line, @1.first_column);
+				$$ = new AstExpressionBin($2, $1, $3);
+				$$.setLocation(@1);
 			}
 		;
 
@@ -521,12 +532,12 @@ multiplicative_expression:
 additive_expression:
 		  multiplicative_expression
 		| additive_expression '+' multiplicative_expression {
-				$$ = new ast.expression_bin($2, $1, $3);
-				$$.setLocation(@1.first_line, @1.first_column);
+				$$ = new AstExpressionBin($2, $1, $3);
+				$$.setLocation(@1);
 			}
 		| additive_expression '-' multiplicative_expression {
-				$$ = new ast.expression_bin($2, $1, $3);
-				$$.setLocation(@1.first_line, @1.first_column);
+				$$ = new AstExpressionBin($2, $1, $3);
+				$$.setLocation(@1);
 			}
 		;
 
@@ -534,12 +545,12 @@ additive_expression:
 shift_expression:
 		  additive_expression
 		| shift_expression '<<' additive_expression {
-				$$ = new ast.expression_bin($2, $1, $3);
-				$$.setLocation(@1.first_line, @1.first_column);
+				$$ = new AstExpressionBin($2, $1, $3);
+				$$.setLocation(@1);
 			}
 		| shift_expression '>>' additive_expression {
-				$$ = new ast.expression_bin($2, $1, $3);
-				$$.setLocation(@1.first_line, @1.first_column);
+				$$ = new AstExpressionBin($2, $1, $3);
+				$$.setLocation(@1);
 			}
 		;
 
@@ -547,20 +558,20 @@ shift_expression:
 relational_expression:
 		  shift_expression
 		| relational_expression '<' shift_expression {
-				$$ = new ast.expression_bin($2, $1, $3);
-				$$.setLocation(@1.first_line, @1.first_column);
+				$$ = new AstExpressionBin($2, $1, $3);
+				$$.setLocation(@1);
 			}
 		| relational_expression '>' shift_expression {
-				$$ = new ast.expression_bin($2, $1, $3);
-				$$.setLocation(@1.first_line, @1.first_column);
+				$$ = new AstExpressionBin($2, $1, $3);
+				$$.setLocation(@1);
 			}
 		| relational_expression '<=' shift_expression {
-				$$ = new ast.expression_bin($2, $1, $3);
-				$$.setLocation(@1.first_line, @1.first_column);
+				$$ = new AstExpressionBin($2, $1, $3);
+				$$.setLocation(@1);
 			}
 		| relational_expression '>=' shift_expression {
-				$$ = new ast.expression_bin($2, $1, $3);
-				$$.setLocation(@1.first_line, @1.first_column);
+				$$ = new AstExpressionBin($2, $1, $3);
+				$$.setLocation(@1);
 			}
 		;
 
@@ -568,12 +579,12 @@ relational_expression:
 equality_expression:
 		  relational_expression
 		| equality_expression '==' relational_expression {
-				$$ = new ast.expression_bin($2, $1, $3);
-				$$.setLocation(@1.first_line, @1.first_column);
+				$$ = new AstExpressionBin($2, $1, $3);
+				$$.setLocation(@1);
 			}
 		| equality_expression '!=' relational_expression {
-				$$ = new ast.expression_bin($2, $1, $3);
-				$$.setLocation(@1.first_line, @1.first_column);
+				$$ = new AstExpressionBin($2, $1, $3);
+				$$.setLocation(@1);
 			}
 		;
 
@@ -581,8 +592,8 @@ equality_expression:
 and_expression:
 		  equality_expression
 		| and_expression '&' equality_expression {
-				$$ = new ast.expression_bin($2, $1, $3);
-				$$.setLocation(@1.first_line, @1.first_column);
+				$$ = new AstExpressionBin($2, $1, $3);
+				$$.setLocation(@1);
 			}
 		;
 
@@ -590,8 +601,8 @@ and_expression:
 exclusive_or_expression:
 		  and_expression
 		| exclusive_or_expression '^' and_expression {
-				$$ = new ast.expression_bin($2, $1, $3);
-				$$.setLocation(@1.first_line, @1.first_column);
+				$$ = new AstExpressionBin($2, $1, $3);
+				$$.setLocation(@1);
 			}
 		;
 
@@ -599,8 +610,8 @@ exclusive_or_expression:
 inclusive_or_expression:
 		  exclusive_or_expression
 		| inclusive_or_expression '|' exclusive_or_expression {
-				$$ = new ast.expression_bin($2, $1, $3);
-				$$.setLocation(@1.first_line, @1.first_column);
+				$$ = new AstExpressionBin($2, $1, $3);
+				$$.setLocation(@1);
 			}
 		;
 
@@ -608,8 +619,8 @@ inclusive_or_expression:
 logical_and_expression:
 		  inclusive_or_expression
 		| logical_and_expression '&&' inclusive_or_expression {
-				$$ = new ast.expression_bin($2, $1, $3);
-				$$.setLocation(@1.first_line, @1.first_column);
+				$$ = new AstExpressionBin($2, $1, $3);
+				$$.setLocation(@1);
 			}
 		;
 
@@ -617,8 +628,8 @@ logical_and_expression:
 logical_xor_expression:
 		  logical_and_expression
 		| logical_xor_expression '^^' logical_and_expression {
-				$$ = new ast.expression_bin($2, $1, $3);
-				$$.setLocation(@1.first_line, @1.first_column);
+				$$ = new AstExpressionBin($2, $1, $3);
+				$$.setLocation(@1);
 			}
 		;
 
@@ -626,8 +637,8 @@ logical_xor_expression:
 logical_or_expression:
 		  logical_xor_expression
 		| logical_or_expression '||' logical_xor_expression {
-				$$ = new ast.expression_bin($2, $1, $3);
-				$$.setLocation(@1.first_line, @1.first_column);
+				$$ = new AstExpressionBin($2, $1, $3);
+				$$.setLocation(@1);
 			}
 		;
 
@@ -635,8 +646,8 @@ logical_or_expression:
 conditional_expression:
 		  logical_or_expression
 		| logical_or_expression '?' expression ':' assignment_expression {
-				$$ = new ast.expression($2, $1, $3, $5);
-				$$.setLocation(@1.first_line, @1.first_column);
+				$$ = new AstExpression($2, $1, $3, $5);
+				$$.setLocation(@1);
 			}
 		;
 
@@ -644,8 +655,8 @@ conditional_expression:
 assignment_expression:
 		  conditional_expression
 		| unary_expression assignment_operator assignment_expression {
-				$$ = new ast.expression($2, $1, $3);
-				$$.setLocation(@1.first_line, @1.first_column);
+				$$ = new AstExpression($2, $1, $3);
+				$$.setLocation(@1);
 			}
 		;
 
@@ -670,9 +681,9 @@ expression:
 				$$ = $1;
 			}
 		| expression ',' assignment_expression {
-				if ($1.oper != $2) {
-					$$ = new ast.expression($2);
-					$$.setLocation(@1.first_line, @1.first_column);
+				if ($1.oper !== $2) {
+					$$ = new AstExpression($2);
+					$$.setLocation(@1);
 					$$.expressions.push($1);
 				} else {
 					$$ = $1;
@@ -721,8 +732,8 @@ function_header_with_parameters:
 /* Line: 804 */
 function_header:
 		  fully_specified_type variable_identifier '(' {
-				$$ = new ast.func();
-				$$.setLocation(@1.first_line, @1.first_column);
+				$$ = new AstFunction();
+				$$.setLocation(@1);
 				$$.return_type = $1;
 				$$.identifier = $2;
 				yy.state.symbols.add_function($2);
@@ -742,9 +753,9 @@ parameter_declaration:
 		| parameter_qualifier parameter_declarator
 		| parameter_type_qualifier parameter_qualifier parameter_type_specifier
 		| parameter_qualifier parameter_type_specifier {
-				$$ = new ast.parameter_declarator();
-				$$.setLocation(@1.first_line, @1.first_column);
-				$$.type = new ast.fully_specified_type();
+				$$ = new AstParameterDeclarator();
+				$$.setLocation(@1);
+				$$.type = new AstFullySpecifiedType();
 				$$.type.qualifier = $1;
 				$$.type.specifier = $2;
 			}
@@ -778,73 +789,63 @@ init_declarator_list:
 /* Line: 969 */
 single_declaration:
 		  fully_specified_type {
-				if ($1.specifier.type_specifier != types.struct) {
+				if ($1.specifier.type_specifier !== types.struct) {
 					yy.state.error(@1, "empty declaration list");
 					return 0;
-				} else {
-					$$ = new ast.declarator_list($1);
-					$$.setLocation(@1.first_line, @1.first_column);
 				}
-			}
+
+				$$ = new AstDeclaratorList($1);
+				$$.setLocation(@1); }
 		| fully_specified_type any_identifier {
-				var decl = new ast.declaration($2, false);
-				$$ = new ast.declarator_list($1);
-				$$.setLocation(@1.first_line, @1.first_column);
-				$$.declarations.push(decl);
-			}
+				var decl = new AstDeclaration($2, false);
+				$$ = new AstDeclaratorList($1);
+				$$.setLocation(@1);
+				$$.declarations.push(decl); }
 		| fully_specified_type any_identifier '[' ']' {
-				var decl = new ast.declaration($2, true);
-				$$ = new ast.declarator_list($1);
-				$$.setLocation(@1.first_line, @1.first_column);
-				$$.declarations.push(decl);
-			}
+				var decl = new AstDeclaration($2, true);
+				$$ = new AstDeclaratorList($1);
+				$$.setLocation(@1);
+				$$.declarations.push(decl); }
 		| fully_specified_type any_identifier '[' constant_expression ']' {
-				var decl = new ast.declaration($2, true, $4);
-				$$ = new ast.declarator_list($1);
-				$$.setLocation(@1.first_line, @1.first_column);
-				$$.declarations.push(decl);
-			}
+				var decl = new AstDeclaration($2, true, $4);
+				$$ = new AstDeclaratorList($1);
+				$$.setLocation(@1);
+				$$.declarations.push(decl); }
 		| fully_specified_type any_identifier '[' ']' '=' initializer {
-				var decl = new ast.declaration($2, true, null, $6);
-				$$ = new ast.declarator_list($1);
-				$$.setLocation(@1.first_line, @1.first_column);
-				$$.declarations.push(decl);
-			}
+				var decl = new AstDeclaration($2, true, null, $6);
+				$$ = new AstDeclaratorList($1);
+				$$.setLocation(@1);
+				$$.declarations.push(decl); }
 		| fully_specified_type any_identifier '[' constant_expression ']' '=' initializer {
-				var decl = new ast.declaration($2, true, $4, $7);
-				$$ = new ast.declarator_list($1);
-				$$.setLocation(@1.first_line, @1.first_column);
-				$$.declarations.push(decl);
-			}
+				var decl = new AstDeclaration($2, true, $4, $7);
+				$$ = new AstDeclaratorList($1);
+				$$.setLocation(@1);
+				$$.declarations.push(decl); }
 		| fully_specified_type any_identifier '=' initializer {
-				var decl = new ast.declaration($2, false, null, $4);
-				$$ = new ast.declarator_list($1);
-				$$.setLocation(@1.first_line, @1.first_column);
-				$$.declarations.push(decl);
-			}
+				var decl = new AstDeclaration($2, false, null, $4);
+				$$ = new AstDeclaratorList($1);
+				$$.setLocation(@1);
+				$$.declarations.push(decl); }
 		| 'INVARIANT' variable_identifier
 		;
 
 /* Line: 1049 */
 fully_specified_type:
 		  type_specifier {
-				$$ = new ast.fully_specified_type();
-				$$.setLocation(@1.first_line, @1.first_column);
-				$$.specifier = $1;
-			}
+				$$ = new AstFullySpecifiedType();
+				$$.setLocation(@1);
+				$$.specifier = $1; }
 		| type_qualifier type_specifier {
-				$$ = new ast.fully_specified_type();
-				$$.setLocation(@1.first_line, @1.first_column);
+				$$ = new AstFullySpecifiedType();
+				$$.setLocation(@1);
 				$$.qualifier = $1;
-				$$.specifier = $2;
-			}
+				$$.specifier = $2; }
 		;
 
 /* Line: 1067 */
 layout_qualifier:
 		  'LAYOUT' '(' layout_qualifier_id_list ')' {
-				$$ = $3;	
-			}
+				$$ = $3; }
 		;
 
 /* Line: 1074 */
@@ -888,39 +889,40 @@ type_qualifier:
 storage_qualifier:
 		  'CONST'
 		| 'ATTRIBUTE' /* Vertex only. */ {
-				$$ = new ast.type_qualifier();
-				$$.flags |= ast.type_qualifier.flags.attribute;
+				/*jslint bitwise: true */
+				$$ = new AstTypeQualifier();
+				$$.flags |= AstTypeQualifier.flags.attribute;
 			}
 		| 'VARYING' {
-				$$ = new ast.type_qualifier();
-				$$.flags |= ast.type_qualifier.flags.varying;
+				$$ = new AstTypeQualifier();
+				$$.flags |= AstTypeQualifier.flags.varying;
 			}
 		| 'CENTROID' 'VARYING' {
-				$$ = new ast.type_qualifier();
-				$$.flags |= ast.type_qualifier.flags.centroid;
-				$$.flags |= ast.type_qualifier.flags.varying;
+				$$ = new AstTypeQualifier();
+				$$.flags |= AstTypeQualifier.flags.centroid;
+				$$.flags |= AstTypeQualifier.flags.varying;
 			}
 		| 'IN' {
-				$$ = new ast.type_qualifier();
-				$$.flags |= ast.type_qualifier.flags['in'];
+				$$ = new AstTypeQualifier();
+				$$.flags |= AstTypeQualifier.flags['in'];
 			}
 		| 'OUT' {
-				$$ = new ast.type_qualifier();
-				$$.flags |= ast.type_qualifier.flags.out;
+				$$ = new AstTypeQualifier();
+				$$.flags |= AstTypeQualifier.flags.out;
 			}
 		| 'CENTROID' 'IN' {
-				$$ = new ast.type_qualifier();
-				$$.flags |= ast.type_qualifier.flags.centroid;
-				$$.flags |= ast.type_qualifier.flags['in'];
+				$$ = new AstTypeQualifier();
+				$$.flags |= AstTypeQualifier.flags.centroid;
+				$$.flags |= AstTypeQualifier.flags['in'];
 			}
 		| 'CENTROID' 'OUT' {
-				$$ = new ast.type_qualifier();
-				$$.flags |= ast.type_qualifier.flags.centroid;
-				$$.flags |= ast.type_qualifier.flags.out;
+				$$ = new AstTypeQualifier();
+				$$.flags |= AstTypeQualifier.flags.centroid;
+				$$.flags |= AstTypeQualifier.flags.out;
 			}
 		| 'UNIFORM' {
-				$$ = new ast.type_qualifier();
-				$$.flags |= ast.type_qualifier.flags.uniform;
+				$$ = new AstTypeQualifier();
+				$$.flags |= AstTypeQualifier.flags.uniform;
 			}
 		;
 
@@ -945,16 +947,16 @@ type_specifier_no_prec:
 /* Line: 1299 */
 type_specifier_nonarray:
 	  basic_type_specifier_nonarray {
-		  	$$ = new ast.type_specifier($1);
-			$$.setLocation(@1.first_line, @1.first_column);
+		  	$$ = new AstTypeSpecifier($1);
+			$$.setLocation(@1);
 		}
 	| struct_specifier {
-		  	$$ = new ast.type_specifier($1);
-			$$.setLocation(@1.first_line, @1.first_column);
+		  	$$ = new AstTypeSpecifier($1);
+			$$.setLocation(@1);
 		}
 	| 'TYPE_IDENTIFIER' {
-		  	$$ = new ast.type_specifier($1);
-			$$.setLocation(@1.first_line, @1.first_column);
+		  	$$ = new AstTypeSpecifier($1);
+			$$.setLocation(@1);
 		}
 	;
 
@@ -997,8 +999,8 @@ precision_qualifier:
 /* Line: 1407 */
 struct_specifier:
 		  'STRUCT' any_identifier '{' struct_declaration_list '}' {
-				$$ = new ast.struct_specifier($2, $4);
-				$$.setLocation(@1.first_line, @2.first_column);
+				$$ = new AstStructSpecifier($2, $4);
+				$$.setLocation(@1);
 				yy.state.symbols.add_type($2, types._void);
 			}			  
 		| 'STRUCT' '{' struct_declaration_list '}'
@@ -1018,13 +1020,13 @@ struct_declaration_list:
 /* Line: 1436 */
 struct_declaration:
 		  type_specifier struct_declarator_list ';' {
-				var type = new ast.fully_specified_type();
-				type.setLocation(@1.first_line, @2.first_column);
+				var type = new AstFullySpecifiedType();
+				type.setLocation(@1);
 				type.specifier = $1;
-				$$ = new ast.declarator_list(type);
-				$$.setLocation(@1.first_line, @2.first_column);
-				$$.declarations = $2;
-			}
+				
+				$$ = new AstDeclaratorList(type);
+				$$.setLocation(@1);
+				$$.declarations = $2; }
 		;
 
 /* Line: 1451 */
@@ -1036,8 +1038,8 @@ struct_declarator_list:
 /* Line: 1464 */
 struct_declarator:
 		  any_identifier {
-				$$ = new ast.declaration(ident, false);
-				$$.setLocation(@1.first_line, @2.first_column);
+				$$ = new AstDeclaration($1, false);
+				$$.setLocation(@1);
 				yy.state.symbols.add_variable($1);
 			}
 		| any_identifier '[' constant_expression ']'
@@ -1090,21 +1092,21 @@ statement_no_new_scope:
 compound_statement_no_new_scope:
 		  '{' '}'
 		| '{' statement_list '}' {
-				$$ = new ast.compound_statement(false, $2);
-				$$.setLocation(@1.first_line, @1.first_column); console.log('compound_statement_no_new_scope', $$); }
+				$$ = new AstCompoundStatement(false, $2);
+				$$.setLocation(@1); }
 		;
 
 /* Line: 1545 */
 statement_list:
 		  statement {
-				if ($1 == null) {
+				if ($1 === null) {
 					yy.state.error(@1, "<nil> statement\n");
 				} else {
 					$$ = [$1];
 				}
 			}
 		| statement_list statement {
-				if ($2 == null) {
+				if ($2 === null) {
 					yy.state.error(@1, "<nil> statement");	
 				}
 				$$ = $1;
@@ -1116,8 +1118,8 @@ statement_list:
 expression_statement:
 		  ';'
 		| expression ';' {
-				$$ = new ast.expression_statement($1);
-				$$.setLocation(@1.first_line, @2.first_column); console.log('expression_statement', $$); }
+				$$ = new AstExpressionStatement($1);
+				$$.setLocation(@1); console.log('expression_statement', $$); }
 		;
 
 /* Line: 1582 */
@@ -1195,8 +1197,8 @@ external_declaration:
 /* Line: 1721 */
 function_definition:
 		  function_prototype compound_statement_no_new_scope {
-				$$ = new ast.function_definition();
-				$$.setLocation(@1.first_line, @1.first_column);
+				$$ = new AstFunctionDefinition();
+				$$.setLocation(@1);
 				$$.proto_type = $1;
 				$$.body = $2;
 				yy.state.symbols.pop_scope(); console.log('function_definition', $$); }

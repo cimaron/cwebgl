@@ -18,20 +18,26 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
+"use strict";
+/*global window: false */
 
-var util = require('./util');
-var parser = require('./parser.jison.js');
-var generator = require('./arb/ir_generator.js');
+var util = require('util');
 
-glsl = {
+var glsl = {
+	
+	state : null,
 
 	compile : function(source, options) {
 
-		var state = parser.compile(source, options);
+		this.state = this.parse(source, options);
 
-		var irs = generator.generate(state);
+		var irs = this.generate(this.state);
 
 		return irs;
+	},
+
+	getLastError : function() {
+		return this.state.info_log;
 	},
 
 	/**
@@ -39,9 +45,13 @@ glsl = {
 	 */
 	target : {
 		fragment : 0,
-		vertex : 1,
+		vertex : 1
 	}
 };
+
+if (window !== undefined) {
+	window.glsl = glsl;	
+}
 
 module.exports = glsl;
 

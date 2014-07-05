@@ -19,51 +19,35 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-var util = require('util');
-var ARB = require('./arb/instruction.js');
 
 /**
  * IR Class
  *
- * Stores intermediate representation (3-address code)
- */	
-function IR(op, d, s1, s2, s3, gen) {
-	if (gen) {
-		d = IRS.getTemp(gen);
-	}
-	ARB.Instruction.call(this, op, d, s1, s2, s3);
-}
-
-util.inherits(IR, ARB.Instruction);
-
-IR.operands = ['d', 's1', 's2', 's3'];
-
-
-/**
- * IRS Class
- *
  * Stores IR code tree
  */	
-function IRS() {
+function Ir() {
 	this.code = [];
 	this.last = null;
 }
 
-var count = 0;
-IRS.getTemp = function(n) {
-	return n + count++;
+Ir.count = 0;
+Ir.getTemp = function(n) {
+	return n + Ir.count++;
 }
 
-IRS.prototype.get = function(i) {
+Ir.prototype.getTemp = Ir.getTemp;
+
+Ir.prototype.get = function(i) {
 	return this.code[i];	
 };
-	
-IRS.prototype.push = function(ir) {
+
+Ir.prototype.push = function(ir) {
 	this.code.push(ir);
 	this.last = ir;
 };
 
-IRS.prototype.getTemp = IRS.getTemp;
+Ir.swizzles = ["xyzw", "rgba", "stpq"];
+
 
 /**
  * Replaces all instances of an operand name and base index in all instructions after start
@@ -74,7 +58,7 @@ IRS.prototype.getTemp = IRS.getTemp;
  * @param   integer     Add offset
  * @param   boolean     True if replacing with a completely new operand
  */
-IRS.prototype.replaceName = function(start, old, nw, index, repl) {
+Ir.prototype.replaceName = function(start, old, nw, index, repl) {
 	var i, j, ir, f, name, neg_const;
 	neg_const = old.match(/^\-([0-9]+\.[0-9]+)/);
 	if (neg_const) {
@@ -90,7 +74,7 @@ IRS.prototype.replaceName = function(start, old, nw, index, repl) {
 			f = IR.operands[j];
 			if (ir[f] && ir[f].name == old) {
 				if (repl) {
-					ir[f] = new ARB.Operand(ir[f].neg + nw);
+					ir[f] = new Ir.Operand(ir[f].neg + nw);
 				} else {
 					ir[f].name = nw;
 					ir[f].addOffset(index);
@@ -104,15 +88,83 @@ IRS.prototype.replaceName = function(start, old, nw, index, repl) {
 	}
 };
 	
-IRS.prototype.toString = function() {
-	return this.code.join("");
+Ir.prototype.toString = function() {
+	return this.code.join("\n");
+};
+
+
+/**
+ * Builds instructions from code table record
+ *
+ * @param   array       List of instruction strings
+ * @param   array       List of operands
+ */
+Ir.prototype.build = function(code, oprds) {
+	var repl, dest, parts, i, j, oprd, ir, new_swz;
+
+	for (i = 0; i < oprds.length; i++) {
+		oprd = Ir.splitOperand(oprds[i]);
+		if (oprd[1]) {
+			//need a new temp to move the swizzle so our code pattern works
+			new_swz = swizzles[0].substring(0, oprd[1].length);
+			if (oprd[1] != new_swz) {
+				dest = this.getTemp('$tempv');
+				ir = new IrInstruction('MOV', util.format("%s.%s", dest, new_swz), oprd.join("."));
+				this.push(ir);
+				oprd[0] = dest;
+			}
+		}
+		oprds[i] = oprd[0];	
+	}
+
+	repl = [];
+	for (i = oprds.length - 1; i >= 0; i--) {
+		repl.push({
+			s : new RegExp('%' + (i + 1), 'g'),
+			d : oprds[i]
+		});
+	}
+
+	for (i = 0; i < code.length; i++) {
+		parts = code[i];
+
+		if (parts.substring(0, 4) == 'TEMP') {
+			repl.unshift({
+				s : new RegExp(parts.substring(5), 'g'),
+				d : this.getTemp('$tempv')
+			});
+			continue;
+		}
+
+		for (j = 0; j < repl.length; j++) {
+			parts = parts.replace(repl[j].s, repl[j].d);
+		}
+
+		parts = parts.split(" ").join(",");
+
+		this.push(new IrInstruction(parts));
+	}
 };
 
 /**
- * External interface
+ * Splits an operand into name and swizzle parts
+ *
+ * @param   string      The operand
+ *
+ * @return  array       [name, swizzle]
  */
-module.exports = {
-	ir : IR,
-	irs : IRS
+Ir.splitOperand = function(oprd) {
+	oprd = oprd.split(".");
+	if (!oprd[1] || oprd[1].match(/[xyzw]+/)) {
+		
+	} else {
+		oprd = [oprd.join(".")];
+	}
+	return oprd;
 };
+
+
+
+
+
 

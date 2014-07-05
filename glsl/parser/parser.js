@@ -19,16 +19,14 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-var util = require('util');
-
 function glsl_state(options) {
 
 	this.options = util._extend({
 		target : 0,
 		language_version : 100,
-	});
+	}, options);
 
-	this.symbols = new symbol.SymbolTable();
+	this.symbols = new SymbolTable();
 	this.translation_unit = [];
 
 	this.info_log = [];
@@ -53,30 +51,27 @@ proto.classify_identifier = function(name) {
 	} else {
 		return 'NEW_IDENTIFIER';
 	}
-}
+};
 
 
-
-
-
-
-proto.error = function(locp, err) {
+proto.addError = function(err, location) {
 	this.error = true;
-	this.info_log.push(
-		util.format("%u:%u(%u): error: ", locp.source, locp.first_line, locp.first_column) +
-		err ? util.format.apply(arguments.slice(1)) : "");
-}
-
-
-
+	if (location) {
+		err = util.format("%u(%u): %s", location.first_line, location.first_column, err);
+	}
+	this.info_log.push(err);
+};
 
 
 /**
  * Jison parser compatibility
  */
-function parse(src, options) {
+glsl.parse = function(src, options) {
+	var result, state;
 
-	var state = new glsl_state(options);
+	state = new glsl_state(options);
+
+	symbol_table_init(state);
 
 	parser.yy =  {
 		test : 1,
@@ -89,8 +84,5 @@ function parse(src, options) {
 	}
 
 	return state;
-}
-
-
-
-module.exports.compile = parse;
+};
+	

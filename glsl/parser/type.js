@@ -19,31 +19,30 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-function type(name, size, slots) {
+function Type(name, size, slots) {
 	this.name = name;
 	this.size = size;
 	this.slots = slots;
 }
 
-types = {
-	_void : new type("void", 1, 1),
-	bool : new type("bool", 1, 1),
-	int : new type("int", 1, 1),
-	float : new type("float", 1, 1),
-	vec2 : new type("vec2", 2, 1),
-	vec3 : new type("vec3", 3, 1),
-	vec4 : new type("vec4", 4, 1),
-	bvec2 : new type("bvec2", 2, 1),
-	bvec3 : new type("bvec3", 3, 1),
-	bvec4 : new type("bvec4", 4, 1),
-	ivec2 : new type("ivec2", 2, 1),
-	ivec3 : new type("ivec3", 3, 1),
-	ivec4 : new type("ivec4", 4, 1),
-	mat2 : new type("mat2", 4, 2),
-	mat3 : new type("mat3", 9, 3),
-	mat4 : new type("mat4", 16, 4),
-	sampler2D : new type("sampler2D", 1, 1),
-	samplerCube : new type("samplerCube", 1, 1)
-}
+var types = {
+	_void : new Type("void", 1, 1),
+	bool : new Type("bool", 1, 1),
+	int : new Type("int", 1, 1),
+	float : new Type("float", 1, 1),
+	vec2 : new Type("vec2", 2, 1),
+	vec3 : new Type("vec3", 3, 1),
+	vec4 : new Type("vec4", 4, 1),
+	bvec2 : new Type("bvec2", 2, 1),
+	bvec3 : new Type("bvec3", 3, 1),
+	bvec4 : new Type("bvec4", 4, 1),
+	ivec2 : new Type("ivec2", 2, 1),
+	ivec3 : new Type("ivec3", 3, 1),
+	ivec4 : new Type("ivec4", 4, 1),
+	mat2 : new Type("mat2", 4, 2),
+	mat3 : new Type("mat3", 9, 3),
+	mat4 : new Type("mat4", 16, 4),
+	sampler2D : new Type("sampler2D", 1, 1),
+	samplerCube : new Type("samplerCube", 1, 1)
+};
 
-module.exports.types = types;

@@ -49,7 +49,8 @@ function SymbolTable() {
 	this.depth = 0;
 }
 
-var proto = SymbolTable.prototype = {};
+SymbolTable.prototype = {};
+var proto = SymbolTable.prototype;
 
 /**
  * 
@@ -62,21 +63,21 @@ proto.push_scope = function() {
  * 
  */
 proto.pop_scope = function() {
-
 	var n, t;
 	
 	for (n in this.table) {
-	
-		t = this.table[n];
 		
-		while (t[0] && t[0].depth == this.depth) {
-			t.splice(0, 1);	
+		if (this.table.hasOwnProperty(n)) {
+			t = this.table[n];
+			
+			while (t[0] && t[0].depth === this.depth) {
+				t.splice(0, 1);	
+			}
+			
+			if (t.length === 0) {
+				delete this.table[n];	
+			}
 		}
-		
-		if (t.length == 0) {
-			delete this.table[n];	
-		}
-
 	}
 
 	this.depth--;
@@ -89,7 +90,7 @@ proto.name_declared_this_scope = function(name) {
 	
 	var e = this.get_entry(name);
 	
-	return e && e.depth == this.depth;
+	return e && e.depth === this.depth;
 };
 
 /**
@@ -122,7 +123,8 @@ proto.add_function = function(name, type, def) {
 	var entry;
 
 	//don't readd the exact same function definition
-	if (entry = this.get_function(name, type, def)) {
+	entry = this.get_function(name, type, def);
+	if (entry) {
 		return entry;
 	}
 
@@ -177,12 +179,12 @@ proto._match_definition = function(def, entry) {
 		return true;	
 	}
 	
-	if (def.length != entry.length) {
+	if (def.length !== entry.length) {
 		return false;	
 	}
 	
 	for (i = 0; i < def.length; i++) {
-		if (def[i] != entry[i]) {
+		if (def[i] !== entry[i]) {
 			return false;
 		}
 	}
@@ -215,18 +217,11 @@ proto.get_entry = function(name, typedef, def) {
 	t = this.table[name] || [];
 	for (i = 0; i < t.length; i++) {
 		entry = t[i];
-		if (entry.typedef == typedef && (typedef != SymbolTableEntry.typedef.func || this._match_definition(def, entry.definition))) {
+		if (entry.typedef === typedef && (typedef !== SymbolTableEntry.typedef.func || this._match_definition(def, entry.definition))) {
 			return entry;
 		}
 	}
 	
 	return null;
 };
-
-
-/**
- * Exports
- */
-module.exports.SymbolTable = SymbolTable;
-module.exports.SymbolTableEntry = SymbolTableEntry;
 
