@@ -220,15 +220,15 @@ function AstExpression(oper, ex0, ex1, ex2) {
 	}
 }
 
-proto = AstExpression.prototype;
 util.inherits(AstExpression, AstNode);
+proto = AstExpression.prototype;
 
 //public:
 
 /**
  * Makes number a float representation
  *
- * @param   string      The string representation of a number
+ * @param   string   The string representation of a number
  *
  * @return  string
  */
@@ -432,7 +432,7 @@ function AstExpressionStatement(ex) {
 	this.expression = ex;
 }
 
-proto = AstExpression.prototype;
+proto = AstExpressionStatement.prototype;
 util.inherits(AstExpressionStatement, AstNode);
 
 /**

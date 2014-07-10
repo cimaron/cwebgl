@@ -93,7 +93,7 @@ AstTypeSpecifier.prototype.ir = function(state, irs) {
  * @param   object   state   GLSL state
  * @param   object   irs     IR representation
  */
-ast_declarator_list.prototype.ir = function(state, irs) {
+AstDeclaratorList.prototype.ir = function(state, irs) {
 	var type, qualifier, i, decl, name, entry, constant;
 
 	type = this.type;
@@ -108,10 +108,10 @@ ast_declarator_list.prototype.ir = function(state, irs) {
 
 		//add symbol table entry
 		entry = state.symbols.add_variable(name);
-		entry.type = type.specifier.type_specifier;
+		entry.type = type.specifier.type_name;
 		entry.qualifier = qualifier;
 
-		constant = (qualifier & ast_type_qualifier.flags.constant);
+		constant = (qualifier & AstTypeQualifier.flags.constant);
 
 		if (decl.initializer) {
 			debugger;
@@ -145,7 +145,7 @@ ast_declarator_list.prototype.ir = function(state, irs) {
  * @param   object   state   GLSL state
  * @param   object   irs     IR representation
  */
-ast_function_definition.prototype.ir = function(state, irs) {
+AstFunctionDefinition.prototype.ir = function(state, irs) {
 
 	if (this.is_definition) {
 		//enter definition into symbol table?
@@ -168,7 +168,7 @@ ast_function_definition.prototype.ir = function(state, irs) {
  * @param   object   state   GLSL state
  * @param   object   irs     IR representation
  */
-ast_function.prototype.ir = function(state, irs) {
+AstFunction.prototype.ir = function(state, irs) {
 	var i, name, param, entry;
 
 	//generate
@@ -191,7 +191,7 @@ ast_function.prototype.ir = function(state, irs) {
  * @param   object   state   GLSL state
  * @param   object   irs     IR representation
  */
-ast_compound_statement.prototype.ir = function(state, irs) {
+AstCompoundStatement.prototype.ir = function(state, irs) {
 	var i;
 
 	state.symbols.push_scope();
@@ -255,8 +255,7 @@ AstExpression.prototype.ir = function(state, irs) {
  */
 AstExpression.prototype.ir_op = function(state, irs) {
 	var se, temp, ops;
-	
-	debugger;
+
 	if (se = this.subexpressions) {
 		se[0] ? se[0].ir(state, irs) : null;
 		se[1] ? se[1].ir(state, irs) : null;
@@ -364,7 +363,6 @@ AstExpression.prototype.ir_op = function(state, irs) {
  */
 AstExpression.prototype.ir_assign = function(state, irs, local) {
 	var cond, ir, temp, size, slots, swz, i, entry, se;
-	debugger;
 
 	se = this.subexpressions;
 
@@ -380,40 +378,45 @@ AstExpression.prototype.ir_assign = function(state, irs, local) {
 	*/
 
 	if (se[0].Type != se[1].Type) {
-		ir_error(util.format("Could not assign value of type %s to %s", glsl.type.names[se[1].Type], glsl.type.names[se[0].Type]), e);
+		ir_error(util.format("Could not assign value of type %s to %s", glsl.type.names[se[1].Type], glsl.type.names[se[0].Type]), this);
 	}
 	this.Type = se[0].Type;
 
 	entry = state.symbols.get_variable(se[0].Dest);
 	if (entry.constant) {
-		ir_error(util.format("Cannot assign value to constant %s", se[0].Dest), e);	
+		ir_error(util.format("Cannot assign value to constant %s", se[0].Dest), this);	
 	}
 
-	size = glsl.type.size[e.Type];
-	slots = glsl.type.slots[e.Type];
+	irs.push(new IrComment(util.format("(%s = %s)", se[0].Dest, se[1].Dest), this.location));
+
+	size = types[this.Type].size;
+	slots = types[this.Type].slots;
 
 	//get the swizzle for each slot
-	swz = swizzles[0].substring(0, 4 - (((slots * 4) - size) / slots));
+	swz = Ir.swizzles[0].substring(0, 4 - (((slots * 4) - size) / slots));
 
 	//all components are used up in all slots
-	if (swz == swizzles[0]) {
+	if (swz == Ir.swizzles[0]) {
 		swz = "";
 	}
 
 	for (i = 0; i < slots; i++) {
-
+		/*
 		if (cond && !local) {
-			ir = new IR('CMP', se[0].Dest, "-"+cond, se[1].Dest, se[0].Dest);
+			ir = new IR('CMP', se[0].Dest, "-" + cond, se[1].Dest, se[0].Dest);
 			ir.addOffset(i);
 			ir.setSwizzle(swz);
 			irs.push(ir);
 
 		} else {
-			ir = new IR('MOV', se[0].Dest, se[1].Dest);
+		*/
+			ir = new IrInstruction('MOV', se[0].Dest, se[1].Dest);
 			ir.addOffset(i);
 			ir.setSwizzle(swz);
 			irs.push(ir);
+		/*
 		}
+		*/
 	}
 };
 
@@ -437,7 +440,7 @@ AstExpression.prototype.ir_simple = function(state, irs) {
 			ir_error(util.format("%s is undefined", name), this);
 		}
 
-		this.Type = entry.type.name;
+		this.Type = entry.type;
 
 		if (entry.constant) {
 			this.Dest = entry.constant;
@@ -449,15 +452,15 @@ AstExpression.prototype.ir_simple = function(state, irs) {
 	}
 
 	//float constant
-	if ('float_contsnt' in this.primary_expression) {
-		this.Type = types.float;
-		this.Dest = this.makeFloat(e.primary_expression.float_constant);
+	if ('float_constant' in this.primary_expression) {
+		this.Type = 'float';
+		this.Dest = this.makeFloat(this.primary_expression.float_constant);
 		return;
 	}
 
 	//int constant
 	if ('int_constant' in this.primary_expression) {
-		this.Type = types.int;
+		this.Type = 'int';
 		this.Dest = this.makeFloat(e.primary_expression.int_constant);
 		return;
 	}
@@ -478,7 +481,7 @@ AstExpression.prototype.ir_generate = function(state, irs, len) {
 		ir_error(util.format("Could not generate operation %s", this.oper), this);
 	}
 
-	this.Dest = Ir.getTemp('$tempv');
+	this.Dest = irs.getTemp('$tempv');
 
 	types = [];
 	dest = [this.Dest];
@@ -527,7 +530,7 @@ AstExpression.prototype.ir_generate = function(state, irs, len) {
  * @param   object   irs     IR representation
  */
 AstFunctionExpression.prototype.ir_constructor = function(state, irs) {
-	var type, dest_i, si, sei, ses, d, s, expr;
+	var type, dest_i, si, sei, ses, d, s, expr, comment, comment_text;
 
 	type = this.subexpressions[0].type_specifier;
 
@@ -536,6 +539,10 @@ AstFunctionExpression.prototype.ir_constructor = function(state, irs) {
 
 	this.Type = type.name;
 	this.Dest = irs.getTemp('$tempv');
+
+	comment_text = [];
+	comment = new IrComment("", this.location);
+	irs.push(comment);
 
 	for (dest_i = 0; dest_i < type.size; dest_i++) {
 
@@ -547,10 +554,11 @@ AstFunctionExpression.prototype.ir_constructor = function(state, irs) {
 			if (!expr) {
 				ir_error("Not enough parameters to constructor", e);				
 			}
-			
-debugger;
+
 			expr.ir(state, irs);
 			ses = types[expr.Type].size;
+
+			comment_text.push(expr.Dest);
 		}
 
 		//need to add support for > vec4
@@ -584,5 +592,7 @@ debugger;
 		}
 
 	}
+
+	comment.comment = util.format("%s(%s) => %s:%s", this.Type, comment_text.join(", "), this.Dest, this.Type);
 };
 

@@ -28,10 +28,13 @@ var glsl = {
 	state : null,
 
 	compile : function(source, options) {
+		var irs = false;
 
 		this.state = this.parse(source, options);
 
-		var irs = this.generate(this.state);
+		if (!this.state.error) {
+			irs = this.generate(this.state);
+		}
 
 		return irs;
 	},

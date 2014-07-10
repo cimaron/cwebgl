@@ -25,7 +25,8 @@ var gulp = require('gulp'),
 	jison = require('gulp-jison'),
 	del = require('del'),
 	browserify = require('gulp-browserify')
-	jslint = require('gulp-jslint')
+	//jslint = require('gulp-jslint')
+	jshint = require('gulp-jshint')
 	;
 
 gulp.task('clean', function(cb) {
@@ -78,12 +79,16 @@ gulp.task('errors', ['glsl'], function() {
 	return gulp.src([
 		'build/glsl.js'
 	])
+	/*
 	.pipe(jslint({
 		nomen : true,
 		white : true,
 		node : true,
 		plusplus  : true,
 	}));
+	*/
+	.pipe(jshint())
+	;
 });
 
 gulp.task('default', ['clean', 'web']);

@@ -28,14 +28,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 function Ir() {
 	this.code = [];
 	this.last = null;
+	this.count = 0;
 }
 
-Ir.count = 0;
-Ir.getTemp = function(n) {
-	return n + Ir.count++;
+Ir.prototype.getTemp = function(n) {
+	return n + this.count++;
 }
-
-Ir.prototype.getTemp = Ir.getTemp;
 
 Ir.prototype.get = function(i) {
 	return this.code[i];	

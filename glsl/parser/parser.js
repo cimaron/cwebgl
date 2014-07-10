@@ -78,9 +78,10 @@ glsl.parse = function(src, options) {
 		state : state
 	};
 
-	result = parser.parse(src);
-	if (!result) {
-		state.error = true;	
+	try {
+		result = parser.parse(src);
+	} catch(e) {
+		state.addError(e);
 	}
 
 	return state;
