@@ -19,10 +19,11 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-function Type(name, size, slots) {
+function Type(name, size, slots, base) {
 	this.name = name;
 	this.size = size;
 	this.slots = slots;
+	this.base = base;
 }
 
 var types = {
@@ -30,18 +31,18 @@ var types = {
 	bool : new Type("bool", 1, 1),
 	int : new Type("int", 1, 1),
 	float : new Type("float", 1, 1),
-	vec2 : new Type("vec2", 2, 1),
-	vec3 : new Type("vec3", 3, 1),
-	vec4 : new Type("vec4", 4, 1),
-	bvec2 : new Type("bvec2", 2, 1),
-	bvec3 : new Type("bvec3", 3, 1),
-	bvec4 : new Type("bvec4", 4, 1),
-	ivec2 : new Type("ivec2", 2, 1),
-	ivec3 : new Type("ivec3", 3, 1),
-	ivec4 : new Type("ivec4", 4, 1),
-	mat2 : new Type("mat2", 4, 2),
-	mat3 : new Type("mat3", 9, 3),
-	mat4 : new Type("mat4", 16, 4),
+	vec2 : new Type("vec2", 2, 1, 'float'),
+	vec3 : new Type("vec3", 3, 1, 'float'),
+	vec4 : new Type("vec4", 4, 1, 'float'),
+	bvec2 : new Type("bvec2", 2, 1, 'bool'),
+	bvec3 : new Type("bvec3", 3, 1, 'bool'),
+	bvec4 : new Type("bvec4", 4, 1, 'bool'),
+	ivec2 : new Type("ivec2", 2, 1, 'int'),
+	ivec3 : new Type("ivec3", 3, 1, 'int'),
+	ivec4 : new Type("ivec4", 4, 1, 'int'),
+	mat2 : new Type("mat2", 4, 2, 'float'),
+	mat3 : new Type("mat3", 9, 3, 'float'),
+	mat4 : new Type("mat4", 16, 4, 'float'),
 	sampler2D : new Type("sampler2D", 1, 1),
 	samplerCube : new Type("samplerCube", 1, 1)
 };

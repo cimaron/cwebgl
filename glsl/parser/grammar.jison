@@ -389,12 +389,15 @@ primary_expression:
 
 /* Line: 373 */
 postfix_expression:
-			primary_expression
-		|	postfix_expression '[' integer_expression ']'
-		|	function_call
-		|	postfix_expression '.' any_identifier
-		|	postfix_expression '++'
-		|	postfix_expression '--'
+		  primary_expression
+		| postfix_expression '[' integer_expression ']'
+		| function_call
+		| postfix_expression '.' any_identifier {
+				$$ = new AstExpression('.', $1);
+				$$.setLocation(@1);				
+				$$.primary_expression.identifier = $3; }
+		| postfix_expression '++'
+		| postfix_expression '--'
 		;
 
 /* Line: 406 */
@@ -444,7 +447,10 @@ function_call_header:
 				$$ = new AstFunctionExpression($1);
 				$$.setLocation(@1);
 			}
-		| variable_identifier '('
+		| variable_identifier '(' {
+				var callee = new AstExpression($1);
+				$$ = new AstFunctionExpression(callee);
+				$$.setLocation(@1); }
 		| 'FIELD_SELECTION'
 		;
 
@@ -706,7 +712,10 @@ declaration:
 		| init_declarator_list ';' {
 				$$ = $1;
 			}
-		| 'PRECISION' precision_qualifier type_specifier_no_prec ';'
+		| 'PRECISION' precision_qualifier type_specifier_no_prec ';' {
+				$3.precision = $2;
+				$3.is_precision_statement = true;
+				$$ = $3; }
 		;
 
 /* Line: 782 */
@@ -790,7 +799,7 @@ init_declarator_list:
 single_declaration:
 		  fully_specified_type {
 				if ($1.specifier.type_specifier !== types.struct) {
-					yy.state.error(@1, "empty declaration list");
+					yy.state.addError("empty declaration list", @1.first_line, @1.first_column);
 					return 0;
 				}
 
@@ -991,9 +1000,12 @@ basic_type_specifier_nonarray:
 
 /* Line: 1374 */
 precision_qualifier:
-			'HIGHP'
-		|	'MEDIUMP'
-		|	'LOWP'
+		  'HIGHP' {
+				$$ = ast_precision.high; }
+		| 'MEDIUMP' {
+				$$ = ast_precision.medium; }
+		| 'LOWP' {
+				$$ = ast_precision.low; }
 		;
 
 /* Line: 1407 */
@@ -1100,14 +1112,14 @@ compound_statement_no_new_scope:
 statement_list:
 		  statement {
 				if ($1 === null) {
-					yy.state.error(@1, "<nil> statement\n");
+					yy.state.addError("<nil> statement", @1.first_line, @1.first_column);
 				} else {
 					$$ = [$1];
 				}
 			}
 		| statement_list statement {
 				if ($2 === null) {
-					yy.state.error(@1, "<nil> statement");	
+					yy.state.addError("<nil> statement", @1.first_line, @1.first_column);
 				}
 				$$ = $1;
 				$$.push($2);
@@ -1119,12 +1131,14 @@ expression_statement:
 		  ';'
 		| expression ';' {
 				$$ = new AstExpressionStatement($1);
-				$$.setLocation(@1); console.log('expression_statement', $$); }
+				$$.setLocation(@1); }
 		;
 
 /* Line: 1582 */
 selection_statement:
-			'IF' '(' expression ')' selection_rest_statement
+		  'IF' '(' expression ')' selection_rest_statement {
+				$$ = new AstSelectionStatement($3, $5.then_statement, $5.else_statement);
+				$$.setLocation(@1); }
 		;
 
 /* Line: 1591 */
@@ -1201,6 +1215,6 @@ function_definition:
 				$$.setLocation(@1);
 				$$.proto_type = $1;
 				$$.body = $2;
-				yy.state.symbols.pop_scope(); console.log('function_definition', $$); }
+				yy.state.symbols.pop_scope(); }
 		;
 

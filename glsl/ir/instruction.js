@@ -29,14 +29,14 @@ function IrInstruction(op, d, s1, s2, s3, gen) {
 	var args;
 
 	if (gen) {
-		d = IRS.getTemp(gen);
+		d = IRS.getTemp();
 	}
 
 	this.str = null;
 	this.line = null;
 
 	if (arguments.length == 1) {
-		args = op.split(/ *, */);
+		args = op.split(/[\s,]/);
 		op = args[0];
 		d = args[1];
 		s1 = args[2];
@@ -45,17 +45,17 @@ function IrInstruction(op, d, s1, s2, s3, gen) {
 	}
 
 	this.op = op;
-	this.d = d;
-	this.s1 = s1;
-	this.s2 = s2;
-	this.s3 = s3;
+	this.d = this.operand(d);
+	this.s1 = this.operand(s1);
+	this.s2 = this.operand(s2);
+	this.s3 = this.operand(s3);
 }
 
 IrInstruction.operands = ['d', 's1', 's2', 's3'];
 
 
 IrInstruction.prototype.operand = function(opr) {
-	return opr ? new Ir.Operand(opr) : null;
+	return opr ? new IrOperand(opr) : "";
 };
 
 /**
@@ -64,15 +64,14 @@ IrInstruction.prototype.operand = function(opr) {
  * @param   integer    The offset to set
  */
 IrInstruction.prototype.addOffset = function(offset) {
-	
-	if (!offset) {
-		return;
+	var i, o;
+
+	for (i = 0; i < IrInstruction.operands.length; i++) {
+		o = IrInstruction.operands[i];
+		if (this[o]) {
+			this[o].addOffset(offset);	
+		}
 	}
-	
-	this.d ? this.d.addOffset(offset) : null;
-	this.s1 ? this.s1.addOffset(offset) : null;
-	this.s2 ? this.s2.addOffset(offset) : null;
-	this.s3 ? this.s3.addOffset(offset) : null;
 };
 
 /**
@@ -81,10 +80,14 @@ IrInstruction.prototype.addOffset = function(offset) {
  * @param   string    The swizzle to set
  */
 IrInstruction.prototype.setSwizzle = function(swz) {
-	this.d  && !this.d.swizzle  ? this.d.swizzle  = swz : null;
-	this.s1 && !this.s1.swizzle ? this.s1.swizzle = swz : null;
-	this.s2 && !this.s2.swizzle ? this.s2.swizzle = swz : null;
-	this.s3 && !this.s3.swizzle ? this.s3.swizzle = swz : null;
+	var i, o;
+
+	for (i = 0; i < IrInstruction.operands.length; i++) {
+		o = IrInstruction.operands[i];
+		if (this[o] && !this[o].swizzle) {
+			this[o].swizzle = swz;
+		}
+	}
 };
 
 /**
@@ -115,11 +118,113 @@ function IrComment(comment, loc) {
 }
 
 IrComment.prototype.toString = function() {
-	var c;
-	c = '# ' + this.comment;
+	var c = this.comment;
+
 	if (this.loc) {
-		c += util.format(" [%s:%s-%s:%s]", this.loc.first_line, this.loc.first_column, this.loc.last_line, this.loc.last_column);
+		c = util.format("[%s:%s-%s:%s] %s", this.loc.first_line, this.loc.first_column, this.loc.last_line, this.loc.last_column, c);
 	}
+	c = '# ' + c;
+
 	return c;
 };
+
+
+/**
+ * IR Operand Class
+ *
+ * Represents a single operand
+ */
+function IrOperand(str, raw) {
+
+	this.full = "";
+	this.neg = "";
+	this.name = "";
+	this.address = "";
+	this.swizzle = "";
+	this.number = "";
+	this.raw = "";
+
+	if (raw) {
+		this.full = str;
+		this.raw = str;
+	} else {
+		this.parse(str);
+	}
+}
+
+/**
+ * Parses operand string
+ *
+ * @param   string    string that represents a single variable
+ */
+IrOperand.prototype.parse = function(str) {
+	var parts, regex;
+
+	if (!str) {
+		return;
+	}
+
+	//neg
+	regex = "(\-)?";
+
+	//name (include '%' for our code substitution rules)
+	regex += "([\\w%]+)";
+
+	//address
+	regex += "(?:@(\\d+))?";
+
+	//swizzle
+	regex += "(?:\\.([xyzw]+))?";
+
+	regex = new RegExp("^" + regex + "$");
+
+	if (parts = str.match(regex)) {
+
+		this.neg = parts[1] || "";
+		this.name = parts[2];
+		this.address = parseInt(parts[3]) || 0;
+		this.swizzle = parts[4] || "";
+	} else {
+		if (parts = str.match(/^"(.*)"$/)) {
+			this.raw = parts[1];
+		} else {
+			this.raw = str;
+		}
+	}
+
+	this.full = this.toString();
+};
+
+/**
+ * Adds an offset
+ *
+ * @param   integer    Offset to add
+ */
+IrOperand.prototype.addOffset = function(offset) {
+
+	this.address = this.address || 0;
+
+	this.address += offset;
+};
+
+/**
+ * toString method
+ *
+ * @return  string
+ */
+IrOperand.prototype.toString = function() {
+	var str;
+
+	if (this.raw) {
+		str = this.raw;	
+	} else {
+		str = this.neg + this.name + ("@" + this.address) + (this.swizzle ? "." + this.swizzle : "");
+	}
+	
+	return str;
+};
+
+
+
+
 

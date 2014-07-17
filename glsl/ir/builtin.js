@@ -28,16 +28,22 @@ var builtin = {
 				position : 0,
 				type : 'vec4',
 				name : 'gl_Position',
-				out : 'result.position'
+				out : 'result@0'
+			},
+			{
+				position : 1,
+				type : 'float',
+				name : 'gl_PointSize',
+				out : 'result@1'
 			}
 		],
-	
+
 		fragment : [
 			{
-				position : 2,
+				position : 0,
 				type : 'vec4',
 				name : 'gl_FragColor',
-				out : 'result.color'
+				out : 'result@0'
 			}
 		]
 	},
@@ -70,33 +76,33 @@ var builtin = {
 			"vec3,vec3:vec3" : ["MUL %1.xyz %2.xyz %3.xyz"],
 			"vec4,vec4:vec4" : ["MUL %1 %2 %3"],
 			"mat3,vec3:vec3" : [
-				"MUL %1.xyz %2[0].xyz %3.x",
-				"MAD %1.xyz %2[1].xyz %3.y %1",
-				"MAD %1.xyz %2[2].xyz %3.z %1"
+				"MUL %1.xyz %2.xyz %3.x",
+				"MAD %1.xyz %2@1.xyz %3.y %1",
+				"MAD %1.xyz %2@2.xyz %3.z %1"
 				],
 			"mat4,vec4:vec4" : [
-				"MUL %1 %2[0] %3.x",
-				"MAD %1 %2[1] %3.y %1",
-				"MAD %1 %2[2] %3.z %1",
-				"MAD %1 %2[3] %3.w %1"
+				"MUL %1 %2 %3.x",
+				"MAD %1 %2@1 %3.y %1",
+				"MAD %1 %2@2 %3.z %1",
+				"MAD %1 %2@3 %3.w %1"
 				],
 			"mat4,mat4:mat4" : [
-				"MUL %1[0] %2[0] %3[0].x",
-				"MAD %1[0] %2[1] %3[0].y %1[0]",
-				"MAD %1[0] %2[2] %3[0].z %1[0]",
-				"MAD %1[0] %2[3] %3[0].w %1[0]",
-				"MUL %1[1] %2[0] %3[1].x",
-				"MAD %1[1] %2[1] %3[1].y %1[1]",
-				"MAD %1[1] %2[2] %3[1].z %1[1]",
-				"MAD %1[1] %2[3] %3[1].w %1[1]",
-				"MUL %1[2] %2[0] %3[2].x",
-				"MAD %1[2] %2[1] %3[2].y %1[2]",
-				"MAD %1[2] %2[2] %3[2].z %1[2]",
-				"MAD %1[2] %2[3] %3[2].w %1[2]",
-				"MUL %1[3] %2[0] %3[3].x",
-				"MAD %1[3] %2[1] %3[3].y %1[3]",
-				"MAD %1[3] %2[2] %3[3].z %1[3]",
-				"MAD %1[3] %2[3] %3[3].w %1[3]"
+				"MUL %1 %2 %3.x",
+				"MAD %1 %2@1 %3.y %1",
+				"MAD %1 %2@2 %3.z %1",
+				"MAD %1 %2@3 %3.w %1",
+				"MUL %1@1 %2 %3@1.x",
+				"MAD %1@1 %2@1 %3@1.y %1@1",
+				"MAD %1@1 %2@2 %3@1.z %1@1",
+				"MAD %1@1 %2@3 %3@1.w %1@1",
+				"MUL %1@2 %2 %3@2.x",
+				"MAD %1@2 %2@1 %3@2.y %1@2",
+				"MAD %1@2 %2@2 %3@2.z %1@2",
+				"MAD %1@2 %2@3 %3@2.w %1@2",
+				"MUL %1@3 %2 %3@3.x",
+				"MAD %1@3 %2@1 %3@3.y %1@3",
+				"MAD %1@3 %2@2 %3@3.z %1@3",
+				"MAD %1@3 %2@3 %3@3.w %1@3"
 				]
 			},
 		"-" : {
@@ -141,14 +147,28 @@ var builtin = {
 				]
 			},
 		"texture2D": {
-			"sampler2D,vec2:vec4" : ["TEX %1 %3 %2 2D"]
+			"sampler2D,vec2:vec4" : ["TEX %1 %3 %2 \"2D\""]
 		}
 	}
 };
 
+function _builtinParseType(str) {
+	var parts, ret;
+
+	parts = str.split(":");
+	parts[0] = parts[0].split(",");
+	
+	ret = {
+		src : parts[0],
+		dest : parts[1]
+	};
+	
+	return ret;
+}
+
 
 function symbol_table_init(state) {
-	var i, vars, v, entry;
+	var i, j, vars, v, entry, types, name;
 
 	vars = (state.options.target === glsl.target.vertex) ? builtin.vars.vertex : builtin.vars.fragment;
 
@@ -157,6 +177,17 @@ function symbol_table_init(state) {
 		entry = state.symbols.add_variable(v.name, v.type);
 		entry.position = v.position;
 		entry.out = v.out;
+	}
+
+	vars = builtin.func;
+
+	for (name in vars) {
+		v = vars[name];
+		for (j in v) {
+			types = _builtinParseType(j);	
+			entry = state.symbols.add_function(name, types.dest, types.src);
+			entry.code = v[j]
+		}
 	}
 }
 

@@ -38,7 +38,10 @@ glsl.generate = function(state) {
 		}
 
 	} catch (e) {
-		state.addError(e);
+		if (!e.ir) {
+			e.message = "compiler error: " + e.message;
+		}
+		state.addError(e.message, e.lineNumber, e.columnNumber);
 	}
 
 	if (state.error) {
@@ -56,13 +59,16 @@ glsl.generate = function(state) {
  *
  * @return  string
  */
-function ir_error(msg, n) {
+function ir_error(message, node) {
+	var e = new IrError();
 
-	if (n && n.location) {
-		msg = util.format("%s at line %s, column %s", msg, n.location.first_line, n.location.first_column);
+	if (node && node.location) {
+		e.lineNumber = node.location.first_line;
+		e.columnNumber = node.location.first_column;
+		e.message = message;
 	}
 
-	throw new Error(msg);
+	throw e;
 }
 
 /**
@@ -94,7 +100,7 @@ AstTypeSpecifier.prototype.ir = function(state, irs) {
  * @param   object   irs     IR representation
  */
 AstDeclaratorList.prototype.ir = function(state, irs) {
-	var type, qualifier, i, decl, name, entry, constant;
+	var type, qualifier, i, decl, name, entry, constant, assign, lhs;
 
 	type = this.type;
 	if (type.qualifier) {
@@ -111,23 +117,29 @@ AstDeclaratorList.prototype.ir = function(state, irs) {
 		entry.type = type.specifier.type_name;
 		entry.qualifier = qualifier;
 
+		switch (entry.qualifier) {
+
+			case AstTypeQualifier.flags.uniform:
+				entry.out = irs.getUniform(entry);
+				break;
+			
+			default:
+				entry.out = irs.getTemp();
+
+		}
+
 		constant = (qualifier & AstTypeQualifier.flags.constant);
 
 		if (decl.initializer) {
-			debugger;
-			//destination node is not created in parser, so need to create it here to keep things clean
-			name = {
-				Dest : name,
-				Type : entry.type
-			};
-
-			//ir_expression(decl.initializer);
 
 			//@todo: generate constants at compile time (this may be able to be taken care of in the generator)
 			if (constant) {
 				//entry.constant = decl.initializer.Dest;
 			} else {
-				//ir_expression_assign(decl, [name, decl.initializer], true);
+				lhs = new AstExpression('ident');
+				lhs.primary_expression.identifier = name;
+				assign = new AstExpression('=', lhs, decl.initializer);
+				assign.ir(state, irs);
 			}
 
 		} else {
@@ -328,18 +340,9 @@ AstExpression.prototype.ir_op = function(state, irs) {
 		case '_++':
 		case '_--':
 			break;
-		case '.':
-			ir_expression_field(e, se);
-			break;
+			*/
+		//case '.': break;
 		case '[]':
-			break;
-		*/
-		case '()':
-			if (this.cons) {
-				this.ir_constructor(state, irs);
-			} else {
-				ir_expression_function(e);	
-			}
 			break;
 		/*
 		case 'VAR':
@@ -350,7 +353,7 @@ AstExpression.prototype.ir_op = function(state, irs) {
 			break;
 		*/
 		default:
-			ir_error(util.format("Could not translate unknown expression %s (%s)", e.typeOf(), e.oper), e);
+			ir_error(util.format("Could not translate unknown expression %s (%s)", this, this.oper), this);
 	}
 };
 
@@ -362,13 +365,14 @@ AstExpression.prototype.ir_op = function(state, irs) {
  * @param   object   irs     IR representation
  */
 AstExpression.prototype.ir_assign = function(state, irs, local) {
-	var cond, ir, temp, size, slots, swz, i, entry, se;
+	var cond, ir, temp, size, slots, swz, i, entry, lhs, rhs;
 
-	se = this.subexpressions;
+	lhs = this.subexpressions[0];
+	rhs = this.subexpressions[1];
 
 	if (this.oper == '+=') {
-		se[1].oper = '+';
-		ir_expression_generate(se[1], [se[0], se[1]], 2);
+		rhs.oper = '+';
+		//ir_expression_generate(rhs, [lhs, rhs], 2);
 	}
 
 	/*
@@ -377,17 +381,16 @@ AstExpression.prototype.ir_assign = function(state, irs, local) {
 	}
 	*/
 
-	if (se[0].Type != se[1].Type) {
-		ir_error(util.format("Could not assign value of type %s to %s", glsl.type.names[se[1].Type], glsl.type.names[se[0].Type]), this);
+	if (lhs.Type != rhs.Type) {
+		ir_error(util.format("Could not assign value of type %s to %s", rhs.Type, lhs.Type), this);
 	}
-	this.Type = se[0].Type;
+	this.Type = lhs.Type;
 
-	entry = state.symbols.get_variable(se[0].Dest);
-	if (entry.constant) {
-		ir_error(util.format("Cannot assign value to constant %s", se[0].Dest), this);	
+	if (lhs.Entry && lhs.Entry.constant) {
+		ir_error(util.format("Cannot assign value to constant %s", lhs.Dest), this);	
 	}
 
-	irs.push(new IrComment(util.format("(%s = %s)", se[0].Dest, se[1].Dest), this.location));
+	irs.push(new IrComment(util.format("(%s = %s) => %s %s", lhs.Dest, rhs.Dest, lhs.Type, lhs.Dest), this.location));
 
 	size = types[this.Type].size;
 	slots = types[this.Type].slots;
@@ -410,7 +413,7 @@ AstExpression.prototype.ir_assign = function(state, irs, local) {
 
 		} else {
 		*/
-			ir = new IrInstruction('MOV', se[0].Dest, se[1].Dest);
+			ir = new IrInstruction('MOV', lhs.Dest, rhs.Dest);
 			ir.addOffset(i);
 			ir.setSwizzle(swz);
 			irs.push(ir);
@@ -430,6 +433,11 @@ AstExpression.prototype.ir_assign = function(state, irs, local) {
 AstExpression.prototype.ir_simple = function(state, irs) {
 	var name, entry, t;
 
+	if (this.oper == '.') {
+		this.ir_field(state, irs);
+		return;
+	}
+
 	//identifier
 	if (name = this.primary_expression.identifier) {
 
@@ -441,11 +449,12 @@ AstExpression.prototype.ir_simple = function(state, irs) {
 		}
 
 		this.Type = entry.type;
+		this.Entry = entry;
 
 		if (entry.constant) {
 			this.Dest = entry.constant;
 		} else {
-			this.Dest = entry.name;
+			this.Dest = entry.out;
 		}
 
 		return;
@@ -481,7 +490,7 @@ AstExpression.prototype.ir_generate = function(state, irs, len) {
 		ir_error(util.format("Could not generate operation %s", this.oper), this);
 	}
 
-	this.Dest = irs.getTemp('$tempv');
+	this.Dest = irs.getTemp();
 
 	types = [];
 	dest = [this.Dest];
@@ -501,7 +510,7 @@ AstExpression.prototype.ir_generate = function(state, irs, len) {
 	}
 
 	if (!match) {
-		ir_error(util.format("Could not apply operation %s to %s", e.oper, types.join(", ")), this);
+		ir_error(util.format("Could not apply operation %s to %s", this.oper, types.join(", ")), this);
 	}
 
 	if (len <= 4) {
@@ -509,11 +518,11 @@ AstExpression.prototype.ir_generate = function(state, irs, len) {
 	}
 
 	if (len == 1) {
-		comment = util.format("(%s %s) => %s:%s", this.oper, se[1].Dest, this.Dest, this.Type);
+		comment = util.format("(%s %s) => %s %s", this.oper, se[1].Dest, this.Type, this.Dest);
 	} else if (len == 2) {
-		comment = util.format("(%s %s %s) => %s:%s", se[0].Dest, this.oper, se[1].Dest, this.Dest, this.Type);
+		comment = util.format("(%s %s %s) => %s %s", se[0].Dest, this.oper, se[1].Dest, this.Type, this.Dest);
 	} else if (len == 3) {
-		comment = util.format("(%s ? %s : %s) => %s:%s", se[0].Dest, se[1].Dest, se[2].Dest, this.Dest, this.Type);
+		comment = util.format("(%s ? %s : %s) => %s %s", se[0].Dest, se[1].Dest, se[2].Dest, this.Type, this.Dest);
 	}
 
 	irs.push(new IrComment(comment, this.location));
@@ -521,6 +530,50 @@ AstExpression.prototype.ir_generate = function(state, irs, len) {
 	irs.build(table[j], dest);
 };
 
+
+/**
+ * Constructs a function expression
+ *
+ * @param   object   state   GLSL state
+ * @param   object   irs     IR representation
+ */
+AstFunctionExpression.prototype.ir = function(state, irs) {
+	var i, func, se, def, dest, entry;
+
+	//Prepare the dest
+	this.subexpressions[0].ir(state, irs);
+
+	if (this.cons) {
+		return this.ir_constructor(state, irs);
+	}
+
+	func = this.subexpressions[0].Dest;
+	def = [];
+	dest = [];
+
+	for (i = 0; i < this.expressions.length; i++) {
+
+		se = this.expressions[i];
+		se.ir(state, irs);
+
+		def.push(se.Type);
+		dest.push(se.Dest);
+	}
+
+	entry = state.symbols.get_function(func, null, def);
+	if (!entry) {
+		ir_error(util.format("Function %s(%s) is not defined", func, def_names.join(",")), this);
+	}
+
+	this.Type = entry.type;
+	this.Dest = irs.getTemp();
+	
+	irs.push(new IrComment(util.format("%s(%s) => %s %s", entry.name, dest.join(", "), this.Type, this.Dest), this.location));
+
+	dest.unshift(this.Dest);
+
+	irs.build(entry.code, dest);
+};
 
 
 /**
@@ -538,7 +591,7 @@ AstFunctionExpression.prototype.ir_constructor = function(state, irs) {
 	sei = 0;
 
 	this.Type = type.name;
-	this.Dest = irs.getTemp('$tempv');
+	this.Dest = irs.getTemp();
 
 	comment_text = [];
 	comment = new IrComment("", this.location);
@@ -567,22 +620,16 @@ AstFunctionExpression.prototype.ir_constructor = function(state, irs) {
 		d = util.format("%s.%s", this.Dest, Ir.swizzles[0][dest_i]);
 
 		//compute source
-		s = Ir.splitOperand(expr.Dest);
+		s = new IrOperand(expr.Dest);
 
 		//expression was to just get the identifier, so add the appropriate swizzle,
 		//else, either a number, or the correct swizzle already been set
-		if (s[1]) {
-			s = s.join(".");
-		} else {
-			//value
-			if (s[0].match(/^\-?[0-9]+(\.[0-9]+)?/)) {
-				s = s[0];	
-			} else {
-				s = util.format("%s.%s", s[0], Ir.swizzles[0][si]);
-			}
+
+		if (!s.swizzle) {
+			s.swizzle = Ir.swizzles[0][si];			
 		}
 
-		irs.push(new IrInstruction('MOV', d, s));
+		irs.push(new IrInstruction('MOV', d, s.toString()));
 
 		//used up all components in current expression, move on to the next one
 		si++;
@@ -593,6 +640,84 @@ AstFunctionExpression.prototype.ir_constructor = function(state, irs) {
 
 	}
 
-	comment.comment = util.format("%s(%s) => %s:%s", this.Type, comment_text.join(", "), this.Dest, this.Type);
+	comment.comment = util.format("%s(%s) => %s %s", this.Type, comment_text.join(", "), this.Type, this.Dest);
 };
+
+
+/**
+ * Constructs a field selection code block
+ *
+ * @param   object   state   GLSL state
+ * @param   object   irs     IR representation
+ */
+AstExpression.prototype.ir_field = function(state, irs) {
+	var field, swz, base, se;
+
+	//pick swizzle set
+	field = this.primary_expression.identifier;
+
+	se = this.subexpressions[0];
+	se.ir(state, irs);
+
+	if (Ir.isSwizzle(field)) {
+
+		base = types[se.Type].base;
+		if (field.length > 1) {
+			if (base == 'int') {
+				base = 'ivec' + field.length;	
+			}
+			if (base == 'bool') {
+				base = 'bvec' + field.length;	
+			}
+			if (base == 'float') {
+				base = 'vec' + field.length;	
+			}
+		}
+
+		this.Type = base;
+
+		if (field.length > 4 || !this.Type) {
+			ir_error(util.format("Invalid field selection %s.%s", se, field), this);
+		}
+
+		this.Dest = util.format("%s.%s", se.Dest, field)
+	}
+}
+
+
+/**
+ * Constructs a selection statement
+ *
+ * @param   ast_node    Statement
+ */
+AstSelectionStatement.prototype.ir = function(state, irs) {
+	var ir, cond;
+debugger;
+	this.condition.ir(state, irs);
+	//@todo: add a check that condition is bool type?
+
+	irs.push(new IrComment(util.format("if %s then", entry.name, dest.join(", "), this.Type, this.Dest), this.location));
+
+	cond = util.format("%s.x", irs.getTemp());
+
+	//set a flag based on the result
+	ir = new IrInstruction('IF', this.condition.Dest);
+	irs.push(ir);
+
+	//if conditional is set, all subsequent output assignments will use the condition result to set using (MAD dest, cond, (new - old), old)
+	conditional.push(cond);
+	
+	this.then_statement.ir(state, irs);
+
+	irs.push(new IrInstruction('ELSE'));
+
+	if (this.else_statement) {
+		ir = new IR('SGE', cond, "0.0", cond);
+		irs.push(ir);
+		ir_compound_statement(this.else_statement);
+	}
+
+	conditional.pop();
+}
+
 

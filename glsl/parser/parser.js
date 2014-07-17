@@ -40,8 +40,12 @@ proto = glsl_state.prototype = {};
  *
  * @param   object   state   GLSL state
  * @param   string   name    Identifier name
+ * Add error to state
  *
  * @return  string
+ * @param   string   msg      Message
+ * @param   int      line     Message
+ * @param   int      column   Message
  */
 proto.classify_identifier = function(name) {
 	if (this.symbols.get_variable(name) || this.symbols.get_function(name)) {
@@ -54,11 +58,19 @@ proto.classify_identifier = function(name) {
 };
 
 
-proto.addError = function(err, location) {
+/**
+ * Add error to state
+ *
+ * @param   string   msg      Message
+ * @param   int      line     Message
+ * @param   int      column   Message
+ */
+proto.addError = function(msg, line, column) {
+	var err;
+
+	err = util.format("%s at line %s, column %s", msg, line, column);
+
 	this.error = true;
-	if (location) {
-		err = util.format("%u(%u): %s", location.first_line, location.first_column, err);
-	}
 	this.info_log.push(err);
 };
 
@@ -81,7 +93,7 @@ glsl.parse = function(src, options) {
 	try {
 		result = parser.parse(src);
 	} catch(e) {
-		state.addError(e);
+		state.addError(e.message, e.lineNumber, e.columnNumber);
 	}
 
 	return state;

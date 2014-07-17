@@ -26,14 +26,50 @@ CONNECTION WITH THE SOFTWARE OR THE USE		 OR OTHER DEALINGS IN THE SOFTWARE.
  * Stores IR code tree
  */	
 function Ir() {
+
+	this.symbols = {
+		uniform : {
+			next : 0,
+			entries : {}
+		},
+		temp : {
+			next : 0
+		}
+	};
+
 	this.code = [];
 	this.last = null;
-	this.count = 0;
 }
 
-Ir.prototype.getTemp = function(n) {
-	return n + this.count++;
-}
+Ir.prototype.getTemp = function() {
+	
+	var t = 'temp@' + this.symbols.temp.next;
+
+	this.symbols.temp.next++;
+	
+	return t;
+};
+
+/**
+ * Add a symbol table entry into the local symbol table and return a new IR identifier
+ *
+ * @param   object   entry   Symbol table entry
+ *
+ * @return  string
+ */
+Ir.prototype.getUniform = function(entry) {
+
+	var table = this.symbols.uniform, out;
+
+	if (!table.entries[entry.name]) {
+		table.entries[entry.name] = entry;
+		entry.out = 'uniform@' + table.next;
+		table.next += types[entry.type].slots;
+	}
+
+	return entry.out;
+};
+
 
 Ir.prototype.get = function(i) {
 	return this.code[i];	
@@ -42,6 +78,21 @@ Ir.prototype.get = function(i) {
 Ir.prototype.push = function(ir) {
 	this.code.push(ir);
 	this.last = ir;
+};
+
+Ir.isSwizzle = function(swz) {
+
+	if (swz.match(/[xyzw]+/)) {
+		return true;	
+	}
+
+	if (swz.match(/[rgba]+/)) {
+		return true;	
+	}
+
+	if (swz.match(/[stpq]+/)) {
+		return true;	
+	}
 };
 
 Ir.swizzles = ["xyzw", "rgba", "stpq"];
@@ -98,69 +149,61 @@ Ir.prototype.toString = function() {
  * @param   array       List of operands
  */
 Ir.prototype.build = function(code, oprds) {
-	var repl, dest, parts, i, j, oprd, ir, new_swz;
+	var dest, i, j, o, n, oprd, ir, new_swz;
 
+	//Parse operands
 	for (i = 0; i < oprds.length; i++) {
-		oprd = Ir.splitOperand(oprds[i]);
-		if (oprd[1]) {
+
+		oprd = new IrOperand(oprds[i]);
+
+		if (oprd.swizzle) {
+
 			//need a new temp to move the swizzle so our code pattern works
-			new_swz = swizzles[0].substring(0, oprd[1].length);
-			if (oprd[1] != new_swz) {
-				dest = this.getTemp('$tempv');
-				ir = new IrInstruction('MOV', util.format("%s.%s", dest, new_swz), oprd.join("."));
+			new_swz = swizzles[0].substring(0, oprd.swizzle.length);
+
+			if (oprd.swizzle != new_swz) {
+				dest = this.getTemp();
+				ir = new IrInstruction('MOV', util.format("%s.%s", dest, new_swz), oprd.full);
 				this.push(ir);
-				oprd[0] = dest;
+				oprd = new IrOperand(dest);
 			}
 		}
-		oprds[i] = oprd[0];	
+
+		oprds[i] = oprd;
 	}
 
-	repl = [];
-	for (i = oprds.length - 1; i >= 0; i--) {
-		repl.push({
-			s : new RegExp('%' + (i + 1), 'g'),
-			d : oprds[i]
-		});
-	}
-
+	//Merge template with passed operands
 	for (i = 0; i < code.length; i++) {
-		parts = code[i];
 
-		if (parts.substring(0, 4) == 'TEMP') {
-			repl.unshift({
-				s : new RegExp(parts.substring(5), 'g'),
-				d : this.getTemp('$tempv')
-			});
-			continue;
+		ir = new IrInstruction(code[i]);
+
+		//For each operand
+		for (j = 0; j < IrInstruction.operands.length; j++) {		
+			o = IrInstruction.operands[j];
+			oprd = ir[o];
+			if (oprd && (n = oprd.name.match(/%(\d)/))) {
+				n = parseInt(n[1]);
+				ir[o] = new IrOperand(oprds[n - 1].toString());
+				ir[o].addOffset(oprd.address);
+				ir[o].swizzle = oprd.swizzle;
+			}
 		}
 
-		for (j = 0; j < repl.length; j++) {
-			parts = parts.replace(repl[j].s, repl[j].d);
-		}
-
-		parts = parts.split(" ").join(",");
-
-		this.push(new IrInstruction(parts));
+		this.push(ir);
 	}
 };
+
 
 /**
- * Splits an operand into name and swizzle parts
+ * Ir Error Class
  *
- * @param   string      The operand
- *
- * @return  array       [name, swizzle]
+ * Used to differentiate between a compilation error and a compiler error
  */
-Ir.splitOperand = function(oprd) {
-	oprd = oprd.split(".");
-	if (!oprd[1] || oprd[1].match(/[xyzw]+/)) {
-		
-	} else {
-		oprd = [oprd.join(".")];
-	}
-	return oprd;
-};
-
+function IrError(msg) {
+	this.msg = msg;
+	this.ir = true;
+}
+IrError.prototype = Error.prototype;
 
 
 

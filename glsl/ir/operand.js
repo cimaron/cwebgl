@@ -47,14 +47,14 @@ IrOperand.prototype.parse = function(str) {
 	//extract and check for swizzle at end
 	parts = str.split('.');
 	swz = parts.pop();
-	if (!swz.match(/^([xyzw]+|[rgba]+)$/)) {
+	if (!swz.match(/^([xyzw]+|[rgba]+|[stpq]+)$/)) {
 		parts.push(swz);
 		swz = "";
 	}
-	swz = swz.replace(/r/g, 'x');
-	swz = swz.replace(/g/g, 'y');
-	swz = swz.replace(/b/g, 'z');
-	swz = swz.replace(/a/g, 'w');
+	swz = swz.replace(/[xrs]/g, 'x');
+	swz = swz.replace(/[ygt]/g, 'y');
+	swz = swz.replace(/[zbp]/g, 'z');
+	swz = swz.replace(/[waq]/g, 'w');
 	this.swizzle = swz;
 
 	//now split the rest
