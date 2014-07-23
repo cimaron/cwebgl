@@ -19,27 +19,17 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+/**
+ * cWebGLFramebuffer class
+ */
+function cWebGLFramebuffer(context) {
+	cWebGLObject.call(this, context);
 
-cWebGLFramebuffer = (function() {
+	var framebuffers = [];
+	cnvgl.setContext(context._context);
+	cnvgl.genFramebuffers(1, framebuffers);
+	this.setObject(framebuffers[0][0]);
+}
 
-	function Initializer() {
-		cWebGLObject.Initializer.apply(this);
-		//public:
-	}
-
-	var cWebGLFramebuffer = jClass('cWebGLFramebuffer', Initializer, cWebGLObject);
-
-	//public:
-
-	cWebGLFramebuffer.cWebGLFramebuffer = function(context) {
-		var framebuffers = [];
-		this.cWebGLObject(context);
-		cnvgl.setContext(context._context);
-		cnvgl.genFramebuffers(1, framebuffers);
-		this.setObject(framebuffers[0][0]);
-	};
-
-	return cWebGLFramebuffer.Constructor;
-
-}());
+util.inherits(cWebGLFramebuffer, cWebGLObject);
 

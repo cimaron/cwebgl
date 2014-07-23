@@ -19,37 +19,19 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-cWebGL.Driver = (function() {
-
-	function Initializer() {
-		this.canvas = null;
-		this.config = null;
-		this.compileStatus = null;
-		this.compileErrors = "";
-		this.linkStatus = null;
-		this.linkErrors = "";
-
-		this.ready = false;
-	}
-
-	var Driver = jClass('Driver', Initializer);
-
-	//static:
-
-	Driver.Static.test = function() {
-		return false;
-	};
-
-	//public:
-
-	Driver.Driver = function(canvas, config) {
-		this.canvas = canvas;
-		this.config = config;
-	};
-
-	return Driver.Constructor;
+function cWebGLDriver(canvas, config) {
 	
-}());
+	this.canvas = canvas;
+	this.config = config;
 
-include('drivers/program.js');
+	this.compileStatus = null;
+	this.compileErrors = "";
+	this.linkStatus = null;
+	this.linkErrors = "";
+
+	this.ready = false;	
+}
+
+
+//include('drivers/program.js');
 

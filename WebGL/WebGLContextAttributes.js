@@ -19,39 +19,23 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+/**
+ * cWebGLContextAttributes class
+ */
+function cWebGLContextAttributes(req) {
+	var i;
 
-cWebGLContextAttributes = (function() {
-						  
-	function Initializer() {
-		//public:
-		this.alpha = null;
-		this.depth = null;
-		this.stencil = null;
-		this.antialias = null;
-		this.premultipliedAlpha = null;
-		this.preserveDrawingBuffer = null;	
-	}
-
-	var cWebGLContextAttributes = jClass('cWebGLContextAttributes', Initializer);
+	this.alpha = true;
+	this.depth = true;
+	this.stencil = true;
+	this.antialias = true;
+	this.premultipliedAlpha = true;
+	this.preserveDrawingBuffer = true;
 	
-	//public:
-	
-	cWebGLContextAttributes.cWebGLContextAttributes = function(req) {
-		var i;
-		this.alpha = true;
-		this.depth = true;
-		this.stencil = true;
-		this.antialias = true;
-		this.premultipliedAlpha = true;
-		this.preserveDrawingBuffer = true;
-		for (i in req) {
-			if (this[i]) {
-				this[i] = !!req[i];
-			}
+	for (i in req) {
+		if (this[i]) {
+			this[i] = !!req[i];
 		}
-	};
-
-	return cWebGLContextAttributes.Constructor;
-
-}());
+	}
+}
 

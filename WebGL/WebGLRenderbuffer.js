@@ -19,27 +19,20 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+/**
+ * cWebGLRenderbuffer class
+ */
+function cWebGLRenderbuffer(context) {
 
-cWebGLRenderbuffer = (function() {
+	cWebGLObject.call(this, context);
 
-	function Initializer() {
-		cWebGLObject.Initializer.apply(this);
-		//public:
-	}
+	var renderbuffers = [];
 
-	var cWebGLRenderbuffer = jClass('cWebGLRenderbuffer', Initializer, cWebGLObject);
+	cnvgl.setContext(context._context);
+	cnvgl.genRenderbuffers(1, renderbuffers);
+	
+	this.setObject(renderbuffers[0][0]);
+}
 
-	//public:
-
-	cWebGLRenderbuffer.cWebGLRenderbuffer = function(context) {
-		var renderbuffers = [];
-		this.cWebGLObject(context);
-		cnvgl.setContext(context._context);
-		cnvgl.genRenderbuffers(1, renderbuffers);
-		this.setObject(renderbuffers[0][0]);
-	};
-
-	return cWebGLRenderbuffer.Constructor;
-
-}());
+util.inherits(cWebGLRenderbuffer, cWebGLObject);
 

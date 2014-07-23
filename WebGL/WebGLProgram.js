@@ -19,39 +19,31 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+/**
+ * cWebGLProgram class
+ */
+function cWebGLProgram(context) {
 
-cWebGLProgram = (function() {
-						  
-	function Initializer() {
-		cWebGLObject.Initializer.apply(this);
-		this._activeAttribLocations = null;
-		this._linkStatus = null;
-		this._linkCount = null;
-		this._vertexShader = null;
-		this._fragmentShader = null;
-	}
+	cWebGLObject.call(this, context);
 
-	var cWebGLProgram = jClass('cWebGLProgram', Initializer, cWebGLObject);
-	
-	//public:
-	
-	cWebGLProgram.cWebGLProgram = function(context) {
-		this.cWebGLObject(context);
-		this._linkStatus = false;
-		this._linkCount = 0;
-		cnvgl.setContext(context._context);
-		this.setObject(cnvgl.createProgram());
-	};
+	this._activeAttribLocations = null;
+	this._vertexShader = null;
+	this._fragmentShader = null;
 
-	cWebGLProgram.getLinkCount = function() {
-		return this._linkCount;
-	};
+	this._linkStatus = false;
+	this._linkCount = 0;
 
-	cWebGLProgram.increaseLinkCount = function() {
-		this._linkCount++;
-	};
+	cnvgl.setContext(context._context);
+	this.setObject(cnvgl.createProgram());
+}
 
-	return cWebGLProgram.Constructor;
+util.inherits(cWebGLProgram, cWebGLObject);
 
-}());
+cWebGLProgram.prototype.getLinkCount = function() {
+	return this._linkCount;
+};
+
+cWebGLProgram.prototype.increaseLinkCount = function() {
+	this._linkCount++;
+};
 

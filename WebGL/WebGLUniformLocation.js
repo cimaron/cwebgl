@@ -19,40 +19,26 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+/**
+ * cWebGLUniformLocation class
+ */
+function cWebGLUniformLocation(program, location) {
+	this._program = program;
+	this._location = location;
+	this._linkCount = this._program.getLinkCount();
+}
 
-cWebGLUniformLocation = (function() {
-	
-	function Initializer() {
-		this._program = null;
-		this._location = null;
-		this._linkCount = null;
+cWebGLUniformLocation.prototype.program = function() {
+	if (this._program.getLinkCount() != this._linkCount) {
+		return 0;
 	}
+	return this._program;
+};
 
-	var cWebGLUniformLocation = jClass('cWebGLUniformLocation', Initializer);
-
-	//public:
-
-	cWebGLUniformLocation.cWebGLUniformLocation = function(program, location) {
-		this._program = program;
-		this._location = location;
-		this._linkCount = this._program.getLinkCount();
-	};
-
-	cWebGLUniformLocation.program = function() {
-		if (this._program.getLinkCount() != this._linkCount) {
-			return 0;
-		}
-		return this._program;
-	};
-
-	cWebGLUniformLocation.location = function() {
-		if (this._program.getLinkCount() != this._linkCount) {
-			throw new Error("Uniform no longer valid");	
-		}
-		return this._location;
-	};
-
-	return cWebGLUniformLocation.Constructor;
-
-}());
+cWebGLUniformLocation.prototype.location = function() {
+	if (this._program.getLinkCount() != this._linkCount) {
+		throw new Error("Uniform no longer valid");	
+	}
+	return this._location;
+};
 

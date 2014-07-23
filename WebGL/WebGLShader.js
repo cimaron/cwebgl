@@ -19,40 +19,31 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+/**
+ * cWebGLProgram class
+ */
+function cWebGLShader(context, type) {
 
-cWebGLShader = (function() {
+	cWebGLObject.call(this, context);
 	
-	function Initializer() {
-		cWebGLObject.Initializer.apply(this);
-		this._type = null;
-		this._source = null;
-	}
+	this._type = type;
+	this._source = '';
 
-	var cWebGLShader = jClass('cWebGLShader', Initializer, cWebGLObject);
+	cnvgl.setContext(context._context);
+	this.setObject(cnvgl.createShader(type));
+}
 
-	//public:
+util.inherits(cWebGLShader, cWebGLObject);
 
-	cWebGLShader.cWebGLShader = function(context, type) {
-		this.cWebGLObject(context);
-		this._type = type;
-		this._source = '';
-		cnvgl.setContext(context._context);
-		this.setObject(cnvgl.createShader(type));
-	};
+cWebGLShader.prototype.getType = function() {
+	return this._type;
+};
 
-	cWebGLShader.getType = function() {
-		return this._type;
-	};
+cWebGLShader.prototype.getSource = function() {
+	return this._source;	
+};
 
-	cWebGLShader.getSource = function() {
-		return this._source;	
-	};
-
-	cWebGLShader.setSource = function(source) {
-		this._source = source;
-	};
-
-	return cWebGLShader.Constructor;
-
-}());
+cWebGLShader.prototype.setSource = function(source) {
+	this._source = source;
+};
 

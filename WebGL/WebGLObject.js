@@ -19,36 +19,25 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+/**
+ * cWebGLObject class
+ */
+function cWebGLObject(context) {
+	this._context = context;
+	this._object = null;
+}
 
-cWebGLObject = (function() {
+cWebGLObject.prototype = {};
 
-	function Initializer() {
-		//public:
-		this._context = null;
-		this._object = null;	
-	}
+cWebGLObject.prototype.context = function() {
+	return this._context;
+};
 
-	var cWebGLObject = jClass('cWebGLObject', Initializer);
+cWebGLObject.prototype.object = function() {
+	return this._object;	
+};
 
-	//public:
+cWebGLObject.prototype.setObject = function(object) {
+	this._object = object;
+};
 
-	cWebGLObject.cWebGLObject = function(context) {
-		this._context = context;
-	};
-
-	cWebGLObject.context = function() {
-		return this._context;	
-	};
-
-	cWebGLObject.object = function() {
-		return this._object;	
-	};
-
-	cWebGLObject.setObject = function(object) {
-		this._object = object;
-	};
-
-	return cWebGLObject.Constructor;
-
-}());
-	
