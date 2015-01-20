@@ -152,7 +152,7 @@ cnvgl_rendering_primitive_triangle = (function() {
 			//Early depth test
 			//Need to add check for shader writing to depth value.
 			//If so, this needs to run after processing the fragment
-			if (state.depthTest == cnvgl.TRUE) {
+			if (state.depthTest) {
 				this.frag.gl_FragDepth = int.interpolateTriangle(this.v1.zw, this.v2.zw, this.v3.zw);
 				if (!this.renderer.checkDepth(state, i, this.frag.gl_FragDepth)) {
 					i++;
@@ -160,7 +160,11 @@ cnvgl_rendering_primitive_triangle = (function() {
 				}
 			}
 
-			int.interpolateVarying(state, this.v1, this.v2, this.v3, this.frag.attrib.data);
+			if (!this.frag.attrib) {
+				this.frag.attrib = new Float32Array(this.v1.varying);
+				this.frag.result = new Float32Array(this.v1.result);				
+			}
+			int.interpolateVarying(state, this.v1, this.v2, this.v3, this.frag.attrib);
 
 			this.renderer.fragment.process(state, this.frag);
 			this.renderer.fragment.write(state, i, this.frag);

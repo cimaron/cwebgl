@@ -43,10 +43,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		this.yc = 0;
 		this.zc = 0;
 		
-		this.i = 4 * i;
+		this.i = i;
 
 		//allocate memory
-		this.varying = cnvgl.malloc(GPU.shader.MAX_VARYING_VECTORS * 4, 4);
+		this.varying = null;
+		this.result = null;
 	};
 
 

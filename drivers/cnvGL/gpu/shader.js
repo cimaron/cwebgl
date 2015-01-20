@@ -34,36 +34,19 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	GPU.executeVertex = function(){};
 	GPU.executeFragment = function(){};
 
-	GPU.memory.temp = cnvgl.malloc(shader.MAX_TEMPORARIES * 4, 4);
-	cnvgl.memset(GPU.memory.temp, 0, 0);
-	GPU.memory.uniforms = cnvgl.malloc(shader.MAX_UNIFORMS * 4, 4);
-	cnvgl.memset(GPU.memory.uniforms, 0, 0);
-	GPU.memory.attributes = cnvgl.malloc(shader.MAX_VERTEX_ATTRIBS, 1);
-	cnvgl.memset(GPU.memory.attributes, 0, 0);
-	GPU.memory.result = cnvgl.malloc(3 * 4, 4);
-	cnvgl.memset(GPU.memory.result, 0, 0);
+	GPU.memory.attributes_src = cnvgl.malloc(shader.MAX_VERTEX_ATTRIBS, 1);
 
-	program = {};
-	vertex = {};
-	fragment = {};
-	result = {};
+	GPU.uploadShaders = function(state, prgm) {
 
-	//set up alias for use by shaders
-	temp = GPU.memory.temp;
-	program.local = GPU.memory.uniforms.data;
-	vertex.attrib = GPU.memory.attributes.data;
-	result.position = GPU.memory.result.data;
-	result.color = {};
-	result.color.primary = GPU.memory.result.data;
+		state.prgm = prgm;
 
-	GPU.uploadVertexShader = function(source) {
-		eval(source);
-		this.executeVertex = main;
-	};
+		this.executeVertex = prgm.vertex;
+		this.executeFragment = prgm.fragment;
 
-	GPU.uploadFragmentShader = function(source) {
-		eval(source);
-		this.executeFragment = main;
+		GPU.memory.uniforms = prgm.context.uniform_f32;
+		GPU.memory.attributes = prgm.context.attribute_f32;
+		GPU.memory.varying = prgm.context.varying_f32;
+		GPU.memory.result = prgm.context.result_f32;		
 	};
 
 	GPU.shader = shader;

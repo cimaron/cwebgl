@@ -116,12 +116,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		return true;
 	};
 		
-	GPU.commands.uploadProgram = function(ctx, cmd, name, data) {
-		if (name == 'vertex') {
-			GPU.uploadVertexShader(data);
-		} else {
-			GPU.uploadFragmentShader(data);
-		}
+	GPU.commands.uploadProgram = function(ctx, cmd, data) {
+		GPU.uploadShaders(ctx, data);
 		return true;
 	};
 
@@ -131,7 +127,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		ds = Math.ceil((data.length - si) / (size + stride)) * 4;
 		dest = cnvgl.malloc(ds, 1);
 
-		GPU.memory.attributes[location] = dest;
+		GPU.memory.attributes_src[location] = {
+			start : location * 4,
+			size : size,
+			stride : stride,
+			si : si,
+			data : dest
+		};
+		
 		c = 0;
 		for (i = 0; i < ds; i++) {
 
@@ -157,10 +160,19 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	};
 
 	GPU.commands.uploadUniforms = function(ctx, cmd, location, data, slots, components) {
-		var i;
+		var i, j, mem, row, s;
+
+		mem = GPU.memory.uniforms;
+		row = 4 * location;
+		s = 0;
+
 		for (i = 0; i < slots; i++) {
-			cnvgl.memcpy(GPU.memory.uniforms, (location + i) * 4, data, components, (components * i));
+			for (j = 0; j < components; j++) {
+				mem[row + j] = data[s++];
+			}
+			row += 4;
 		}
+
 		return true;
 	};
 

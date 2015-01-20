@@ -32,28 +32,32 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		texUnit[i] = null;
 	}
 
-	function tex(c, sampler, s, t, target) {
-		var texture, mipmap_level, img, img_w, img_h, img_d, i, u, v, a, b, i1;
+	function tex(c, ci, src, si, sampler, target) {
+		var texture, mipmap_level, img, img_w, img_h, img_d, i, u, v, a, b, i1, s, t;
+		
+		s = src[si];
+		t = src[si + 1];
+
 		target = 0;
 		mipmap_level = 0;
 
 		texture = texUnit[sampler];
 		
 		if (!texture) {
-			c[0] = 0;
-			c[1] = 0;
-			c[2] = 0;
-			c[3] = 1;
+			c[ci + 0] = 0;
+			c[ci + 1] = 0;
+			c[ci + 2] = 0;
+			c[ci + 3] = 1;
 			return;
 		}
 		
 		img = texture.images[mipmap_level];
 
 		if (!img) {
-			c[0] = 0;
-			c[1] = 0;
-			c[2] = 0;
-			c[3] = 1;
+			c[ci + 0] = 0;
+			c[ci + 1] = 0;
+			c[ci + 2] = 0;
+			c[ci + 3] = 1;
 			return;
 		}
 
@@ -81,10 +85,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				i = (vi * img_w + ui) * 4;
 				i1 = i + (img_w * 4);
 
-				c[0] = u0v0 * img_d[i    ] + u1v0 * img_d[i + 4] + u0v1 * img_d[i1    ] + u1v1 * img_d[i1 + 4];
-				c[1] = u0v0 * img_d[i + 1] + u1v0 * img_d[i + 5] + u0v1 * img_d[i1 + 1] + u1v1 * img_d[i1 + 5];
-				c[2] = u0v0 * img_d[i + 2] + u1v0 * img_d[i + 6] + u0v1 * img_d[i1 + 2] + u1v1 * img_d[i1 + 6];
-				c[3] = u0v0 * img_d[i + 3] + u1v0 * img_d[i + 7] + u0v1 * img_d[i1 + 3] + u1v1 * img_d[i1 + 7];
+				c[ci + 0] = u0v0 * img_d[i    ] + u1v0 * img_d[i + 4] + u0v1 * img_d[i1    ] + u1v1 * img_d[i1 + 4];
+				c[ci + 1] = u0v0 * img_d[i + 1] + u1v0 * img_d[i + 5] + u0v1 * img_d[i1 + 1] + u1v1 * img_d[i1 + 5];
+				c[ci + 2] = u0v0 * img_d[i + 2] + u1v0 * img_d[i + 6] + u0v1 * img_d[i1 + 2] + u1v1 * img_d[i1 + 6];
+				c[ci + 3] = u0v0 * img_d[i + 3] + u1v0 * img_d[i + 7] + u0v1 * img_d[i1 + 3] + u1v1 * img_d[i1 + 7];
 				
 				break;
 
@@ -99,17 +103,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					v--;
 				}
 				i = (v * img_w + u) * 4;
-				c[0] = img_d[i];
-				c[1] = img_d[i + 1];
-				c[2] = img_d[i + 2];
-				c[3] = img_d[i + 3];
+				c[ci + 0] = img_d[i];
+				c[ci + 1] = img_d[i + 1];
+				c[ci + 2] = img_d[i + 2];
+				c[ci + 3] = img_d[i + 3];
 		}
 
 	}
 
 	GPU.texture = texture;
 
-	GPU.shader.setTexFunc(tex);
+	GPU.tex = tex;
 
 	GPU.texture.upload = function(unit, texture_obj) {
 		texUnit[unit] = texture_obj;

@@ -43,7 +43,7 @@ function strip_comments($str) {
 	$in_single_string = 4;
 	$in_double_string = 8;
 
-	for ($i = 0; $i < strlen($str); $i++) {
+	for ($i = 0; $i < strlen($str) - 1; $i++) {
 
 		$c = $str[$i];
 		$la = $str[$i + 1];
@@ -117,7 +117,7 @@ function cWebGLIncludeFile($file) {
 	$output = preg_replace_callback('#include\(\'([^\']+)\'\);#', 'cWebGLIncludeCallback', $output);
 	$output = "//file: $file\n$output";
 	
-	$output = processCnvGLDefines($output);
+	//$output = processCnvGLDefines($output);
 	
 	return $output;
 }
@@ -152,8 +152,8 @@ function processCnvglDefines($str) {
 		$sub = $matches[0][0];
 		$start = $matches[0][1];
 		$name = $matches[1][0];
-		$value = $defines[$name];
 		if (isset($defines[$name])) {
+			$value = $defines[$name];
 			$str = substr_replace($str, $value, $start, strlen($sub));
 		} else {
 			$offset = ($matches[0][1] + strlen($sub));
@@ -165,7 +165,7 @@ function processCnvglDefines($str) {
 
 $include = 'cWebGLInclude';
 
-if (!$_SERVER['argv']) {
+if (!isset($_SERVER['argv'])) {
 	header('Content-Type: text/javascript');
 }
 if ($debug) { ?>

@@ -154,11 +154,27 @@ cWebGL.drivers.cnvGL = (function() {
 	};
 
 	DriverCnvGL.compileShader = function(ctx, shader, source, type) {
-		this.compileStatus = glsl.compile(source, type - cnvgl.FRAGMENT_SHADER);
-		this.compileLog = glsl.errors.join("\n");
+
+		var options, state;
+		
+		options = {};
+
+		switch (type) {
+			case cnvgl.FRAGMENT_SHADER:
+				options.target = glsl.target.fragment;
+				break;
+			case cnvgl.VERTEX_SHADER:
+				options.target = glsl.target.vertex;
+				break;
+		}
+
+		state = glsl.compile(source, options);
+
+		this.compileStatus = state.status;
+		this.compileLog = state.errors.join("\n");
 
 		if (this.compileStatus) {
-			shader.out = glsl.output;
+			shader.out = state;
 		}
 	};
 
@@ -236,40 +252,52 @@ cWebGL.drivers.cnvGL = (function() {
 	};
 
 	DriverCnvGL.link = function(ctx, program, shaders) {
-		var sh, i, j, unif, varying;
+
+		var i, code, prgm;
 		
-		sh = [];
+		prgm = new glsl.program();
+
 		for (i = 0; i < shaders.length; i++) {
-			sh[i] = shaders[i].out;	
+			code = shaders[i].out.getIR();
+			prgm.addObjectCode(code, shaders[i].out.options.target);
 		}
 
-		program.GLSL = glsl.link(sh);
+		if (prgm.error) {
+		
+			this.linkStatus = false;
+			this.linkLog = prgm.error.join("\n");
+			this.logError(this.program.error);
 
-		for (i = 0; i < sh.length; i++) {
-			if (sh[i].target == 0) {
-				program.fragmentProgram = sh[i].exec;
-			} else {
-				program.vertexProgram = sh[i].exec;	
+			return;
+		}
+
+		this.linkStatus = true;
+		this.linkLog = "";
+
+		prgm.setTexFunction(GPU.tex);		
+		prgm.build();
+
+		/*
+		var sh, j, unif, varying;
+		*/
+
+		program.exec = prgm;
+
+		program.attributes = prgm.symbols.attribute;
+		program.uniforms = prgm.symbols.uniform;
+		program.varying = prgm.symbols.varying;
+
+		var varying;
+		varying = new Array(GPU.shader.MAX_VARYING_VECTORS);
+
+		for (i in program.varying) {
+			for (j = 0; j < program.varying[i].slots; j++) {
+				varying[program.varying[i].pos + j] = program.varying[i].components;
 			}
 		}
 
-		this.linkStatus = program.GLSL.status;
-		this.linkLog = glsl.errors.join("\n");
-
-		if (this.linkStatus) {
-			program.attributes = program.GLSL.attributes.active;
-			program.uniforms = program.GLSL.uniforms.active;
-			program.varying = program.GLSL.varying.active;
-
-			varying = new Array(GPU.shader.MAX_VARYING_VECTORS);
-			for (i = 0; i < program.varying.length; i++) {
-				for (j = 0; j < program.varying[i].slots; j++) {
-					varying[program.varying[i].location + j] = program.varying[i].components;
-				}
-			}
-			for (i = 0; i < varying.length; i++) {
-				this.command('setArray', 'activeVarying', i, varying[i] || 0);
-			}
+		for (i = 0; i < varying.length; i++) {
+			this.command('setArray', 'activeVarying', i, varying[i] || 0);
 		}
 	};
 
@@ -331,8 +359,7 @@ cWebGL.drivers.cnvGL = (function() {
 	};
 
 	DriverCnvGL.useProgram = function(ctx, program) {
-		this.command('uploadProgram', 'fragment', program.fragmentProgram);
-		this.command('uploadProgram', 'vertex', program.vertexProgram);
+		this.command('uploadProgram', program.exec);
 	};
 
 	DriverCnvGL.texImage2D = function(ctx, target, unit, tex_obj) {

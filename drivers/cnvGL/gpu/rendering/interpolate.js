@@ -65,6 +65,7 @@ cnvgl_rendering_interpolate = (function() {
 		this.precompute();
 	};
 
+	/*
 	cnvgl_rendering_interpolate.interpolateAttributes = function(v1, v2, v3, dest) {
 		var attribute, vi, vl, vs;
 		for (v in this.attribute) {
@@ -77,12 +78,13 @@ cnvgl_rendering_interpolate = (function() {
 			}
 		}
 	};
+	*/
 
 	cnvgl_rendering_interpolate.interpolateVarying = function(state, v1, v2, v3, dest) {
 		var i;
 		for (i = 0; i < state.activeVarying.length; i++) {
 			if (state.activeVarying[i]) {
-				this.interpolateTriangleVector(v1.varying.data[i], v2.varying.data[i], v3.varying.data[i], dest[i], state.activeVarying[i]);
+				this.interpolateTriangleVector(v1.varying, v2.varying, v3.varying, dest, state.activeVarying[i], i * 4);
 			}
 		}
 	};
@@ -171,11 +173,11 @@ cnvgl_rendering_interpolate = (function() {
 		return v;
 	};
 
-	cnvgl_rendering_interpolate.interpolateTriangleVector = function(f1, f2, f3, dest, size) {
+	cnvgl_rendering_interpolate.interpolateTriangleVector = function(f1, f2, f3, dest, size, start) {
 		var i;
 		//todo: do a check that we need to interpolate at all
 		for (i = 0; i < size; i++) {
-			dest[i] = ((this.a * f1[i]) + (this.b * f2[i]) + (this.c * f3[i])) * this.t.p;
+			dest[start + i] = ((this.a * f1[start + i]) + (this.b * f2[start + i]) + (this.c * f3[start + i])) * this.t.p;
 		}
 	};
 

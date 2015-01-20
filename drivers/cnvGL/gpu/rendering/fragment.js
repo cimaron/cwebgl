@@ -35,38 +35,51 @@ cnvgl_rendering_fragment = (function() {
 		this.renderer = renderer;
 	};
 
+	cnvgl_rendering_fragment.loadAttributes = function(state, f) {
+		var attr, i, j;
+
+		for (i = 0; i < state.activeVarying.length; i++) {
+			attr = state.activeVarying[i];
+
+			if (attr) {
+				for (j = 0; j < attr; j++) {
+					GPU.memory.varying[4 * i + j] = f.attrib[4 * i + j];	
+				}
+			}
+		}
+	};
+
 	cnvgl_rendering_fragment.process = function(state, f) {
-		GPU.executeFragment(
-			GPU.memory.temp.data,
-			GPU.memory.uniforms.data,
-			f.attrib.data,
-			f.result.data
-		);
+		var i;
+
+		this.loadAttributes(state, f);
+		
+		GPU.executeFragment();
 	};
 
 	cnvgl_rendering_fragment.write = function(state, i, frag) {
-		var c_buffer, c, c_mask;
-
-		c_buffer = state.colorBuffer.data;
-
-		c = frag.result.data[2];
-		c_mask = state.colorMask;
+		var c_buffer, c, result, c_mask;
 
 		if (state.depthMask) {
 			state.depthBuffer[i] = frag.gl_FragDepth;
 		}
 
 		i <<= 2;
-		
-		c[0] *= 255;
-		c[1] *= 255;
-		c[2] *= 255;
-		c[3] *= 255;
+
+		result = GPU.memory.result;
+		c = frag.color;
+		c[0] = result[0] * 255;
+		c[1] = result[1] * 255;
+		c[2] = result[2] * 255;
+		c[3] = result[3] * 255;
+
+		c_buffer = state.colorBuffer.data;
 
 		if (state.blendEnabled) {
 			this.blend(state, c, c[0], c[1], c[2], c[3], c_buffer[i], c_buffer[i + 1], c_buffer[i + 2], c_buffer[i + 3]);
 		}
 
+		c_mask = state.colorMask;
 		c_buffer[i    ] = c_mask[0] & (c[0] + .5)|0; //round(frag.r)
 		c_buffer[i + 1] = c_mask[1] & (c[1] + .5)|0; //round(frag.g)
 		c_buffer[i + 2] = c_mask[2] & (c[2] + .5)|0; //round(frag.b)

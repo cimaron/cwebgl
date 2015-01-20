@@ -381,7 +381,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glLinkProgram.xml
 	 */
 	cnvgl.linkProgram = function(program) {
-		var ctx, program_obj, i, shaders, attrib, unif, attrib_obj, uniform_obj;
+		var ctx, program_obj, i, shaders, attrib, unif, attrib_obj, uniform_obj, driver_obj;
 	
 		//get program
 		ctx = cnvgl.getCurrentContext();
@@ -410,15 +410,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		if (program_obj.link_status) {
 
-			for (i = 0; i < program_obj.driverObj.attributes.length; i++) {
-				attrib = program_obj.driverObj.attributes[i];
-				attrib_obj = new cnvgl.program_var(attrib.name, attrib.type, attrib.location, attrib.slots, attrib.components);
+			driver_obj = program_obj.driverObj;
+
+			for (i in driver_obj.attributes) {
+				attrib = driver_obj.attributes[i];
+				attrib_obj = new cnvgl.program_var(attrib.name, attrib.type, attrib.pos, attrib.slots, attrib.components);
 				program_obj.addActiveAttribute(attrib_obj);
 			}
 
-			for (i = 0; i < program_obj.driverObj.uniforms.length; i++) {
-				unif = program_obj.driverObj.uniforms[i];
-				uniform_obj = new cnvgl.program_var(unif.name, unif.type, unif.location, unif.slots, unif.components);
+			for (i in driver_obj.uniforms) {
+				unif = driver_obj.uniforms[i];
+				uniform_obj = new cnvgl.program_var(unif.name, unif.type, unif.pos, unif.slots, unif.components);
 				program_obj.addActiveUniform(uniform_obj);
 			}	
 		}

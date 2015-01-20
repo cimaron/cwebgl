@@ -34,26 +34,39 @@ cnvgl_rendering_vertex = (function() {
 		this.renderer = renderer;
 	};
 
+	cnvgl_rendering_vertex.loadAttributes = function(state, n) {
+		var src, attr, i, j;
+		
+		src = GPU.memory.attributes_src;
+
+		for (i = 0; i < src.length; i++) {
+
+			attr = src[i];
+			
+			if (!attr) {
+				break;
+			}
+
+			for (j = 0; j < attr.size; j++) {
+				GPU.memory.attributes[attr.start + j] = attr.data[n * 4 + j];
+			}
+		}
+		
+	};
+
 	cnvgl_rendering_vertex.process = function(state, v) {
-		var position;
 
-		GPU.executeVertex(
-			GPU.memory.temp.data,
-			GPU.memory.uniforms.data,
-			GPU.memory.attributes,
-			v.i,
-			v.i + 1,
-			v.i + 2,
-			v.i + 3,
-			v.varying.data,
-			GPU.memory.result.data);
+		this.loadAttributes(state, v.i);
 
-		position = GPU.memory.result.data[0];
+		GPU.executeVertex();
 
-		v.x = position[0];
-		v.y = position[1];
-		v.z = position[2];
-		v.w = position[3];
+		v.varying = new Float32Array(GPU.memory.varying);
+		v.result = new Float32Array(GPU.memory.result);
+
+		v.x = v.result[0];
+		v.y = v.result[1];
+		v.z = v.result[2];
+		v.w = v.result[3];
 
 		//set normalized coordinates
 		if (v.w) {

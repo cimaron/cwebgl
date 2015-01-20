@@ -107,6 +107,8 @@ cnvgl_rendering_clipping = (function() {
 		int.setPoint(xw, yw);
 
 		vr = new cnvgl.vertex();
+		vr.varying = new Float32Array(v1.varying);
+		vr.result = new Float32Array(v1.result);
 
 		//we don't need to interpolate all values, only those used in the rest of the rendering pipeline
 		vr.xw = v1.xw * namt + v2.xw * amt;
@@ -117,7 +119,7 @@ cnvgl_rendering_clipping = (function() {
 
 		//interpolate
 		//int.interpolateAttributes(this.v1, this.v2, this.v3, vr);
-		int.interpolateVarying(state, this.v1, this.v2, this.v3, vr.varying.data);
+		int.interpolateVarying(state, this.v1, this.v2, this.v3, vr.varying);
 
 		return vr;
 	};

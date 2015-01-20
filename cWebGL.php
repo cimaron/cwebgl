@@ -31,8 +31,7 @@ $include('library/TypedArray/TypedArray.js');
 $include('cnvGL/cnvGL.js');
 
 //GLSL Library
-$include('glsl/ARB/ARB.js');
-$include('glsl/glsl.js');
+$include('external/glsl2js/glsl.js');
 
 //WebGL Library
 $include('WebGL/WebGLObject.js');

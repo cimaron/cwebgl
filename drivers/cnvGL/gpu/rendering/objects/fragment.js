@@ -24,8 +24,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 	cnvgl.fragment = function() {
-		this.attrib = cnvgl.malloc(GPU.shader.MAX_VARYING_VECTORS * 4, 4);
-		this.result = cnvgl.malloc(3 * 4, 4);
+		this.attrib = null;
+		this.result = null;
+		this.color = new Float32Array(4);
 	};
 
 
