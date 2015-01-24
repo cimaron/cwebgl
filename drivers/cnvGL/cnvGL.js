@@ -377,5 +377,5 @@ cWebGL.drivers.cnvGL = (function() {
 }());
 
 
-include('drivers/cnvGL/gpu/gpu.js');
+include('external/jsgpu/gpu.js');
 
