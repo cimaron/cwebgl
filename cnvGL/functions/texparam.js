@@ -46,9 +46,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				break;
 
 			case cnvgl.TEXTURE_MAG_FILTER:
-				texture_obj.min_filter = param;
+				texture_obj.mag_filter = param;
 				break;
-		}		
+		}
+
+		ctx.driver.texParameter(ctx, target, texture_obj, pname, param);
 	}
 
 

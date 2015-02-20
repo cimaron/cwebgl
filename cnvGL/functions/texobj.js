@@ -65,7 +65,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		texture_unit.current_texture[target] = texture_obj;
 
-		ctx.driver.bindTexture(ctx, unit, target, texture_obj);
+		ctx.driver.bindTexture(ctx, target, texture_obj);
 	};
 	
 	
@@ -78,15 +78,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glGenTextures.xml
 	 */
 	cnvgl.genTextures = function(n, textures) {
-	
-		var current, list, i, t, texture_obj;
+		var ctx, current, list, i, t, texture_obj;
 	
 		if (n < 0) {
 			cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
 			return;
 		}
 	
-		current = cnvgl.getCurrentContext().shared.texture_objects;
+		ctx = cnvgl.getCurrentContext();
+		current = ctx.shared.texture_objects;
 	
 		list = [];
 		for (i = 0; i < n; i++) {
@@ -94,7 +94,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			if (t == -1) {
 				t = current.length;
 			}
+
 			texture_obj = new cnvgl.texture_object(t, 0);
+			texture_obj.driverObj = ctx.driver.newTextureObject();
+
 			current[t] = texture_obj;
 			list[i] = t;
 		}

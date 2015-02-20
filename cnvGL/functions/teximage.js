@@ -39,7 +39,19 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Notes: See http://www.opengl.org/sdk/docs/man/xhtml/glTexImage2D.xml
 	 */
 	cnvgl.texImage2D = function(target, level, internalFormat, width, height, border, format, type, data) {
-		var ctx, unit, texture_unit, texture_obj, texture_img, size, a, n, s, k, size, group, j, src, dest;
+		var ctx;
+
+		ctx = cnvgl.getCurrentContext();
+
+		teximage(ctx, 2, target, level, internalFormat, width, height, 1, border, format, type, data);
+	};
+
+
+
+
+	function teximage(ctx, dims, target, level, internalFormat, width, height, depth, border, format, type, data) {
+
+		var unit, texture_unit, texture_obj, texture_img, size, a, n, s, k, size, group, j, src, dest;
 	
 		if (target != cnvgl.TEXTURE_1D
 			&& target != cnvgl.TEXTURE_2D
@@ -48,83 +60,20 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			cnvgl.throw_error(cnvgl.INVALID_ENUM, ctx);
 			return;
 		}
-	
-		ctx = cnvgl.getCurrentContext();
+
 		unit = ctx.texture.currentUnit;
 		texture_unit = ctx.texture.unit[unit];
 		texture_obj = texture_unit.current_texture[target];
-	
-		texture_img = new cnvgl.texture_image(texture_obj);
-	
+
+		texture_img = new cnvgl.texture_image();
+
 		texture_img.width = width;
 		texture_img.height = height;
 		texture_img.internalFormat = internalFormat;
-		
-		texture_obj.images.push(texture_img);
-	
-		//get bytes per group
-		switch (format) {
-			case cnvgl.RGB:
-				n = 3;
-				s = 3;
-				break;
-			case cnvgl.RGBA:
-				n = 4;
-				s = 4;
-				break;
-			case cnvgl.COLOR_INDEX:
-			case cnvgl.RED:
-			case cnvgl.GREEN:
-			case cnvgl.BLUE:
-			case cnvgl.ALPHA:
-			case cnvgl.INTENSITY:
-			case cnvgl.BGR:
-			case cnvgl.BGRA:
-			case cnvgl.LUMINANCE:
-			case cnvgl.LUMINANCE_ALPHA:
-			case cnvgl.DEPTH_COMPONENT:
-				throw new Error('glTextImage2D format not implemented');
-			default:		
-		}
-	
-		a = ctx.unpack.alignment;
-		if (s < a) {
-			k = a / s * Math.ceil(s * n * width / a);	
-		} else {
-			k = n * width;	
-		}
-		size = width * height * 4;
-	
-		texture_img.data = cnvgl.malloc(size, 1, Float32Array);
+		texture_obj.images[level] = texture_img;
 
-		group = [0, 0, 0, 1];
-		dest = 0;
-		for (i = 0; i < height; i++) {
-			for (j = 0; j < width; j++) {
-				src = (i * k) + (j * s);
-				switch (format) {
-					case cnvgl.RGB:
-						group[0] = data[src    ] / 255;
-						group[1] = data[src + 1] / 255;
-						group[2] = data[src + 2] / 255;
-						break;
-					case cnvgl.RGBA:
-						group[0] = data[src    ] / 255;
-						group[1] = data[src + 1] / 255;
-						group[2] = data[src + 2] / 255;
-						group[3] = data[src + 3] / 255;
-						break;
-				}
-				texture_img.data[dest++] = group[0];
-				texture_img.data[dest++] = group[1];
-				texture_img.data[dest++] = group[2];
-				texture_img.data[dest++] = group[3];
-			}
-		}
-
-		ctx.driver.texImage2D(ctx, target, unit, texture_img);
-	};
-
+		ctx.driver.texImage2D(ctx, target, level, internalFormat, width, height, depth, border, format, type, data, ctx.Unpack, texture_obj, texture_img);	
+	}
 
 }(cnvgl));
 

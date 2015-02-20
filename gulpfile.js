@@ -18,49 +18,49 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
+var del = require('del'),
+	gulp = require('gulp'),
+	//browserify = require('gulp-browserify'),
+	concat = require('gulp-concat'),
+	include = require('gulp-include'),
+	//jshint = require('gulp-jshint'),
+	rename = require('gulp-rename'),
+	uglify = require('gulp-uglify'),
+	wrap = require("gulp-wrap")
+	;
 
-cnvgl_rendering_culling = (function() {
+gulp.task('clean', function(cb) {
+    del(['build/*'], cb);
+});
 
-	function Initializer() {
-		//public:
-		this.renderer = null;
-	}
+/**
+ * Build
+ */
+gulp.task('driver-cnvgl', function() {
+	return gulp.src([
+		'drivers/cnvgl/**/*.js'
+		])
+		.pipe(concat('driver.cnvgl.js'))
+		.pipe(wrap('(function(){\n<%= contents %>\n})();\n\n'))
+		.pipe(rename('driver.cnvgl.js'))
+		.pipe(gulp.dest('build'))
+});
 
-	var cnvgl_rendering_culling = jClass('cnvgl_rendering_culling', Initializer);	
 
-	cnvgl_rendering_culling.cnvgl_rendering_culling = function(renderer) {
-		this.renderer = renderer;
-	};
+gulp.task('drivers', ['driver-cnvgl']);
 
-	cnvgl_rendering_culling.checkCull = function(state, prim) {
-		var dir;
-		if (state.cullFlag) {
 
-			//always cull if front and back
-			if (state.cullFaceMode == cnvgl.FRONT_AND_BACK) {
-				return true;	
-			}
+/**
+ * Final processing
+ */
+gulp.task('default', ['drivers']);
 
-			dir = this.getPolygonFaceDir(prim);
-			if (!(
-				(dir > 0 && (state.cullFlag == cnvgl.FALSE || state.cullFaceMode == cnvgl.FRONT)) ||
-				(dir < 0 && (state.cullFlag == cnvgl.FALSE || state.cullFaceMode == cnvgl.BACK)))) {
-				return true;
-			}
-		}
-		return false;
-	};
-
-	cnvgl_rendering_culling.getPolygonFaceDir = function(state, prim) {
-		var dir;
-		dir = prim.getDirection();
-		if (state.cullFrontFace == cnvgl.CCW) {
-			dir = -dir;
-		}
-		return dir;
-	};
-
-	return cnvgl_rendering_culling.Constructor;
-
-}());
+/**
+ * Watch
+ */
+gulp.task('watch', function() {
+    gulp.watch([
+        '**/*.js',
+    ], ['default']);
+});
 

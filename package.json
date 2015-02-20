@@ -1,0 +1,18 @@
+{
+  "name": "cwebgl",
+  "version": "0.1.0",
+  "description": "",
+  "author": "Cimaron Shanahan",
+  "license": "MIT License",
+  "main": "build/cwebgl.js",
+  "dependencies": {},
+  "devDependencies": {
+    "del": "^0.1.3",
+    "gulp": "^3.8.10",
+    "gulp-concat": "^2.4.1",
+    "gulp-include": "^1.1.0",
+    "gulp-rename": "^1.2.0",
+    "gulp-uglify": "^1.1.0",
+    "gulp-wrap": "^0.11.0"
+  }
+}

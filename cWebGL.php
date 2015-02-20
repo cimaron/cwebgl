@@ -23,6 +23,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 require_once dirname(__FILE__).'/include.php';
 
 //Extra Libraries
+$include('library/util.js');
 $include('library/jClass/jClass.js');
 $include('library/stdio/stdio.js');
 $include('library/TypedArray/TypedArray.js');
@@ -51,5 +52,7 @@ $include('cWebGL.js');
 $include('drivers/driver.js');
 //$include('drivers/WebGL/WebGL.js');
 //$include('drivers/Stage3D/Stage3D.js');
-$include('drivers/cnvGL/cnvGL.js');
+//$include('drivers/cnvGL/cnvGL.js');
+
+$include('build/driver.cnvgl.js');
 

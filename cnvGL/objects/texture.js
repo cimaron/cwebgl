@@ -29,26 +29,22 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	};
 	
 	cnvgl.texture_object = function(name, target) {
+
 		this.name = name;
 		this.target = target;
 	
 		this.min_filter = cnvgl.NEAREST_MIPMAP_LINEAR;
 		this.mag_filter = cnvgl.LINEAR;
-	
+
 		this.images = [];
 	};
 	
 	
-	cnvgl.texture_image = function(texture_object) {
-		this.texture_object = texture_object;
-	
+	cnvgl.texture_image = function() {	
 		this.width = 0;
 		this.height = 0;
-	
-		this.data = null;
 		this.internalFormat = null;
 	};
-
 
 }(cnvgl));
 
