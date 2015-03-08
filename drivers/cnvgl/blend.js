@@ -19,61 +19,45 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+proto.blendColor = function(ctx, r, g, b, a) {
+	this.command('set', 'blendColor', [r, g, b, a]);
+};
+
+proto.blendFunc = function(ctx, sfactor, dfactor) {
+	this.command('set', 'blendSrcA', sfactor);
+	this.command('set', 'blendSrcRGB', sfactor);
+	this.command('set', 'blendDestA', dfactor);
+	this.command('set', 'blendDestRGB', dfactor);
+};
+
 
 /**
- * Convert GL texture target to GPU texture target
+ * Set GPU blend equations
  */
-function getGPUTextureTarget(gl_target) {
-	var cnst = GPU.constants.texture.targets;
+proto.blendEquationSeparate = function(ctx, rgb, a) {
+	this.command('blendEqs', getGPUBlendEquation(rgb), getGPUBlendEquation(a));
+};
 
-	switch (gl_target) {
-
-		case cnvgl.TEXTURE_2D:
-			return cnst.texture_2D;
-	}
-
-	throw new Error("cnvGL.driver: Invalid texture target");
-}
 
 /**
- * Convert GL texture pixel format to gpu format
+ * Convert GL blend mode to GPU blend mode
  */
-function getGPUPixelFormat(format) {
-	var cnst = GPU.constants.texture.image.format;
+function getGPUBlendEquation(mode) {
+	var fns = GPU.constants.fragment.fn.blend;
 
-	switch (format) {
+	switch (mode) {
+
+		case cnvgl.FUNC_ADD:
+			return fns.eqAdd;
+
+		case cnvgl.FUNC_SUBTRACT:
+			return fns.eqSub;
 		
-		case cnvgl.RGB:
-			return cnst.rgb;
-
-		case cnvgl.RGBA:
-			return cnst.rgba;
+		case cnvgl.FUNC_REVERSE_SUBTRACT:
+			return fns.eqRevSub;
 	}
 
-	throw new Error("cnvGL.driver: Invalid pixel format");
+	throw new Error("cnvGL.driver: Invalid equation mode");
 }
 
-/**
- * Convert GL texture filter format to gpu format
- */
-function getGPUTextureFilter(filter) {
-	var cnst = GPU.constants.texture.func;
-
-	switch (filter) {
-		
-		case cnvgl.LINEAR:
-			return cnst.linear;
-
-		case cnvgl.NEAREST:
-			return cnst.nearest;
-		
-		case cnvgl.LINEAR_MIPMAP_NEAREST:
-			return cnst.linear_mipmap_nearest;
-
-		case cnvgl.NEAREST_MIPMAP_LINEAR:
-			return cnst.nearest_mipmap_linear;
-	}
-
-	throw new Error("cnvGL.driver: Invalid texture filter");
-}
 

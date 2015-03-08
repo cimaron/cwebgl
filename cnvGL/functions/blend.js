@@ -45,6 +45,41 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		ctx.driver.blendColor(ctx, red, green, blue, alpha);
 	};
 
+	/**
+	 * glBlendEquationSeparate - specify the equation used for both the RGB blend equation and the Alpha blend equation
+	 *
+	 * @var   GLenum   mode
+	 *
+	 * Notes: See https://www.khronos.org/opengles/sdk/docs/man/xhtml/glBlendEquation.xml
+	 */
+	cnvgl.blendEquation = function(mode) {
+		cnvgl.blendEquationSeparate(mode, mode);
+	};
+
+	/**
+	 * glBlendEquationSeparate - set the RGB blend equation and the alpha blend equation separately
+	 *
+	 * @var   GLenum   mode
+	 * @var   GLenum   mode
+	 *
+	 * Notes: See https://www.khronos.org/opengles/sdk/docs/man/xhtml/glBlendEquationSeparate.xml
+	 */
+	cnvgl.blendEquationSeparate = function(modeRGB, modeAlpha) {
+		var ctx;
+
+		ctx = cnvgl.getCurrentContext();
+		
+		//@todo: validate modes
+
+		if (ctx.color.blendEquationRGB == modeRGB && ctx.color.blendEquationA == modeAlpha) {
+			return;	
+		}
+
+		ctx.color.blendEquationRGB = modeRGB;
+		ctx.color.blendEquationA = modeAlpha;
+
+		ctx.driver.blendEquationSeparate(ctx, modeRGB, modeAlpha);
+	};
 
 	/**
 	 * glBlendFunc — specify pixel arithmetic
@@ -68,7 +103,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		
 		ctx.driver.blendFunc(ctx, sfactor, dfactor);
 	};
-
 
 	/**
 	 * glColorMask — enable and disable writing of frame buffer color components

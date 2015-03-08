@@ -113,16 +113,6 @@ proto.command = function() {
 	this.queue.enqueue(args);
 };
 
-proto.blendColor = function(ctx, r, g, b, a) {
-	this.command('set', 'blendColor', [r, g, b, a]);
-};
-
-proto.blendFunc = function(ctx, sfactor, dfactor) {
-	this.command('set', 'blendSrcA', sfactor);
-	this.command('set', 'blendSrcRGB', sfactor);
-	this.command('set', 'blendDestA', dfactor);
-	this.command('set', 'blendDestRGB', dfactor);
-};
 
 proto.clear = function(ctx, color, depth, stencil, mask) {
 	if (mask && cnvgl.COLOR_BUFFER_BIT) {

@@ -38,6 +38,7 @@ gulp.task('clean', function(cb) {
  */
 gulp.task('driver-cnvgl', function() {
 	return gulp.src([
+		'drivers/cnvgl/driver.js',
 		'drivers/cnvgl/**/*.js'
 		])
 		.pipe(concat('driver.cnvgl.js'))

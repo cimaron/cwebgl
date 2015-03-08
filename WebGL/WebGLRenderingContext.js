@@ -529,12 +529,19 @@ cWebGLRenderingContext = (function() {
 		cnvgl.blendColor(red, green, blue, alpha);
 	};
 
+	cWebGLRenderingContext.blendEquation = function(mode) {
+		cnvgl.setContext(this._context);
+		cnvgl.blendEquation(mode);
+	};
+
+	cWebGLRenderingContext.blendEquationSeparate = function(modeRGB, modeAlpha) {
+		cnvgl.setContext(this._context);
+		cnvgl.blendEquationSeparate(modeRGB, modeAlpha);
+	};
+
 	cWebGLRenderingContext.blendFunc = function(sfactor, dfactor) {
 		cnvgl.setContext(this._context);
 		cnvgl.blendFunc(sfactor, dfactor);
-	};
-
-	cWebGLRenderingContext.blendEquation = function() {
 	};
 
 	cWebGLRenderingContext.bufferData = function(target, data, usage) {
