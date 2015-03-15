@@ -24,12 +24,8 @@ proto.blendColor = function(ctx, r, g, b, a) {
 };
 
 proto.blendFunc = function(ctx, sfactor, dfactor) {
-	this.command('set', 'blendSrcA', sfactor);
-	this.command('set', 'blendSrcRGB', sfactor);
-	this.command('set', 'blendDestA', dfactor);
-	this.command('set', 'blendDestRGB', dfactor);
+	this.command('blendFunc', getGPUBlendFunction(sfactor), getGPUBlendFunction(dfactor));	
 };
-
 
 /**
  * Set GPU blend equations
@@ -43,21 +39,49 @@ proto.blendEquationSeparate = function(ctx, rgb, a) {
  * Convert GL blend mode to GPU blend mode
  */
 function getGPUBlendEquation(mode) {
-	var fns = GPU.constants.fragment.fn.blend;
 
 	switch (mode) {
 
 		case cnvgl.FUNC_ADD:
-			return fns.eqAdd;
+			return GPU.constants.fnBlendEqAdd;
 
 		case cnvgl.FUNC_SUBTRACT:
-			return fns.eqSub;
+			return GPU.constants.fnBlendEqSub;
 		
 		case cnvgl.FUNC_REVERSE_SUBTRACT:
-			return fns.eqRevSub;
+			return GPU.constants.fnBlendEqRevSub;
 	}
 
-	throw new Error("cnvGL.driver: Invalid equation mode");
+	throw new Error("cnvGL.driver: Invalid equation");
+}
+
+/**
+ * Convert GL blend mode to GPU blend mode
+ */
+function getGPUBlendFunction(fn) {
+
+	switch (fn) {
+
+		case cnvgl.ONE:
+			return GPU.constants.fnBlendFnOne;
+
+		case cnvgl.ZERO:
+			return GPU.constants.fnBlendFnZero;
+		
+		case cnvgl.SRC_ALPHA:
+			return GPU.constants.fnBlendFnSrcAlpha;
+
+		case cnvgl.ONE_MINUS_SRC_ALPHA:
+			return GPU.constants.fnBlendFnOneMinusSrcAlpha;
+
+		case cnvgl.DST_ALPHA:
+			return GPU.constants.fnBlendFnDestAlpha;
+
+		case cnvgl.ONE_MINUS_DST_ALPHA:
+			return GPU.constants.fnBlendFnOneMinusDestAlpha;
+	}
+
+	throw new Error("cnvGL.driver: Invalid function");
 }
 
 
