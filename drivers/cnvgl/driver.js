@@ -288,12 +288,9 @@ proto.link = function(ctx, program, shaders) {
 		prgm.addObjectCode(code, shaders[i].out.options.target);
 	}
 
-	if (prgm.errors) {
-	
+	if (prgm.errors.length) {
 		this.linkStatus = false;
 		this.linkLog = prgm.errors.join("\n");
-		this.logError(this.program.error);
-
 		return;
 	}
 
