@@ -26,7 +26,6 @@ require_once dirname(__FILE__).'/include.php';
 $include('library/util.js');
 $include('library/jClass/jClass.js');
 $include('library/stdio/stdio.js');
-$include('library/TypedArray/TypedArray.js');
 
 //cnvGL Library
 $include('cnvGL/cnvGL.js');
