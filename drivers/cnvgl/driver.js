@@ -24,6 +24,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * CnvGL Driver Class
  */
 function DriverCnvGL(canvas, config) {
+	var colorBuffer,
+	    depthBuffer,
+		stencilBuffer
+		;
+	
 	cWebGL.Driver.Initializer.apply(this);
 	
 	this.Driver(canvas, config);
@@ -34,9 +39,7 @@ function DriverCnvGL(canvas, config) {
 		this.width = canvas.width;
 		this.height = canvas.height;
 
-		this.colorBuffer = this._context2d.createImageData(this.width, this.height);
-		this.depthBuffer = cnvgl.malloc(this.width * this.height, 1, Float32Array);
-		this.stencilBuffer = cnvgl.malloc(this.width * this.height, 1, Uint8Array);
+		this.canvasBuffer = this._context2d.createImageData(this.width, this.height);
 
 		if (!GPU.renderer) {
 			GPU.renderer = new cnvgl_renderer();
@@ -44,9 +47,16 @@ function DriverCnvGL(canvas, config) {
 		this.queue = new GPU.CommandQueue(this);
 		this._context = GPU.createContext();
 
-		this.command('set', 'colorBuffer', this.colorBuffer);
-		this.command('set', 'depthBuffer', this.depthBuffer);
-		this.command('set', 'stencilBuffer', this.stencilBuffer);
+		//Create default buffers
+		colorBuffer = new GPU.ColorBuffer(this.width, this.height, 4);
+		colorBuffer.data = this.canvasBuffer.data;
+		this._context.colorBuffer = colorBuffer;
+
+		depthBuffer = new GPU.DepthBuffer(this.width, this.height);
+		this._context.depthBuffer = depthBuffer;
+
+		stencilBuffer = new GPU.ColorBuffer(this.width, this.height, 1);
+		this._context.stencilBuffer = stencilBuffer;
 
 		DriverCnvGL.animationFrameFunc = DriverCnvGL.requestAnimationFrame;
 	}
@@ -115,16 +125,18 @@ proto.command = function() {
 
 
 proto.clear = function(ctx, color, depth, stencil, mask) {
+
 	if (mask && cnvgl.COLOR_BUFFER_BIT) {
-		this.command('set', 'clearColor', color);
+		this.command('clearColorBuffer', color);
 	}
+
 	if (mask && cnvgl.DEPTH_BUFFER_BIT) {
-		this.command('set', 'clearDepth', depth);
+		this.command('clearDepthBuffer', depth);
 	}
+	
 	if (mask && cnvgl.STENCIL_BUFFER_BIT) {
-		this.command('set', 'clearStencil', stencil);
+		this.command('clearStencilBuffer', stencil);
 	}
-	this.command('clear', mask);
 };
 
 proto.colorMask = function(ctx, r, g, b, a) {
@@ -330,7 +342,7 @@ proto.polygonOffset = function(ctx, factor, units) {
 };
 
 proto.present = function() {
-	this._context2d.putImageData(this.colorBuffer, 0, 0);
+	this._context2d.putImageData(this.canvasBuffer, 0, 0);
 	DriverCnvGL.frameComplete();
 };
 
