@@ -309,7 +309,7 @@ proto.link = function(ctx, program, shaders) {
 	this.linkStatus = true;
 	this.linkLog = "";
 
-	prgm.setTexFunction(GPU.getTexFunction());		
+	prgm.setTexFunction2D(GPU.getTexFunction2D());
 	prgm.build();
 
 	/*
