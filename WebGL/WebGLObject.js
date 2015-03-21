@@ -19,36 +19,50 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+/**
+ * Interface WebGLObject
+ *
+ * @param   WebGLRenderingContext   context   The rendering context
+ */
+function cWebGLObject(context) {
 
-cWebGLObject = (function() {
+	this._context = context;
+	this._object = null;
+}
 
-	function Initializer() {
-		//public:
-		this._context = null;
-		this._object = null;	
-	}
 
-	var cWebGLObject = jClass('cWebGLObject', Initializer);
+var proto = cWebGLObject.prototype;
 
-	//public:
+/**
+ * Get context
+ *
+ * @protected
+ *
+ * @return  WebGLRenderingContext
+ */
+proto.context = function() {
+	return this._context;	
+};
 
-	cWebGLObject.cWebGLObject = function(context) {
-		this._context = context;
-	};
+/**
+ * Get internal gl object
+ *
+ * @protected
+ *
+ * @return  mixed
+ */
+proto.object = function() {
+	return this._object;	
+};
 
-	cWebGLObject.context = function() {
-		return this._context;	
-	};
+/**
+ * Set internal gl object
+ *
+ * @protected
+ *
+ * @param   mixed   object   The gl object
+ */
+proto.setObject = function(object) {
+	this._object = object;
+};
 
-	cWebGLObject.object = function() {
-		return this._object;	
-	};
-
-	cWebGLObject.setObject = function(object) {
-		this._object = object;
-	};
-
-	return cWebGLObject.Constructor;
-
-}());
-	

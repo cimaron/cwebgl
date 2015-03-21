@@ -20,39 +20,69 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-cWebGLUniformLocation = (function() {
-	
-	function Initializer() {
-		this._program = null;
-		this._location = null;
-		this._linkCount = null;
+/**
+ * Interface WebGLUniformLocation
+ *
+ * @param   cWebGLProgram   program    The program
+ * @param   int             location   The location
+ * @param   int             type       The type
+ */
+function cWebGLUniformLocation(program, location, type) {
+
+	this._program = program;
+	this._location = location;
+	this._type = type;
+
+	this._linkCount = this._program.getLinkCount();
+}
+
+var proto = cWebGLUniformLocation.prototype;
+
+/**
+ * Get program
+ *
+ * @protected
+ *
+ * @return   mixed
+ */
+proto.program = function() {
+
+	if (this._program.getLinkCount() != this._linkCount) {
+		return 0;
 	}
 
-	var cWebGLUniformLocation = jClass('cWebGLUniformLocation', Initializer);
+	return this._program;
+};
 
-	//public:
+/**
+ * Get location
+ *
+ * @protected
+ *
+ * @return   mixed
+ */
+proto.location = function() {
 
-	cWebGLUniformLocation.cWebGLUniformLocation = function(program, location) {
-		this._program = program;
-		this._location = location;
-		this._linkCount = this._program.getLinkCount();
-	};
+	if (this._program.getLinkCount() != this._linkCount) {
+		throw new Error("Uniform no longer valid");	
+	}
 
-	cWebGLUniformLocation.program = function() {
-		if (this._program.getLinkCount() != this._linkCount) {
-			return 0;
-		}
-		return this._program;
-	};
+	return this._location;
+};
 
-	cWebGLUniformLocation.location = function() {
-		if (this._program.getLinkCount() != this._linkCount) {
-			throw new Error("Uniform no longer valid");	
-		}
-		return this._location;
-	};
+/**
+ * Get type
+ *
+ * @protected
+ *
+ * @return   mixed
+ */
+proto.type = function() {
 
-	return cWebGLUniformLocation.Constructor;
+	if (this._program.getLinkCount() != this._linkCount) {
+		throw new Error("Uniform no longer valid");	
+	}
 
-}());
+	return this._type;
+};
 

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2011 Cimaron Shanahan
+Copyright (c) 2014 Cimaron Shanahan
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -19,24 +19,17 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+include('WebGL/WebGLRenderingContextBase.js');
+include('WebGL/defines.js');
+include('WebGL/WebGLObject.js');
 
-/**
- * Interface WebGLRenderbuffer
- *
- * @param   WebGLRenderingContext   context   The rendering context
- */
-function cWebGLRenderbuffer(context) {
-	var res;
-
-	cWebGLObject.apply(this, arguments);
-
-	res = [];
-	cnvgl.setContext(context._context);
-	cnvgl.genRenderbuffers(1, res);
-
-	this.setObject(res[0][0]);
-}
-
-util.inherits(cWebGLRenderbuffer, cWebGLObject);
-var proto = cWebGLRenderbuffer.prototype;
+include('WebGL/WebGLBuffer.js');
+include('WebGL/WebGLContextAttributes.js');
+include('WebGL/WebGLFramebuffer.js');
+include('WebGL/WebGLProgram.js');
+include('WebGL/WebGLShader.js');
+include('WebGL/WebGLTexture.js');
+include('WebGL/WebGLRenderbuffer.js');
+include('WebGL/WebGLRenderingContext.js');
+include('WebGL/WebGLUniformLocation.js');
 

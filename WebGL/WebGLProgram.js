@@ -19,39 +19,46 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+/**
+ * Interface WebGLProgram
+ *
+ * @param   WebGLRenderingContext   context   The rendering context
+ */
+function cWebGLProgram(context) {
 
-cWebGLProgram = (function() {
-						  
-	function Initializer() {
-		cWebGLObject.Initializer.apply(this);
-		this._activeAttribLocations = null;
-		this._linkStatus = null;
-		this._linkCount = null;
-		this._vertexShader = null;
-		this._fragmentShader = null;
-	}
+	cWebGLObject.apply(this, arguments);
 
-	var cWebGLProgram = jClass('cWebGLProgram', Initializer, cWebGLObject);
-	
-	//public:
-	
-	cWebGLProgram.cWebGLProgram = function(context) {
-		this.cWebGLObject(context);
-		this._linkStatus = false;
-		this._linkCount = 0;
-		cnvgl.setContext(context._context);
-		this.setObject(cnvgl.createProgram());
-	};
+	this._activeAttribLocations = null;
+	this._linkStatus = false;
+	this._linkCount = 0;
+	this._vertexShader = null;
+	this._fragmentShader = null;
 
-	cWebGLProgram.getLinkCount = function() {
-		return this._linkCount;
-	};
+	cnvgl.setContext(context._context);
+	this.setObject(cnvgl.createProgram());
+}
 
-	cWebGLProgram.increaseLinkCount = function() {
-		this._linkCount++;
-	};
+util.inherits(cWebGLProgram, cWebGLObject);
+var proto = cWebGLProgram.prototype;
 
-	return cWebGLProgram.Constructor;
 
-}());
+/**
+ * Get link count
+ *
+ * @protected
+ *
+ * @return  int
+ */
+proto.getLinkCount = function() {
+	return this._linkCount;
+};
+
+/**
+ * Increment link count
+ *
+ * @protected
+ */
+proto.increaseLinkCount = function() {
+	this._linkCount++;
+};
 

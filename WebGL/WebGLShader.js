@@ -19,40 +19,79 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+/**
+ * Interface WebGLShader
+ *
+ * @param   WebGLRenderingContext   context   The rendering context
+ * @param   int                     type      The shader type (FRAGMENT_SHADER, VERTEX_SHADER)
+ */
+function cWebGLShader(context, type) {
 
-cWebGLShader = (function() {
-	
-	function Initializer() {
-		cWebGLObject.Initializer.apply(this);
-		this._type = null;
-		this._source = null;
-	}
+	cWebGLObject.apply(this, arguments);
 
-	var cWebGLShader = jClass('cWebGLShader', Initializer, cWebGLObject);
+	this._type = type;
+	this._source = '';
+	this._isValid = false;
 
-	//public:
+	cnvgl.setContext(context._context);
+	this.setObject(cnvgl.createShader(type));
+}
 
-	cWebGLShader.cWebGLShader = function(context, type) {
-		this.cWebGLObject(context);
-		this._type = type;
-		this._source = '';
-		cnvgl.setContext(context._context);
-		this.setObject(cnvgl.createShader(type));
-	};
+util.inherits(cWebGLShader, cWebGLObject);
+var proto = cWebGLShader.prototype;
 
-	cWebGLShader.getType = function() {
-		return this._type;
-	};
+/**
+ * Get shader type
+ *
+ * @protected
+ *
+ * @return  int
+ */
+proto.getType = function() {
+	return this._type;
+};
 
-	cWebGLShader.getSource = function() {
-		return this._source;	
-	};
+/**
+ * Get shader source
+ *
+ * @protected
+ *
+ * @return  string
+ */
+proto.getSource = function() {
+	return this._source;	
+};
 
-	cWebGLShader.setSource = function(source) {
-		this._source = source;
-	};
+/**
+ * Set shader source
+ *
+ * @protected
+ *
+ * @param   string   source   The shader source
+ */
+proto.setSource = function(source) {
+	this._source = source;
+};
 
-	return cWebGLShader.Constructor;
+/**
+ * Get valid status
+ *
+ * @protected
+ *
+ * @return  bool
+ */
+proto.isValid = function() {
+	return this._isValid;
+};
 
-}());
+/**
+ * Set valid status
+ *
+ * @protected
+ *
+ * @param   bool   valid   Status
+ */
+proto.isValid = function(valid) {
+	this._isValid = valid;
+};
 

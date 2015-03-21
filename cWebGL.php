@@ -34,16 +34,7 @@ $include('cnvGL/cnvGL.js');
 $include('external/glsl2js/glsl.js');
 
 //WebGL Library
-$include('WebGL/WebGLObject.js');
-$include('WebGL/WebGLBuffer.js');
-$include('WebGL/WebGLContextAttributes.js');
-$include('WebGL/WebGLFramebuffer.js');
-$include('WebGL/WebGLProgram.js');
-$include('WebGL/WebGLShader.js');
-$include('WebGL/WebGLTexture.js');
-$include('WebGL/WebGLRenderbuffer.js');
-$include('WebGL/WebGLRenderingContext.js');
-$include('WebGL/WebGLUniformLocation.js');
+$include('WebGL/WebGL.js');
 
 $include('cWebGL.js');
 

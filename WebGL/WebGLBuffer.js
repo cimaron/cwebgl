@@ -19,29 +19,25 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+/**
+ * Interface WebGLBuffer
+ *
+ * @param   WebGLRenderingContext   context   The rendering context
+ */
+function cWebGLBuffer(context) {
+	var res;
 
-cWebGLBuffer = (function() {
- 
-	function Initializer() {
-		cWebGLObject.Initializer.apply(this);
-		this.target = null;
-	}
-	
-	var cWebGLBuffer = jClass('cWebGLBuffer', Initializer, cWebGLObject);
+	cWebGLObject.apply(this, arguments);
 
-	//public:
+	this.target = null;
 
-	cWebGLBuffer.cWebGLBuffer = function(context) {
-		var buffers = [];
-		this.cWebGLObject(context);
+	res = [];
+	cnvgl.setContext(context._context);
+	cnvgl.genBuffers(1, res);
 
-		cnvgl.setContext(context._context);
-		cnvgl.genBuffers(1, buffers);
+	this.setObject(res[0][0]);
+}
 
-		this.setObject(buffers[0][0]);
-	};
-
-	return cWebGLBuffer.Constructor;
-	
-}());
+util.inherits(cWebGLBuffer, cWebGLObject);
+var proto = cWebGLBuffer.prototype;
 

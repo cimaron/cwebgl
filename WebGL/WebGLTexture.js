@@ -19,27 +19,23 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+/**
+ * Interface WebGLTexture
+ *
+ * @param   WebGLRenderingContext   context   The rendering context
+ */
+function cWebGLTexture(context) {
+	var res;
 
-cWebGLTexture = (function() {
+	cWebGLObject.apply(this, arguments);
 
-	function Initializer() {
-		cWebGLObject.Initializer.apply(this);
-		//public:
-	}
+	res = [];
+	cnvgl.setContext(context._context);
+	cnvgl.genTextures(1, res);
 
-	var cWebGLTexture = jClass('cWebGLTexture', Initializer, cWebGLObject);
+	this.setObject(res[0][0]);
+}
 
-	//public:
-
-	cWebGLTexture.cWebGLTexture = function(context) {
-		var textures = [];
-		this.cWebGLObject(context);
-		cnvgl.setContext(context._context);
-		cnvgl.genTextures(1, textures);
-		this.setObject(textures[0][0]);
-	};
-
-	return cWebGLTexture.Constructor;
-
-}());
+util.inherits(cWebGLTexture, cWebGLObject);
+var proto = cWebGLTexture.prototype;
 

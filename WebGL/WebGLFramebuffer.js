@@ -20,26 +20,24 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-cWebGLFramebuffer = (function() {
 
-	function Initializer() {
-		cWebGLObject.Initializer.apply(this);
-		//public:
-	}
+/**
+ * Interface WebGLTexture
+ *
+ * @param   WebGLRenderingContext   context   The rendering context
+ */
+function cWebGLFramebuffer(context) {
+	var res;
 
-	var cWebGLFramebuffer = jClass('cWebGLFramebuffer', Initializer, cWebGLObject);
+	cWebGLObject.apply(this, arguments);
 
-	//public:
+	res = [];
+	cnvgl.setContext(context._context);
+	cnvgl.genFramebuffers(1, res);
 
-	cWebGLFramebuffer.cWebGLFramebuffer = function(context) {
-		var framebuffers = [];
-		this.cWebGLObject(context);
-		cnvgl.setContext(context._context);
-		cnvgl.genFramebuffers(1, framebuffers);
-		this.setObject(framebuffers[0][0]);
-	};
+	this.setObject(res[0][0]);
+}
 
-	return cWebGLFramebuffer.Constructor;
-
-}());
+util.inherits(cWebGLFramebuffer, cWebGLObject);
+var proto = cWebGLFramebuffer.prototype;
 

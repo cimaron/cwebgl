@@ -20,38 +20,29 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-cWebGLContextAttributes = (function() {
-						  
-	function Initializer() {
-		//public:
-		this.alpha = null;
-		this.depth = null;
-		this.stencil = null;
-		this.antialias = null;
-		this.premultipliedAlpha = null;
-		this.preserveDrawingBuffer = null;	
-	}
+/**
+ * Dictionary WebGLContextAttributes
+ *
+ * @param   object   req   
+ */
+function cWebGLContextAttributes(req) {
+	var i;
 
-	var cWebGLContextAttributes = jClass('cWebGLContextAttributes', Initializer);
-	
-	//public:
-	
-	cWebGLContextAttributes.cWebGLContextAttributes = function(req) {
-		var i;
-		this.alpha = true;
-		this.depth = true;
-		this.stencil = true;
-		this.antialias = true;
-		this.premultipliedAlpha = true;
-		this.preserveDrawingBuffer = true;
-		for (i in req) {
-			if (this[i]) {
-				this[i] = !!req[i];
-			}
+	this.alpha = true;
+	this.depth = true;
+	this.stencil = false;
+	this.antialias = true;
+	this.premultipliedAlpha = true;
+	this.preserveDrawingBuffer = false;
+	this.preferLowPowerToHighPerformance  = false;
+	this.failIfMajorPerformanceCaveat = false;
+
+	for (i in req) {
+		if (this.hasOwnProperty(i)) {
+			this[i] = req[i] ? true : false;
 		}
-	};
+	}
+}
 
-	return cWebGLContextAttributes.Constructor;
-
-}());
+var proto = cWebGLContextAttributes.prototype;
 
