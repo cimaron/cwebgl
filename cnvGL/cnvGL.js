@@ -76,7 +76,6 @@ include('cnvGL/defines.js');
 
 include('cnvGL/objects/attrib_array_object.js');
 include('cnvGL/objects/buffer.js');
-include('cnvGL/objects/constants.js');
 include('cnvGL/objects/context.js');
 include('cnvGL/objects/context_shared.js');
 include('cnvGL/objects/framebuffer.js');

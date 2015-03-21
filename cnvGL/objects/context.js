@@ -168,12 +168,29 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 			//direct
 			this.errorValue = cnvgl.NO_ERROR;
-			this.const = cnvgl.constants;
+			
+			this.initConst();
 	
 			//texture state
 			this.initFramebuffer();
 			this.initTextures();
 			this.initVertexAttribs();
+		};
+	
+		cnvgl_context.initConst = function() {
+
+			this.const.maxVarying = 0;
+			
+			this.const.vertexProgram = {
+				maxAttribs : 0,
+				maxUniformComponents : 0
+			};
+			
+			this.const.fragmentProgram = {
+				maxUniformComponents : 0
+			};
+			
+			this.driver.initContext(this, this.const);
 		};
 	
 		cnvgl_context.initFramebuffer = function(width, height) {
@@ -225,7 +242,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
 		cnvgl_context.initVertexAttribs = function() {
 			var i;
-			for (i = 0; i < this.const.maxVertexAttribs; i++) {
+			for (i = 0; i < this.const.vertexProgram.maxAttribs; i++) {
 				this.array.arrayObj.vertexAttrib[i] = new cnvgl.attrib_array_object();
 			}
 		};

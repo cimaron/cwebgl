@@ -36,7 +36,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		ctx = cnvgl.getCurrentContext();
 		i = texture - cnvgl.TEXTURE0;
 
-		if (i < 0 || i > (cnvgl.constants.maxTextureUnits - 1)) {
+		if (i < 0 || i > (ctx.const.maxTextureUnits - 1)) {
 			cnvgl.throw_error(cnvgl.INVALID_ENUM, ctx);
 			return;
 		}

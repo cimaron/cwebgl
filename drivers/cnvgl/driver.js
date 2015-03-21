@@ -290,10 +290,14 @@ proto.frontFace = function(ctx, mode) {
 };
 
 proto.link = function(ctx, program, shaders) {
-
 	var i, code, prgm;
-	
-	prgm = glsl.createProgram('js');
+
+	prgm = glsl.createProgram('js', {
+		max_vertex_attribute_vectors : GPU.capabilities.vertex_attribute_vectors,
+		max_vertex_uniform_vectors   : GPU.capabilities.vertex_uniform_vectors,
+		max_varying_vectors          : GPU.capabilities.varying_vectors,
+		max_fragment_uniform_vectors : GPU.capabilities.fragment_uniform_vectors
+	});
 
 	for (i = 0; i < shaders.length; i++) {
 		code = shaders[i].out.getIR();
@@ -323,7 +327,7 @@ proto.link = function(ctx, program, shaders) {
 	program.varying = prgm.symbols.varying;
 
 	var varying;
-	varying = new Array(GPU.constants.program.max_varying_vectors);
+	varying = new Array(GPU.capabilities.varying_vectors);
 
 	for (i in program.varying) {
 		for (j = 0; j < program.varying[i].slots; j++) {

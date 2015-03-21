@@ -56,7 +56,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		ctx = cnvgl.getCurrentContext();
 	
 		//out of bounds
-		if (index >= ctx.const.maxVertexAttribs || index < 0) {
+		if (index >= ctx.const.vertexProgram.maxAttribs || index < 0) {
 			cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
 			return;
 		}
@@ -80,7 +80,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		ctx = cnvgl.getCurrentContext();
 	
 		//out of bounds
-		if (index >= ctx.const.maxVertexAttribs || index < 0) {
+		if (index >= ctx.const.vertexProgram.maxAttribs || index < 0) {
 			cnvgl.throw_error(cnvgl.INVALID_VALUE, ctx);
 			return;
 		}
