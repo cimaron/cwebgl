@@ -32,7 +32,7 @@ cWebGLRenderingContext = (function() {
 		this._initialized = false;
 
 		this._state = {};
-		this.errors = [];
+		this.errors = this.NO_ERROR;
 	}
 
 	var cWebGLRenderingContext = jClass('cWebGLRenderingContext', Initializer);
@@ -490,11 +490,11 @@ cWebGLRenderingContext = (function() {
 	cWebGLRenderingContext.bindBuffer = function(target, buffer) {
 		
 		if (buffer && buffer.target && buffer.target != target) {
-			this.errors.push(this.INVALID_OPERATION);
+			this.addError(this.INVALID_OPERATION);
 			return;
 		}
 		if (target != this.ARRAY_BUFFER && target != this.ELEMENT_ARRAY_BUFFER) {
-			this.errors.push(this.INVALID_OPERATION);
+			this.addError(this.INVALID_OPERATION);
 			return;
 		}
 
@@ -554,7 +554,7 @@ cWebGLRenderingContext = (function() {
 			size = data.byteLength;
 		}
 		if (!size) {
-			this.errors.push(this.INVALID_VALUE);
+			this.addError(this.INVALID_VALUE);
 			return;
 		}
 
@@ -566,7 +566,7 @@ cWebGLRenderingContext = (function() {
 		var size;
 		size = data.byteLength;
 		if (!size) {
-			this.errors.push(this.INVALID_VALUE);
+			this.addError(this.INVALID_VALUE);
 			return;
 		}
 		cnvgl.setContext(this._context);
@@ -727,15 +727,56 @@ cWebGLRenderingContext = (function() {
 		return this.attr;
 	};
 
+	/**
+	 * Get last error
+	 *
+	 * @return  int
+	 */
 	cWebGLRenderingContext.getError = function() {
-		if (this.errors.length > 0) {
-			return this.errors.shift();	
+		var err;
+
+		if (this.error != this.NO_ERROR) {
+			err = this.error;
+			this.error = this.NO_ERROR;
+			return err;
 		}
+
 		cnvgl.setContext(this._context);
+
 		return cnvgl.getError();
 	};
 
+	/**
+	 * Return the value for the passed pname.
+	 *
+	 * @param   int   pname   Name
+	 *
+	 * @return  int
+	 */
 	cWebGLRenderingContext.getParameter = function(pname) {
+		var ret;
+		ret = [];
+
+		cnvgl.setContext(this._context);
+
+		switch (pname) {
+
+			case this.MAX_FRAGMENT_UNIFORM_VECTORS:
+			case this.MAX_VARYING_VECTORS:
+			case this.MAX_VERTEX_ATTRIBS:
+			case this.MAX_VERTEX_UNIFORM_VECTORS:
+
+				cnvgl.getIntegerv(pname, ret);
+				
+				if (ret.length > 0) {
+					return ret[0];
+				}
+				
+				return null;
+		}
+
+		this.addError(this.INVALID_ENUM);
+
 		return null;
 	};
 
@@ -1015,7 +1056,7 @@ cWebGLRenderingContext = (function() {
 		}
 
 		if (!(l instanceof cWebGLUniformLocation)) {
-			this.errors.push(this.INVALID_OPERATION);
+			this.addError(this.INVALID_OPERATION);
 			return true;
 		}
 
@@ -1041,6 +1082,29 @@ cWebGLRenderingContext = (function() {
 	cWebGLRenderingContext.initialize = function() {
 		cnvgl.setContext(this._context);
 		cnvgl.viewport(0, 0, this.canvas.width, this.canvas.height);
+	};
+
+	cWebGLRenderingContext.isContextLost = function() {
+		return false;	
+	};
+
+	/**
+	 * Add an error to the local stack iff one does not already exist either locally or in gl context
+	 *
+	 * @param   int   err
+	 */
+	cWebGLRenderingContext.addError = function(err) {
+
+		if (this.error != this.NO_ERROR) {
+			return;	
+		}
+		
+		cnvgl.setContext(this._context);
+		this.error = cnvgl.getError();
+		
+		if (this.error == this.NO_ERROR) {
+			this.error = err;	
+		}
 	};
 
 	return cWebGLRenderingContext.Constructor;

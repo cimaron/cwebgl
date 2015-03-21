@@ -23,15 +23,31 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 	function cnvgl_get(pname, params) {
+		var ctx;
+
+		ctx = cnvgl.getCurrentContext();
+
 		switch (pname) {
+
+			case cnvgl.MAX_FRAGMENT_UNIFORM_VECTORS:
+				params[0] = ctx.const.fragmentProgram.maxUniformComponents;
+				break;
+
+			case cnvgl.MAX_VARYING_VECTORS:
+				params[0] = ctx.const.maxVarying;
+				return;
+
 			case cnvgl.MAX_VERTEX_ATTRIBS:
-				params[0] = GPU.shader.MAX_VERTEX_ATTRIBS;
+				params[0] = ctx.const.vertexProgram.maxAttribs;
 				return;
-			case cnvgl.MAX_FRAGMENT_UNIFORM_COMPONENTS:
-				params[0] = GPU.shader.MAX_FRAGMENT_UNIFORM_COMPONENTS;
-				return;
+
+			case cnvgl.MAX_VERTEX_UNIFORM_VECTORS:
+				params[0] = ctx.const.vertexProgram.maxUniformComponents;
+				break;
+
 			default:
-				console.log('glGet(): pname not implemented yet', pname);
+				cnvgl.throw_error(cnvgl.INVALID_ENUM, ctx);
+				return;
 		}
 	}
 
